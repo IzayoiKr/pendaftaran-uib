@@ -1,0 +1,17 @@
+backend/tmp/
+backend/.env
+backend/coverage/
+backend/*.exe
+backend/*.exe~
+backend/*.test
+backend/*.out
+
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+.DS_Store
+Thumbs.db
+
