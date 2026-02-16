@@ -1,3 +1,5 @@
+tmp/
+
 backend/tmp/
 backend/.env
 backend/coverage/
