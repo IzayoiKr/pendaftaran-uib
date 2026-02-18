@@ -35,8 +35,6 @@ services:
             SERVER_PORT: 8888
         ports:
             - "8888:8888"
-        command: >
-            sh -c "until pg_isready -h postgres -U admin; do sleep 2; done && /root/server"
 
     frontend:
         build: ./frontend
