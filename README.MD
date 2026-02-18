@@ -30,8 +30,8 @@ Make sure the following tools are installed:
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/university-registration.git
-cd university-registration
+git clone https://github.com/IzayoiKr/pendaftaran-uib.git
+cd pendaftaran-uib
 ```
 
 ## Option A: Local Development (without Docker)
