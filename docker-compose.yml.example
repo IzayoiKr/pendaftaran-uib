@@ -1,0 +1,47 @@
+services:
+    postgres:
+        image: postgres:15
+        container_name: postgres-pendaftaran-uib
+        environment:
+            POSTGRES_USER: admin
+            POSTGRES_PASSWORD: babualdo
+            POSTGRES_DB: pendaftaran-uib-db
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/postgres_data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U admin -d pendaftaran-uib-db"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    backend:
+        build: ./backend
+        container_name: backend-pendaftaran-uib
+        depends_on:
+            postgres:
+                condition: service_healthy
+        environment:
+            DB_HOST: postgres
+            DB_PORT: 5432
+            DB_USER: admin
+            DB_PASSWORD: "babualdo"
+            DB_NAME: pendaftaran-uib-db
+            DB_SSLMODE: disable
+            # `openssl rand -base64 32`
+            JWT_SECRET: add-your-secret-key-here
+            SERVER_PORT: 8888
+        ports:
+            - "8888:8888"
+
+    frontend:
+        build: ./frontend
+        container_name: frontend-pendaftaran-uib
+        ports:
+            - "8989:8989"
+        depends_on:
+            - backend
+
+volumes:
+    postgres_data:
