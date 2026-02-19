@@ -154,13 +154,13 @@ sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 **Start Docker and enable it to run at boot**
-```
+```bash
 sudo service docker start
 # (Optional) To have Docker start automatically whenever you open WSL, add the start command to your shell profile (~/.bashrc or ~/.zshrc)
 echo 'sudo service docker start' >> ~/.bashrc
 ```
 **Add your user to the `docker` group (so you can run `docker` without `sudo`)**
-```
+```bash
 sudo usermod -aG docker $USER
 ```
 **Log out of WSL (type `exit` or `Ctrl+D`) and restart your WSL terminal for the group change to take effect. You can also run `newgrp docker` in the current session.**
