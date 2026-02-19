@@ -131,30 +131,51 @@ cd frontend
 npm install
 npm run dev
 ```
-The Vite dev server will start on http://localhost:5173 (or another port if 5173 is busy).
+The Vite dev server will start on http://localhost:8989.
 It proxies API requests starting with /api to the backend at http://localhost:8888.
 
-Open http://localhost:5173 in your browser.
+Open http://localhost:8989 in your browser.
 
 ## Option B: Run Everything with Docker (using WSL2)
 This method builds and runs the entire stack (PostgreSQL, Go backend, React frontend) in containers.
 
-### 2. Setup Docker in WSL2
+### 1. Setup Docker in WSL2
 ```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install docker
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
+**Start Docker and enable it to run at boot**
+```
+sudo service docker start
+# (Optional) To have Docker start automatically whenever you open WSL, add the start command to your shell profile (~/.bashrc or ~/.zshrc)
+echo 'sudo service docker start' >> ~/.bashrc
+```
+**Add your user to the `docker` group (so you can run `docker` without `sudo`)**
+```
+sudo usermod -aG docker $USER
+```
+**Log out of WSL (type `exit` or `Ctrl+D`) and restart your WSL terminal for the group change to take effect. You can also run `newgrp docker` in the current session.**
+> After this, don't forget to git clone repo.
 
-### 3. Environment variables for docker
+### 2. Environment variables for docker
 Docker Compose reads environment variables from the `docker-compose.yml` file. The backend service is configured with these values:
 *   `DB_HOST=postgres`
 *   `DB_USER=admin`
 *   `DB_PASSWORD="babualdo"`
-*   `JWT_SECRET=your-very-secret-key-change-this` – you should change this in the `docker-compose.yml` before running.
+*   `JWT_SECRET=your-very-secret-key-change-this` – you should change this in the `docker-compose.yml.example` and rename it to `docker-compose.yml` before running.
 
 If you want to override any variable, you can create a `.env` file in the **project root** (not inside `backend`) with the same keys. Docker Compose will automatically pick it up.
 
-### 4. Build and start the containers
+### 3. Build and start the containers
 In the **project root** (where `docker-compose.yml` is located), run:
 ```bash
 docker compose up --build
