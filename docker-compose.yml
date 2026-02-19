@@ -29,7 +29,7 @@ services:
             DB_PASSWORD: "babualdo"
             DB_NAME: pendaftaran-uib-db
             DB_SSLMODE: disable
-            JWT_SECRET: 9xlcpL1fp3VYFNYN19RlLhnMrrj9/S9b3BVz6SDWEzk=
+            JWT_SECRET: add-your-secret-key-here
             SERVER_PORT: 8888
         ports:
             - "8888:8888"
