@@ -1,6 +1,5 @@
-FROM node:alpine AS base
+FROM node:22-alpine AS base
 WORKDIR /app
-RUN chown -R node:node /app
 COPY package*.json ./
 
 FROM base AS development
