@@ -6,6 +6,12 @@ export default defineConfig({
     server: {
         host: true,
         port: 8989,
+        watch: {
+            usePolling: true,
+        },
+        hmr: {
+            clientPort: 8989,
+        },
         proxy: {
             '/api': 'http://localhost:8989'
         }

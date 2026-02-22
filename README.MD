@@ -128,6 +128,7 @@ The backend will start on http://localhost:8888.
 Open a new terminal (keep the backend running) and go to the `frontend` folder:
 ```bash
 cd frontend
+cp .env.example .env
 npm install
 npm run dev
 ```
@@ -169,11 +170,11 @@ sudo usermod -aG docker $USER
 ### 2. Environment variables for docker
 Docker Compose reads environment variables from the `docker-compose.yml` file. The backend service is configured with these values:
 *   `DB_HOST=postgres`
-*   `DB_USER=admin`
-*   `DB_PASSWORD="babualdo"`
-*   `JWT_SECRET=your-very-secret-key-change-this` – you should change this in the `docker-compose.yml.example` and rename it to `docker-compose.yml` before running.
+*   `DB_USER=${POSTGRES_USER}`
+*   `DB_PASSWORD=${POSTGRES_PASSWORD}`
+*   `JWT_SECRET=your-very-secret-key-change-this` – you should change this in the `.env.example` and rename it to `.env` before running.
 
-If you want to override any variable, you can create a `.env` file in the **project root** (not inside `backend`) with the same keys. Docker Compose will automatically pick it up.
+If you want to change any variable, you can change in `.env` file in the **project root** (not inside `backend`) with the same keys. Docker Compose will automatically pick it up.
 
 ### 3. Build and start the containers
 In the **project root** (where `docker-compose.yml` is located), run:

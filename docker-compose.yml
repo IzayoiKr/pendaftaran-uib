@@ -1,0 +1,65 @@
+services:
+    postgres:
+        image: postgres:15-alpine
+        container_name: postgres-pendaftaran-uib-dev
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_DB: ${POSTGRES_DB}
+        ports:
+            - ${postgres_ports}
+        volumes:
+            - postgres_data:/var/lib/postgresql/data:Z
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}",
+                ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    backend:
+        build:
+            context: ./backend
+            target: development
+        container_name: backend-pendaftaran-uib-dev
+        depends_on:
+            postgres:
+                condition: service_healthy
+        environment:
+            DB_HOST: postgres
+            DB_PORT: ${POSTGRES_PORT}
+            DB_USER: ${POSTGRES_USER}
+            DB_PASSWORD: ${POSTGRES_PASSWORD}
+            DB_NAME: ${POSTGRES_DB}
+            DB_SSLMODE: ${POSTGRES_SSLMODE}
+            # `openssl rand -base64 32`
+            JWT_SECRET: ${JWT_SECRET}
+            SERVER_PORT: ${SERVER_PORT}
+        ports:
+            - ${backend_ports}
+        volumes:
+            - ./backend:/app:z
+            - /app/tmp:Z
+        command: air -c .air.toml
+
+    frontend:
+        build:
+            context: ./frontend
+            target: development
+        container_name: frontend-pendaftaran-uib-dev
+        ports:
+            - ${frontend_ports}
+        volumes:
+            - ./frontend:/app:z
+            - /app/node_modules:Z
+        environment:
+            - NODE_ENV=development
+            - CHOKIDAR_USEPOLLING=true
+        depends_on:
+            - backend
+
+volumes:
+    postgres_data:
