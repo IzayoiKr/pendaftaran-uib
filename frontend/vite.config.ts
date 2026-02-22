@@ -13,8 +13,17 @@ export default defineConfig({
             clientPort: 8989,
         },
         proxy: {
-            '/api': 'http://localhost:8989'
+            '/api': 'http://localhost:8888'
         }
     },
-    plugins: [react()],
+    plugins: [
+        react({
+            babel: {
+                plugins: [
+                    ['babel-plugin-react-compiler', { target: '19' }]
+                ]
+            }
+        })
+    ]
 })
+
