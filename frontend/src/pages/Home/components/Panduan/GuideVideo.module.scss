@@ -1,0 +1,16 @@
+@import '../../../../styles/global.scss';
+
+.video {
+  h3 {
+    color: $secondary-color;
+    margin-bottom: 0.5rem;
+  }
+  p {
+    color: $text-color;
+    margin-bottom: 1rem;
+  }
+  iframe {
+    border-radius: 8px;
+  }
+}
+

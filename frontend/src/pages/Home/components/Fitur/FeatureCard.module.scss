@@ -1,0 +1,41 @@
+@import '../../../../styles/global.scss';
+
+.card {
+  background: $white;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transition: transform 0.3s;
+  &:hover {
+    transform: translateY(-5px);
+  }
+}
+
+.icon {
+  font-size: 3rem;
+  color: $primary-color;
+  margin-bottom: 1rem;
+}
+
+h4 {
+  color: $secondary-color;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+p {
+  color: $text-color;
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+}
+
+.link {
+  color: $primary-color;
+  font-weight: 600;
+  text-decoration: underline;
+  &:hover {
+    color: darken($primary-color, 15%);
+  }
+}
+

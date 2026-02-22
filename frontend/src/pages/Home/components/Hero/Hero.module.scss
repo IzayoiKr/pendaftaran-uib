@@ -1,0 +1,47 @@
+@import '../../../../styles/global.scss';
+
+.hero {
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('../../../../assets/hero-bg.jpg');
+  background-size: cover;
+  color: $white;
+  padding: 150px 0;
+  text-align: center;
+}
+
+.content {
+  max-width: 800px;
+  margin: 0 auto;
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+  }
+}
+
+.buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  a {
+    padding: 0.8rem 2rem;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: all 0.3s;
+    &.btn-primary {
+      background: $primary-color;
+      color: $secondary-color;
+    }
+    &.btn-outline {
+      border: 2px solid $white;
+      color: $white;
+      &:hover {
+        background: $white;
+        color: $secondary-color;
+      }
+    }
+  }
+}
+

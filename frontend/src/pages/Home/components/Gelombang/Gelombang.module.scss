@@ -1,0 +1,34 @@
+@import '../../../../styles/global.scss';
+
+.gelombang {
+  background: $secondary-color;
+  color: $white;
+  padding: 5rem 0;
+}
+
+.title {
+  @include section-title;
+  h2 {
+    color: $white;
+  }
+  hr {
+    border: 1px solid $primary-color;
+    width: 100px;
+    margin: 0.5rem auto;
+  }
+  .sub {
+    color: $primary-color;
+    font-size: 2rem;
+  }
+  p {
+    color: rgba(255,255,255,0.8);
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+

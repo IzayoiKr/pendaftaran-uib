@@ -1,0 +1,65 @@
+@import '../../styles/global.scss';
+
+.footer {
+  background: $secondary-color;
+  color: $white;
+  padding: 3rem 0 1rem;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.col {
+  h4 {
+    color: $primary-color;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+  }
+  ul {
+    list-style: none;
+    li {
+      margin-bottom: 0.5rem;
+      a {
+        color: $white;
+        &:hover {
+          color: $primary-color;
+        }
+      }
+    }
+  }
+  address {
+    font-style: normal;
+    line-height: 1.8;
+    a {
+      color: $primary-color;
+    }
+  }
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.social {
+  display: flex;
+  gap: 1.5rem;
+  a {
+    color: $white;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    &:hover {
+      color: $primary-color;
+    }
+  }
+}
+
