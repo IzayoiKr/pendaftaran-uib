@@ -1,8 +1,8 @@
-@import '../../styles/global.scss';
+@use '../../styles/global.scss';
 
 .footer {
-  background: $secondary-color;
-  color: $white;
+  background: global.$secondary-color;
+  color: global.$white;
   padding: 3rem 0 1rem;
 }
 
@@ -15,7 +15,7 @@
 
 .col {
   h4 {
-    color: $primary-color;
+    color: global.$primary-color;
     margin-bottom: 1rem;
     font-size: 1.2rem;
   }
@@ -24,9 +24,9 @@
     li {
       margin-bottom: 0.5rem;
       a {
-        color: $white;
+        color: global.$white;
         &:hover {
-          color: $primary-color;
+          color: global.$primary-color;
         }
       }
     }
@@ -35,7 +35,7 @@
     font-style: normal;
     line-height: 1.8;
     a {
-      color: $primary-color;
+      color: global.$primary-color;
     }
   }
 }
@@ -53,12 +53,12 @@
   display: flex;
   gap: 1.5rem;
   a {
-    color: $white;
+    color: global.$white;
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
     &:hover {
-      color: $primary-color;
+      color: global.$primary-color;
     }
   }
 }

@@ -1,7 +1,8 @@
-@import '../../../../styles/global.scss';
+@use "sass:color";
+@use '../../../../styles/global.scss';
 
 .card {
-  background: $white;
+  background: global.$white;
   padding: 2rem;
   border-radius: 8px;
   text-align: center;
@@ -14,28 +15,28 @@
 
 .icon {
   font-size: 3rem;
-  color: $primary-color;
+  color: global.$primary-color;
   margin-bottom: 1rem;
 }
 
 h4 {
-  color: $secondary-color;
+  color: global.$secondary-color;
   margin-bottom: 1rem;
   font-size: 1.3rem;
 }
 
 p {
-  color: $text-color;
+  color: global.$text-color;
   margin-bottom: 1.5rem;
   line-height: 1.7;
 }
 
 .link {
-  color: $primary-color;
+  color: global.$primary-color;
   font-weight: 600;
   text-decoration: underline;
   &:hover {
-    color: darken($primary-color, 15%);
+    color: color.adjust(global.$primary-color, $lightness: -15%);
   }
 }
 

@@ -1,7 +1,7 @@
-@import '../../styles/global.scss';
+@use '../../styles/global.scss';
 
 .header {
-  background: $white;
+  background: global.$white;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   position: sticky;
   top: 0;
@@ -24,10 +24,10 @@
   list-style: none;
   gap: 2rem;
   li a {
-    color: $secondary-color;
+    color: global.$secondary-color;
     font-weight: 500;
     &:hover {
-      color: $primary-color;
+      color: global.$primary-color;
     }
   }
 }

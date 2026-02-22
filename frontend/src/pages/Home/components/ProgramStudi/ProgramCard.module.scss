@@ -1,4 +1,4 @@
-@import '../../../../styles/global.scss';
+@use '../../../../styles/global.scss';
 
 .card {
   border: 1px solid #eee;
@@ -21,8 +21,8 @@
     padding: 1.5rem;
 
     .degree {
-      background: $primary-color;
-      color: $secondary-color;
+      background: global.$primary-color;
+      color: global.$secondary-color;
       padding: 0.2rem 0.8rem;
       border-radius: 20px;
       font-size: 0.8rem;
@@ -31,22 +31,22 @@
     }
 
     .faculty {
-      color: $text-color;
+      color: global.$text-color;
       font-size: 0.9rem;
     }
 
     h3 {
       margin: 1rem 0 0.5rem;
       a {
-        color: $secondary-color;
+        color: global.$secondary-color;
         &:hover {
-          color: $primary-color;
+          color: global.$primary-color;
         }
       }
     }
 
     p {
-      color: $text-color;
+      color: global.$text-color;
       font-size: 0.95rem;
       line-height: 1.6;
       display: -webkit-box;

@@ -1,11 +1,11 @@
-@import '../../../../styles/global.scss';
+@use '../../../../styles/global.scss';
 
 .panduan {
   padding: 5rem 0;
 }
 
 .title {
-  @include section-title;
+  @include global.section-title;
 }
 
 .grid {

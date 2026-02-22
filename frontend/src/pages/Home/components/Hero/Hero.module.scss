@@ -1,9 +1,9 @@
-@import '../../../../styles/global.scss';
+@use '../../../../styles/global.scss';
 
 .hero {
   background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('../../../../assets/hero-bg.jpg');
   background-size: cover;
-  color: $white;
+  color: global.$white;
   padding: 150px 0;
   text-align: center;
 }
@@ -31,15 +31,15 @@
     font-weight: 600;
     transition: all 0.3s;
     &.btn-primary {
-      background: $primary-color;
-      color: $secondary-color;
+      background: global.$primary-color;
+      color: global.$secondary-color;
     }
     &.btn-outline {
-      border: 2px solid $white;
-      color: $white;
+      border: 2px solid global.$white;
+      color: global.$white;
       &:hover {
-        background: $white;
-        color: $secondary-color;
+        background: global.$white;
+        color: global.$secondary-color;
       }
     }
   }

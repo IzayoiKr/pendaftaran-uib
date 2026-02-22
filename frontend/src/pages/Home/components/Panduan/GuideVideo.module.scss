@@ -1,12 +1,12 @@
-@import '../../../../styles/global.scss';
+@use '../../../../styles/global.scss';
 
 .video {
   h3 {
-    color: $secondary-color;
+    color: global.$secondary-color;
     margin-bottom: 0.5rem;
   }
   p {
-    color: $text-color;
+    color: global.$text-color;
     margin-bottom: 1rem;
   }
   iframe {

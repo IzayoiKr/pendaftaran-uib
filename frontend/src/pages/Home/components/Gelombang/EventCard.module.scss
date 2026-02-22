@@ -1,12 +1,13 @@
-@import '../../../../styles/global.scss';
+@use "sass:color";
+@use '../../../../styles/global.scss';
 
 
 .card {
   display: flex;
-  background: $white;
+  background: global.$white;
   border-radius: 8px;
   overflow: hidden;
-  color: $secondary-color;
+  color: global.$secondary-color;
 
   .image {
     flex: 0 0 200px;
@@ -24,7 +25,7 @@
   }
 
   .type {
-    color: $primary-color;
+    color: global.$primary-color;
     text-transform: uppercase;
     font-size: 1rem;
     margin-bottom: 0.5rem;
@@ -35,7 +36,7 @@
   }
 
   .program {
-    color: $primary-color;
+    color: global.$primary-color;
     text-transform: uppercase;
     margin-bottom: 0.25rem;
 
@@ -45,7 +46,7 @@
   }
 
   .year {
-    color: $primary-color;
+    color: global.$primary-color;
     margin-bottom: 1rem;
   }
 
@@ -55,8 +56,8 @@
     margin-bottom: 1rem;
 
     .date {
-      background: $primary-color;
-      color: $secondary-color;
+      background: global.$primary-color;
+      color: global.$secondary-color;
       padding: 0.5rem 1rem;
       border-radius: 4px;
       text-align: center;
@@ -72,7 +73,7 @@
     .timeLocation {
       p {
         margin: 0.25rem 0;
-        color: $text-color;
+        color: global.$text-color;
 
         i {
           margin-right: 0.5rem;
@@ -89,8 +90,8 @@
 
   .registerBtn {
     display: inline-block;
-    background: $primary-color;
-    color: $secondary-color;
+    background: global.$primary-color;
+    color: global.$secondary-color;
     padding: 0.5rem 1.5rem;
     border-radius: 4px;
     font-weight: 600;
@@ -98,7 +99,7 @@
     transition: background 0.3s;
 
     &:hover {
-      background: darken($primary-color, 10%);
+      background: color.adjust(global.$primary-color, $lightness: -10%);
     }
   }
 }
