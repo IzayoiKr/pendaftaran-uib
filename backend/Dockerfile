@@ -1,8 +1,6 @@
 FROM golang:1.25-alpine AS base
 RUN apk --no-cache add ca-certificates postgresql-client curl bash
 WORKDIR /app
-RUN adduser -D appuser && chown -R appuser /app
-USER appuser
 
 FROM base AS dependency
 COPY go.mod go.sum ./
@@ -11,9 +9,11 @@ RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate
 
 FROM dependency AS development
 RUN go install github.com/air-verse/air@latest
-COPY . .
-COPY --chmod=755 entrypoint.sh .
-ENTRYPOINT ["bash", "/app/entrypoint.sh"]
+RUN adduser -D appuser
+USER appuser
+COPY --chown=appuser:appuser . .
+RUN chmod +x entrypoint.sh
+ENTRYPOINT ["bash", "entrypoint.sh"]
 CMD ["air", "-c", ".air.toml"]
 
 FROM dependency AS builder

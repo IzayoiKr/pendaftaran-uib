@@ -1,10 +1,12 @@
 FROM node:alpine AS base
 WORKDIR /app
+RUN chown -R node:node /app
 COPY package*.json ./
 
 FROM base AS development
 RUN --mount=type=cache,target=/root/.npm npm install
-COPY . .
+USER node
+COPY --chown=node:node . .
 EXPOSE 8989
 CMD [ "npm", "run", "dev", "--", "--host" ]
 
