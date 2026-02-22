@@ -9,7 +9,7 @@ services:
         ports:
             - ${postgres_ports}
         volumes:
-            - postgres_data:/var/lib/postgresql/data:Z
+            - postgres_data:/var/lib/postgresql/data
         healthcheck:
             test:
                 [
@@ -41,8 +41,8 @@ services:
         ports:
             - ${backend_ports}
         volumes:
-            - ./backend:/app:z
-            - /app/tmp:Z
+            - ./backend:/app
+            - /app/tmp
         command: air -c .air.toml
 
     frontend:
@@ -53,8 +53,8 @@ services:
         ports:
             - ${frontend_ports}
         volumes:
-            - ./frontend:/app:z
-            - /app/node_modules:Z
+            - ./frontend:/app
+            - /app/node_modules
         environment:
             - NODE_ENV=development
             - CHOKIDAR_USEPOLLING=true
