@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Header.module.scss';
+import logo from '../../assets/logo.png'
 
 const Header: FC = () => {
     return (
@@ -8,7 +9,7 @@ const Header: FC = () => {
             <div className="container">
                 <nav className={styles.nav}>
                     <Link to="/" className={styles.logo}>
-                        <img src="../../assets/logo.png" alt="UIB" />
+                    <img src={logo} alt="UIB"/>
                     </Link>
                     <ul className={styles.menu}>
                         <li><Link to="/#home">Beranda</Link></li>
