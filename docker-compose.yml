@@ -2,7 +2,7 @@ services:
   mysql:
     image: mysql:8.0
     container_name: mysql-pendaftaran-uib-dev
-    command: --port=3300
+    command: --port=${MYSQL_PORT}
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}
@@ -33,7 +33,12 @@ services:
   mongodb:
     image: mongo:7
     container_name: mongodb-pendaftaran-uib-dev
-    command: mongod --port 27000 --auth
+    command: >
+      mongod
+        --port ${MONGO_PORT}
+        --auth
+        --quiet
+        --setParameter logComponentVerbosity={"storage":{"verbosity":-1}}
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
@@ -44,13 +49,37 @@ services:
       - mongo_data:/data/db
     healthcheck:
       test:
-        [
-          "CMD-SHELL",
-          'mongosh --port 27000 --username "$MONGO_INITDB_ROOT_USERNAME" --password "$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin --eval "db.adminCommand(''ping'')" --quiet',
-        ]
+        - CMD-SHELL
+        - >-
+          mongosh --port ${MONGO_PORT}
+          --username "$$MONGO_INITDB_ROOT_USERNAME"
+          --password "$$MONGO_INITDB_ROOT_PASSWORD"
+          --authenticationDatabase admin
+          --eval "db.adminCommand('ping')"
+          --quiet
       interval: 10s
       timeout: 5s
       retries: 10
+
+  migrate:
+    build:
+      context: ./backend
+      target: development
+    container_name: migrate-pendaftaran-uib-dev
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: ${MYSQL_PORT}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+    command: >-
+      migrate
+      -path /app/migrations
+      -database "mysql://$${DB_USER}:$${DB_PASSWORD}@tcp($${DB_HOST}:$${DB_PORT})/$${DB_NAME}"
+      up
 
   backend:
     build:
@@ -79,38 +108,21 @@ services:
       - /app/tmp
     command: air -c .air.toml
 
-  migrate:
-    build:
-      context: ./backend
-      target: development
-    container_name: migrate-pendaftaran-uib-dev
-    depends_on:
-      mysql:
-        condition: service_healthy
-    environment:
-      DB_HOST: mysql
-      DB_PORT: ${MYSQL_PORT}
-      DB_USER: ${MYSQL_USER}
-      DB_PASSWORD: ${MYSQL_PASSWORD}
-      DB_NAME: ${MYSQL_DATABASE}
-    command: >
-      sh -c 'migrate -path /app/migrations -database "mysql://$DB_USER:$DB_PASSWORD@tcp($DB_HOST:$MYSQL_PORT)/$DB_NAME" up'
-
   frontend:
     build:
       context: ./frontend
       target: development
     container_name: frontend-pendaftaran-uib-dev
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
     ports:
       - ${FRONTEND_PORTS}
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    environment:
-      - NODE_ENV=development
-      - CHOKIDAR_USEPOLLING=true
-    depends_on:
-      - backend
 
 volumes:
   mysql_data:
