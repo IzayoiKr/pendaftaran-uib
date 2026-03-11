@@ -1,4 +1,3 @@
-import type { FC } from 'react';
 import Header from '../../components/Header/Header';
 import Hero from './components/Hero/Hero';
 import ProgramStudi from './components/ProgramStudi/ProgramStudi';
@@ -6,13 +5,14 @@ import Gelombang from './components/Gelombang/Gelombang';
 import Panduan from "./components/Panduan/Panduan";
 import Fitur from "./components/Fitur/Fitur";
 import Footer from "../../components/Footer/Footer";
+import styles from "./index.module.scss";
 
-const Home: FC = () => {
+export default function Home() {
     return (
         <>
-            <Header />
+            <Header className={styles.topSection} />
             <main>
-                <Hero />
+                <Hero className={styles.topSection} />
                 <ProgramStudi />
                 <Gelombang />
                 <Panduan />
@@ -22,6 +22,4 @@ const Home: FC = () => {
         </>
     );
 }
-
-export default Home;
 

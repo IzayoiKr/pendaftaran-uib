@@ -1,11 +1,10 @@
-import type { FC } from "react";
 import { Link } from "react-router-dom";
 import styles from './Footer.module.scss';
 
-const Footer: FC = () => {
+export default function Footer() {
     return (
         <footer className={styles.footer} id="kontak">
-            <div className="container">
+            <div className={styles.container}>
                 <div className={styles.row}>
                     <div className={styles.col}>
                         <h4>Menu</h4>
@@ -53,6 +52,4 @@ const Footer: FC = () => {
         </footer>
     );
 }
-
-export default Footer;
 

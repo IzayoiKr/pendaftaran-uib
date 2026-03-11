@@ -1,23 +1,29 @@
 @use '../../../../styles/global.scss';
 
 .hero {
-  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('../../../../assets/hero-bg.jpg');
-  background-size: cover;
-  color: global.$white;
+  min-height: 900px;
   padding: 150px 0;
   text-align: center;
+  .container {
+    @include global.container;
+    display: flex;
+    align-items: center;
+  }
 }
 
 .content {
-  max-width: 800px;
-  margin: 0 auto;
+  color: global.$tertiary-color;
   h1 {
     font-size: 3rem;
-    margin-bottom: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
   }
   p {
+    color: inherit;
     font-size: 1.2rem;
-    margin-bottom: 2rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 3rem;
   }
 }
 
@@ -26,21 +32,28 @@
   gap: 1rem;
   justify-content: center;
   a {
-    padding: 0.8rem 2rem;
-    border-radius: 30px;
+    font-size: 13px;
+    padding: 0.8rem 3rem;
+    border-radius: 5px;
     font-weight: 600;
+  }
+  .btnPrimary {
+    background: global.$tertiary-color;
+    color: global.$primary-color;
     transition: all 0.3s;
-    &.btn-primary {
-      background: global.$primary-color;
-      color: global.$secondary-color;
+    &:hover {
+      background: transparent;
+      color: global.$tertiary-color;
+      border: 1px solid black;
     }
-    &.btn-outline {
-      border: 2px solid global.$white;
-      color: global.$white;
-      &:hover {
-        background: global.$white;
-        color: global.$secondary-color;
-      }
+  }
+  .btnSecondary {
+    background: global.$primary-color;
+    color: global.$tertiary-color;
+    transition: all 0.3s;
+    &:hover {
+      background: global.$tertiary-color;
+      color: global.$primary-color;
     }
   }
 }

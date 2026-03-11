@@ -1,9 +1,15 @@
 @use '../../styles/global.scss';
 
 .footer {
-  background: global.$secondary-color;
+  background: global.$tertiary-color;
   color: global.$white;
   padding: 3rem 0 1rem;
+  .container {
+    @include global.container;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 
 .row {

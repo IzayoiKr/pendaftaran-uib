@@ -1,3 +1,38 @@
+export interface NavLinks {
+    to: string;
+    label: string;
+}
+
+export interface ContactInfo {
+    university: string;
+    address: string;
+    phone: string;
+    fax: string;
+    email: string;
+    line: string;
+    instagram: string;
+    youtube: string;
+    pengumumanLink: string;
+    mapEmbedUrl: string;
+}
+
+export interface Header {
+    image: string;
+}
+
+export interface Footer {
+    pengumumanLink: string;
+    address: string;
+    phone: string;
+    fax: string;
+    email: string;
+    maps: string;
+    lineLink: string;
+    instagramLink: string;
+    youtubeLink: string;
+    eserviceUIBLink: string;
+}
+
 export interface Program {
     id: string;
     title: string;
