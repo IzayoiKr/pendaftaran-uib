@@ -1,32 +1,32 @@
 # Website Pendaftaran UIB – React + Go
 
-This is a monorepo for a university registration system with a React (Vite) frontend and a Go backend using PostgreSQL.
+A university registration system with a React (Vite) frontend and a Go backend.
 
-The project is designed to run both locally (for development) and inside Docker containers (for testing/production simulation).
+| Layer     | Technology              | Purpose                          |
+|-----------|-------------------------|----------------------------------|
+| Frontend  | React + Vite            | UI served on port 8989           |
+| Backend   | Go + Chi                | REST API served on port 8888     |
+| Database  | **MySQL 8**             | User registration data           |
+| Tokens    | **MongoDB 7**           | JWT blacklist (logout / revoke)  |
 
-*   **Local development** – run PostgreSQL locally (or in a Docker container), start the backend with live reload (Air), and run the Vite dev server.
-*   **Docker setup** – use Docker Desktop with WSL2 backend to run the whole stack with `docker-compose`.
+---
 
 ## Prerequisites
 
-Make sure the following tools are installed:
+### For local development
+- **Go** 1.21+
+- **Node.js** 18+ LTS
+- **MySQL** 8.0 (or run it in Docker – see A2 below)
+- **MongoDB** 7 (or run it in Docker – see A3 below)
+- Optional: **Air** for live reload → `go install github.com/air-verse/air@latest`
+- Optional: **golang-migrate** → `go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest`
 
-### Required for both approaches
-*   A terminal (PowerShell, Command Prompt, Git or WSL)
+### For Docker setup
+- **Docker Desktop** with WSL2 backend (Windows) **or** Docker Engine (Linux/macOS)
 
-### For local development (without full Docker)
-*   **Go** (1.21+)
-*   **Node.js** (18+ LTS)
-*   **PostgreSQL** (15+) – or you can run PostgreSQL in a Docker container (see notes below)
-*   Optional but recommended: **Air** for live reload of Go (install with `go install github.com/cosmtrek/air@latest`)
+---
 
-### For Docker setup (Choose one)
-*   **Docker Desktop** with WSL2 backend enabled (recommended for Windows)
-*   **WSL2** (if you prefer to run commands inside a Linux environment) – Docker Desktop can also run containers natively on Windows, but WSL2 gives better performance.
-
-> **Note**: If you use Docker, you don’t need to install Go, Node.js, or PostgreSQL separately – everything runs in containers.
-
-## Getting Started
+## Option A: Local Development (without Docker)
 
 ### 1. Clone the repository
 ```bash
@@ -34,167 +34,182 @@ git clone https://github.com/IzayoiKr/pendaftaran-uib.git
 cd pendaftaran-uib
 ```
 
-## Option A: Local Development (without Docker)
+### 2. Set up MySQL
 
-### 2. Set up the database
-You have two choices for **PostgreSQL**:
-
-#### A1. Install PostgreSQL locally
-*   Download and run the installer from postgresql.org.
-*   During installation, set a password for the default **superuser** `postgres` (remember it, e.g., `postgres`). You'll use this to create the application user and database.
-*   After installation, open **SQL Shell (psql)** or run:
-```bash
-psql -U postgres -h localhost
-```
-*   Inside psql, create the database user `admin` with password `babualdo` and the database:
-```bash
-CREATE USER admin WITH PASSWORD 'babualdo';
-CREATE DATABASE "pendaftaran-uib-db" OWNER admin;
-GRANT ALL PRIVILEGES ON DATABASE "pendaftaran-uib-db" TO admin;
-\q
+#### A1. Install MySQL locally
+Install MySQL 8 from mysql.com. Then create the database and user:
+```sql
+CREATE USER 'admin'@'localhost' IDENTIFIED BY 'babualdo';
+CREATE DATABASE `pendaftaran-uib-db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON `pendaftaran-uib-db`.* TO 'admin'@'localhost';
+FLUSH PRIVILEGES;
 ```
 
-#### A2. Run PostgreSQL in a Docker container (easier, no local install)
-If you have Docker Desktop, you can start a PostgreSQL container:
+#### A2. Run MySQL in Docker
 ```bash
-docker run --name postgres-dev \
-    -e POSTGRES_USER=admin \
-    -e POSTGRES_PASSWORD=babualdo \
-    -e POSTGRES_DB=pendaftaran-uib-db \
-    -p 5432:5432 \
-    -d postgres:15
-```
-This container will keep running in the background. To stop it and remove it later: 
-```bash
-docker stop postgres-dev && docker rm postres-dev
+docker run --name mysql-dev \
+  -e MYSQL_ROOT_PASSWORD=rootpassword \
+  -e MYSQL_USER=admin \
+  -e MYSQL_PASSWORD=babualdo \
+  -e MYSQL_DATABASE=pendaftaran-uib-db \
+  -p 3300:3300 \
+  -d mysql:8.0 \
+  --port=3300
 ```
 
-### 3. Configure backend environment
-Navigate to the `backend` folder and create a `.env` file:
+### 3. Set up MongoDB
+
+#### A1. Install MongoDB locally
+Install MongoDB 7 Community from mongodb.com. Start the service:
+```bash
+# Linux
+sudo systemctl start mongod
+
+# macOS (Homebrew)
+brew services start mongodb-community
+```
+
+Then open a `mongosh` shell and create the admin user and application database:
+```js
+// 1. Switch to the admin database to create the root user
+use admin
+
+db.createUser({
+  user: "admin",
+  pwd:  "babualdo",
+  roles: [{ role: "root", db: "admin" }]
+})
+
+// 2. Switch to the application database and create a dedicated user
+use pendaftaran-uib-db
+
+db.createUser({
+  user: "admin",
+  pwd:  "babualdo",
+  roles: [{ role: "readWrite", db: "pendaftaran-uib-db" }]
+})
+
+// 3. Verify
+show users
+```
+
+> **Note:** After creating users you should enable authentication in your MongoDB config (`/etc/mongod.conf`) by setting `security.authorization: enabled`, then restart the service.
+> The local backend `.env` uses `MONGO_URI=mongodb://admin:babualdo@localhost:27017` once auth is enabled.
+
+#### A2. Run MongoDB in Docker (easier)
+```bash
+docker run --name mongo-dev \
+  -e MONGO_INITDB_ROOT_USERNAME=admin \
+  -e MONGO_INITDB_ROOT_PASSWORD=babualdo \
+  -e MONGO_INITDB_DATABASE=pendaftaran-uib-db \
+  -p 27017:27017 \
+  -d mongo:7
+```
+
+### 4. Configure backend environment
 ```bash
 cd backend
-copy .env.example .env   # on Windows Command Prompt
-# or
-cp .env.example .env     # if using Git / WSL / bash
+cp .env.example .env
 ```
-Edit `.env` with your database credentials. If you used the Docker command above, the default values work:
-```bash
+Edit `.env` if your credentials differ from the defaults:
+```dotenv
 DB_HOST=localhost
-DB_PORT=5432
+DB_PORT=3306
 DB_USER=admin
 DB_PASSWORD=babualdo
 DB_NAME=pendaftaran-uib-db
-DB_SSLMODE=disable
+
+MONGO_URI=mongodb://admin:babualdo@localhost:27017
+MONGO_DB=pendaftaran-uib-db
+
 JWT_SECRET=your-very-secret-key-change-this
 SERVER_PORT=8888
 ```
-> Generate JWT_SECRET key with:
-> * PowerShell:
-`-join ((65..90) + (97..122) + (48..57) | Get-Random -Count 32 | % {[char]$_})`
-> * Command Prompt (needs Node.js): 
-`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
-> * Git Bash/WSL2: 
-`openssl rand -base64 32`
 
-### 4. Run database migrations
-We use `golang-migrate` to create the tables. Install the `migrate` tool (one time):
+Generate a secure `JWT_SECRET`:
 ```bash
-go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
-```
-Then run the migrations (make sure you're in the `backend` folder):
-```bash
-migrate -path migrations -database "postgres://admin:babualdo@localhost:5432/pendaftaran-uib-db?sslmode=disable" up
-```
-You should see a success message `1/u create_users_table`.
+# Git Bash / WSL / macOS
+openssl rand -base64 32
 
-### 5. Install backend dependencies and start the server
-While still in the `backend` folder:
+# PowerShell
+-join ((65..90) + (97..122) + (48..57) | Get-Random -Count 32 | % {[char]$_})
+```
+
+### 5. Run database migrations
 ```bash
+# From the backend/ folder
+go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+migrate \
+  -path migrations \
+  -database "mysql://admin:babualdo@tcp(localhost:3300)/pendaftaran-uib-db" \
+  up
+```
+
+### 6. Start the backend
+```bash
+# From the backend/ folder
 go mod download
-```
-Now start the server. You have two options:
-* Using Air (recommended for development – auto‑restarts on file changes):
-```bash
+
+# Option 1 – Air (live reload, recommended)
 air
-```
-If you don't have Air, install it first: `go install github.com/cosmtrek/air@latest`
-* Using plain `go run`:
-```bash
+
+# Option 2 – plain go run
 go run cmd/server/main.go
 ```
-The backend will start on http://localhost:8888.
+Backend available at **http://localhost:8888**.
 
-### 6. Set up and run the frontend
-Open a new terminal (keep the backend running) and go to the `frontend` folder:
+### 7. Start the frontend
 ```bash
 cd frontend
 cp .env.example .env
 npm install
 npm run dev
 ```
-The Vite dev server will start on http://localhost:8989.
-It proxies API requests starting with /api to the backend at http://localhost:8888.
+Frontend available at **http://localhost:8989**.
 
-Open http://localhost:8989 in your browser.
+---
 
-## Option B: Run Everything with Docker (using WSL2)
-This method builds and runs the entire stack (PostgreSQL, Go backend, React frontend) in containers.
+## Option B: Docker (full stack)
 
-### 1. Setup Docker in WSL2
+### 1. (WSL2 only) Install Docker
 ```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install docker
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-```
-**Start Docker and enable it to run at boot**
-```bash
+sudo apt update && sudo apt install -y \
+  docker-ce docker-ce-cli containerd.io \
+  docker-buildx-plugin docker-compose-plugin
+
 sudo service docker start
-# (Optional) To have Docker start automatically whenever you open WSL, add the start command to your shell profile (~/.bashrc or ~/.zshrc)
-echo 'sudo service docker start' >> ~/.bashrc
-```
-**Add your user to the `docker` group (so you can run `docker` without `sudo`)**
-```bash
 sudo usermod -aG docker $USER
+newgrp docker
 ```
-**Log out of WSL (type `exit` or `Ctrl+D`) and restart your WSL terminal for the group change to take effect. You can also run `newgrp docker` in the current session.**
-> After this, don't forget to git clone repo.
 
-### 2. Environment variables for docker
-Docker Compose reads environment variables from the `docker-compose.yml` file. The backend service is configured with these values:
-*   `DB_HOST=postgres`
-*   `DB_USER=${POSTGRES_USER}`
-*   `DB_PASSWORD=${POSTGRES_PASSWORD}`
-*   `JWT_SECRET=your-very-secret-key-change-this` – you should change this in the `.env.example` and rename it to `.env` before running.
+### 2. Configure environment variables
+```bash
+# From the project root
+cp .env.example .env
+```
+Edit `.env` and set a strong `JWT_SECRET`.
 
-If you want to change any variable, you can change in `.env` file in the **project root** (not inside `backend`) with the same keys. Docker Compose will automatically pick it up.
-
-### 3. Build and start the containers
-In the **project root** (where `docker-compose.yml` is located), run:
+### 3. Build and start
 ```bash
 docker compose up --build
-# or run in the background:
+# or in background:
 docker compose up --build -d
 ```
 
-### 5. Access the application
-*   **Frontend**: http://localhost:8989
-*   **Backend API**: http://localhost:8888 (direct access, though frontend proxies through /api)
+### 4. Access the app
+| Service    | URL                        |
+|------------|----------------------------|
+| Frontend   | http://localhost:8989      |
+| Backend    | http://localhost:8888      |
+| MySQL      | localhost:3300             |
+| MongoDB    | localhost:27000            |
 
-### 6. Stopping the containers
-Press `Ctrl+C` in the terminal where `docker compose up` is running and run:
+### 5. Stop
 ```bash
 docker compose down
-```
-To also delete the database volume (reset all data), add the `-v` flag:
-```bash
+
+# Also delete volumes (resets all data):
 docker compose down -v
 ```
 

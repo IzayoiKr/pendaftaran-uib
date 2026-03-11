@@ -1,65 +1,117 @@
 services:
-    postgres:
-        image: postgres:15-alpine
-        container_name: postgres-pendaftaran-uib-dev
-        environment:
-            POSTGRES_USER: ${POSTGRES_USER}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-            POSTGRES_DB: ${POSTGRES_DB}
-        ports:
-            - ${POSTGRES_PORTS}
-        volumes:
-            - postgres_data:/var/lib/postgresql/data
-        healthcheck:
-            test:
-                [
-                    "CMD-SHELL",
-                    "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}",
-                ]
-            interval: 10s
-            timeout: 5s
-            retries: 5
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-pendaftaran-uib-dev
+    command: --port=3300
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - ${MYSQL_PORTS}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "mysql",
+          "-P",
+          "${MYSQL_PORT}",
+          "-u",
+          "${MYSQL_USER}",
+          "-p${MYSQL_PASSWORD}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
-    backend:
-        build:
-            context: ./backend
-            target: development
-        container_name: backend-pendaftaran-uib-dev
-        depends_on:
-            postgres:
-                condition: service_healthy
-        environment:
-            DB_HOST: postgres
-            DB_PORT: ${POSTGRES_PORT}
-            DB_USER: ${POSTGRES_USER}
-            DB_PASSWORD: ${POSTGRES_PASSWORD}
-            DB_NAME: ${POSTGRES_DB}
-            DB_SSLMODE: ${POSTGRES_SSLMODE}
-            # `openssl rand -base64 32`
-            JWT_SECRET: ${JWT_SECRET}
-            SERVER_PORT: ${SERVER_PORT}
-        ports:
-            - ${BACKEND_PORTS}
-        volumes:
-            - ./backend:/app
-            - /app/tmp
-        command: air -c .air.toml
+  mongodb:
+    image: mongo:7
+    container_name: mongodb-pendaftaran-uib-dev
+    command: mongod --port 27000 --auth
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    ports:
+      - ${MONGO_PORTS}
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'mongosh --port 27000 --username "$MONGO_INITDB_ROOT_USERNAME" --password "$MONGO_INITDB_ROOT_PASSWORD" --authenticationDatabase admin --eval "db.adminCommand(''ping'')" --quiet',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
-    frontend:
-        build:
-            context: ./frontend
-            target: development
-        container_name: frontend-pendaftaran-uib-dev
-        ports:
-            - ${FRONTEND_PORTS}
-        volumes:
-            - ./frontend:/app
-            - /app/node_modules
-        environment:
-            - NODE_ENV=development
-            - CHOKIDAR_USEPOLLING=true
-        depends_on:
-            - backend
+  backend:
+    build:
+      context: ./backend
+      target: development
+    container_name: backend-pendaftaran-uib-dev
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: ${MYSQL_PORT}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+      MONGO_URI: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongodb:${MONGO_PORT}
+      MONGO_DB: ${MONGO_DATABASE}
+      JWT_SECRET: ${JWT_SECRET}
+      SERVER_PORT: ${SERVER_PORT}
+    ports:
+      - ${BACKEND_PORTS}
+    volumes:
+      - ./backend:/app
+      - /app/tmp
+    command: air -c .air.toml
+
+  migrate:
+    build:
+      context: ./backend
+      target: development
+    container_name: migrate-pendaftaran-uib-dev
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: ${MYSQL_PORT}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+    command: >
+      sh -c 'migrate -path /app/migrations -database "mysql://$DB_USER:$DB_PASSWORD@tcp($DB_HOST:$MYSQL_PORT)/$DB_NAME" up'
+
+  frontend:
+    build:
+      context: ./frontend
+      target: development
+    container_name: frontend-pendaftaran-uib-dev
+    ports:
+      - ${FRONTEND_PORTS}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend
 
 volumes:
-    postgres_data:
+  mysql_data:
+  mongo_data:
