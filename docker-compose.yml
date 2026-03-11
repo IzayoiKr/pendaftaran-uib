@@ -52,8 +52,8 @@ services:
         - CMD-SHELL
         - >-
           mongosh --port ${MONGO_PORT}
-          --username "${MONGO_INITDB_ROOT_USERNAME}"
-          --password "${MONGO_INITDB_ROOT_PASSWORD}"
+          --username "${MONGO_USER}"
+          --password "${MONGO_PASSWORD}"
           --authenticationDatabase admin
           --eval "db.adminCommand('ping')"
           --quiet
@@ -78,7 +78,7 @@ services:
     command: >-
       migrate
       -path /app/migrations
-      -database "mysql://${DB_USER}:${DB_PASSWORD}@tcp(${DB_HOST}:${DB_PORT})/${DB_NAME}"
+      -database "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(mysql:${MYSQL_PORT})/${MYSQL_DATABASE}"
       up
 
   backend:
