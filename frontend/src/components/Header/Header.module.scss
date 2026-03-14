@@ -1,39 +1,67 @@
 @use '../../styles/global.scss';
 
+$header-height: 80px;
+$mobile-nav-bg: #868686;
+
 .header {
-  background: transparent;
-  position: sticky;
+  position: absolute;
   top: 0;
+  left: 0;
+  width: 100%;
+  background: transparent;
+  transition: background 0.4s, box-shadow 0.3s;
+  z-index: 100;
+  
   .container {
     @include global.container;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 5rem;
+    height: $header-height
   }
 }
 
-.nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0;
+.header.fixed {
+  position: fixed;
+  background: global.$white;
+  box-shadow: 0px 3px 16px 0px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.3s ease forwards;
 }
 
-.menu {
-  display: inherit;
-  flex-wrap: wrap;
-  justify-content: inherit;
-  align-items: inherit;
-  list-style: none;
-  gap: 2rem;
-  li a {
-    font-size: 1rem;
-    color: global.$secondary-color;
-    font-weight: 700;
-    transition: all 0.3s ease-in-out;
-    &:hover {
-      color: global.$primary-color;
+@keyframes slideDown {
+  from { transform: translateY(-100%) }
+  to { transform: translateY(0) }
+}
+
+.logoUIB img {
+  display: flex;
+  align-items: center;
+}
+
+.nav{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .menu {
+    display: flex;
+    list-style: none;
+    gap: var(--space-l);
+
+    .navLink {
+      /* font-size: clamp(0.8125rem, 1.1vw, 0.875rem); */
+      font-size: var(--step--1);
+      font-weight: 500;
+      line-height: $header-height;
+      color: global.$tertiary-color;
+      padding: 0;
+      display: inline-block;
+      transition: color 0.3s ease;
+      white-space: nowrap;
+
+      &:hover {
+        color: global.$primary-color;
+      }
     }
   }
 }
@@ -42,34 +70,86 @@
   display: none;
   cursor: pointer;
   border: none;
+  border-radius: 0;
   background: transparent;
+  padding: 0;
   
   .iconBar {
     display: block;
-    width: 1.563rem;
-    height: 0.188rem;
-    margin: 0.313rem auto;
+    width: 25px;
+    height: 3px;
+    margin: auto auto 4px auto;
     background-color: global.$primary-color;
-    transition: all 0.3s;
+    transition: all 0.4s linear;
   }
 }
 
-@media (max-width: 992px) {
+.toggler.openState {
+  .iconBar:nth-child(1) {
+    transform:  rotate(-45deg);
+    position: relative;
+    top: 7px;
+  }
+  .iconBar:nth-child(2) {
+    opacity: 0;
+  }
+  .iconBar:nth-child(3) {
+    transform: rotate(45deg);
+    position: relative;
+    bottom: 7px;
+  }
+}
+
+@media (max-width: 991px) {
+  .header {
+    position: absolute;
+    background: $mobile-nav-bg;
+  }
+
+  .header.fixed {
+    background-color: $mobile-nav-bg;
+  }
+
   .toggler {
     display: block;
   }
 
   .menuContainer {
     display: none;
+    position: absolute;
+    top: $header-height;
+    left: 0;
+    width: 100%;
+    background: $mobile-nav-bg;
+    z-index: 99;
+    max-height: 340px;
+    overflow-y: auto;
 
     &.show {
       display: block;
     }
 
     .menu {
+      @include global.container;
       flex-direction: column;
-      align-items: left;
-      gap: 2rem;
+      width: 100%;
+      gap: 0;
+
+      .navItem {
+        width: 100%;
+
+        .navLink {
+          line-height: 40px;
+          color: global.$white;
+          display: block;
+          border-bottom: 1px solid rgba(237, 237, 237, 0.2);
+          border-radius: 0;
+
+          &:hover {
+            color: global.$primary-color;
+          }
+        }
+      }
     }
   }
 }

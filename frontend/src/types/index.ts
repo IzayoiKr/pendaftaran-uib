@@ -33,6 +33,13 @@ export interface Footer {
     eserviceUIBLink: string;
 }
 
+export interface Hero {
+    title: string;
+    description: string;
+    registrationButtonDesc: string;
+    academicButtonDesc: string;
+}
+
 export interface Program {
     id: string;
     title: string;

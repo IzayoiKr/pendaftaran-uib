@@ -5,14 +5,13 @@ import Gelombang from './components/Gelombang/Gelombang';
 import Panduan from "./components/Panduan/Panduan";
 import Fitur from "./components/Fitur/Fitur";
 import Footer from "../../components/Footer/Footer";
-import styles from "./index.module.scss";
 
 export default function Home() {
     return (
         <>
-            <Header className={styles.topSection} />
+            <Header />
             <main>
-                <Hero className={styles.topSection} />
+                <Hero />
                 <ProgramStudi />
                 <Gelombang />
                 <Panduan />

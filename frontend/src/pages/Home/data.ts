@@ -1,4 +1,12 @@
-import type { Program, Event, Feature } from '../../types/index.ts';
+import type { Hero, Program, Event, Feature } from '../../types/index.ts';
+
+export const heroes: Hero = {
+    title: "WELCOME TO UNIVERSITAS INTERNASIONAL BATAM",
+    description: "University with international quality standard that produces graduates, science, technology and arts that can meet global dynamic changes.",
+    registrationButtonDesc: "PENDAFTARAN (REGISTRATION)",
+    academicButtonDesc: "AKADEMIK (ACADEMIC)"
+
+}
 
 export const programs: Program[] = [
     {

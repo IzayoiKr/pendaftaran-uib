@@ -1,18 +1,53 @@
-/* Don't remove it for sake of reference ~ Karenina Lovers */
-/* :root { */
-/*     font-family: system-ui, Avenir, Helvetica, Arial, sans-serif; */
-/*     line-height: 1.5; */
-/*     font-weight: 400; */
-/**/
-/*     color-scheme: light dark; */
-/*     color: rgba(255, 255, 255, 0.87); */
-/*     background-color: #242424; */
-/**/
-/*     font-synthesis: none; */
-/*     text-rendering: optimizeLegibility; */
-/*     -webkit-font-smoothing: antialiased; */
-/*     -moz-osx-font-smoothing: grayscale; */
-/* } */
+@use 'utopia-core-scss/src/utopia' as utopia;
+
+// ─── Fluid Scale (:root CSS custom properties) ────────────────────────────────
+// Min viewport: 320px  →  Max viewport: 1400px (your xxl breakpoint)
+//
+// TYPE SCALE — var(--step-N) in any file, no @use needed
+//   --step--2  ~11px → 13px   (tiny labels)
+//   --step--1  ~13px → 16px   (nav links, buttons, captions)
+//   --step-0   ~16px → 20px   (body / paragraph base)
+//   --step-1   ~19px → 25px   (card titles, subheadings)
+//   --step-2   ~23px → 31px   (section h3)
+//   --step-3   ~28px → 39px   (section h2)
+//   --step-4   ~33px → 49px   (hero h1)
+//
+// SPACE SCALE — var(--space-N) in any file, no @use needed
+//   --space-2xs  ~8px  → 10px
+//   --space-xs   ~12px → 15px
+//   --space-s    ~16px → 20px   (base = same as step-0)
+//   --space-m    ~24px → 30px
+//   --space-l    ~32px → 40px
+//   --space-xl   ~48px → 60px
+//   --space-2xl  ~72px → 90px
+//   One-up pairs also generated: --space-2xs-xs, --space-xs-s, etc.
+
+:root {
+  color-scheme: light dark;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  @include utopia.generateTypeScale((
+    "minWidth":      320,
+    "maxWidth":      1400,
+    "minFontSize":   16,
+    "maxFontSize":   20,
+    "minTypeScale":  1.2,   // minor third — gentle on small screens
+    "maxTypeScale":  1.25,  // major third — more expressive on large screens
+    "positiveSteps": 4,
+    "negativeSteps": 2,
+  ));
+ 
+  @include utopia.generateSpaceScale((
+    "minWidth":       320,
+    "maxWidth":       1400,
+    "minSize":        16,
+    "maxSize":        20,
+    "positiveSteps":  (1.5, 2, 3, 4.5),  // → m, l, xl, 2xl
+    "negativeSteps":  (0.75, 0.5),        // → xs, 2xs
+  ));
+}
 
 // Variables
 $primary-color: #fdc632;
@@ -23,7 +58,7 @@ $link-color: #4a76ee;
 $text-color: #666;
 $text-color2: #1a1c20;
 $white: #fff;
-$font-family: 'Poppins', sans-serif;
+$font-family: "Rubik Variable", "Poppins Variable", sans-serif;
 
 $breakpoints: (
   sm: 576px,
@@ -56,14 +91,15 @@ $container-max-widths: (
 
 @mixin section-title {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-m);
   h2 {
-    font-size: 2.5rem;
+    font-size: var(--step-3);
     font-weight: 600;
     color: $secondary-color;
   }
   p {
     color: $text-color;
+    font-size: var(--step-0);
   }
 }
 
@@ -91,8 +127,13 @@ $container-max-widths: (
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: $font-family;
+  font-size: var(--step-0);
   background-color: $background-color;
   line-height: 1.6;
   color: $text-color;

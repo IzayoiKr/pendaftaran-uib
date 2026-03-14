@@ -1,16 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Header.module.scss';
 import logo from '../../assets/logo.png';
 import { navLinks } from '../../constants/navigation';
 
-interface HeaderProps {
-    className?: string;
-}
-
 interface HamburgerButtonProps {
     isOpen?: boolean;
-    setIsOpen?: (value: boolean) => void;
+    setIsOpen: (value: boolean) => void;
 }
 
 interface NavMenuProps {
@@ -19,7 +15,7 @@ interface NavMenuProps {
 
 function UIBLogo() {
     return (
-        <Link to="/">
+        <Link to="/" className={styles.logoUIB}>
             <img src={logo} alt="Logo UIB" />
         </Link>
     )
@@ -27,7 +23,8 @@ function UIBLogo() {
 
 function HamburgerButton({ isOpen, setIsOpen }: HamburgerButtonProps) {
     return (
-        <button className={styles.toggler} onClick={() => setIsOpen(!isOpen)} aria-label='Toggle Menu'>
+        <button className={`${styles.toggler} ${isOpen ? styles.openState : ''}`}
+            onClick={() => setIsOpen(!isOpen)} aria-label='Toggle Menu'>
             <span className={styles.iconBar}></span>
             <span className={styles.iconBar}></span>
             <span className={styles.iconBar}></span>
@@ -41,8 +38,8 @@ function NavMenu({ isOpen }: NavMenuProps) {
             <nav className={styles.nav}>
                 <ul className={styles.menu}>
                     {navLinks.map(link => (
-                        <li key={link.to}>
-                            <Link to={link.to}>{link.label}</Link>
+                        <li className={styles.navItem} key={link.to}>
+                            <Link className={styles.navLink} to={link.to}>{link.label}</Link>
                         </li>
                     ))}
                 </ul>
@@ -51,10 +48,18 @@ function NavMenu({ isOpen }: NavMenuProps) {
     )
 }
 
-export default function Header({ className }: HeaderProps) {
+export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => setIsScrolled(window.scrollY > 50);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [])
+
     return (
-        <header className={`${styles.header} ${className}`} >
+        <header className={`${styles.header} ${isScrolled ? styles.fixed : ''}`} >
             <div className={styles.container}>
                 <UIBLogo />
                 <HamburgerButton isOpen={isOpen} setIsOpen={setIsOpen} />
