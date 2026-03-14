@@ -24,6 +24,13 @@ export default defineConfig({
                 ]
             }
         })
-    ]
+    ],
+    css: {
+        preprocessorOptions: {
+            scss: {
+                loadPaths: ['node_modules']
+            }
+        }
+    }
 })
 
