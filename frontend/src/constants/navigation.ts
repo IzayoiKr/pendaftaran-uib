@@ -4,5 +4,5 @@ export const navLinks = [
     { to: "/#info-umum", label: "Informasi Umum" },
     { to: "/#kontak", label: "Kontak" },
     { to: "/#panduan", label: "Panduan" },
-    { to: "/#login", label: "Daftar/Login" },
+    { to: "/login", label: "Daftar/Login" },
 ]

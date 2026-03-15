@@ -1,14 +1,15 @@
 @use '../../../../styles/global.scss';
+@use 'sass:map';
 
 .hero {
   position: relative;
-  min-height: clamp(600px, 80vh, 900px);
-  padding-block: clamp(4rem, 12vw, 9.375rem);
+  height: clamp(600px, 80vh, 900px);
+  overflow: auto;
   text-align: center;
   background: url('../../../../assets/hero-bg.jpg') no-repeat center;
   background-size: cover;
   width: 100%;
-  z-index: 98;
+  z-index: 99;
 
   .container {
     @include global.container;
@@ -17,18 +18,16 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    margin-top: var(--space-l);
   }
 }
 
 .content {
   text-align: center;
   color: global.$tertiary-color;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 0 0 5px rgba(255, 255, 255, 0.5);
   
   h1 {
     color: inherit;
-    /* font-size: 3rem; /* 48px */
-    /* font-size: clamp(2rem, 4.5vw, 3rem); */
     font-size: var(--step-4);
     font-weight: 500;
     text-transform: uppercase;
@@ -38,8 +37,6 @@
 
   p {
     color: inherit;
-    /* font-size: 1.25rem; /* 20px */
-    /* font-size: clamp(1rem, 1.8vw, 1.25rem); */
     font-size: var(--step-0);
     font-weight: 500;
     margin-top: var(--space-xs);
@@ -55,12 +52,8 @@
 
   a {
     display: inline-block;
-    /* font-size: 0.813rem; /* 0.813px */
     font-size: var(--step--2);
     font-weight: 500;
-    /* padding: 0.8rem 3rem; */
-    /* padding: 0 3rem; /* 48px */
-    /* padding: 0 clamp(1.5rem, 3vw, 3rem); */
     padding: 0 var(--space-xl);
     border-radius: 5px;
     text-transform: uppercase;
@@ -97,3 +90,13 @@
   }
 }
 
+@media (max-width: map.get(global.$breakpoints, lg)) {
+  .hero {
+    padding-top: calc(var(--space-2xl) + var(--space-s));
+    
+    .container {
+      justify-content: flex-start;
+      padding-top: var(--space-l);
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import ProgramCard from './ProgramCard'
-import { programs } from '../../data';
+import { programs } from '../../../../constants/data';
 import styles from './ProgramStudi.module.scss';
 
 const ProgramStudi: FC = () => {

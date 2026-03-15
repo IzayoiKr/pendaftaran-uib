@@ -1,4 +1,6 @@
-
+/* UNTUK FONT SIZE, PADDING, MARGIN, DLL... TOLONG DI CEK BAGIAN UTOPIA DI GLOBAL */
+/* PELAJARI CARA CODE SIZE, WIDTH, PENGGUNAAN VARIABLE, NESTING, DI */
+/* src/components/header dan src/pages/Home/Hero */
 $color-bg:            #f8f9fa;
 $color-input-bg:      #eef1f5;
 $color-input-focus:   #e4e8f0;
@@ -9,6 +11,7 @@ $color-title:         #222;
 $color-text:          #555;
 $color-placeholder:   #888;
 
+/* Ini kenapa ada tablet, mobile, kan dah kubuatin breakpoints di global.scss */
 $bp-tablet:  48em;   // 768px
 $bp-mobile:  30em;   // 480px
 
@@ -20,20 +23,22 @@ $bp-mobile:  30em;   // 480px
   @media (max-width: $bp-mobile) { @content; }
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  font-size: 100%;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  background: $color-bg;
-}
+/* Sialan, jangan tarok ini lagi, udh ada di frontend/src/styles/global.scss */
+/* Ke overwrite sialan */
+/* * { */
+/*   box-sizing: border-box; */
+/*   margin: 0; */
+/*   padding: 0; */
+/* } */
+/**/
+/* html { */
+/*   font-size: 100%; */
+/* } */
+/**/
+/* body { */
+/*   font-family: Arial, sans-serif; */
+/*   background: $color-bg; */
+/* } */
 
 
 .page-content {

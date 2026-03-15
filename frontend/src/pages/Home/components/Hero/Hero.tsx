@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import styles from './Hero.module.scss';
-import { heroes } from '../../data';
+import { heroes } from '../../../../constants/data';
 
 function Content() {
     return (
@@ -22,7 +22,7 @@ function RegistrationButton() {
 
 export default function Hero() {
     return (
-        <section className={styles.hero}>
+        <section id="home" className={styles.hero}>
             <div className={styles.container}>
                 <Content />
                 <RegistrationButton />

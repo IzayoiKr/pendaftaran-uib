@@ -1,4 +1,5 @@
 @use 'utopia-core-scss/src/utopia' as utopia;
+@use 'sass:map';
 
 // ─── Fluid Scale (:root CSS custom properties) ────────────────────────────────
 // Min viewport: 320px  →  Max viewport: 1400px (your xxl breakpoint)
@@ -30,7 +31,7 @@
 
   @include utopia.generateTypeScale((
     "minWidth":      320,
-    "maxWidth":      1400,
+    "maxWidth":      1600,
     "minFontSize":   16,
     "maxFontSize":   20,
     "minTypeScale":  1.2,   // minor third — gentle on small screens
@@ -41,7 +42,7 @@
  
   @include utopia.generateSpaceScale((
     "minWidth":       320,
-    "maxWidth":       1400,
+    "maxWidth":       1600,
     "minSize":        16,
     "maxSize":        20,
     "positiveSteps":  (1.5, 2, 3, 4.5),  // → m, l, xl, 2xl
@@ -65,7 +66,8 @@ $breakpoints: (
   md: 768px,
   lg: 992px,
   xl: 1200px,
-  xxl: 1400px
+  xxl: 1400px,
+  xxxl: 1600px
 );
 
 $container-max-widths: (
@@ -73,7 +75,8 @@ $container-max-widths: (
   md: 720px,
   lg: 960px,
   xl: 1140px,
-  xxl: 1320px
+  xxl: 1320px,
+  xxxl: 1520px
 );
 
 // Mixins
@@ -83,7 +86,7 @@ $container-max-widths: (
   padding: 0 15px;
 
   @each $name, $container-width in $container-max-widths {
-    @media (min-width: map-get($breakpoints, $name)) {
+    @media (min-width: map.get($breakpoints, $name)) {
       max-width: $container-width;
     }
   }
@@ -103,21 +106,9 @@ $container-max-widths: (
   }
 }
 
-.html {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  box-sizing: border-box;
+html {
   scroll-behavior: smooth;
+  box-sizing: border-box;
 }
 
 // Reset & Base
@@ -125,10 +116,6 @@ $container-max-widths: (
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
 }
 
 body {

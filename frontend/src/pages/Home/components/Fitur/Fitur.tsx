@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import FeatureCard from './FeatureCard';
-import { features } from '../../data';
+import { features } from '../../../../constants/data';
 import styles from './Fitur.module.scss';
 
 const Fitur: FC = () => {

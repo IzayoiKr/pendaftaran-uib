@@ -16,23 +16,6 @@ export interface ContactInfo {
     mapEmbedUrl: string;
 }
 
-export interface Header {
-    image: string;
-}
-
-export interface Footer {
-    pengumumanLink: string;
-    address: string;
-    phone: string;
-    fax: string;
-    email: string;
-    maps: string;
-    lineLink: string;
-    instagramLink: string;
-    youtubeLink: string;
-    eserviceUIBLink: string;
-}
-
 export interface Hero {
     title: string;
     description: string;

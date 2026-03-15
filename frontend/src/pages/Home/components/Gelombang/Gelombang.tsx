@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import EventCard from './EventCard';
-import { events } from '../../data';
+import { events } from '../../../../constants/data';
 import styles from './Gelombang.module.scss';
 
 const Gelombang: FC = () => {
