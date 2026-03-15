@@ -1,0 +1,184 @@
+
+$color-bg:            #f8f9fa;
+$color-input-bg:      #eef1f5;
+$color-input-focus:   #e4e8f0;
+$color-primary:       #29b6f6;
+$color-primary-hover: #039be5;
+$color-link:          #2196f3;
+$color-title:         #222;
+$color-text:          #555;
+$color-placeholder:   #888;
+
+$bp-tablet:  48em;   // 768px
+$bp-mobile:  30em;   // 480px
+
+@mixin tablet {
+  @media (max-width: $bp-tablet) { @content; }
+}
+
+@mixin mobile {
+  @media (max-width: $bp-mobile) { @content; }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 100%;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: $color-bg;
+}
+
+
+.page-content {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 5vh 5%;
+
+  @include tablet {
+    padding: 6vh 8%;
+  }
+
+  @include mobile {
+    padding: 4vh 5%;
+    align-items: flex-start;
+  }
+}
+
+
+.login-box {
+  width: 100%;
+  max-width: 30rem;
+  text-align: center;
+
+  @include tablet {
+    max-width: 85%;
+  }
+
+  @include mobile {
+    max-width: 100%;
+  }
+
+
+  .login-title {
+    font-size: clamp(1.1rem, 3vw, 1.4rem);
+    font-weight: 700;
+    color: $color-title;
+    margin-bottom: 1.75rem;
+    letter-spacing: 0.06em;
+  }
+
+  .single-input {
+    width: 100%;
+    height: 3rem;
+    background: $color-input-bg;
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0 1rem;
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    color: #333;
+    outline: none;
+    margin-bottom: 0.625rem;
+    display: block;
+
+    &::placeholder {
+      color: $color-placeholder;
+    }
+
+    &:focus {
+      background: $color-input-focus;
+    }
+
+    @include mobile {
+      height: 2.8rem;
+      font-size: 1rem;
+    }
+  }
+
+
+  .forgot-link {
+    display: block;
+    text-align: left;
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+    color: $color-link;
+    text-decoration: none;
+    margin-bottom: 1.25rem;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+
+  .login-btn {
+    background: $color-primary;
+    color: #fff;
+    border: none;
+    border-radius: 6.25rem;
+    height: 2.75rem;
+    padding: 0 2.5rem;
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.2s;
+
+    &:hover {
+      background: $color-primary-hover;
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    @include mobile {
+      width: 100%;
+      justify-content: center;
+      height: 3rem;
+      font-size: 1rem;
+    }
+  }
+
+  .register-text {
+    margin-top: 1.25rem;
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    color: $color-text;
+
+    a {
+      color: $color-link;
+      font-weight: 600;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+
+.spinner {
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 0.125rem solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
