@@ -11,7 +11,7 @@ $mobile-nav-bg: #868686;
   height: $header-height;
   background: transparent;
   transition: background 0.4s, box-shadow 0.3s;
-  z-index: 100;
+  z-index: 99;
 
   &.fixed {
     position: fixed;
@@ -61,7 +61,7 @@ $mobile-nav-bg: #868686;
       transition: color 0.3s ease;
       white-space: nowrap;
 
-      &:hover {
+      &:hover, &.active {
         color: global.$primary-color;
       }
     }
@@ -126,7 +126,7 @@ $mobile-nav-bg: #868686;
     left: 0;
     width: 100%;
     background: $mobile-nav-bg;
-    z-index: 98;
+    z-index: 100;
     overflow-y: auto;
 
     &.show {
@@ -149,7 +149,7 @@ $mobile-nav-bg: #868686;
           border-bottom: 1px solid rgba(237, 237, 237, 0.2);
           border-radius: 0;
 
-          &:hover {
+          &:hover, &.active {
             color: global.$primary-color;
           }
         }

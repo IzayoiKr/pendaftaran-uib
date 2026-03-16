@@ -9,7 +9,7 @@
   background: url('../../../../assets/hero-bg.jpg') no-repeat center;
   background-size: cover;
   width: 100%;
-  z-index: 99;
+  z-index: 1;
 
   .container {
     @include global.container;
@@ -90,13 +90,8 @@
   }
 }
 
-@media (max-width: map.get(global.$breakpoints, lg)) {
+@media (max-width: map.get(global.$breakpoints, sm)) {
   .hero {
-    padding-top: calc(var(--space-2xl) + var(--space-s));
-    
-    .container {
-      justify-content: flex-start;
-      padding-top: var(--space-l);
-    }
+    padding-top: var(--space-xl);
   }
 }

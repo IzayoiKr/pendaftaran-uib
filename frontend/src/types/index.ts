@@ -1,6 +1,7 @@
 export interface NavLinks {
     to: string;
     label: string;
+    hashId?: string;
 }
 
 export interface ContactInfo {
