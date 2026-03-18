@@ -1,4 +1,12 @@
 
+$secondary-color:     #333;
+$text-color:          #666;
+$text-color2:         #1a1c20;
+$link-color:          #4a76ee;
+$white:               #fff;
+$font-family:         "Rubik Variable", "Poppins Variable", sans-serif;
+
+
 $color-input-bg:      #eef1f5;
 $color-input-focus:   #e4e8f0;
 $color-primary:       #29b6f6;
@@ -27,6 +35,7 @@ $color-placeholder:   #888;
   }
 }
 
+
 .login-box {
   width: 100%;
   max-width: 30rem;
@@ -40,16 +49,14 @@ $color-placeholder:   #888;
     max-width: 100%;
   }
 
-  
   .login-title {
     font-size: var(--step-2);
     font-weight: 700;
-    color: $secondary-color;        
+    color: $secondary-color;
     margin-bottom: var(--space-m);
     letter-spacing: 0.06em;
   }
 
-  // Input fields
   .single-input {
     width: 100%;
     height: 3em;
@@ -57,9 +64,9 @@ $color-placeholder:   #888;
     border: none;
     border-radius: 0.25em;
     padding: 0 var(--space-s);
-    font-size: var(--step--1);       
-    font-family: $font-family;       
-    color: $text-color2;             
+    font-size: var(--step--1);
+    font-family: $font-family;
+    color: $text-color2;
     outline: none;
     margin-bottom: var(--space-2xs);
     display: block;
@@ -72,20 +79,18 @@ $color-placeholder:   #888;
       background: $color-input-focus;
     }
 
-   
+  
     @include respond-below(576px) {
       font-size: var(--step-0);
       height: 2.8em;
     }
   }
 
-  // Forgot password
   .forgot-link {
     display: block;
     text-align: left;
-    font-size: var(--step--2);      
-    color: $link-color;             
-    text-decoration: none;
+    font-size: var(--step--2);
+    color: $link-color;
     margin-bottom: var(--space-s);
 
     &:hover {
@@ -93,10 +98,9 @@ $color-placeholder:   #888;
     }
   }
 
-  // Login button
   .login-btn {
     background: $color-primary;
-    color: $white;                   
+    color: $white;
     border: none;
     border-radius: 6.25em;
     height: 2.75em;
@@ -127,11 +131,10 @@ $color-placeholder:   #888;
     }
   }
 
- 
   .register-text {
     margin-top: var(--space-s);
     font-size: var(--step--1);
-    color: $text-color;             
+    color: $text-color;
 
     a {
       color: $link-color;
