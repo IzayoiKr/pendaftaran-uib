@@ -18,8 +18,3 @@ frontend/.env.*.local
 .DS_Store
 Thumbs.db
 
-backend/.air.toml
-frontend/package-lock.json
-.gitignore
-frontend/package-lock.json
-backend/.air.toml
