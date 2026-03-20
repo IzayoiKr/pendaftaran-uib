@@ -12,28 +12,14 @@ export default function useScrollSpy({ ids, offset = 80 }: UseScrollSpyProps) {
     useEffect(() => { idsRef.current = ids });
 
     useEffect(() => {
-        const intersecting = new Set<string>();
         const observer = new IntersectionObserver(
             (entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        intersecting.add(entry.target.id);
-                    } else {
-                        intersecting.delete(entry.target.id);
-                    }
-                })
-
-                if (intersecting.size === 0) {
-                    setActiveId('');
-                    return;
+                const visible = entries
+                    .filter(e => e.isIntersecting)
+                    .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+                if (visible.length > 0) {
+                    setActiveId(visible[0].target.id);
                 }
-
-                const topmost = [...intersecting]
-                    .map(id => document.getElementById(id))
-                    .filter((el): el is HTMLElement => el !== null)
-                    .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)[0];
-
-                if (topmost) setActiveId(topmost.id);
             },
             {
                 rootMargin: `-${offset}px 0px -40% 0px`,

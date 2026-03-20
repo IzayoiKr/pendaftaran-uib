@@ -11,7 +11,7 @@ function Content() {
     )
 }
 
-function HeroButtons() {
+function RegistrationButton() {
     return (
         <div className={styles.heroButtons}>
             <Link to="#gelombang" className={styles.btnPrimary}>{heroes.registrationButtonDesc}</Link>
@@ -25,7 +25,7 @@ export default function Hero() {
         <section id="home" className={styles.hero}>
             <div className={styles.container}>
                 <Content />
-                <HeroButtons />
+                <RegistrationButton />
             </div>
         </section>
     );

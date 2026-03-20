@@ -1,10 +1,9 @@
 @use '../../styles/global.scss';
-@use 'sass:map';
 
 $header-height: var(--space-2xl);
 $mobile-nav-bg: #868686;
 
-header {
+.header {
   position: absolute;
   top: 0;
   left: 0;
@@ -105,8 +104,8 @@ header {
   }
 }
 
-@media (max-width: map.get(global.$breakpoints, lg)) {
-  header {
+@media (max-width: map-get(global.$breakpoints, lg)) {
+  .header {
     background: $mobile-nav-bg;
 
     &.fixed {
