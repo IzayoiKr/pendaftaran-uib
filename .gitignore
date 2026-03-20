@@ -1,19 +1,31 @@
+# ENV
 .env
-tmp/
-
-backend/tmp/
 backend/.env
-backend/coverage/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# TEMP
+tmp/
+backend/tmp/
+
+# BUILD / BIN
 backend/*.exe
 backend/*.exe~
 backend/*.test
 backend/*.out
 
+# COVERAGE
+backend/coverage/
+
+# NODE
 frontend/node_modules/
 frontend/dist/
-frontend/.env
-frontend/.env.local
-frontend/.env.*.local
 
+# SYSTEM
 .DS_Store
 Thumbs.db
+
+# DEV CONFIG
+backend/.air.toml
+.gitignore
