@@ -71,10 +71,10 @@ export default function LoginPage() {
                         value={form.email} autoComplete="email" onChange={handleChange} />
                     <LoginInput type="password" name="password" placeholder="Password"
                         value={form.password} autoComplete="current-password" minLength={8} onChange={handleChange} />
-                    <a href="https://pendaftaran.uib.ac.id/akun/lupa_password" //nanti baru ganti ke page
+                    <a href="https://pendaftaran.uib.ac.id/akun/lupa_password" 
                         className="forgot-link" target="_blank" rel="noopener noreferrer">
                         Lupa Password?
-                    </a>
+                    </a> //nanti baru ganti ke page
                     <div>
                         <LoginButton isLoading={isLoading} />
                     </div>
