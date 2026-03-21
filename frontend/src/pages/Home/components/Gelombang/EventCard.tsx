@@ -7,6 +7,8 @@ interface Props {
 }
 
 const EventCard: FC<Props> = ({ event }) => {
+    const [day = '', month = ''] = event.date.split(' ');
+
     return (
         <div className={styles.card}>
             <div className={styles.image}>
@@ -23,11 +25,11 @@ const EventCard: FC<Props> = ({ event }) => {
                 <h5 className={styles.year}>{event.academicYear}</h5>
                 <div className={styles.meta}>
                     <div className={styles.date}>
-                        <span>{event.date.split(' ')[0]}</span> {event.date.split(' ')[1]}
+                        <span>{day}</span> {month}
                     </div>
                     <div className={styles.timeLocation}>
-                        <p><span className="ti-time"></span> {event.time}</p>
-                        <p><span className="ti-location-pin"></span> {event.location}</p>
+                        <p><span className="ti-time mr-2"></span> {event.time}</p>
+                        <p><span className="ti-location-pin mr-2"></span> {event.location}</p>
                     </div>
                 </div>
                 <p className={styles.batch}>
@@ -43,4 +45,3 @@ const EventCard: FC<Props> = ({ event }) => {
 };
 
 export default EventCard;
-

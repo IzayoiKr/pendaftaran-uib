@@ -5,7 +5,7 @@ import styles from './Panduan.module.scss';
 const Panduan: FC = () => {
     return (
         <section className={styles.panduan} id="panduan">
-            <div className="container">
+            <div className={styles.container}>
                 <div className={styles.title}>
                     <h2>Guides</h2>
                 </div>
@@ -25,4 +25,3 @@ const Panduan: FC = () => {
 };
 
 export default Panduan;
-
