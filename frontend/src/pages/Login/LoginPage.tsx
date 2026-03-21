@@ -56,7 +56,7 @@ export default function LoginPage() {
         e.preventDefault();
         setIsLoading(true);
         try {
-            await new Promise(r => setTimeout(r, 1000)); // TODO: ganti API call
+            await new Promise(r => setTimeout(r, 1000)); 
         } finally {
             setIsLoading(false);
         }
@@ -71,7 +71,7 @@ export default function LoginPage() {
                         value={form.email} autoComplete="email" onChange={handleChange} />
                     <LoginInput type="password" name="password" placeholder="Password"
                         value={form.password} autoComplete="current-password" minLength={8} onChange={handleChange} />
-                    <a href="https://pendaftaran.uib.ac.id/akun/lupa_password"
+                    <a href="https://pendaftaran.uib.ac.id/akun/lupa_password" //nanti baru ganti ke page
                         className="forgot-link" target="_blank" rel="noopener noreferrer">
                         Lupa Password?
                     </a>
@@ -80,10 +80,10 @@ export default function LoginPage() {
                     </div>
                     <p className="register-text">
                         Belum memiliki akun?{" "}
-                        <a href="https://pendaftaran.uib.ac.id/akun/register" target="_blank" rel="noopener noreferrer">
+                        <a href="https://pendaftaran.uib.ac.id/akun/register" target="_blank" rel="noopener noreferrer"> 
                             Buat Akun
-                        </a>
-                    </p>
+                        </a> 
+                    </p> //nanti baru ganti ke page lain
                 </form>
             </div>
         </div>
