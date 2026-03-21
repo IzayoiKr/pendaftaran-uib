@@ -1,4 +1,4 @@
-import { features } from '../../../../constants/data';
+import { features } from '../../../constants/data';
 import styles from './Feature.module.scss';
 
 function FeatureCard() {

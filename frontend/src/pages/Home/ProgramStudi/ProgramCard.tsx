@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import type { Program } from '../../../../types';
+import type { Program } from '../../../types';
 import styles from './ProgramCard.module.scss';
 
 interface Props {

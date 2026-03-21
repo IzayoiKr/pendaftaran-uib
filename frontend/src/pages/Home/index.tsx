@@ -1,9 +1,9 @@
 import Header from '../../components/Header/Header';
-import Hero from './components/Hero/Hero';
-import ProgramStudi from './components/ProgramStudi/ProgramStudi';
-import Gelombang from './components/Gelombang/Gelombang';
-import Panduan from "./components/Panduan/Panduan";
-import Feature from './components/Feature/Feature';
+import Hero from './Hero/Hero';
+import ProgramStudi from './ProgramStudi/ProgramStudi';
+import Gelombang from './Gelombang/Gelombang';
+import Panduan from './Panduan/Panduan';
+import Feature from './Feature/Feature';
 import Footer from "../../components/Footer/Footer";
 
 export default function Home() {

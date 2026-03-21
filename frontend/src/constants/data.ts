@@ -1,21 +1,21 @@
 import type { Hero, Program, Event, Feature } from "../types";
 
 const images = import.meta.glob('../assets/courses/*.{jpg,png,jpeg}', {
-  eager: true,
-  import: 'default'
+    eager: true,
+    import: 'default'
 });
 
 const getImage = (name: string): string => {
-  return images[`../assets/courses/${name}`] as string;
+    return images[`../assets/courses/${name}`] as string;
 };
 
 const eventImages = import.meta.glob('../assets/event/*.{jpg,png,jpeg}', {
-  eager: true,
-  import: 'default'
+    eager: true,
+    import: 'default'
 }) as Record<string, string>;
 
 const getEventImage = (name: string): string => {
-  return eventImages[`../assets/event/${name}`];
+    return eventImages[`../assets/event/${name}`];
 };
 
 
@@ -46,7 +46,7 @@ export const programs: Program[] = [
         image: getImage('AR.jpg'),
         link: 'https://www.uib.ac.id/arsi/',
     },
-       {
+    {
         id: 'si',
         title: 'Sistem Informasi',
         faculty: 'FTI',

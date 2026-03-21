@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import styles from './Hero.module.scss';
-import { heroes } from '../../../../constants/data';
+import { heroes } from '../../../constants/data';
 
 function Content() {
     return (
