@@ -1,10 +1,5 @@
 
-$secondary-color:     #333;
-$text-color:          #666;
-$text-color2:         #1a1c20;
-$link-color:          #4a76ee;
-$white:               #fff;
-$font-family:         "Rubik Variable", "Poppins Variable", sans-serif;
+@use '../../styles/global.scss';
 
 
 $color-input-bg:      #eef1f5;
@@ -14,51 +9,37 @@ $color-primary-hover: #039be5;
 $color-placeholder:   #888;
 
 
-@mixin respond-below($bp) {
-  @media (max-width: ($bp - 0.02px)) { @content; }
+$header-height: var(--space-2xl);
+
+
+.loginLayout {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.loginMain {
+  width: 100%;
 }
 
 
 .page-content {
+  width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-
-  padding: calc(var(--space-2xl) + var(--space-l)) var(--space-s) var(--space-l);
-
- 
-  @include respond-below(992px) {
-    align-items: flex-start;
-    min-height: 100svh;
-    padding: calc(var(--space-2xl) + var(--space-m)) var(--space-m) var(--space-l);
-  }
-
-  @include respond-below(576px) {
-    align-items: flex-start;
-    min-height: 100svh;
-    padding: calc(var(--space-2xl) + var(--space-s)) var(--space-s) var(--space-m);
-  }
+  align-items: flex-start;
+  padding: calc(#{$header-height} + var(--space-m)) var(--space-s) var(--space-m);
 }
 
 
 .login-box {
-  width: 100%;
-  max-width: 30rem;
+  @include global.container;
   text-align: center;
-
-  @include respond-below(768px) {
-    max-width: 80%;
-  }
-
-  @include respond-below(576px) {
-    max-width: 100%;
-  }
 
   .login-title {
     font-size: var(--step-2);
     font-weight: 700;
-    color: $secondary-color;
+    color: global.$secondary-color;
     margin-bottom: var(--space-m);
     letter-spacing: 0.06em;
   }
@@ -71,8 +52,8 @@ $color-placeholder:   #888;
     border-radius: 0.25em;
     padding: 0 var(--space-s);
     font-size: var(--step--1);
-    font-family: $font-family;
-    color: $text-color2;
+    font-family: global.$font-family;
+    color: global.$text-color2;
     outline: none;
     margin-bottom: var(--space-2xs);
     display: block;
@@ -84,19 +65,13 @@ $color-placeholder:   #888;
     &:focus {
       background: $color-input-focus;
     }
-
-  
-    @include respond-below(576px) {
-      font-size: var(--step-0);
-      height: 2.8em;
-    }
   }
 
   .forgot-link {
     display: block;
     text-align: left;
     font-size: var(--step--2);
-    color: $link-color;
+    color: global.$link-color;
     margin-bottom: var(--space-s);
 
     &:hover {
@@ -106,13 +81,13 @@ $color-placeholder:   #888;
 
   .login-btn {
     background: $color-primary;
-    color: $white;
+    color: global.$white;
     border: none;
     border-radius: 6.25em;
     height: 2.75em;
     padding: 0 var(--space-l);
     font-size: var(--step--1);
-    font-family: $font-family;
+    font-family: global.$font-family;
     font-weight: 600;
     cursor: pointer;
     display: inline-flex;
@@ -128,22 +103,15 @@ $color-placeholder:   #888;
       opacity: 0.7;
       cursor: not-allowed;
     }
-
-    @include respond-below(576px) {
-      width: 100%;
-      justify-content: center;
-      height: 3em;
-      font-size: var(--step-0);
-    }
   }
 
   .register-text {
     margin-top: var(--space-s);
     font-size: var(--step--1);
-    color: $text-color;
+    color: global.$text-color;
 
     a {
-      color: $link-color;
+      color: global.$link-color;
       font-weight: 600;
 
       &:hover {
@@ -153,12 +121,11 @@ $color-placeholder:   #888;
   }
 }
 
-
 .spinner {
   width: 0.875em;
   height: 0.875em;
-  border: 0.125em solid rgba($white, 0.4);
-  border-top-color: $white;
+  border: 0.125em solid rgba(global.$white, 0.4);
+  border-top-color: global.$white;
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
   flex-shrink: 0;
@@ -166,4 +133,31 @@ $color-placeholder:   #888;
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+@media (max-width: map-get(global.$breakpoints, md)) {
+  .page-content {
+    padding: calc(#{$header-height} + var(--space-s)) var(--space-m) var(--space-m);
+  }
+}
+
+
+@media (max-width: map-get(global.$breakpoints, sm)) {
+  .page-content {
+    padding: calc(#{$header-height} + var(--space-xs)) var(--space-s) var(--space-s);
+  }
+
+  .login-box {
+    .single-input {
+      font-size: var(--step-0);
+      height: 2.8em;
+    }
+
+    .login-btn {
+      width: 100%;
+      justify-content: center;
+      height: 3em;
+      font-size: var(--step-0);
+    }
+  }
 }
