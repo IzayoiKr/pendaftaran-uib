@@ -32,3 +32,6 @@
   margin-top: 3rem;
 }
 
+.container {
+  @include global.container;
+}

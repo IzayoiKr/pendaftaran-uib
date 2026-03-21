@@ -6,7 +6,7 @@ import styles from './Gelombang.module.scss';
 const Gelombang: FC = () => {
     return (
         <section className={styles.gelombang} id="gelombang">
-            <div className="container">
+            <div className={styles.container}>
                 <div className={styles.title}>
                     <h2>Gelombang Pendaftaran</h2>
                     <hr />
@@ -24,4 +24,3 @@ const Gelombang: FC = () => {
 };
 
 export default Gelombang;
-

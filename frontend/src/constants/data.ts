@@ -1,5 +1,15 @@
 import type { Hero, Program, Event, Feature } from "../types";
 
+const images = import.meta.glob('../assets/courses/*.{jpg,png,jpeg}', {
+  eager: true,
+  import: 'default'
+});
+
+const getImage = (name: string): string => {
+  return images[`../assets/courses/${name}`] as string;
+};
+
+
 export const heroes: Hero = {
     title: "WELCOME TO UNIVERSITAS INTERNASIONAL BATAM",
     description: "University with international quality standard that produces graduates, science, technology and arts that can meet global dynamic changes.",
@@ -15,7 +25,7 @@ export const programs: Program[] = [
         faculty: 'FTSP',
         degree: 'S1',
         description: 'Sebagai program study yang menghasilkan lulusan berstandar internasional yang berkompeten dalam menerapkan keilmuan dalam pengembangan teknologi di bidang rekayasa sipil serta mampu mengaplikasikan dalam pembangunan berkelanjutan (sustainable development) di wilayah kepulauan untuk menghadapi tuntutan dan perubahan global dunia yang bersifat dinamis.',
-        image: '/assets/courses/TS.jpg',
+        image: getImage('TS.jpg'),
         link: 'https://www.uib.ac.id/ts/',
     },
     {
@@ -24,8 +34,89 @@ export const programs: Program[] = [
         faculty: 'FTSP',
         degree: 'S1',
         description: 'Menjadi program studi arsitektur maritim berbasis kearifan lokal dengan daya saing global yang mendukung pembangunan wilayah pesisir berkelanjutan.',
-        image: '/assets/courses/AR.jpg',
+        image: getImage('AR.jpg'),
         link: 'https://www.uib.ac.id/arsi/',
+    },
+       {
+        id: 'si',
+        title: 'Sistem Informasi',
+        faculty: 'FTI',
+        degree: 'S1',
+        description: 'Test',
+        image: getImage('SI.jpg'),
+        link: '',
+    },
+    {
+        id: 'ti',
+        title: 'Teknik Informatika',
+        faculty: 'FTI',
+        degree: 'S1',
+        description: '...',
+        image: getImage('TI.jpg'),
+        link: '',
+    },
+    {
+        id: 'mn',
+        title: 'Manajemen',
+        faculty: 'FEB',
+        degree: 'S1',
+        description: '...',
+        image: getImage('MN.jpg'),
+        link: '',
+    },
+    {
+        id: 'ak',
+        title: 'Akuntansi',
+        faculty: 'FEB',
+        degree: 'S1',
+        description: '...',
+        image: getImage('AK.jpg'),
+        link: '',
+    },
+    {
+        id: 'pr',
+        title: 'Ilmu Komunikasi (Public Relations)',
+        faculty: 'FIKOM',
+        degree: 'S1',
+        description: '...',
+        image: getImage('PR.jpg'),
+        link: '',
+    },
+    {
+        id: 'mm',
+        title: 'Manajemen (Magister)',
+        faculty: 'Pascasarjana',
+        degree: 'S2',
+        description: '...',
+        image: getImage('MM.jpg'),
+        link: '',
+    },
+    {
+        id: 'ih',
+        title: 'Ilmu Hukum',
+        faculty: 'FH',
+        degree: 'S1',
+        description: '...',
+        image: getImage('IH.jpg'),
+        link: '',
+    },
+    {
+        id: 'mh',
+        title: 'Magister Hukum',
+        faculty: 'Pascasarjana',
+        degree: 'S2',
+        description: '...',
+        image: getImage('MH.jpg'),
+        link: '',
+    },
+    {
+        id: 'pbi',
+        title: 'Pendidikan Bahasa Inggris',
+        faculty: 'FKIP',
+        degree: 'S1',
+        description: '...',
+        image: getImage('PBI.jpg'),
+        link: '',
     },
     // ... add all other programs (SI, TI, MN, AK, PR, MM, IH, MH, PBI)
 ];
