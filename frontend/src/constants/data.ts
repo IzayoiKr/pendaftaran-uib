@@ -9,6 +9,15 @@ const getImage = (name: string): string => {
   return images[`../assets/courses/${name}`] as string;
 };
 
+const eventImages = import.meta.glob('../assets/event/*.{jpg,png,jpeg}', {
+  eager: true,
+  import: 'default'
+}) as Record<string, string>;
+
+const getEventImage = (name: string): string => {
+  return eventImages[`../assets/event/${name}`];
+};
+
 
 export const heroes: Hero = {
     title: "WELCOME TO UNIVERSITAS INTERNASIONAL BATAM",
@@ -124,7 +133,7 @@ export const programs: Program[] = [
 export const events: Event[] = [
     {
         id: 's1-1',
-        image: '/assets/event/GP.jpg',
+        image: getEventImage('GP.jpg'),
         programType: 'Program Sarjana',
         programTypeEn: 'Undergraduate Program',
         academicYear: 'T.A 2026/2027',
@@ -138,7 +147,7 @@ export const events: Event[] = [
     },
     {
         id: 's2-1',
-        image: '/assets/event/magister.png',
+        image: getEventImage('magister.png'),
         programType: 'Program Magister',
         programTypeEn: 'Master Program',
         academicYear: 'T.A 2025/2026',
@@ -152,7 +161,7 @@ export const events: Event[] = [
     },
     {
         id: 's1-2',
-        image: '/assets/event/GP.jpg',
+        image: getEventImage('GP.jpg'),
         programType: 'Program Sarjana',
         programTypeEn: 'Undergraduate Program',
         academicYear: 'T.A 2026/2027',
@@ -166,7 +175,7 @@ export const events: Event[] = [
     },
     {
         id: 's1-3',
-        image: '/assets/event/beasiswa-baru.png',
+        image: getEventImage('beasiswa-baru.png'),
         programType: 'Program Sarjana',
         programTypeEn: 'Undergraduate Program',
         academicYear: 'T.A 2026/2027',
