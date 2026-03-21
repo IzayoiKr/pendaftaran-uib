@@ -2,8 +2,9 @@ import { useEffect, useState, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from './Header.module.scss';
 import logo from '../../assets/logo.png';
-import { navLinks, spyIds } from '../../constants/navigation';
+import { headerNavLinks, spyIds } from '../../constants/navigation';
 import useScrollSpy from '../../hooks/useScrollSpy';
+import scrollToId from '../ScrollToId';
 
 interface HamburgerButtonProps {
     isOpen?: boolean;
@@ -13,23 +14,8 @@ interface HamburgerButtonProps {
 interface NavMenuProps {
     isOpen?: boolean;
     activeId: string;
-    headerHeight: number;
     pathname: string;
     onLinkClick: () => void;
-}
-
-interface scrollToIdProps {
-    id: string,
-    offset: number
-}
-
-function scrollToId({ id, offset }: scrollToIdProps) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    window.scrollTo({
-        top: el.getBoundingClientRect().top + window.scrollY - offset,
-        behavior: 'smooth'
-    })
 }
 
 function UIBLogo() {
@@ -51,19 +37,19 @@ function HamburgerButton({ isOpen, setIsOpen }: HamburgerButtonProps) {
     )
 }
 
-function NavMenu({ isOpen, activeId, headerHeight, pathname, onLinkClick }: NavMenuProps) {
+function NavMenu({ isOpen, activeId, pathname, onLinkClick }: NavMenuProps) {
     return (
         <div className={`${styles.menuContainer} ${isOpen ? styles.show : ''}`}>
             <nav className={styles.nav}>
                 <ul className={styles.menu}>
-                    {navLinks.map(link => {
+                    {headerNavLinks.map(link => {
                         const isActive = link.hashId ? activeId === link.hashId : pathname === link.to;
 
                         const handleClick = (e: React.MouseEvent) => {
                             onLinkClick();
                             if (link.hashId && window.location.pathname === '/') {
                                 e.preventDefault();
-                                scrollToId({ id: link.hashId, offset: headerHeight });
+                                scrollToId(link.hashId);
                             }
                         }
 
@@ -130,7 +116,6 @@ export default function Header() {
                 <NavMenu
                     isOpen={isOpen}
                     activeId={activeId}
-                    headerHeight={headerHeight}
                     pathname={pathname}
                     onLinkClick={() => setIsOpen(false)}
                 />

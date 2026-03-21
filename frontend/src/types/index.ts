@@ -1,7 +1,12 @@
-export interface NavLinks {
+export interface HeaderNavLinks {
     to: string;
     label: string;
     hashId?: string;
+}
+
+export interface FooterNavLinks {
+    to: string;
+    label: string;
 }
 
 export interface ContactInfo {
@@ -11,10 +16,16 @@ export interface ContactInfo {
     fax: string;
     email: string;
     line: string;
-    instagram: string;
-    youtube: string;
-    pengumumanLink: string;
+}
+
+interface SocialLinks {
+    name: string;
+    url: string;
+}
+
+export interface ExternalLinks {
     mapEmbedUrl: string;
+    socials: SocialLinks[];
 }
 
 export interface Hero {

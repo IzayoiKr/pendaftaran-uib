@@ -1,6 +1,6 @@
-import type { NavLinks } from "../types"
+import type { HeaderNavLinks, FooterNavLinks } from "../types"
 
-export const navLinks: NavLinks[] = [
+export const headerNavLinks: HeaderNavLinks[] = [
     { to: "/#home", label: "Beranda", hashId: "home" },
     { to: "/#gelombang", label: "Gelombang", hashId: "gelombang" },
     { to: "/info-umum", label: "Informasi Umum" },
@@ -9,6 +9,14 @@ export const navLinks: NavLinks[] = [
     { to: "/login", label: "Daftar/Login" },
 ]
 
-export const spyIds = navLinks
+export const spyIds = headerNavLinks
     .filter(l => l.hashId)
     .map(l => l.hashId as string);
+
+export const footerNavLinks: FooterNavLinks[] = [
+    { to: "/#home", label: "Beranda" },
+    { to: "/#gelombang", label: "Gelombang" },
+    { to: "/info-umum", label: "Info Umum" },
+    { to: "https://www.uib.ac.id/category/pengumuman/", label: "Pengumuman" },
+    { to: "/login", label: "Daftar/Login" },
+]

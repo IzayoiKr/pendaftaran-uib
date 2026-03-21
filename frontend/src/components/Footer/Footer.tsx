@@ -1,53 +1,118 @@
 import { Link } from "react-router-dom";
 import styles from './Footer.module.scss';
+import { footerNavLinks } from "../../constants/navigation";
+import { contactInfo, externalLinks } from "../../constants/contact";
+import scrollToId from "../ScrollToId";
+import { socialIconMap } from "../Icons";
+
+function FooterMenu() {
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, to: string) => {
+        const hashMatch = to.match(/^\/#(.+)/);
+        if (hashMatch && window.location.pathname === '/') {
+            e.preventDefault();
+            scrollToId(hashMatch[1]);
+        }
+    }
+
+    return (
+        <div className={styles.widget}>
+            <h4>Menu</h4>
+            <ul className={styles.widgetList}>
+                {footerNavLinks.map(link => {
+                    const isExternal = link.to.startsWith('http');
+                    return (
+                        <li key={link.to}>
+                            {isExternal ? (
+                                <a href={link.to} target="_blank" rel="noopener noreferrer">{link.label}</a>
+                            ) : (
+                                <Link to={link.to} onClick={(e) => handleClick(e, link.to)}>{link.label}</Link>
+                            )}
+                        </li>
+                    )
+                })}
+            </ul>
+        </div>
+    )
+}
+
+function FooterContact() {
+    return (
+        <div className={styles.widget}>
+            <h4>Kontak</h4>
+            <address>
+                <strong>{contactInfo.university}</strong><br />
+                {contactInfo.address}<br />
+                Phone: {contactInfo.phone} / Fax: {contactInfo.fax}<br />
+                Email: <a href={`mailto:${contactInfo.email}`}>{contactInfo.email}</a><br />
+                Line Official: <a href={contactInfo.line} target="_blank" rel="noopener noreferrer">Pusat Informasi UIB</a>
+            </address>
+        </div>
+    )
+}
+
+function FooterMap() {
+    return (
+        <div className={styles.widget}>
+            <h4>Lokasi Kampus</h4>
+            <iframe
+                src={externalLinks.mapEmbedUrl}
+                width="100%"
+                height="200"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                title="Lokasi Universitas Internasional Batam"
+            ></iframe>
+        </div>
+    )
+}
+
+function FooterSocial() {
+    return (
+        <div className={styles.footerSocial}>
+            {externalLinks.socials.map(social => {
+                return (
+                    <a
+                        key={social.name}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={social.name}
+                        className={styles.socialIcon}
+                    >
+                        {socialIconMap[social.name] ?? social.name}
+                    </a>
+                )
+            })}
+        </div>
+    )
+}
+
+function FooterTop() {
+    return (
+        <div className={styles.footerTop}>
+            <FooterMenu />
+            <FooterContact />
+            <FooterMap />
+        </div>
+    )
+}
+
+function FooterBottom() {
+    return (
+        <div className={styles.footerBottom}>
+            <p>Copyright &copy; {new Date().getFullYear()} | Universitas Internasional Batam</p>
+            <FooterSocial />
+        </div>
+    )
+}
 
 export default function Footer() {
     return (
-        <footer className={styles.footer} id="kontak">
+        <footer id="kontak">
             <div className={styles.container}>
-                <div className={styles.row}>
-                    <div className={styles.col}>
-                        <h4>Menu</h4>
-                        <ul>
-                            <li><Link to="/">Beranda</Link></li>
-                            <li><Link to="/#gelombang">Gelombang</Link></li>
-                            <li><Link to="/info-umum">Info Umum</Link></li>
-                            <li><a href="https://www.uib.ac.id/category/pengumuman/" target="_blank" rel="noopener noreferrer">Pengumuman</a></li>
-                            <li><Link to="/login">Daftar/Login</Link></li>
-                        </ul>
-                    </div>
-                    <div className={styles.col}>
-                        <h4>Kontak</h4>
-                        <address>
-                            <strong>Universitas Internasional Batam</strong><br />
-                            Jl. Gajah Mada, Baloi - Sei Ladi, Batam 29442<br />
-                            Phone: (0778) 743 7111<br />
-                            Fax: (0778) 743 7112<br />
-                            Email: <a href="mailto:humas@uib.ac.id">humas@uib.ac.id</a><br />
-                            Line Official: <a href="https://lin.ee/2Ep0bNN" target="_blank" rel="noopener noreferrer">Pusat Informasi UIB</a>
-                        </address>
-                    </div>
-                    <div className={styles.col}>
-                        <h4>Lokasi Kampus</h4>
-                        <iframe
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.0568544597563!2d104.00080231431652!3d1.1194203625853616!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31d98be09646b351%3A0x36a826082690c786!2sUniversitas+Internasional+Batam!5e0!3m2!1sen!2sid!4v1453347461824"
-                            width="100%"
-                            height="200"
-                            style={{ border: 0 }}
-                            allowFullScreen
-                            loading="lazy"
-                            title="UIB Map"
-                        ></iframe>
-                    </div>
-                </div>
-                <div className={styles.bottom}>
-                    <p>Copyright &copy; {new Date().getFullYear()} | Universitas Internasional Batam</p>
-                    <div className={styles.social}>
-                        <a href="https://www.instagram.com/humasuib/" target="_blank" rel="noopener noreferrer"><i className="ti-instagram"></i> Instagram</a>
-                        <a href="https://www.youtube.com/channel/UCEvBaqNRmjsIAxb53bpElYQ" target="_blank" rel="noopener noreferrer"><i className="ti-youtube"></i> YouTube</a>
-                        <a href="http://eservice.uib.ac.id/kbtopic/humas/" target="_blank" rel="noopener noreferrer"><i className="ti-announcement"></i> Pengumuman</a>
-                    </div>
-                </div>
+                <FooterTop />
+                <FooterBottom />
             </div>
         </footer>
     );
