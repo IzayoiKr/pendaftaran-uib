@@ -1,7 +1,6 @@
 import type { FC } from 'react';
-import ProgramCard from './ProgramCard'
-import { programs } from '../../../constants/data';
 import styles from './ProgramStudi.module.scss';
+import ProgramSlider from '../../../components/PowerSlider/PowerSlider';
 
 const ProgramStudi: FC = () => {
     return (
@@ -11,15 +10,10 @@ const ProgramStudi: FC = () => {
                     <h2>Program Studi</h2>
                     <p>Program Sarjana dan Program Pasca Sarjana</p>
                 </div>
-                <div className={styles.grid}>
-                    {programs.map(program => (
-                        <ProgramCard key={program.id} program={program} />
-                    ))}
-                </div>
+            <ProgramSlider />
             </div>
         </section>
     );
 };
 
 export default ProgramStudi;
-

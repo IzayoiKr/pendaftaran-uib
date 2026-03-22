@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 export interface HeaderNavLinks {
     to: string;
     label: string;
@@ -62,7 +64,7 @@ export interface Event {
 
 export interface Feature {
     id: string;
-    icon: string;            // class name like "flaticon-student"
+    icon: ReactNode;
     title: string;
     description: string;
     link: string;

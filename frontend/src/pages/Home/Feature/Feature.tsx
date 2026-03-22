@@ -7,7 +7,7 @@ function FeatureCard() {
             {features.map((feature) => (
                 <div key={feature.id} className={styles.card}>
                     <div className={styles.icon}>
-                        <span className={feature.icon}></span>
+                        {feature.icon} 
                     </div>
                     <h4>{feature.title}</h4>
                     <p>{feature.description}</p>
@@ -21,8 +21,10 @@ function FeatureCard() {
 export default function Feature() {
     return (
         <section className={styles.feature}>
-            <div className="container">
-                <h2>Awesome Feature</h2>
+            <div className={styles.container}>
+                <div className={styles.title}>
+                    <h2>Awesome Feature</h2>
+                </div>
                 <FeatureCard />
             </div>
         </section>
