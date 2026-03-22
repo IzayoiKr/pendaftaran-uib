@@ -7,6 +7,7 @@ $color-primary:       #29b6f6;
 $color-primary-hover: #039be5;
 $color-placeholder:   #888;
 
+
 $header-height: var(--space-2xl);
 
 
@@ -33,6 +34,7 @@ $header-height: var(--space-2xl);
 .login-box {
   @include global.container;
   text-align: center;
+  max-width: 34rem !important;
 
   .login-title {
     font-size: var(--step-2);
@@ -139,7 +141,6 @@ $header-height: var(--space-2xl);
     padding: calc(#{$header-height} + var(--space-s)) var(--space-m) calc(var(--space-2xl) + var(--space-l));
   }
 }
-
 
 @media (max-width: map-get(global.$breakpoints, sm)) {
   .page-content {
