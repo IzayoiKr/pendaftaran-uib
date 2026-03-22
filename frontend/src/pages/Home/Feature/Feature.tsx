@@ -7,7 +7,7 @@ function FeatureCard() {
             {features.map((feature) => (
                 <div key={feature.id} className={styles.card}>
                     <div className={styles.icon}>
-                        <span className={feature.icon}></span>
+                        {feature.icon} 
                     </div>
                     <h4>{feature.title}</h4>
                     <p>{feature.description}</p>

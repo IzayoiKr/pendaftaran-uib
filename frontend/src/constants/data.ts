@@ -1,22 +1,22 @@
+import { createElement } from "react";
 import type { Hero, Program, Event, Feature } from "../types";
 
 const images = import.meta.glob('../assets/courses/*.{jpg,png,jpeg}', {
     eager: true,
     import: 'default'
 });
-
 const getImage = (name: string): string => {
     return images[`../assets/courses/${name}`] as string;
 };
-
 const eventImages = import.meta.glob('../assets/event/*.{jpg,png,jpeg}', {
     eager: true,
     import: 'default'
 }) as Record<string, string>;
-
 const getEventImage = (name: string): string => {
     return eventImages[`../assets/event/${name}`];
 };
+
+import { FaUserGraduate, FaBook, FaGlobeAmericas } from 'react-icons/fa';
 
 
 export const heroes: Hero = {
@@ -192,21 +192,21 @@ export const events: Event[] = [
 export const features: Feature[] = [
     {
         id: 'scholarship',
-        icon: 'flaticon-student',
+        icon: createElement(FaUserGraduate, { size: 36, color: "#4F46E5" }),
         title: 'UIB Scholarship',
         description: 'Universitas Internasional Batam memberikan fasilitas beasiswa kepada calon mahasiswa baru sebesar 10 Miliar setiap tahunnya. Beasiswa yang diberikan terdiri dari dua macam yaitu beasiswa penuh dan beasiswa tidak penuh (sebagian). Beasiswa penuh terdiri dari Beasiswa Cemerlang dan Beasiswa Insan Mandiri dan beasiswa tidak penuh (sebagian) terdiri dari Beasiswa Prestasi 1, 2, 3, dan 4.',
         link: '/home/detail_informasi/6',
     },
     {
         id: 'assistance',
-        icon: 'flaticon-book',
+        icon: createElement(FaBook, { size: 36, color: "#4F46E5" }),
         title: 'Student Assistance Service',
         description: 'Universitas Internasional Batam menyediakan beberapa fasilitas layanan bagi calon mahasiswa yang akan mendaftar ulang dan hadir di UIB.',
         link: '/home/detail_informasi/7',
     },
     {
         id: 'batam',
-        icon: 'flaticon-earth',
+        icon: createElement(FaGlobeAmericas, { size: 36, color: "#4F46E5" }),
         title: 'About Batam',
         description: 'Kota Batam adalah salah satu pulau di Provinsi Kepulauan Riau, yang terletak antara Selat Malaka dan Singapura yang secara keseluruhan membentuk wilayah Batam. Kota Batam merupakan daerah tropis, dengan suhu rata-rata berkisar antara 24 hingga 35 derajat Celcius (77 sampai 95 derajat Fahrenheit). Kelembaban di wilayah ini berkisar dari 73% menjadi 96%. Secara umum musim hujan dimulai dari November hingga April dan musim kering dari Mei hingga Oktober. Rata-rata curah hujan tahunan sekitar 2600 mm.',
         link: '/home/detail_informasi/11',
