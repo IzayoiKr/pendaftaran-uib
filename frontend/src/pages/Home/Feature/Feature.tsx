@@ -22,7 +22,9 @@ export default function Feature() {
     return (
         <section className={styles.feature}>
             <div className={styles.container}>
-                <h2>Awesome Feature</h2>
+                <div className={styles.title}>
+                    <h2>Awesome Feature</h2>
+                </div>
                 <FeatureCard />
             </div>
         </section>

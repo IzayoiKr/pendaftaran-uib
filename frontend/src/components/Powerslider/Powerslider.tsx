@@ -5,7 +5,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 
 import { programs } from '../../constants/data';
-import ProgramCard from '../../pages/Home/ProgramStudi//ProgramCard';
+import ProgramCard from '../../pages/Home/ProgramStudi/ProgramCard';
 
 export default function ProgramSlider() {
   return (

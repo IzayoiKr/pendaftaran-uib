@@ -2,6 +2,7 @@
 @use 'sass:color';
 
 .feature {
+  padding: 5rem 0;
   .container {
     @include global.container;
   }
@@ -52,3 +53,18 @@
   gap: 2rem;
 }
 
+.title {
+  text-align: center;
+  max-width: 540px;
+  margin: 0 auto 85px;
+
+  h2 {
+    font-family: 'Rubik Variable', 'Poppins', sans-serif;
+    color: global.$tertiary-color;
+    font-size: 36px;
+    line-height: 30px;
+    font-weight: 800;
+    font-style: normal;
+    margin-bottom: 15px;
+  }
+}
