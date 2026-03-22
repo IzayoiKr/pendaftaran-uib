@@ -74,7 +74,8 @@ export default function LoginPage() {
                     <a href="https://pendaftaran.uib.ac.id/akun/lupa_password" 
                         className="forgot-link" target="_blank" rel="noopener noreferrer">
                         Lupa Password?
-                    </a> //nanti baru ganti ke page
+                    </a> 
+                    {/* // nanti baru direct ke page lain */}
                     <div>
                         <LoginButton isLoading={isLoading} />
                     </div>
@@ -83,7 +84,8 @@ export default function LoginPage() {
                         <a href="https://pendaftaran.uib.ac.id/akun/register" target="_blank" rel="noopener noreferrer"> 
                             Buat Akun
                         </a> 
-                    </p> //nanti baru ganti ke page lain
+                    </p>
+                     {/* //nanti baru ganti ke page lain */}
                 </form>
             </div>
         </div>
