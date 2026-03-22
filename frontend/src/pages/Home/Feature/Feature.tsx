@@ -21,7 +21,7 @@ function FeatureCard() {
 export default function Feature() {
     return (
         <section className={styles.feature}>
-            <div className="container">
+            <div className={styles.container}>
                 <h2>Awesome Feature</h2>
                 <FeatureCard />
             </div>
