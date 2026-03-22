@@ -1,4 +1,4 @@
-@use '../../../styles/global.scss';
+@use '../../../styles/global.scss' as global;
 
 .card {
   border: 1px solid #eee;
@@ -6,10 +6,6 @@
   overflow: hidden;
   box-shadow: 0 5px 15px rgba(0,0,0,0.05);
   transition: transform 0.3s, box-shadow 0.3s;
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  }
 
   img {
     width: 100%;
@@ -35,13 +31,10 @@
       font-size: 0.9rem;
     }
 
-    h3 {
-      margin: 1rem 0 0.5rem;
-      a {
-        color: global.$secondary-color;
-        &:hover {
-          color: global.$primary-color;
-        }
+    h3 a {
+      color: global.$secondary-color;
+      &:hover {
+        color: global.$primary-color;
       }
     }
 
@@ -51,9 +44,29 @@
       line-height: 1.6;
       display: -webkit-box;
       -webkit-line-clamp: 3;
+      line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
+
+      &.expanded {
+        display: block;
+        -webkit-line-clamp: unset;
+        line-clamp: unset;
+        overflow: visible;
+      }
+    }
+
+    .toggleBtn {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: global.$primary-color;
+      cursor: pointer;
+      user-select: none;
     }
   }
-}
 
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  }
+}

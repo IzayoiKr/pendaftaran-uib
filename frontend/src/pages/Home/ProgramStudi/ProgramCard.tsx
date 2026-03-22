@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { useState, type FC } from 'react';
 import type { Program } from '../../../types';
 import styles from './ProgramCard.module.scss';
 
@@ -7,6 +7,8 @@ interface Props {
 }
 
 const ProgramCard: FC<Props> = ({ program }) => {
+    const [expanded, setExpanded] = useState(false);
+
     return (
         <div className={styles.card}>
             <img src={program.image} alt={program.title} />
@@ -18,11 +20,18 @@ const ProgramCard: FC<Props> = ({ program }) => {
                         {program.title}
                     </a>
                 </h3>
-                <p>{program.description}</p>
+                <p className={expanded ? styles.expanded : ''}>
+                    {program.description}
+                </p>
+                <div
+                    className={styles.toggleBtn}
+                    onClick={() => setExpanded(prev => !prev)}
+                >
+                    {expanded ? 'Tutup' : 'Detail'}
+                </div>
             </div>
         </div>
     );
 };
 
 export default ProgramCard;
-
