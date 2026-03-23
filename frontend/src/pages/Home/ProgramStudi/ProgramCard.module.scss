@@ -38,6 +38,10 @@
       }
     }
 
+    h3 {
+      font-size: 1.45rem; // dari default (biasanya 1.25rem / 20px)
+    }
+
     p {
       color: global.$text-color;
       font-size: 0.95rem;
