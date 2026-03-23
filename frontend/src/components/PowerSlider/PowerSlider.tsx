@@ -16,6 +16,11 @@ export default function ProgramSlider() {
       <Swiper
         modules={[Navigation, Autoplay, Pagination]}
 
+        onBeforeInit={(swiper) => {
+          (swiper.params.navigation as any).prevEl = `.${styles.prev}`;
+          (swiper.params.navigation as any).nextEl = `.${styles.next}`;
+        }}
+
         navigation={{
           prevEl: '.custom-prev',
           nextEl: '.custom-next',

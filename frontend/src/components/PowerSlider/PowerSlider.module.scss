@@ -5,30 +5,6 @@
 }
 
 /* =========================
-   FADE OVERLAY (TIDAK NUTUP CARD)
-========================= */
-.wrapper::before,
-.wrapper::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  width: 60px; // diperkecil biar tidak ganggu
-  height: 100%;
-  z-index: 1; // di bawah slide
-  pointer-events: none;
-}
-
-.wrapper::before {
-  left: 0;
-  background: linear-gradient(to right, rgba(255,255,255,0.9), transparent);
-}
-
-.wrapper::after {
-  right: 0;
-  background: linear-gradient(to left, rgba(255,255,255,0.9), transparent);
-}
-
-/* =========================
    NAVIGATION BUTTON
 ========================= */
 :global(.swiper-button-prev),
