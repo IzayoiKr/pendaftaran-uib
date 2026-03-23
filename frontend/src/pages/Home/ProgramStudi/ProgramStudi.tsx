@@ -5,7 +5,7 @@ import ProgramSlider from '../../../components/PowerSlider/PowerSlider';
 const ProgramStudi: FC = () => {
     return (
         <section className={styles.program} id="program">
-            <div className={styles.container}>
+            <div className={styles.programContainer}>
                 <div className={styles.title}>
                     <h2>Program Studi</h2>
                     <p>Program Sarjana dan Program Pasca Sarjana</p>

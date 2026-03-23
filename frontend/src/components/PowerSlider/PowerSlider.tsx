@@ -1,8 +1,9 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, EffectFade } from 'swiper/modules'; 
+import { Navigation, Autoplay, Pagination } from 'swiper/modules';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 import { programs } from '../../constants/data';
 import ProgramCard from '../../pages/Home/ProgramStudi/ProgramCard';
@@ -13,13 +14,28 @@ export default function ProgramSlider() {
   return (
     <div className={styles.wrapper}>
       <Swiper
-        modules={[Navigation, EffectFade]}
-        navigation
+        modules={[Navigation, Autoplay, Pagination]}
+
+        navigation={{
+          prevEl: '.custom-prev',
+          nextEl: '.custom-next',
+        }}
+
         loop={true}
-        speed={1000} // smooth ala Owl Carousel
-        effect="fade"
-        fadeEffect={{ crossFade: true }}
+        speed={800}
+
+        autoplay={{
+          delay: 3000,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: true,
+        }}
+
+        pagination={{
+          clickable: true,
+        }}
+
         spaceBetween={30}
+
         breakpoints={{
           576: { slidesPerView: 1 },
           768: { slidesPerView: 2 },
@@ -32,6 +48,10 @@ export default function ProgramSlider() {
           </SwiperSlide>
         ))}
       </Swiper>
+
+      {/* tombol custom (di luar swiper) */}
+      <div className={styles.prev}></div>
+      <div className={styles.next}></div>
     </div>
   );
 }

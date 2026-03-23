@@ -1,59 +1,57 @@
 .wrapper {
   position: relative;
-  padding: 0 60px; // ruang tombol kiri kanan
-  overflow: hidden; // biar fade effect nggak scroll keluar
+  padding: 0 60px;
+  overflow: hidden;
 }
 
 /* =========================
-   FADE EFFECT (kiri kanan)
+   FADE OVERLAY (TIDAK NUTUP CARD)
 ========================= */
 .wrapper::before,
 .wrapper::after {
   content: '';
   position: absolute;
   top: 0;
-  width: 120px;
+  width: 60px; // diperkecil biar tidak ganggu
   height: 100%;
-  z-index: 2;
+  z-index: 1; // di bawah slide
   pointer-events: none;
 }
 
 .wrapper::before {
   left: 0;
-  background: linear-gradient(to right, #fff, transparent);
+  background: linear-gradient(to right, rgba(255,255,255,0.9), transparent);
 }
 
 .wrapper::after {
   right: 0;
-  background: linear-gradient(to left, #fff, transparent);
+  background: linear-gradient(to left, rgba(255,255,255,0.9), transparent);
 }
 
 /* =========================
-   TOMBOL SWIPER
+   NAVIGATION BUTTON
 ========================= */
 :global(.swiper-button-prev),
 :global(.swiper-button-next) {
-  width: 50px !important;
-  height: 50px !important;
-  background: #fff !important;
-  border-radius: 50% !important;
-  border: 1px solid #e5e7eb !important;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08) !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  z-index: 3 !important; // di atas overlay
+  width: 50px;
+  height: 50px;
+  background: #fff;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
 }
 
-/* posisi tombol */
 :global(.swiper-button-prev) {
-  left: 0 !important;
+  left: 0;
 }
 
 :global(.swiper-button-next) {
-  right: 0 !important;
+  right: 0;
 }
 
-/* icon panah */
 :global(.swiper-button-prev::after),
 :global(.swiper-button-next::after) {
   font-size: 18px;
@@ -61,9 +59,71 @@
 }
 
 /* =========================
-   SMOOTH ANIMASI WRAPPER
+   PAGINATION
 ========================= */
-:global(.swiper-wrapper) {
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 1; // biar fade overlay kelihatan
+:global(.swiper-pagination) {
+  position: relative;
+  margin-top: 20px;
 }
+
+:global(.swiper-pagination-bullet) {
+  width: 10px;
+  height: 10px;
+  background: #d1d5db;
+  opacity: 1;
+  margin: 0 5px !important;
+  transition: all 0.3s ease;
+}
+
+:global(.swiper-pagination-bullet-active) {
+  background: #4f46e5;
+  transform: scale(1.2);
+}
+
+/* tombol custom */
+.prev,
+.next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background: #fff;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  z-index: 5;
+  cursor: pointer;
+}
+
+/* posisi mentok layar */
+.prev {
+  left: 10px;
+}
+
+.next {
+  right: 10px;
+}
+
+/* icon panah */
+.prev::after,
+.next::after {
+  content: '‹';
+  font-size: 24px;
+  color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.next::after {
+  content: '›';
+}
+
+/* sembunyikan default swiper button */
+:global(.swiper-button-prev),
+:global(.swiper-button-next) {
+  display: none;
+}
+
