@@ -63,8 +63,7 @@ export interface Event {
 }
 
 export interface Feature {
-    id: string;
-    icon: ReactNode;
+    icon: string;
     title: string;
     description: string;
     link: string;

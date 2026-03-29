@@ -1,48 +1,24 @@
 @use '../../../styles/global.scss';
 @use 'sass:color';
+@use 'sass:map';
+
+$card-bg: #f9f9ff;
 
 .feature {
-  padding: 5rem 0;
+  margin-bottom: var(--space-2xl);
+
   .container {
     @include global.container;
-  }
 
-  .card {
-    background: global.$white;
-    padding: 2rem;
-    border-radius: 8px;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    transition: transform 0.3s;
-    &:hover {
-      transform: translateY(-5px);
-    }
-  }
+    h2 {
+      text-align: center;
+      color: global.$tertiary-color;
+      font-weight: 600;
+      margin-bottom: var(--space-xl);
 
-  .icon {
-    font-size: 3rem;
-    color: global.$primary-color;
-    margin-bottom: 1rem;
-  }
-
-  h4 {
-    color: global.$secondary-color;
-    margin-bottom: 1rem;
-    font-size: 1.3rem;
-  }
-
-  p {
-    color: global.$text-color;
-    margin-bottom: 1.5rem;
-    line-height: 1.7;
-  }
-
-  .link {
-    color: global.$primary-color;
-    font-weight: 600;
-    text-decoration: underline;
-    &:hover {
-      color: color.adjust(global.$primary-color, $lightness: -15%);
+      @media(max-width: map.get(global.$breakpoints, lg)) {
+        margin-bottom: var(--space-l);
+      }
     }
   }
 }
@@ -50,21 +26,58 @@
 .stack {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+  align-items: start;
+  gap: var(--space-m);
+
+  @media(max-width: map.get(global.$breakpoints, lg)) {
+    grid-template-columns: 1fr;
+  }
 }
 
-.title {
-  text-align: center;
-  max-width: 540px;
-  margin: 0 auto 85px;
+.card {
+  background: $card-bg;
+  padding: var(--space-l) var(--space-m);
+  transition: box-shadow 0.3s ease;
 
-  h2 {
-    font-family: 'Rubik Variable', 'Poppins', sans-serif;
+  &:hover {
+    box-shadow: 0px 10px 30px rgba(0, 35, 71, 0.1);
+  }
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: global.$tertiary-color;
-    font-size: 36px;
-    line-height: 30px;
-    font-weight: 800;
-    font-style: normal;
-    margin-bottom: 15px;
+
+    svg {
+      width: var(--step-4);
+      height: var(--step-4);
+    }
+  }
+
+  h4 {
+    color: global.$text-color2;
+    font-weight: 500;
+    margin-top: var(--space-s);
+    margin-bottom: var(--space-2xs);
+    text-align: center;
+  }
+
+  p {
+    color: global.$text-color;
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
+    text-wrap: pretty;
+    line-height: 1.7;
+
+    a {
+      color: global.$link-color;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: darken(global.$link-color, 20%);
+      }
+    }
   }
 }
