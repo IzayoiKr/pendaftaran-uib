@@ -2,9 +2,9 @@ import Header from '../../components/Header/Header';
 import Hero from './Hero/Hero';
 import ProgramStudi from './ProgramStudi/ProgramStudi';
 import Gelombang from './Gelombang/Gelombang';
-import Panduan from './Panduan/Panduan';
+import Guide from './Guides/Guides';
 import Feature from './Feature/Feature';
-import Footer from "../../components/Footer/Footer";
+import Footer from '../../components/Footer/Footer';
 
 export default function Home() {
     return (
@@ -14,7 +14,7 @@ export default function Home() {
                 <Hero />
                 <ProgramStudi />
                 <Gelombang />
-                <Panduan />
+                <Guide />
                 <Feature />
             </main>
             <Footer />

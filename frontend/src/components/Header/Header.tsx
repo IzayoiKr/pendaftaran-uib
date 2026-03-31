@@ -8,7 +8,7 @@ import scrollToId from '../ScrollToId';
 
 interface HamburgerButtonProps {
     isOpen?: boolean;
-    setIsOpen: (value: boolean) => void;
+    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface NavMenuProps {
@@ -72,8 +72,8 @@ function NavMenu({ isOpen, activeId, pathname, onLinkClick }: NavMenuProps) {
 }
 
 export default function Header() {
-    const [isOpen, setIsOpen] = useState(false);
-    const [isScrolled, setIsScrolled] = useState(false);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [isScrolled, setIsScrolled] = useState<boolean>(false);
     const { pathname } = useLocation();
 
     const headerRef = useRef<HTMLElement>(null);

@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-
 export interface HeaderNavLinks {
     to: string;
     label: string;
@@ -69,3 +67,9 @@ export interface Feature {
     link: string;
 }
 
+export interface Guide {
+    id: string;
+    title: string;
+    description: string;
+    embedUrl: string
+}

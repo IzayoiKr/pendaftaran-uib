@@ -3,9 +3,9 @@ WORKDIR /app
 COPY package*.json ./
 
 FROM base AS development
-RUN --mount=type=cache,target=/root/.npm npm install
-USER node
+RUN --mount=type=cache,target=/root/.npm npm install --legacy-peer-deps
 COPY --chown=node:node . .
+USER node
 EXPOSE 8989
 CMD [ "npm", "run", "dev", "--", "--host" ]
 

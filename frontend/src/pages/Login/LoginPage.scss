@@ -1,5 +1,5 @@
 @use '../../styles/global.scss';
-
+@use 'sass:map';
 
 $color-input-bg:      #eef1f5;
 $color-input-focus:   #e4e8f0;
@@ -7,9 +7,7 @@ $color-primary:       #29b6f6;
 $color-primary-hover: #039be5;
 $color-placeholder:   #888;
 
-
 $header-height: var(--space-2xl);
-
 
 .loginLayout {
   display: flex;
@@ -136,13 +134,13 @@ $header-height: var(--space-2xl);
 }
 
 
-@media (max-width: map-get(global.$breakpoints, md)) {
+@media (max-width: map.get(global.$breakpoints, md)) {
   .page-content {
     padding: calc(#{$header-height} + var(--space-s)) var(--space-m) calc(var(--space-2xl) + var(--space-l));
   }
 }
 
-@media (max-width: map-get(global.$breakpoints, sm)) {
+@media (max-width: map.get(global.$breakpoints, sm)) {
   .page-content {
     padding: calc(#{$header-height} + var(--space-xs)) var(--space-s) calc(var(--space-xl) + var(--space-l));
   }

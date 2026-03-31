@@ -2,8 +2,6 @@
 @use 'sass:color';
 @use 'sass:map';
 
-$card-bg: #f9f9ff;
-
 .feature {
   margin-bottom: var(--space-2xl);
 
@@ -35,7 +33,7 @@ $card-bg: #f9f9ff;
 }
 
 .card {
-  background: $card-bg;
+  background: global.$card-bg;
   padding: var(--space-l) var(--space-m);
   transition: box-shadow 0.3s ease;
 
@@ -76,7 +74,7 @@ $card-bg: #f9f9ff;
       transition: color 0.3s ease;
 
       &:hover {
-        color: darken(global.$link-color, 20%);
+        color: color.adjust(global.$link-color, $lightness: -20%);
       }
     }
   }

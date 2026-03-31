@@ -1,4 +1,4 @@
-import type { Hero, Program, Event, Feature } from "../types";
+import type { Hero, Program, Event, Feature, Guide } from "../types";
 
 const images = import.meta.glob('../assets/courses/*.{jpg,png,jpeg}', {
     eager: true,
@@ -206,3 +206,17 @@ export const features: Feature[] = [
     },
 ];
 
+export const guides: Guide[] = [
+    {
+        id: 'admissions',
+        title: 'Student Admissions Guideline',
+        description: 'Silahkan ikuti video di bawah ini.',
+        embedUrl: 'https://www.youtube.com/embed/E3ez3tOA_D4?vq=hd1080si=KUOZbzZdYxe10y95'
+    },
+    {
+        id: 're-registration',
+        title: 'Re-registration Guideline',
+        description: 'Silahkan ikuti video di bawah ini.',
+        embedUrl: 'https://www.youtube.com/embed/WWaq2Hs6kq0?vq=hd1080si=poy1zeAo5OMuMauu'
+    }
+]

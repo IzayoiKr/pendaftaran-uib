@@ -1,5 +1,6 @@
 @use '../../styles/global.scss';
 @use 'sass:map';
+@use 'sass:color';
 
 $widget-color: #7b838a;
 $widget-link-color: #007bff;
@@ -57,7 +58,7 @@ address {
     transition: color 0.3s ease;
 
     &:hover {
-      color: darken($widget-link-color, 10%);
+      color: color.adjust($widget-link-color, $lightness: -10%);
     }
   }
 }
