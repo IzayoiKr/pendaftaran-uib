@@ -11,7 +11,7 @@ footer {
 
   .container {
     @include global.container;
-    padding: var(--space-xl);
+    padding: var(--space-xl) 15px;
   }
 }
 

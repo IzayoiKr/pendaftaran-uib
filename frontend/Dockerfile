@@ -3,14 +3,14 @@ WORKDIR /app
 COPY package*.json ./
 
 FROM base AS development
-RUN --mount=type=cache,target=/root/.npm npm install --legacy-peer-deps
+RUN --mount=type=cache,target=/home/node/.npm npm install --legacy-peer-deps
 COPY --chown=node:node . .
 USER node
 EXPOSE 8989
 CMD [ "npm", "run", "dev", "--", "--host" ]
 
 FROM base AS builder
-RUN --mount=type=cache,target=/root/.npm npm ci
+RUN --mount=type=cache,target=/home/node/.npm npm ci
 COPY . .
 RUN npm run build
 
