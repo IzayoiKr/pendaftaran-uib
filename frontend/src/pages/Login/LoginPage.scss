@@ -25,7 +25,6 @@ $header-height: var(--space-2xl);
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: calc(#{$header-height} + var(--space-m)) var(--space-s) calc(var(--space-2xl) + var(--space-l));
 }
 
 

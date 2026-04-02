@@ -220,3 +220,49 @@ export const guides: Guide[] = [
         embedUrl: 'https://www.youtube.com/embed/WWaq2Hs6kq0?vq=hd1080si=poy1zeAo5OMuMauu'
     }
 ]
+
+export const schools: string[] = [
+  "SMAN 1 Batam",
+  "SMAN 2 Batam",
+  "SMAN 3 Batam",
+  "SMKN 1 Batam",
+  "SMKN 2 Batam",
+  "SMK Kartini Batam",
+  "SMA Yos Sudarso Batam",
+  "SMA Kartini Batam",
+  "SMA Methodist Batam",
+  "SMA Harapan Utama Batam"
+];
+
+export const universities: string[] = [
+  "Universitas Indonesia",
+  "Universitas Gadjah Mada",
+  "Institut Teknologi Bandung",
+  "Universitas Airlangga",
+  "Universitas Diponegoro",
+  "Universitas Brawijaya",
+  "Universitas Hasanuddin",
+  "Universitas Padjadjaran",
+  "Universitas Sebelas Maret",
+  "Universitas Sumatera Utara",
+  "Universitas Riau",
+  "Universitas Maritim Raja Ali Haji",
+  "Universitas Internasional Batam",
+  "Politeknik Negeri Batam",
+  "Universitas Putera Batam",
+  "Universitas Batam",
+  "Universitas Negeri Jakarta",
+  "Universitas Gunadarma",
+  "Universitas Bina Nusantara",
+  "Universitas Trisakti",
+  "Universitas Tarumanagara",
+  "Universitas Atma Jaya Jakarta",
+  "Universitas Mercu Buana",
+  "Universitas Telkom",
+  "Universitas Komputer Indonesia",
+  "Institut Teknologi Sepuluh Nopember",
+  "Universitas Andalas",
+  "Universitas Sriwijaya",
+  "Universitas Lampung",
+  "Universitas Mulawarman",
+];

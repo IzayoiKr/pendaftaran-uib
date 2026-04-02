@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import type { Event } from '../../../types';
 import styles from './EventCard.module.scss';
+import { Link } from "react-router-dom"
 
 interface Props {
     event: Event;
@@ -38,7 +39,12 @@ const EventCard: FC<Props> = ({ event }) => {
                 <p className={styles.regDate}>
                     Tanggal Pendaftaran (<i>Registration date</i>) : {event.registrationStart} s.d. {event.registrationEnd}
                 </p>
-                <a href={event.registerLink} className={styles.registerBtn}>Daftar (Register)</a>
+                <Link
+                to={`/register/${event.id}`} // ⭐ PENTING
+                className={styles.registerBtn}
+                >
+                Daftar (Register)
+                </Link>
             </div>
         </div>
     );

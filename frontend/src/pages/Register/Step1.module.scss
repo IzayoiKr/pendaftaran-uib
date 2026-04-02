@@ -1,0 +1,269 @@
+@use '../../styles/global.scss' as global;
+
+/* ================= CONTAINER ================= */
+.container {
+  @include global.container;
+  padding: var(--space-l) 0;
+}
+
+.formWrapper {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ================= HEADER ================= */
+.header {
+  text-align: center;
+  margin-bottom: var(--space-l);
+}
+
+.mainTitle {
+  font-size: var(--step-2);
+  font-weight: 700;
+  color: #0b3c5d;
+}
+
+.subTitle {
+  font-size: var(--step--1);
+  margin-bottom: var(--space-m);
+}
+
+.steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin-top: var(--space-s);
+}
+
+/* GARIS ABU (TIDAK DIUBAH) */
+.steps::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--space-m) / 2);
+  left: calc(50% / 3);
+  right: calc(50% / 3);
+  height: 2px;
+  background: #ccc;
+  transform: translateY(-50%);
+}
+
+/* GARIS HIJAU (TETAP HIJAU) */
+.steps::after {
+  content: "";
+  position: absolute;
+  top: calc(var(--space-m) / 2);
+  left: calc(50% / 3);
+  height: 2px;
+  width: var(--progress, 0%);
+  background: green; // 🔒 tidak diubah
+  transform: translateY(-50%);
+}
+
+.step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.circle {
+  width: var(--space-m);
+  height: var(--space-m);
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--step--1);
+  z-index: 1;
+}
+
+.step.active .circle {
+  border-color: green;
+  color: green;
+}
+
+/* ================= FORM ================= */
+.title {
+  font-size: var(--step-2);
+  font-weight: 600;
+  margin-bottom: var(--space-m);
+}
+
+.sectionTitle {
+  font-size: var(--step-1);
+  font-weight: 600;
+  margin: var(--space-l) 0 var(--space-s);
+}
+
+.formGroup {
+  margin-bottom: var(--space-s);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.label {
+  font-size: var(--step--1);
+  margin-bottom: 0.4em;
+  height: 1.2em;
+  color: #333;
+}
+
+/* ================= INPUT ================= */
+.input {
+  width: 100%;
+  height: 2.3em;
+  padding: 0 0.75em;
+  border: 1px solid #ccc;
+  border-radius: 0.25em;
+  font-size: var(--step--1);
+  background: #fff;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: #999;
+  }
+}
+
+/* ================= SELECT ================= */
+.select {
+  width: 100%;
+  height: 3em;
+  padding: 0 2em 0 0.75em;
+  border: 1px solid #ccc;
+  border-radius: 0.25em;
+  font-size: 0.9em;
+  background: #fff;
+  box-sizing: border-box;
+
+  appearance: none;
+}
+
+/* ================= WRAPPER ================= */
+.selectWrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* ================= ICON ================= */
+.selectWrapper::after {
+  content: "▾";
+  position: absolute;
+  right: 0.75em;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8em;
+  color: #666;
+  pointer-events: none;
+}
+/* ================= DROPDOWN ================= */
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  margin-top: 0.25em;
+
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 0.3em;
+
+  max-height: 14em;
+  overflow-y: auto;
+
+  z-index: 10;
+}
+
+/* ================= OPTION ================= */
+.option {
+  padding: 0.6em;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.option:hover {
+  background: #f3f4f6;
+}
+
+/* ================= NOT FOUND ================= */
+.notFound {
+  padding: 0.6em 0.75em;
+  font-size: 0.85em;
+  color: #888;
+}
+
+/* ================= SCROLLBAR ================= */
+.dropdown::-webkit-scrollbar {
+  width: 0.35em;
+}
+
+.dropdown::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 0.2em;
+}
+
+/* ================= GRID ================= */
+.row {
+  display: flex;
+  gap: var(--space-s);
+  margin-bottom: var(--space-s);
+}
+
+.col {
+  flex: 1;
+}
+
+/* ================= EXTRA ================= */
+.extraBox {
+  background: #f9fafb;
+  border: 1px solid #ddd;
+  padding: 0.75em;
+  margin-bottom: var(--space-s);
+}
+
+.checkbox {
+  display: flex;
+  gap: 0.4em;
+  font-size: var(--step--1);
+}
+
+/* ================= BUTTON ================= */
+.buttonGroup {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-m);
+}
+
+.cancel {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  border-radius: 6.25em;
+  height: 2.75em;
+  padding: 0 var(--space-l);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: #dc2626;
+  }
+}
+
+.next {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6.25em;
+  height: 2.75em;
+  padding: 0 var(--space-l);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: #0056b3;
+  }
+}
