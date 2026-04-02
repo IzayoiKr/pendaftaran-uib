@@ -83,7 +83,7 @@ $dot-size: clamp(0.5rem, 0.4688rem + 0.1563vw, 0.625rem);
       color: global.$primary-color;
     }
 
-    .courseContent h4 a {
+    .courseContent h3 a {
       color: global.$primary-color;
     }
   }
@@ -120,7 +120,7 @@ $dot-size: clamp(0.5rem, 0.4688rem + 0.1563vw, 0.625rem);
   border-radius: 50%;
   background: global.$primary-color;
   color: global.$tertiary-color;
-  font-size: 20px;
+  font-size: clamp(1rem, 0.9274rem + 0.3226vw, 1.25rem);
   font-weight: 500;
   transition: background 0.3s ease, color 0.3s ease;
 }
@@ -132,11 +132,11 @@ $dot-size: clamp(0.5rem, 0.4688rem + 0.1563vw, 0.625rem);
   color: global.$card-bg;
   background: global.$tertiary-color;
   text-transform: uppercase;
-  margin-bottom: var(--space-m);
+  margin-bottom: var(--space-xs);
 }
 
 .courseContent {
-  h4 {
+  h3 {
   font-weight: 500;
   margin-bottom: var(--space-xs);
 

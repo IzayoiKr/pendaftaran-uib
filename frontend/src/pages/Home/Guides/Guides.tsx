@@ -11,7 +11,7 @@ function GuideVideo({ title, description, embedUrl }: GuideVideoProps) {
     return (
         <div className={styles.card}>
             <div className={styles.cardBody}>
-                <h4>{title}</h4>
+                <h3>{title}</h3>
                 <p>{description}</p>
                 <div className={styles.videoWrapper}>
                     <iframe

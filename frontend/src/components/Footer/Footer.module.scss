@@ -24,7 +24,8 @@ footer {
 }
 
 .widget {
-  h4 {
+  h2 {
+    font-size: var(--step-1);
     color: global.$white;
     font-weight: 600;
     margin-bottom: var(--space-s);

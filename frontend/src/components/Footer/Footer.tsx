@@ -16,7 +16,7 @@ function FooterMenu() {
 
     return (
         <div className={styles.widget}>
-            <h4>Menu</h4>
+            <h2>Menu</h2>
             <ul className={styles.widgetList}>
                 {footerNavLinks.map(link => {
                     const isExternal = link.to.startsWith('http');
@@ -38,7 +38,7 @@ function FooterMenu() {
 function FooterContact() {
     return (
         <div className={styles.widget}>
-            <h4>Kontak</h4>
+            <h2>Kontak</h2>
             <address>
                 <strong>{contactInfo.university}</strong><br />
                 {contactInfo.address}<br />
@@ -53,7 +53,7 @@ function FooterContact() {
 function FooterMap() {
     return (
         <div className={styles.widget}>
-            <h4>Lokasi Kampus</h4>
+            <h2>Lokasi Kampus</h2>
             <iframe
                 src={externalLinks.mapEmbedUrl}
                 width="100%"
