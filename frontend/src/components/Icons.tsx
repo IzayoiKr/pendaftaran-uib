@@ -1,3 +1,5 @@
+import type React from "react";
+
 function InstagramIcon() {
     return (
         <svg
@@ -88,6 +90,22 @@ function EarthIcon() {
     );
 }
 
+function ClockIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm.5-13H11v6l4.25 2.55.75-1.23-3.5-2.07V7z" />
+        </svg>
+    );
+}
+
+function PinIcon() {
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+        </svg>
+    );
+}
+
 export const socialIconMap: Record<string, React.ReactNode> = {
     Instagram: <InstagramIcon />,
     Youtube: <YoutubeIcon />,
@@ -98,4 +116,9 @@ export const featureIconMap: Record<string, React.ReactNode> = {
     Student: <StudentIcon />,
     Book: <BookIcon />,
     Earth: <EarthIcon />
+}
+
+export const gelombangIconMap: Record<string, React.ReactNode> = {
+    Clock: <ClockIcon />,
+    Pin: <PinIcon />
 }

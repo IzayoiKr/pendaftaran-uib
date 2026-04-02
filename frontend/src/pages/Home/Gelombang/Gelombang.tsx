@@ -1,19 +1,79 @@
-import type { FC } from 'react';
-import EventCard from './EventCard';
+import type { Event } from '../../../types';
 import { events } from '../../../constants/data';
+import { gelombangIconMap } from '../../../components/Icons';
 import styles from './Gelombang.module.scss';
 
-const Gelombang: FC = () => {
+interface EventCardProps {
+    event: Event
+}
+
+function EventCard({ event }: EventCardProps) {
+    return (
+        <div
+            className={styles.card}
+            style={{ backgroundImage: `url(${event.image})` }}
+            aria-label={event.batchName}
+        >
+            <div className={styles.details}>
+                <h3>
+                    Ujian Saringan Masuk <br />
+                    <i>Admission Test</i>
+                </h3>
+                <h4>
+                    {event.programType} <br />
+                    <i>{event.programTypeEn}</i>
+                </h4>
+                <h5>{event.academicYear}</h5>
+
+                <div className={styles.meta}>
+                    <div className={styles.date}>
+                        <span>{event.day}</span>
+                        {event.month}
+                    </div>
+                    <div className={styles.timeLocation}>
+                        <p>
+                            {gelombangIconMap.Clock}
+                            {' '}
+                            <time dateTime={event.startTime}>{event.startTime}</time>
+                            {' - '}
+                            <time dateTime={event.endTime}>{event.endTime}</time>
+                        </p>
+                        <p>{gelombangIconMap.Pin} {event.location}</p>
+                    </div>
+                </div>
+                <p className={styles.batch}>
+                    <span>Gelombang (<i>Batch</i>):</span>
+                    <br />
+                    {event.batchName}
+                </p>
+                <p className={styles.regDate}>
+                    <span>Tanggal Pendaftaran (<i>Registration date</i>):</span>
+                    <br />
+                    <time dateTime={event.registrationStart}>{event.registrationStart}</time>
+                    {' s.d. '}
+                    <time dateTime={event.registrationEnd}>{event.registrationEnd}</time>
+                </p>
+                <a href={event.registerLink} className={styles.registerBtn}>Daftar (Register)</a>
+            </div>
+        </div>
+    );
+};
+
+export default function Gelombang() {
     return (
         <section className={styles.gelombang} id="gelombang">
             <div className={styles.container}>
                 <div className={styles.title}>
                     <h2>Gelombang Pendaftaran</h2>
                     <hr />
-                    <h2 className={styles.sub}><i>Registration Batch</i></h2>
-                    <p>Informasi Jadwal Penerimaan Mahasiswa Baru <br /><i>New Student Admission Schedule Information</i></p>
+                    <h2 className={styles.subTitle}><i>Registration Batch</i></h2>
+                    <p>
+                        Informasi Jadwal Penerimaan Mahasiswa Baru
+                        <br />
+                        <i>New Student Admission Schedule Information</i>
+                    </p>
                 </div>
-                <div className={styles.grid}>
+                <div className={styles.stack}>
                     {events.map(event => (
                         <EventCard key={event.id} event={event} />
                     ))}
@@ -22,5 +82,3 @@ const Gelombang: FC = () => {
         </section>
     );
 };
-
-export default Gelombang;

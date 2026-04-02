@@ -1,19 +1,11 @@
 import type { Hero, Program, Event, Feature, Guide } from "../types";
 
-const images = import.meta.glob('../assets/courses/*.{jpg,png,jpeg}', {
-    eager: true,
-    import: 'default'
-});
-const getImage = (name: string): string => {
-    return images[`../assets/courses/${name}`] as string;
-};
-const eventImages = import.meta.glob('../assets/event/*.{jpg,png,jpeg}', {
+const assetImages = import.meta.glob('../assets/**/*.{jpg,png,jpeg}', {
     eager: true,
     import: 'default'
 }) as Record<string, string>;
-const getEventImage = (name: string): string => {
-    return eventImages[`../assets/event/${name}`];
-};
+
+const getImg = (path: string): string => { return assetImages[`../assets/${path}`] };
 
 export const heroes: Hero = {
     title: "WELCOME TO UNIVERSITAS INTERNASIONAL BATAM",
@@ -30,7 +22,7 @@ export const programs: Program[] = [
         faculty: 'FTSP',
         degree: 'S1',
         description: 'Sebagai program study yang menghasilkan lulusan berstandar internasional yang berkompeten dalam menerapkan keilmuan dalam pengembangan teknologi di bidang rekayasa sipil serta mampu mengaplikasikan dalam pembangunan berkelanjutan (sustainable development) di wilayah kepulauan untuk menghadapi tuntutan dan perubahan global dunia yang bersifat dinamis.',
-        image: getImage('TS.jpg'),
+        image: getImg('courses/TS.jpg'),
         link: 'https://www.uib.ac.id/ts/',
     },
     {
@@ -39,7 +31,7 @@ export const programs: Program[] = [
         faculty: 'FTSP',
         degree: 'S1',
         description: 'Menjadi program studi arsitektur maritim berbasis kearifan lokal dengan daya saing global yang mendukung pembangunan wilayah pesisir berkelanjutan.',
-        image: getImage('AR.jpg'),
+        image: getImg('courses/AR.jpg'),
         link: 'https://www.uib.ac.id/arsi/',
     },
     {
@@ -48,7 +40,7 @@ export const programs: Program[] = [
         faculty: 'FIK',
         degree: 'S1',
         description: 'Sebagai program sarjana yang menghasilkan lulusan berkualitas di bidang Sistem Informasi melalui pendidikan, penelitian, dan pengabdian kepada masyarakat, pada tingkat nasional dan internasional di tahun 2021.',
-        image: getImage('SI.jpg'),
+        image: getImg('courses/SI.jpg'),
         link: 'https://www.uib.ac.id/si/',
     },
     {
@@ -57,7 +49,7 @@ export const programs: Program[] = [
         faculty: 'FIK',
         degree: 'S1',
         description: 'Sebagai program sarjana yang menghasilkan lulusan berkualitas dalam bidang teknologi informasi khususnya teknologi cloud dan keamanan melalui pendidikan, penelitian, dan pengabdian masyarakat, pada tingkat nasional dan internasional di tahun 2021.',
-        image: getImage('TI.jpg'),
+        image: getImg('courses/TI.jpg'),
         link: 'https://www.uib.ac.id/ti/',
     },
     {
@@ -66,7 +58,7 @@ export const programs: Program[] = [
         faculty: 'FBM',
         degree: 'S1',
         description: 'Sebagai Program Sarjana Manajemen berstandar internasional dalam menghasilkan lulusan yang memiliki jiwa kepemimpinan dan kewirausahaan, berkompeten dalam bidang hubungan industri, keuangan perusahaan, pemasaran business to consumer, serta tanggap dalam mengantisipasi perubahan global yang dinamis.',
-        image: getImage('MN.jpg'),
+        image: getImg('courses/MN.jpg'),
         link: 'https://www.uib.ac.id/mn/',
     },
     {
@@ -75,7 +67,7 @@ export const programs: Program[] = [
         faculty: 'FBM',
         degree: 'S1',
         description: 'Sebagai program studi yang menghasilkan lulusan profesional di bidang akuntansi keuangan sesuai standar internasional dengan jiwa kepemimpinan dan kewirausahaan serta mampu mengikuti perubahan global yang dinamis.',
-        image: getImage('AK.jpg'),
+        image: getImg('courses/AK.jpg'),
         link: 'https://www.uib.ac.id/ak/',
     },
     {
@@ -84,7 +76,7 @@ export const programs: Program[] = [
         faculty: 'FBM',
         degree: 'S1',
         description: 'Menjadi program studi pariwisata dengan standar mutu internasional yang menghasilkan IPTEKS dan lulusan yang mampu mengikuti dinamika perubahan pariwisata di tingkat nasional dan internasional.',
-        image: getImage('PR.jpg'),
+        image: getImg('courses/PR.jpg'),
         link: 'https://www.uib.ac.id/par/',
     },
     {
@@ -93,7 +85,7 @@ export const programs: Program[] = [
         faculty: 'FBM',
         degree: 'S2',
         description: 'Sebagai program studi dengan standar kualitas internasional yang menghasilkan lulusan berkualitas dengan kepemimpinan dan kewirausahaan bersemangat dan kompetensi dalam manajemen internasional di tingkat manajerial.',
-        image: getImage('MM.jpg'),
+        image: getImg('courses/MM.jpg'),
         link: 'https://www.uib.ac.id/mm/',
     },
     {
@@ -102,7 +94,7 @@ export const programs: Program[] = [
         faculty: 'FIH',
         degree: 'S1',
         description: 'Sebagai Program Studi dengan standar kualitas internasional yang menghasilkan lulusan hukum yang dapat memenuhi perubahan dinamis hukum bisnis dalam konteks nasional dan internasional.',
-        image: getImage('IH.jpg'),
+        image: getImg('courses/IH.jpg'),
         link: 'https://www.uib.ac.id/ih/',
     },
     {
@@ -111,7 +103,7 @@ export const programs: Program[] = [
         faculty: 'FIH',
         degree: 'S2',
         description: 'Sebagai program studi dengan standar mutu internasional yang menghasilkan lulusan berkualitas yang mampu mengikuti dinamika perubahan hukum bisnis di tingkat nasional dan internasional.',
-        image: getImage('MH.jpg'),
+        image: getImg('courses/MH.jpg'),
         link: 'https://www.uib.ac.id/mh/',
     },
     {
@@ -120,7 +112,7 @@ export const programs: Program[] = [
         faculty: 'FIP',
         degree: 'S1',
         description: 'Menjadi program sarjana yang menghasilkan lulusan dengan kompetensi unggul dalam bidang pendidikan bahasa Inggris yang dinamis berbasis Edutechnopreneur (education, technology, and entrepreneurship) sesuai dengan standar kualitas internasional.',
-        image: getImage('PBI.jpg'),
+        image: getImg('courses/PBI.jpg'),
         link: 'https://www.uib.ac.id/pbi/',
     },
 ];
@@ -129,12 +121,14 @@ export const programs: Program[] = [
 export const events: Event[] = [
     {
         id: 's1-1',
-        image: getEventImage('GP.jpg'),
+        image: getImg('event/GP.jpg'),
         programType: 'Program Sarjana',
         programTypeEn: 'Undergraduate Program',
         academicYear: 'T.A 2026/2027',
-        date: '09 May',
-        time: '09:00 - 13:00',
+        day: '09',
+        month: 'May',
+        startTime: '09:00',
+        endTime: '13:00',
         location: 'Batam',
         batchName: 'Gelombang 2 Beasiswa-S1 Kedokteran',
         registrationStart: '09 Feb 2026',
@@ -143,12 +137,14 @@ export const events: Event[] = [
     },
     {
         id: 's2-1',
-        image: getEventImage('magister.png'),
+        image: getImg('event/magister.png'),
         programType: 'Program Magister',
         programTypeEn: 'Master Program',
         academicYear: 'T.A 2025/2026',
-        date: '07 Mar',
-        time: '09:00 - 17:00',
+        day: '07',
+        month: 'Mar',
+        startTime: '09:00',
+        endTime: '17:00',
         location: 'Online',
         batchName: 'Gelombang 05',
         registrationStart: '26 Jan 2026',
@@ -157,12 +153,14 @@ export const events: Event[] = [
     },
     {
         id: 's1-2',
-        image: getEventImage('GP.jpg'),
+        image: getImg('event/GP.jpg'),
         programType: 'Program Sarjana',
         programTypeEn: 'Undergraduate Program',
         academicYear: 'T.A 2026/2027',
-        date: '01 Mar',
-        time: '09:00 - 16:00',
+        day: '01',
+        month: 'Mar',
+        startTime: '09:00',
+        endTime: '16:00',
         location: 'Online',
         batchName: 'Gelombang 04',
         registrationStart: '12 Jan 2026',
@@ -171,12 +169,14 @@ export const events: Event[] = [
     },
     {
         id: 's1-3',
-        image: getEventImage('beasiswa-baru.png'),
+        image: getImg('event/beasiswa-baru.png'),
         programType: 'Program Sarjana',
         programTypeEn: 'Undergraduate Program',
         academicYear: 'T.A 2026/2027',
-        date: '27 Jun',
-        time: '09:00 - 16:00',
+        day: '27',
+        month: 'Jun',
+        startTime: '09:00',
+        endTime: '16:00',
         location: 'Online',
         batchName: 'Beasiswa III',
         registrationStart: '08 Dec 2025',
