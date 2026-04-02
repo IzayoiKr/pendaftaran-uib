@@ -5,6 +5,8 @@ import './styles/global.scss';
 import ScrollToHash from './components/ScrollToHash';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import Register from './pages/Register';
+import Forgot from './pages/ForgotPassword';
 import NotFound from './components/NotFound/NotFound';
 
 export default function App() {
@@ -15,6 +17,9 @@ export default function App() {
                 <Route path='/' element={<Home />} />
                 <Route path='/login' element={<Login />} />
                 <Route path='*' element={<NotFound />} />
+                <Route path='/register' element= {<Register/>} />
+                <Route path='/forgot' element= {<Forgot/>} />
+
             </Routes>
         </BrowserRouter>
     );
