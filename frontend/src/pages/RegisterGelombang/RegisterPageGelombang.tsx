@@ -4,7 +4,7 @@ import { events } from "../../constants/data";
 import Step1S1 from "./Step1S1";
 // import Step1S2 from "./Step1S2";
 
-export default function RegisterPage() {
+export default function RegisterPageGelombang() {
   const { id } = useParams();
   const event = events.find(e => e.id === id);
 
@@ -17,23 +17,23 @@ export default function RegisterPage() {
 
   return (
     <div>
+      {step === 1 && event.programType === "Program Sarjana" && (
+        <Step1S1
+          formData={formData}
+          setFormData={setFormData}
+          next={next}
+        />
+      )}
 
-    {step === 1 && event.programType === "Program Sarjana" && (
-    <Step1S1
-        formData={formData}
-        setFormData={setFormData}
-        next={next}
-    />
-    )}
-
-    {/* {step === 1 && event.programType === "Program Magister" && (
-    <Step1S2
-        formData={formData}
-        setFormData={setFormData}
-        next={next}
-        event={event}
-    />
-    )} */}
+      {/* {step === 1 && event.programType === "Program Magister" && (
+        <Step1S2
+          formData={formData}
+          setFormData={setFormData}
+          next={next}
+          event={event}
+        />
+      )} */}
     </div>
   );
 }
+

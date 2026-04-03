@@ -1,13 +1,14 @@
 import Header from "../../components/Header/Header";
-import RegisterPage from "./RegisterPage";
 import Footer from "../../components/Footer/Footer";
+import RegisterPageGelombang from "./RegisterPageGelombang";
 
-export default function Register() {
+export default function RegisterGelombang() {
     return (
         <>
             <Header />
-            <RegisterPage />
+            <RegisterPageGelombang />
             <Footer />
         </>
-    )
+    );
 }
+

@@ -1,5 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import "./LoginPage.scss";
+
 
 interface LoginForm {
     email: string;
@@ -71,21 +73,18 @@ export default function LoginPage() {
                         value={form.email} autoComplete="email" onChange={handleChange} />
                     <LoginInput type="password" name="password" placeholder="Password"
                         value={form.password} autoComplete="current-password" minLength={8} onChange={handleChange} />
-                    <a href="https://pendaftaran.uib.ac.id/akun/lupa_password" 
-                        className="forgot-link" target="_blank" rel="noopener noreferrer">
-                        Lupa Password?
-                    </a> 
-                    {/* // nanti baru direct ke page lain */}
+                    <Link to="/forgot"> 
+                    Lupa Password? 
+                    </Link>
+                
                     <div>
                         <LoginButton isLoading={isLoading} />
                     </div>
                     <p className="register-text">
                         Belum memiliki akun?{" "}
-                        <a href="https://pendaftaran.uib.ac.id/akun/register" target="_blank" rel="noopener noreferrer"> 
-                            Buat Akun
-                        </a> 
+                        <Link to="/register">Buat Akun</Link>
                     </p>
-                     {/* //nanti baru ganti ke page lain */}
+                     
                 </form>
             </div>
         </div>
