@@ -11,16 +11,18 @@ $header-height: var(--space-2xl);
 
 .page-content {
   width: 100%;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: calc(#{$header-height} + var(--space-m)) var(--space-s) calc(var(--space-2xl) + var(--space-l));
+  padding: calc(#{$header-height} + 6rem) var(--space-s) calc(var(--space-2xl) + var(--space-l));
+  box-sizing: border-box;
 }
 
 .register-box {
   @include global.container;
   text-align: center;
-  max-width: 34rem !important;
+  max-width: 34rem;
 
   .register-title {
     font-size: var(--step-2);
