@@ -93,12 +93,18 @@ $dot-size: clamp(0.5rem, 0.4688rem + 0.1563vw, 0.625rem);
   position: relative;
   overflow: hidden;
 
-  img {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    object-fit: cover;
-    display: block;
+  picture {
     transition: transform 0.3s ease;
+
+    img {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4 / 3;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      transition: transform 0.3s ease;
+    }
   }
 }
 

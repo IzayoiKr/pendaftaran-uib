@@ -20,6 +20,7 @@ function GuideVideo({ title, description, embedUrl }: GuideVideoProps) {
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         referrerPolicy="strict-origin-when-cross-origin"
                         allowFullScreen
+                        loading='lazy'
                     />
                 </div>
             </div>
@@ -27,7 +28,7 @@ function GuideVideo({ title, description, embedUrl }: GuideVideoProps) {
     );
 };
 
-export default function Guide() {
+export default function Guides() {
     return (
         <section className={styles.guide}>
             <div className={styles.container}>

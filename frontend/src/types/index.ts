@@ -42,12 +42,16 @@ export interface Program {
     degree: 'S1' | 'S2';
     description: string;
     image: string;
+    imageWebp: string;
+    imageAvif: string;
     link: string;
 }
 
 export interface Event {
     id: string;
     image: string;
+    imageWebp: string;
+    imageAvif: string;
     programType: string;
     programTypeEn: string;
     academicYear: string;

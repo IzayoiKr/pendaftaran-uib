@@ -1,11 +1,11 @@
 import type { Hero, Program, Event, Feature, Guide } from "../types";
 
-const assetImages = import.meta.glob('../assets/**/*.{jpg,png,jpeg}', {
+const assetImages = import.meta.glob('../assets/**/*.{jpg,png,jpeg,webp,avif}', {
     eager: true,
     import: 'default'
 }) as Record<string, string>;
 
-const getImg = (path: string): string => { return assetImages[`../assets/${path}`] };
+export const getImg = (path: string): string => { return assetImages[`../assets/${path}`] };
 
 export const heroes: Hero = {
     title: "WELCOME TO UNIVERSITAS INTERNASIONAL BATAM",
@@ -23,6 +23,8 @@ export const programs: Program[] = [
         degree: 'S1',
         description: 'Sebagai program study yang menghasilkan lulusan berstandar internasional yang berkompeten dalam menerapkan keilmuan dalam pengembangan teknologi di bidang rekayasa sipil serta mampu mengaplikasikan dalam pembangunan berkelanjutan (sustainable development) di wilayah kepulauan untuk menghadapi tuntutan dan perubahan global dunia yang bersifat dinamis.',
         image: getImg('courses/TS.jpg'),
+        imageWebp: getImg('courses/TS.webp'),
+        imageAvif: getImg('courses/TS.avif'),
         link: 'https://www.uib.ac.id/ts/',
     },
     {
@@ -32,6 +34,8 @@ export const programs: Program[] = [
         degree: 'S1',
         description: 'Menjadi program studi arsitektur maritim berbasis kearifan lokal dengan daya saing global yang mendukung pembangunan wilayah pesisir berkelanjutan.',
         image: getImg('courses/AR.jpg'),
+        imageWebp: getImg('courses/AR.webp'),
+        imageAvif: getImg('courses/AR.avif'),
         link: 'https://www.uib.ac.id/arsi/',
     },
     {
@@ -41,6 +45,8 @@ export const programs: Program[] = [
         degree: 'S1',
         description: 'Sebagai program sarjana yang menghasilkan lulusan berkualitas di bidang Sistem Informasi melalui pendidikan, penelitian, dan pengabdian kepada masyarakat, pada tingkat nasional dan internasional di tahun 2021.',
         image: getImg('courses/SI.jpg'),
+        imageWebp: getImg('courses/SI.webp'),
+        imageAvif: getImg('courses/SI.avif'),
         link: 'https://www.uib.ac.id/si/',
     },
     {
@@ -50,6 +56,8 @@ export const programs: Program[] = [
         degree: 'S1',
         description: 'Sebagai program sarjana yang menghasilkan lulusan berkualitas dalam bidang teknologi informasi khususnya teknologi cloud dan keamanan melalui pendidikan, penelitian, dan pengabdian masyarakat, pada tingkat nasional dan internasional di tahun 2021.',
         image: getImg('courses/TI.jpg'),
+        imageWebp: getImg('courses/TI.webp'),
+        imageAvif: getImg('courses/TI.avif'),
         link: 'https://www.uib.ac.id/ti/',
     },
     {
@@ -59,6 +67,8 @@ export const programs: Program[] = [
         degree: 'S1',
         description: 'Sebagai Program Sarjana Manajemen berstandar internasional dalam menghasilkan lulusan yang memiliki jiwa kepemimpinan dan kewirausahaan, berkompeten dalam bidang hubungan industri, keuangan perusahaan, pemasaran business to consumer, serta tanggap dalam mengantisipasi perubahan global yang dinamis.',
         image: getImg('courses/MN.jpg'),
+        imageWebp: getImg('courses/MN.webp'),
+        imageAvif: getImg('courses/MN.avif'),
         link: 'https://www.uib.ac.id/mn/',
     },
     {
@@ -68,6 +78,8 @@ export const programs: Program[] = [
         degree: 'S1',
         description: 'Sebagai program studi yang menghasilkan lulusan profesional di bidang akuntansi keuangan sesuai standar internasional dengan jiwa kepemimpinan dan kewirausahaan serta mampu mengikuti perubahan global yang dinamis.',
         image: getImg('courses/AK.jpg'),
+        imageWebp: getImg('courses/AK.webp'),
+        imageAvif: getImg('courses/AK.avif'),
         link: 'https://www.uib.ac.id/ak/',
     },
     {
@@ -77,6 +89,8 @@ export const programs: Program[] = [
         degree: 'S1',
         description: 'Menjadi program studi pariwisata dengan standar mutu internasional yang menghasilkan IPTEKS dan lulusan yang mampu mengikuti dinamika perubahan pariwisata di tingkat nasional dan internasional.',
         image: getImg('courses/PR.jpg'),
+        imageWebp: getImg('courses/PR.webp'),
+        imageAvif: getImg('courses/PR.avif'),
         link: 'https://www.uib.ac.id/par/',
     },
     {
@@ -86,6 +100,8 @@ export const programs: Program[] = [
         degree: 'S2',
         description: 'Sebagai program studi dengan standar kualitas internasional yang menghasilkan lulusan berkualitas dengan kepemimpinan dan kewirausahaan bersemangat dan kompetensi dalam manajemen internasional di tingkat manajerial.',
         image: getImg('courses/MM.jpg'),
+        imageWebp: getImg('courses/MM.webp'),
+        imageAvif: getImg('courses/MM.avif'),
         link: 'https://www.uib.ac.id/mm/',
     },
     {
@@ -95,6 +111,8 @@ export const programs: Program[] = [
         degree: 'S1',
         description: 'Sebagai Program Studi dengan standar kualitas internasional yang menghasilkan lulusan hukum yang dapat memenuhi perubahan dinamis hukum bisnis dalam konteks nasional dan internasional.',
         image: getImg('courses/IH.jpg'),
+        imageWebp: getImg('courses/IH.webp'),
+        imageAvif: getImg('courses/IH.avif'),
         link: 'https://www.uib.ac.id/ih/',
     },
     {
@@ -104,6 +122,8 @@ export const programs: Program[] = [
         degree: 'S2',
         description: 'Sebagai program studi dengan standar mutu internasional yang menghasilkan lulusan berkualitas yang mampu mengikuti dinamika perubahan hukum bisnis di tingkat nasional dan internasional.',
         image: getImg('courses/MH.jpg'),
+        imageWebp: getImg('courses/MH.webp'),
+        imageAvif: getImg('courses/MH.avif'),
         link: 'https://www.uib.ac.id/mh/',
     },
     {
@@ -113,6 +133,8 @@ export const programs: Program[] = [
         degree: 'S1',
         description: 'Menjadi program sarjana yang menghasilkan lulusan dengan kompetensi unggul dalam bidang pendidikan bahasa Inggris yang dinamis berbasis Edutechnopreneur (education, technology, and entrepreneurship) sesuai dengan standar kualitas internasional.',
         image: getImg('courses/PBI.jpg'),
+        imageWebp: getImg('courses/PBI.webp'),
+        imageAvif: getImg('courses/PBI.avif'),
         link: 'https://www.uib.ac.id/pbi/',
     },
 ];
@@ -122,6 +144,8 @@ export const events: Event[] = [
     {
         id: 's1-1',
         image: getImg('event/GP.jpg'),
+        imageWebp: getImg('event/GP.webp'),
+        imageAvif: getImg('event/GP.avif'),
         programType: 'Program Sarjana',
         programTypeEn: 'Undergraduate Program',
         academicYear: 'T.A 2026/2027',
@@ -138,6 +162,8 @@ export const events: Event[] = [
     {
         id: 's2-1',
         image: getImg('event/magister.png'),
+        imageWebp: getImg('event/magister.webp'),
+        imageAvif: getImg('event/magister.avif'),
         programType: 'Program Magister',
         programTypeEn: 'Master Program',
         academicYear: 'T.A 2025/2026',
@@ -154,6 +180,8 @@ export const events: Event[] = [
     {
         id: 's1-2',
         image: getImg('event/GP.jpg'),
+        imageWebp: getImg('event/GP.webp'),
+        imageAvif: getImg('event/GP.avif'),
         programType: 'Program Sarjana',
         programTypeEn: 'Undergraduate Program',
         academicYear: 'T.A 2026/2027',
@@ -170,6 +198,8 @@ export const events: Event[] = [
     {
         id: 's1-3',
         image: getImg('event/beasiswa-baru.png'),
+        imageWebp: getImg('event/beasiswa-baru.webp'),
+        imageAvif: getImg('event/beasiswa-baru.avif'),
         programType: 'Program Sarjana',
         programTypeEn: 'Undergraduate Program',
         academicYear: 'T.A 2026/2027',
@@ -222,47 +252,47 @@ export const guides: Guide[] = [
 ]
 
 export const schools: string[] = [
-  "SMAN 1 Batam",
-  "SMAN 2 Batam",
-  "SMAN 3 Batam",
-  "SMKN 1 Batam",
-  "SMKN 2 Batam",
-  "SMK Kartini Batam",
-  "SMA Yos Sudarso Batam",
-  "SMA Kartini Batam",
-  "SMA Methodist Batam",
-  "SMA Harapan Utama Batam"
+    "SMAN 1 Batam",
+    "SMAN 2 Batam",
+    "SMAN 3 Batam",
+    "SMKN 1 Batam",
+    "SMKN 2 Batam",
+    "SMK Kartini Batam",
+    "SMA Yos Sudarso Batam",
+    "SMA Kartini Batam",
+    "SMA Methodist Batam",
+    "SMA Harapan Utama Batam"
 ];
 
 export const universities: string[] = [
-  "Universitas Indonesia",
-  "Universitas Gadjah Mada",
-  "Institut Teknologi Bandung",
-  "Universitas Airlangga",
-  "Universitas Diponegoro",
-  "Universitas Brawijaya",
-  "Universitas Hasanuddin",
-  "Universitas Padjadjaran",
-  "Universitas Sebelas Maret",
-  "Universitas Sumatera Utara",
-  "Universitas Riau",
-  "Universitas Maritim Raja Ali Haji",
-  "Universitas Internasional Batam",
-  "Politeknik Negeri Batam",
-  "Universitas Putera Batam",
-  "Universitas Batam",
-  "Universitas Negeri Jakarta",
-  "Universitas Gunadarma",
-  "Universitas Bina Nusantara",
-  "Universitas Trisakti",
-  "Universitas Tarumanagara",
-  "Universitas Atma Jaya Jakarta",
-  "Universitas Mercu Buana",
-  "Universitas Telkom",
-  "Universitas Komputer Indonesia",
-  "Institut Teknologi Sepuluh Nopember",
-  "Universitas Andalas",
-  "Universitas Sriwijaya",
-  "Universitas Lampung",
-  "Universitas Mulawarman",
+    "Universitas Indonesia",
+    "Universitas Gadjah Mada",
+    "Institut Teknologi Bandung",
+    "Universitas Airlangga",
+    "Universitas Diponegoro",
+    "Universitas Brawijaya",
+    "Universitas Hasanuddin",
+    "Universitas Padjadjaran",
+    "Universitas Sebelas Maret",
+    "Universitas Sumatera Utara",
+    "Universitas Riau",
+    "Universitas Maritim Raja Ali Haji",
+    "Universitas Internasional Batam",
+    "Politeknik Negeri Batam",
+    "Universitas Putera Batam",
+    "Universitas Batam",
+    "Universitas Negeri Jakarta",
+    "Universitas Gunadarma",
+    "Universitas Bina Nusantara",
+    "Universitas Trisakti",
+    "Universitas Tarumanagara",
+    "Universitas Atma Jaya Jakarta",
+    "Universitas Mercu Buana",
+    "Universitas Telkom",
+    "Universitas Komputer Indonesia",
+    "Institut Teknologi Sepuluh Nopember",
+    "Universitas Andalas",
+    "Universitas Sriwijaya",
+    "Universitas Lampung",
+    "Universitas Mulawarman",
 ];

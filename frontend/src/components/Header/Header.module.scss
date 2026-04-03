@@ -38,8 +38,11 @@ header {
 }
 
 .logoUIB {
-  display: flex;
-  align-items: center;
+  img {
+    display: block;
+    width: auto;
+    height: auto;
+  }
 }
 
 .nav{

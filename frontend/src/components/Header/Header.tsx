@@ -1,7 +1,8 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback, memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from './Header.module.scss';
 import { headerNavLinks, spyIds } from '../../constants/navigation';
+import { getImg } from '../../constants/data';
 import useScrollSpy from '../../hooks/useScrollSpy';
 import scrollToId from '../ScrollToId';
 
@@ -19,13 +20,23 @@ interface NavMenuProps {
 
 function UIBLogo() {
     return (
-        <Link to="#home" className={styles.logoUIB}>
-            <img src='/logo.png' alt="Universitas Internasional Batam Logo" />
+        <Link to="/#home" className={styles.logoUIB}>
+            <picture>
+                <source srcSet={getImg('logo.avif')} type='image/avif' />
+                <source srcSet={getImg('logo.webp')} type='image/webp' />
+                <img
+                    src={getImg('logo.png')}
+                    alt='Universitas Internasional Batam Logo'
+                    width='197'
+                    height='47'
+                    fetchPriority='high'
+                />
+            </picture>
         </Link>
     )
 }
 
-function HamburgerButton({ isOpen, setIsOpen }: HamburgerButtonProps) {
+const HamburgerButton = memo(function HamburgerButton({ isOpen, setIsOpen }: HamburgerButtonProps) {
     return (
         <button className={`${styles.toggler} ${isOpen ? styles.openState : ''}`}
             onClick={() => setIsOpen(prev => !prev)} aria-label='Toggle Menu' aria-expanded={isOpen}>
@@ -34,9 +45,9 @@ function HamburgerButton({ isOpen, setIsOpen }: HamburgerButtonProps) {
             <span className={styles.iconBar}></span>
         </button>
     )
-}
+})
 
-function NavMenu({ isOpen, activeId, pathname, onLinkClick }: NavMenuProps) {
+const NavMenu = memo(function NavMenu({ isOpen, activeId, pathname, onLinkClick }: NavMenuProps) {
     return (
         <div className={`${styles.menuContainer} ${isOpen ? styles.show : ''}`}>
             <nav className={styles.nav}>
@@ -68,7 +79,7 @@ function NavMenu({ isOpen, activeId, pathname, onLinkClick }: NavMenuProps) {
             </nav>
         </div>
     )
-}
+})
 
 export default function Header() {
     const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -97,15 +108,7 @@ export default function Header() {
 
     const activeId = useScrollSpy({ ids: spyIds, offset: headerHeight });
 
-    useEffect(() => {
-        setIsOpen(false);
-    }, [pathname])
-
-    useEffect(() => {
-        const handleScroll = () => setIsScrolled(window.scrollY > 50);
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [])
+    const handleLinkClick = useCallback(() => setIsOpen(false), []);
 
     return (
         <header className={isScrolled ? styles.fixed : ''} ref={headerRef}>
@@ -116,7 +119,7 @@ export default function Header() {
                     isOpen={isOpen}
                     activeId={activeId}
                     pathname={pathname}
-                    onLinkClick={() => setIsOpen(false)}
+                    onLinkClick={handleLinkClick}
                 />
             </div>
         </header >

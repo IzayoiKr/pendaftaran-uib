@@ -1,6 +1,6 @@
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef, memo } from 'react';
 import { programs } from '../../../constants/data';
 import styles from './ProgramStudi.module.scss';
 
@@ -10,14 +10,26 @@ interface ProgramCardProps {
     degree: 'S1' | 'S2';
     description: string;
     image: string;
-    link: string;
+    imageWebp: string;
+    imageAvif: string;
+    link: string
 }
 
-function ProgramCard({ title, faculty, degree, description, image, link }: ProgramCardProps) {
+const ProgramCard = memo(function ProgramCard({ title, faculty, degree, description, image, imageWebp, imageAvif, link }: ProgramCardProps) {
     return (
         <div className={styles.card}>
             <div className={styles.courseHead}>
-                <img src={image} alt={title} loading="lazy" />
+                <picture>
+                    <source srcSet={imageAvif} type='image/avif' />
+                    <source srcSet={imageWebp} type='image/webp' />
+                    <img
+                        src={image}
+                        alt={title}
+                        loading='lazy'
+                        width='1080'
+                        height='849'
+                    />
+                </picture>
             </div>
             <div className={styles.courseContent}>
                 <span className={styles.badge}>{degree}</span>
@@ -31,9 +43,9 @@ function ProgramCard({ title, faculty, degree, description, image, link }: Progr
             </div>
         </div>
     );
-}
+})
 
-function DotButton({ active, onClick }: { active: boolean; onClick: () => void }) {
+const DotButton = memo(function DotButton({ active, onClick }: { active: boolean; onClick: () => void }) {
     return (
         <button
             className={`${styles.dot} ${active ? styles.dotActive : ''}`}
@@ -41,19 +53,14 @@ function DotButton({ active, onClick }: { active: boolean; onClick: () => void }
             aria-label={active ? 'Current slide' : 'Go to slide'}
         />
     );
-}
+})
 
 export default function ProgramStudi() {
-    const autoplay = Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true });
+    const autoplay = useRef(Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true }));
 
     const [emblaRef, emblaApi] = useEmblaCarousel(
-        {
-            loop: true,
-            align: 'start',
-            slidesToScroll: 1,
-            breakpoints: {},
-        },
-        [autoplay]
+        { loop: true, align: 'start', slidesToScroll: 1 },
+        [autoplay.current]
     );
 
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -113,6 +120,8 @@ export default function ProgramStudi() {
                                         degree={program.degree}
                                         description={program.description}
                                         image={program.image}
+                                        imageWebp={program.imageWebp}
+                                        imageAvif={program.imageAvif}
                                         link={program.link}
                                     />
                                 </div>

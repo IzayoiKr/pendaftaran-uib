@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import styles from './Hero.module.scss';
-import { heroes } from '../../../constants/data';
+import { heroes, getImg } from '../../../constants/data';
 import scrollToId from '../../../components/ScrollToId';
 
 interface handleClickProps {
@@ -13,6 +13,20 @@ const handleClick = ({ e, hashId }: handleClickProps) => {
         e.preventDefault();
         scrollToId(hashId)
     }
+}
+
+function HeroPicture() {
+    return (
+        <picture>
+            <source srcSet={getImg('hero-bg.avif')} type='image/avif' />
+            <source srcSet={getImg('hero-bg.webp')} type='image/webp' />
+            <img
+                src={getImg('hero-bg.jpg')}
+                alt='A group of international students gathering'
+                fetchPriority='high'
+            />
+        </picture>
+    )
 }
 
 function Content() {
@@ -48,6 +62,7 @@ function HeroButtons() {
 export default function Hero() {
     return (
         <section id="home" className={styles.hero}>
+            <HeroPicture />
             <div className={styles.container}>
                 <Content />
                 <HeroButtons />

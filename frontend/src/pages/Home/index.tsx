@@ -1,8 +1,9 @@
+import { lazy } from 'react';
 import Header from '../../components/Header/Header';
 import Hero from './Hero/Hero';
-import ProgramStudi from './ProgramStudi/ProgramStudi';
-import Gelombang from './Gelombang/Gelombang';
-import Guide from './Guides/Guides';
+const ProgramStudi = lazy(() => import('./ProgramStudi/ProgramStudi'));
+const Gelombang = lazy(() => import('./Gelombang/Gelombang'));
+const Guides = lazy(() => import('./Guides/Guides'));
 import Feature from './Feature/Feature';
 import Footer from '../../components/Footer/Footer';
 
@@ -14,7 +15,7 @@ export default function Home() {
                 <Hero />
                 <ProgramStudi />
                 <Gelombang />
-                <Guide />
+                <Guides />
                 <Feature />
             </main>
             <Footer />

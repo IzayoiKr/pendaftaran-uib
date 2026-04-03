@@ -60,11 +60,27 @@ $card-width: (
     display: flex;
     justify-content: flex-end;
     align-items: stretch;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     position: relative;
     width: 100%;
+
+    picture {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: scale(1.1);
+        }
+      }
+    }
 
     .details {
       display: flex;
@@ -74,6 +90,7 @@ $card-width: (
       background: rgba(0, 35, 71, 0.7);
       color: global.$white;
       padding: var(--space-2xs);
+      z-index: 101;
 
       @each $breakpoints, $width in $card-width {
         @media (min-width: $breakpoints) {
@@ -153,10 +170,6 @@ $card-width: (
         background: global.$tertiary-color;
         color: global.$primary-color;
       }
-    }
-
-    &:hover img {
-      transform: scale(1.1);
     }
   }
 }

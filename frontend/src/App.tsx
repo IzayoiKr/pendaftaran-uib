@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-// import '@fontsource-variable/rubik';
-// import '@fontsource/poppins';
+import '@fontsource-variable/rubik';
+import '@fontsource/poppins';
 import './styles/global.scss';
 import ScrollToHash from './components/ScrollToHash';
 import Home from './pages/Home';

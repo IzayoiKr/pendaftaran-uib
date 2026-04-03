@@ -9,11 +9,18 @@ interface EventCardProps {
 
 function EventCard({ event }: EventCardProps) {
     return (
-        <div
-            className={styles.card}
-            style={{ backgroundImage: `url(${event.image})` }}
-            aria-label={event.batchName}
-        >
+        <div className={styles.card}>
+            <picture>
+                <source srcSet={event.imageAvif} type='image/avif' />
+                <source srcSet={event.imageWebp} type='image/webp' />
+                <img
+                    src={event.image}
+                    alt={event.id}
+                    loading='lazy'
+                    width='555'
+                    height='400'
+                />
+            </picture>
             <div className={styles.details}>
                 <h3>
                     Ujian Saringan Masuk <br />

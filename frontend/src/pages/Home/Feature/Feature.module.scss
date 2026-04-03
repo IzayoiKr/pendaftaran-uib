@@ -70,11 +70,12 @@
     line-height: 1.7;
 
     a {
+      text-decoration: underline;
       color: global.$link-color;
       transition: color 0.3s ease;
 
       &:hover {
-        color: color.adjust(global.$link-color, $lightness: -20%);
+        color: color.adjust(global.$link-color, $lightness: -30%);
       }
     }
   }
