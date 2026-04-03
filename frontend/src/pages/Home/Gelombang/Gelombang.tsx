@@ -1,6 +1,7 @@
 import type { Event } from '../../../types';
 import { events } from '../../../constants/data';
 import { gelombangIconMap } from '../../../components/Icons';
+import { Link } from 'react-router-dom';
 import styles from './Gelombang.module.scss';
 
 interface EventCardProps {
@@ -60,7 +61,23 @@ function EventCard({ event }: EventCardProps) {
                     {' s.d. '}
                     <time dateTime={event.registrationEnd}>{event.registrationEnd}</time>
                 </p>
-                <a href={event.registerLink} className={styles.registerBtn}>Daftar (Register)</a>
+                {event.registerLink && event.registerLink.startsWith('http') ? (
+                    <a
+                        href={event.registerLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.registerBtn}
+                    >
+                        Daftar (Register)
+                    </a>
+                ) : (
+                    <Link
+                        to={`/register/${event.id}`}
+                        className={styles.registerBtn}
+                    >
+                        Daftar (Register)
+                    </Link>
+                )}
             </div>
         </div>
     );
