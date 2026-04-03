@@ -3,7 +3,7 @@
 /* ================= CONTAINER ================= */
 .container {
   @include global.container;
-  padding: var(--space-l) 0;
+  padding: calc(var(--space-2xl) + var(--space-l)) 0 var(--space-l);
 }
 
 .formWrapper {
