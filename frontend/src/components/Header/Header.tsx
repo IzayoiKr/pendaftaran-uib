@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from './Header.module.scss';
-import logo from '../../assets/logo.png';
 import { headerNavLinks, spyIds } from '../../constants/navigation';
 import useScrollSpy from '../../hooks/useScrollSpy';
 import scrollToId from '../ScrollToId';
@@ -21,7 +20,7 @@ interface NavMenuProps {
 function UIBLogo() {
     return (
         <Link to="#home" className={styles.logoUIB}>
-            <img src={logo} alt="Universitas Internasional Batam Logo" />
+            <img src='/logo.png' alt="Universitas Internasional Batam Logo" />
         </Link>
     )
 }

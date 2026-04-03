@@ -22,11 +22,11 @@ function ProgramCard({ title, faculty, degree, description, image, link }: Progr
             <div className={styles.courseContent}>
                 <span className={styles.badge}>{degree}</span>
                 <span className={styles.tag}>{faculty}</span>
-                <h4>
+                <h3>
                     <a href={link} target="_blank" rel="noopener noreferrer">
                         {title}
                     </a>
-                </h4>
+                </h3>
                 <p>{description}</p>
             </div>
         </div>

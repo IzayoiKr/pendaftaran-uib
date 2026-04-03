@@ -10,7 +10,7 @@ function FeatureCard() {
                     <div className={styles.icon}>
                         {featureIconMap[feature.icon]}
                     </div>
-                    <h4>{feature.title}</h4>
+                    <h3>{feature.title}</h3>
                     <p>
                         {feature.description}
                         <a href={feature.link} target='_blank' rel='noopener noreferrer'>Selengkapnya</a>

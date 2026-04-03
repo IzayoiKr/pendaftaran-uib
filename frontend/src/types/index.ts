@@ -48,13 +48,15 @@ export interface Program {
 export interface Event {
     id: string;
     image: string;
-    programType: string;      // e.g., "Program Sarjana"
-    programTypeEn: string;    // "Undergraduate Program"
-    academicYear: string;     // "T.A 2026/2027"
-    date: string;             // "09 May"
-    time: string;             // "09:00 - 13:00"
-    location: string;         // "Batam" or "Online"
-    batchName: string;        // "Gelombang 2 Beasiswa-S1 Kedokteran"
+    programType: string;
+    programTypeEn: string;
+    academicYear: string;
+    day: string;
+    month: string;
+    startTime: string;
+    endTime: string;
+    location: string;
+    batchName: string;
     registrationStart: string;
     registrationEnd: string;
     registerLink: string;
