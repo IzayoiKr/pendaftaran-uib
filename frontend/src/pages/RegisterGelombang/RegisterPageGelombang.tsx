@@ -16,22 +16,26 @@ export default function RegisterPageGelombang() {
   if (!event) return <div>Data tidak ditemukan</div>;
 
   return (
-    <div>
+    <div id="register" className="page-content">
       {step === 1 && event.programType === "Program Sarjana" && (
-        <Step1S1
-          formData={formData}
-          setFormData={setFormData}
-          next={next}
-        />
+        <div className="register-box">
+          <Step1S1
+            formData={formData}
+            setFormData={setFormData}
+            next={next}
+          />
+        </div>
       )}
 
       {/* {step === 1 && event.programType === "Program Magister" && (
-        <Step1S2
-          formData={formData}
-          setFormData={setFormData}
-          next={next}
-          event={event}
-        />
+        <div className="register-box">
+          <Step1S2
+            formData={formData}
+            setFormData={setFormData}
+            next={next}
+            event={event}
+          />
+        </div>
       )} */}
     </div>
   );

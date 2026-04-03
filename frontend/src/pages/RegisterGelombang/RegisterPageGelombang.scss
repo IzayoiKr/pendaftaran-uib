@@ -11,105 +11,101 @@ $header-height: var(--space-2xl);
 
 .page-content {
   width: 100%;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: calc(#{$header-height} + var(--space-m)) var(--space-s) calc(var(--space-2xl) + var(--space-l));
+  padding: calc(#{$header-height} + 4rem) var(--space-s) var(--space-l);
+  box-sizing: border-box;
+  background: #fbfcfe;
 }
 
 .register-box {
-  @include global.container;
-  text-align: center;
-  max-width: 34rem !important;
+  width: min(100%, 44rem);
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 20px rgba(0,0,0,.08);
+  padding: var(--space-l);
+}
 
-  .register-title {
-    font-size: var(--step-2);
-    font-weight: 700;
-    color: global.$secondary-color;
-    margin-bottom: var(--space-2xs);
-    letter-spacing: 0.06em;
+.register-title {
+  font-size: var(--step-2);
+  font-weight: 700;
+  color: global.$secondary-color;
+  margin-bottom: var(--space-s);
+}
+
+.register-required {
+  font-size: var(--step--2);
+  color: global.$text-color;
+  margin-bottom: var(--space-m);
+}
+
+.field-group {
+  text-align: left;
+  margin-bottom: var(--space-s);
+}
+
+.field-group label {
+  display: block;
+  font-size: var(--step--1);
+  font-family: global.$font-family;
+  color: global.$text-color2;
+  margin-bottom: var(--space-2xs);
+}
+
+.single-input {
+  width: 100%;
+  height: 3rem;
+  background: $color-input-bg;
+  border: 1px solid $color-input-border;
+  border-radius: .4rem;
+  padding: 0 var(--space-s);
+  font-size: var(--step--1);
+  font-family: global.$font-family;
+  color: global.$text-color2;
+  outline: none;
+}
+
+.single-input::placeholder {
+  color: $color-placeholder;
+}
+
+.single-input:focus {
+  background: $color-input-focus;
+  border-color: $color-primary;
+}
+
+.register-btn {
+  margin-top: var(--space-m);
+  background: $color-primary;
+  color: global.$white;
+  border: none;
+  border-radius: 3rem;
+  height: 2.8rem;
+  padding: 0 var(--space-l);
+  font-size: var(--step--1);
+  font-family: global.$font-family;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: map-get(global.$breakpoints, sm)) {
+  .page-content {
+    padding: calc(#{$header-height} + 3rem) var(--space-s) var(--space-l);
   }
 
-  .register-required {
-    font-size: var(--step--2);
-    color: global.$text-color;
-    margin-bottom: var(--space-m);
+  .register-box {
+    padding: var(--space-m);
   }
 
- 
-  .field-group {
-    text-align: left;
-    margin-bottom: var(--space-s);
-
-    label {
-      display: block;
-      font-size: var(--step--1);
-      font-family: global.$font-family;
-      color: global.$text-color2;
-      margin-bottom: var(--space-2xs);
-    }
-
-    .single-input {
-      width: 100%;
-      height: 3em;
-      background: $color-input-bg;
-      border: 1px solid $color-input-border;
-      border-radius: 0.25em;
-      padding: 0 var(--space-s);
-      font-size: var(--step--1);
-      font-family: global.$font-family;
-      color: global.$text-color2;
-      outline: none;
-      display: block;
-
-      &::placeholder {
-        color: $color-placeholder;
-      }
-
-      &:focus {
-        background: $color-input-focus;
-        border-color: $color-primary;
-      }
-    }
-  }
-
-  
-  .captcha-wrapper {
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: var(--space-s);
-  }
-
-  .register-btn {
-    background: $color-primary;
-    color: global.$white;
-    border: none;
-    border-radius: 6.25em;
-    height: 2.75em;
-    padding: 0 var(--space-l);
-    font-size: var(--step--1);
-    font-family: global.$font-family;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2xs);
-    transition: background 0.2s;
-    margin-top: var(--space-2xs);
-
-    &:hover {
-      background: $color-primary-hover;
-    }
-
-    &:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
+  .single-input {
+    height: 2.6rem;
   }
 }
 
-.spinner {
-  width: 0.875em;
+.spinner {  width: 0.875em;
   height: 0.875em;
   border: 0.125em solid rgba(global.$white, 0.4);
   border-top-color: global.$white;
@@ -124,13 +120,13 @@ $header-height: var(--space-2xl);
 
 @media (max-width: map-get(global.$breakpoints, md)) {
   .page-content {
-    padding: calc(#{$header-height} + var(--space-s)) var(--space-m) calc(var(--space-2xl) + var(--space-l));
+    padding: calc(#{$header-height} + 4rem) var(--space-m) calc(var(--space-2xl) + var(--space-l));
   }
 }
 
 @media (max-width: map-get(global.$breakpoints, sm)) {
   .page-content {
-    padding: calc(#{$header-height} + var(--space-xs)) var(--space-s) calc(var(--space-xl) + var(--space-l));
+    padding: calc(#{$header-height} + 4rem) var(--space-s) calc(var(--space-xl) + var(--space-l));
   }
 
   .register-box {
