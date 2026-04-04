@@ -1,0 +1,176 @@
+@use '../../styles/global.scss';
+
+$color-primary:       #29b6f6;
+$color-primary-hover: #039be5;
+$color-warning:       #fdc632;
+$color-warning-hover: #e6b020;
+$color-danger:        #e74c3c;
+$color-danger-hover:  #c0392b;
+$color-success:       #27ae60;
+$color-success-hover: #1e8449;
+$color-info:          #8e44ad;
+$color-info-hover:    #6c3483;
+
+$header-height: var(--space-2xl);
+
+.page-content {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: calc(#{$header-height} + var(--space-m)) var(--space-s) calc(var(--space-2xl) + var(--space-l));
+}
+
+.account-box {
+  @include global.container;
+
+  // ── Akun Saya ──
+  .account-title {
+    font-size: var(--step-3);
+    font-weight: 700;
+    color: global.$secondary-color;
+    margin-bottom: var(--space-s);
+  }
+
+  .account-info {
+    margin-bottom: var(--space-l);
+
+    .info-row {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-s);
+      margin-bottom: var(--space-2xs);
+      font-size: var(--step--1);
+
+      .info-label {
+        font-weight: 600;
+        color: global.$primary-color;
+        min-width: 8rem;
+        flex-shrink: 0;
+      }
+
+      .info-value {
+        color: global.$text-color2;
+      }
+    }
+  }
+
+  // ── Pendaftaran ──
+  .section-title {
+    font-size: var(--step-1);
+    font-weight: 700;
+    color: global.$secondary-color;
+    margin-bottom: var(--space-s);
+    padding-bottom: var(--space-2xs);
+    border-bottom: 1px solid #ddd;
+  }
+
+  .table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: var(--space-xl);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--step--2);
+    min-width: 700px;
+
+    th {
+      color: global.$primary-color;
+      font-weight: 600;
+      text-align: left;
+      padding: var(--space-2xs) var(--space-xs);
+      border-bottom: 2px solid #eee;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: var(--space-xs);
+      border-bottom: 1px solid #eee;
+      vertical-align: top;
+      color: global.$text-color2;
+    }
+  }
+
+  // Status text
+  .status-incomplete { color: $color-danger;  font-weight: 600; }
+  .status-complete   { color: $color-success; font-weight: 600; }
+  .status-unpaid     { color: $color-danger;  font-weight: 600; }
+  .status-paid       { color: $color-success; font-weight: 600; }
+
+  // Action buttons in table
+  .action-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  // ── Bottom buttons ──
+  .bottom-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+    margin-top: var(--space-l);
+  }
+}
+
+// ── Shared button base ──
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  border: none;
+  border-radius: 0.25em;
+  padding: 0.4em var(--space-s);
+  font-size: var(--step--2);
+  font-family: global.$font-family;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background 0.2s, opacity 0.2s;
+
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  &.btn-primary  { background: $color-primary;  color: global.$white; &:hover { background: $color-primary-hover; } }
+  &.btn-warning  { background: $color-warning;  color: global.$white; &:hover { background: $color-warning-hover; } }
+  &.btn-danger   { background: $color-danger;   color: global.$white; &:hover { background: $color-danger-hover;  } }
+  &.btn-success  { background: $color-success;  color: global.$white; &:hover { background: $color-success-hover; } }
+  &.btn-info     { background: $color-info;     color: global.$white; &:hover { background: $color-info-hover;    } }
+
+  // Larger for bottom actions
+  &.btn-lg {
+    padding: 0.6em var(--space-m);
+    font-size: var(--step--1);
+    border-radius: 6.25em;
+  }
+}
+
+@media (max-width: map-get(global.$breakpoints, md)) {
+  .page-content {
+    padding: calc(#{$header-height} + var(--space-s)) var(--space-m) calc(var(--space-2xl) + var(--space-l));
+  }
+}
+
+@media (max-width: map-get(global.$breakpoints, sm)) {
+  .page-content {
+    padding: calc(#{$header-height} + var(--space-xs)) var(--space-s) calc(var(--space-xl) + var(--space-l));
+  }
+
+  .account-box {
+    .info-row {
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .bottom-actions {
+      flex-direction: column;
+      align-items: stretch;
+
+      .btn { justify-content: center; }
+    }
+  }
+}

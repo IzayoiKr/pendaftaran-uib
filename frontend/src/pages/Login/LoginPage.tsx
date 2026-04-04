@@ -84,7 +84,12 @@ export default function LoginPage() {
                         Belum memiliki akun?{" "}
                         <Link to="/register">Buat Akun</Link>
                     </p>
-                     
+                    
+                    <p className="accountpage-text">
+                        Akses Profil Sementara{" "}
+                        <Link to="/account">My Profile</Link>
+                    </p>
+
                 </form>
             </div>
         </div>

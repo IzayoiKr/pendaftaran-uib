@@ -6,8 +6,10 @@ import ScrollToHash from './components/ScrollToHash';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Forgot from './pages/ForgotPassword';
+import BuktiTransfer from './pages/TransferProof';
 import RegisterGelombang from './pages/RegisterGelombang';
 import Register from './pages/RegisterPage';
+import Account from './pages/MyAccountPage';
 import NotFound from './components/NotFound/NotFound';
 
 export default function App() {
@@ -21,6 +23,8 @@ export default function App() {
                 <Route path='*' element={<NotFound />} />
                 <Route path='/register' element= {<Register/>} />
                 <Route path='/forgot' element= {<Forgot/>} />
+                <Route path='/account' element= {<Account/>} />
+                <Route path='/transferproof' element={<BuktiTransfer />} />
                 
             
                 
