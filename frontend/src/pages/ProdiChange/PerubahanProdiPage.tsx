@@ -116,7 +116,7 @@ export default function PerubahanProdiPage() {
 
     const handleRequestBaru = () => {
         // TODO: navigate ke form request perpindahan prodi
-        navigate("/perubahan-prodi/request");
+        navigate("/requestchangeprodi");
     };
 
     return (

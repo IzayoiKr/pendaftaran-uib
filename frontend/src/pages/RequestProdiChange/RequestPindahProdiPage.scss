@@ -1,0 +1,219 @@
+@use '../../styles/global.scss';
+@use 'sass:map';
+
+// ─── Local tokens (aligned with PerubahanProdiPage.scss) ──────────────────────
+$color-primary:       #29b6f6;
+$color-primary-hover: #039be5;
+$color-danger:        #ef5350;
+$color-danger-hover:  #e53935;
+$color-input-bg:      #eef1f5;
+$color-input-focus:   #e4e8f0;
+$color-placeholder:   #888;
+$color-disabled-bg:   #f0f0f0;
+$color-disabled-text: #555;
+$header-height:       var(--space-2xl);
+
+// ─── Layout ───────────────────────────────────────────────────────────────────
+.page-content {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: calc(#{$header-height} + var(--space-m)) var(--space-s) calc(var(--space-2xl) + var(--space-l));
+}
+
+// ─── Card ─────────────────────────────────────────────────────────────────────
+.request-prodi-box {
+  @include global.container;
+
+  // ── Headings ──
+  .section-title {
+    font-size: var(--step-2);
+    font-weight: 700;
+    color: global.$secondary-color;
+    margin-bottom: var(--space-s);
+  }
+
+  .form-title {
+    font-size: var(--step-1);
+    font-weight: 700;
+    color: global.$secondary-color;
+    margin-bottom: var(--space-m);
+    padding-bottom: var(--space-2xs);
+    border-bottom: 1px solid #ddd;
+  }
+
+  // ── Biodata — identical to PerubahanProdiPage ──
+  .biodata-info {
+    margin-bottom: var(--space-l);
+
+    .info-row {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-s);
+      margin-bottom: var(--space-2xs);
+      font-size: var(--step--1);
+
+      .info-label {
+        font-weight: 600;
+        color: global.$primary-color;
+        min-width: 8rem;
+        flex-shrink: 0;
+      }
+
+      .info-value {
+        color: global.$text-color2;
+      }
+    }
+  }
+
+  // ── Form grid: 2 columns on md+, stack on mobile ──────────────────────────
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-m) var(--space-l);
+    margin-bottom: var(--space-l);
+
+    @media (max-width: map.get(global.$breakpoints, sm)) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+
+    .field-label {
+      font-size: var(--step--1);
+      color: global.$text-color2;
+
+      .required-star {
+        color: $color-danger;
+        margin-left: 0.15em;
+      }
+    }
+
+    // ── Read-only select (Program Studi Sebelumnya) ──
+    .select-readonly {
+      width: 100%;
+      height: 3em;
+      background: $color-disabled-bg;
+      border: 1px solid #d0d0d0;
+      border-radius: 0.25em;
+      padding: 0 var(--space-s);
+      font-size: var(--step--1);
+      font-family: global.$font-family;
+      color: $color-disabled-text;
+      cursor: not-allowed;
+      appearance: none;
+      -webkit-appearance: none;
+      // keep native arrow via background image trick
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23888' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right var(--space-s) center;
+      background-size: 10px;
+      pointer-events: none;
+    }
+
+    // ── Editable select ──
+    .single-select {
+      width: 100%;
+      height: 3em;
+      background: $color-input-bg;
+      border: none;
+      border-radius: 0.25em;
+      padding: 0 var(--space-s);
+      font-size: var(--step--1);
+      font-family: global.$font-family;
+      color: global.$text-color2;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23888' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right var(--space-s) center;
+      background-size: 10px;
+
+      &:focus {
+        background-color: $color-input-focus;
+      }
+
+      option[value=""] {
+        color: $color-placeholder;
+      }
+    }
+  }
+
+  // ── Action buttons ──
+  .bottom-actions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-s);
+    flex-wrap: wrap;
+  }
+}
+
+// ── Shared .btn (same pattern as PerubahanProdiPage.scss) ─────────────────────
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  border: none;
+  border-radius: 6.25em;
+  padding: 0.6em var(--space-l);
+  font-size: var(--step--1);
+  font-family: global.$font-family;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+  text-decoration: none;
+
+  &:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  &.btn-danger  { background: $color-danger;  color: global.$white; &:hover:not(:disabled) { background: $color-danger-hover;  } }
+  &.btn-primary { background: $color-primary; color: global.$white; &:hover:not(:disabled) { background: $color-primary-hover; } }
+}
+
+// ─── Spinner ──────────────────────────────────────────────────────────────────
+.spinner {
+  width: 0.875em;
+  height: 0.875em;
+  border: 0.125em solid rgba(global.$white, 0.4);
+  border-top-color: global.$white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: map.get(global.$breakpoints, md)) {
+  .page-content {
+    padding: calc(#{$header-height} + var(--space-s)) var(--space-m) calc(var(--space-2xl) + var(--space-l));
+  }
+}
+
+@media (max-width: map.get(global.$breakpoints, sm)) {
+  .page-content {
+    padding: calc(#{$header-height} + var(--space-xs)) var(--space-s) calc(var(--space-xl) + var(--space-l));
+  }
+
+  .request-prodi-box {
+    .biodata-info .info-row {
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .bottom-actions {
+      flex-direction: column;
+      align-items: stretch;
+      .btn { justify-content: center; }
+    }
+  }
+}

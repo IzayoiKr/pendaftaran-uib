@@ -187,7 +187,7 @@ export default function AccountPage() {
 
     const handlers: RegistrationHandlers = {
         onCheckPendaftaran:    ()    => navigate("/"),
-        onUbahBiodata:         (reg) => navigate("/biodata",         { state: { nomorDaftar: reg.nomorDaftar } }),
+        onUbahBiodata:         (reg) => navigate("MASIH KOSONG TUNGGU ALDO",         { state: { nomorDaftar: reg.nomorDaftar } }),
         onDownloadSuratHasil:  (reg) => downloadPdf(`surat-hasil-${reg.nomorDaftar}.pdf`),
         onBuktiTransfer:       (reg) => navigate("/transferproof",  { state: { nomorDaftar: reg.nomorDaftar } }),
         onPerubahanProdi:      (reg) => navigate("/changeprodi", { state: { nomorDaftar: reg.nomorDaftar } }),
