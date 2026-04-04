@@ -190,7 +190,7 @@ export default function AccountPage() {
         onUbahBiodata:         (reg) => navigate("/biodata",         { state: { nomorDaftar: reg.nomorDaftar } }),
         onDownloadSuratHasil:  (reg) => downloadPdf(`surat-hasil-${reg.nomorDaftar}.pdf`),
         onBuktiTransfer:       (reg) => navigate("/transferproof",  { state: { nomorDaftar: reg.nomorDaftar } }),
-        onPerubahanProdi:      (reg) => navigate("/perubahan-prodi", { state: { nomorDaftar: reg.nomorDaftar } }),
+        onPerubahanProdi:      (reg) => navigate("/changeprodi", { state: { nomorDaftar: reg.nomorDaftar } }),
         onDownloadPengunduran: (reg) => downloadPdf(`pengunduran-diri-${reg.nomorDaftar}.pdf`),
         onPrasyaratOspek:      (reg) => navigate("/prasyaratospek", { state: { nomorDaftar: reg.nomorDaftar } }),
     };

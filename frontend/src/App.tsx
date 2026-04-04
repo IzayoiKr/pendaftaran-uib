@@ -9,6 +9,7 @@ import Forgot from './pages/ForgotPassword';
 import BuktiTransfer from './pages/TransferProof';
 import UploadBuktiTransferPage from './pages/UploadTransferProof/UploadBuktiTransferPage';
 import PrasyaratOspekPage from './pages/PrasyaratOSPEK/PrasyaratOspekPage';
+import PerubahanProdiPage from './pages/ProdiChange/PerubahanProdiPage';
 import RegisterGelombang from './pages/RegisterGelombang';
 import Register from './pages/RegisterPage';
 import Account from './pages/MyAccountPage';
@@ -29,7 +30,7 @@ export default function App() {
                 <Route path='/transferproof' element={<BuktiTransfer />} />
                 <Route path='/uploadtransferproof' element={<UploadBuktiTransferPage />} />
                 <Route path='/prasyaratospek' element={<PrasyaratOspekPage />} />
-            
+                <Route path='/changeprodi' element={<PerubahanProdiPage />} />
                 
             </Routes>
         </BrowserRouter>
