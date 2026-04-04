@@ -192,7 +192,7 @@ export default function AccountPage() {
         onBuktiTransfer:       (reg) => navigate("/transferproof",  { state: { nomorDaftar: reg.nomorDaftar } }),
         onPerubahanProdi:      (reg) => navigate("/perubahan-prodi", { state: { nomorDaftar: reg.nomorDaftar } }),
         onDownloadPengunduran: (reg) => downloadPdf(`pengunduran-diri-${reg.nomorDaftar}.pdf`),
-        onPrasyaratOspek:      (reg) => navigate("/prasyarat-ospek", { state: { nomorDaftar: reg.nomorDaftar } }),
+        onPrasyaratOspek:      (reg) => navigate("/prasyaratospek", { state: { nomorDaftar: reg.nomorDaftar } }),
     };
 
     return (

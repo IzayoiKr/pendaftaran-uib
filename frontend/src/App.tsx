@@ -7,6 +7,8 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Forgot from './pages/ForgotPassword';
 import BuktiTransfer from './pages/TransferProof';
+import UploadBuktiTransferPage from './pages/UploadTransferProof/UploadBuktiTransferPage';
+import PrasyaratOspekPage from './pages/PrasyaratOSPEK/PrasyaratOspekPage';
 import RegisterGelombang from './pages/RegisterGelombang';
 import Register from './pages/RegisterPage';
 import Account from './pages/MyAccountPage';
@@ -25,7 +27,8 @@ export default function App() {
                 <Route path='/forgot' element= {<Forgot/>} />
                 <Route path='/account' element= {<Account/>} />
                 <Route path='/transferproof' element={<BuktiTransfer />} />
-                
+                <Route path='/uploadtransferproof' element={<UploadBuktiTransferPage />} />
+                <Route path='/prasyaratospek' element={<PrasyaratOspekPage />} />
             
                 
             </Routes>

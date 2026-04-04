@@ -151,7 +151,7 @@ export default function BuktiTransferPage() {
                         ← Kembali (Back)
                     </button>
                     <button className="btn btn-success"
-                        onClick={() => navigate("/bukti-transfer/tambah")}>
+                        onClick={() => navigate("/uploadtransferproof")}>
                         + Tambah Bukti Transfer (Add Receipt of Payment)
                     </button>
                 </div>
