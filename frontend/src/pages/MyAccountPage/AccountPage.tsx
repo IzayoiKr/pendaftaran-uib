@@ -206,11 +206,11 @@ export default function AccountPage() {
 
                 <div className="bottom-actions">
                     <button className="btn btn-warning btn-lg"
-                        onClick={() => navigate("/ubah-password")}>
+                        onClick={() => navigate("/passwordchange")}>
                         UBAH PASSWORD
                     </button>
                     <button className="btn btn-primary btn-lg"
-                        onClick={() => navigate("/ubah-profile")}>
+                        onClick={() => navigate("/profilechange")}>
                         UBAH PROFILE
                     </button>
                     <button className="btn btn-danger btn-lg"

@@ -10,6 +10,8 @@ import BuktiTransfer from './pages/TransferProof';
 import UploadBuktiTransferPage from './pages/UploadTransferProof/UploadBuktiTransferPage';
 import PrasyaratOspekPage from './pages/PrasyaratOSPEK/PrasyaratOspekPage';
 import PerubahanProdiPage from './pages/ProdiChange/PerubahanProdiPage';
+import UbahPasswordPage from './pages/PasswordChange/UbahPasswordPage';
+import UbahProfilePage from './pages/ProfilChange/UbahProfilePage';
 import RegisterGelombang from './pages/RegisterGelombang';
 import Register from './pages/RegisterPage';
 import Account from './pages/MyAccountPage';
@@ -31,7 +33,8 @@ export default function App() {
                 <Route path='/uploadtransferproof' element={<UploadBuktiTransferPage />} />
                 <Route path='/prasyaratospek' element={<PrasyaratOspekPage />} />
                 <Route path='/changeprodi' element={<PerubahanProdiPage />} />
-                
+                <Route path='/profilechange' element={<UbahProfilePage />} />\
+                <Route path='/passwordchange' element={<UbahPasswordPage />} />
             </Routes>
         </BrowserRouter>
     );
