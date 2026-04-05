@@ -1,97 +1,117 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
-import { Link } from "react-router-dom";
-import "./LoginPage.scss";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { api, saveSession } from "../../api";
+import { RightArrowIcon } from "../../components/Icons";
+import styles from "./LoginPage.module.scss";
 
-
-interface LoginForm {
-    email: string;
-    password: string;
-}
-
-
-function LoginInput({ type, name, placeholder, value, autoComplete, minLength, onChange }: {
-    type: "email" | "password";
-    name: keyof LoginForm;
+interface LoginPlaceholderProps {
+    type: string;
     placeholder: string;
-    value: string;
     autoComplete: string;
     minLength?: number;
-    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-}) {
-    return (
-        <input
-            type={type}
-            name={name}
-            className="single-input"
-            placeholder={placeholder}
-            value={value}
-            autoComplete={autoComplete}
-            minLength={minLength}
-            onChange={onChange}
-            required
-        />
-    );
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-function LoginButton({ isLoading }: { isLoading: boolean }) {
-    return (
-        <button type="submit" className="login-btn" disabled={isLoading} aria-busy={isLoading}>
-            {isLoading
-                ? <><div className="spinner" aria-hidden="true" /> Login</>
-                : "Login"
-            }
-        </button>
-    );
+interface LoginFormProps {
+    onLogin: (email: string, password: string) => Promise<void>;
 }
 
+interface LoginActionProps {
+    error: string | null;
+}
 
-export default function LoginPage() {
-    const [form, setForm] = useState<LoginForm>({ email: "", password: "" });
-    const [isLoading, setIsLoading] = useState(false);
+function LoginPlaceholder({ type, placeholder, autoComplete, minLength, value, onChange }: LoginPlaceholderProps) {
+    return (
+        <>
+            <input
+                id={type}
+                name={type}
+                type={type}
+                placeholder={placeholder}
+                autoComplete={autoComplete}
+                minLength={minLength}
+                value={value}
+                onChange={onChange}
+                required
+            />
+        </>
+    )
+}
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
-    };
+function LoginAction({ error }: LoginActionProps) {
+    return (
+        <>
+            {error && <p className={styles.errorText} role="alert">{error}</p>}
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+            <Link to="/forgot" className={styles.forgotLink}>Lupa Password?</Link>
+
+            <button type="submit" className={styles.loginBtn}>
+                Login <RightArrowIcon />
+            </button>
+
+            <p className={styles.registerText}>
+                Belum memiliki akun?{" "}
+                <Link to="/register">Buat Akun</Link>
+            </p>
+        </>
+    )
+}
+
+function LoginForm({ onLogin }: LoginFormProps) {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState<string | null>(null);
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setIsLoading(true);
+        setError(null);
         try {
-            await new Promise(r => setTimeout(r, 1000)); 
-        } finally {
-            setIsLoading(false);
+            await onLogin(email, password);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Terjadi kesalahan");
         }
     };
 
     return (
-        <div id="login" className="page-content">
-            <div className="login-box">
-                <h3 className="login-title">LOGIN</h3>
-                <form onSubmit={handleSubmit} noValidate>
-                    <LoginInput type="email" name="email" placeholder="Email"
-                        value={form.email} autoComplete="email" onChange={handleChange} />
-                    <LoginInput type="password" name="password" placeholder="Password"
-                        value={form.password} autoComplete="current-password" minLength={8} onChange={handleChange} />
-                    <Link to="/forgot"> 
-                    Lupa Password? 
-                    </Link>
-                
-                    <div>
-                        <LoginButton isLoading={isLoading} />
-                    </div>
-                    <p className="register-text">
-                        Belum memiliki akun?{" "}
-                        <Link to="/register">Buat Akun</Link>
-                    </p>
-                    
-                    <p className="accountpage-text">
-                        Akses Profil Sementara{" "}
-                        <Link to="/account">My Profile</Link>
-                    </p>
+        <>
+            <form onSubmit={handleSubmit} noValidate>
+                <LoginPlaceholder
+                    type="email"
+                    placeholder="Email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => { setEmail(e.target.value); setError(null); }}
+                />
+                <LoginPlaceholder
+                    type="password"
+                    placeholder="Password"
+                    autoComplete="current-password"
+                    minLength={8}
+                    value={password}
+                    onChange={(e) => { setPassword(e.target.value); setError(null); }}
+                />
+                <LoginAction error={error} />
+            </form>
 
-                </form>
+        </>
+    )
+}
+
+export default function LoginPage() {
+    const navigate = useNavigate();
+
+    const handleLogin = async (email: string, password: string) => {
+        const res = await api.auth.login(email, password);
+        saveSession(res);
+        navigate("/");
+    }
+    return (
+        <main id="login" className={styles.login}>
+            <div className={styles.container}>
+                <h1>LOGIN</h1>
+                <LoginForm onLogin={handleLogin} />
             </div>
-        </div>
+        </main>
     );
 }

@@ -89,7 +89,6 @@ export default function Gelombang() {
             <div className={styles.container}>
                 <div className={styles.title}>
                     <h2>Gelombang Pendaftaran</h2>
-                    <hr />
                     <h2 className={styles.subTitle}><i>Registration Batch</i></h2>
                     <p>
                         Informasi Jadwal Penerimaan Mahasiswa Baru

@@ -37,7 +37,7 @@ function FooterMenu() {
 
 function FooterContact() {
     return (
-        <div className={styles.widget}>
+        <div className={styles.widget} id="kontak">
             <h2>Kontak</h2>
             <address>
                 <strong>{contactInfo.university}</strong><br />
@@ -109,7 +109,7 @@ function FooterBottom() {
 
 export default function Footer() {
     return (
-        <footer id="kontak">
+        <footer>
             <div className={styles.container}>
                 <FooterTop />
                 <FooterBottom />

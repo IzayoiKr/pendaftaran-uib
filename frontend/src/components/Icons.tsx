@@ -92,7 +92,14 @@ function EarthIcon() {
 
 function ClockIcon() {
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+        >
             <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm.5-13H11v6l4.25 2.55.75-1.23-3.5-2.07V7z" />
         </svg>
     );
@@ -100,8 +107,33 @@ function ClockIcon() {
 
 function PinIcon() {
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+        >
             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+        </svg>
+    );
+}
+
+export function RightArrowIcon() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="800"
+            height="800"
+            viewBox="0 0 512 512"
+            fill="currentColor"
+            aria-hidden="true"
+        >
+            <path d="M505.183,239.544L388.819,123.179c-6.654-6.658-16.668-8.645-25.363-5.046
+	c-8.696,3.603-14.367,12.089-14.367,21.501v93.092H23.273C10.42,232.727,0,243.147,0,256s10.42,23.273,23.273,23.273h325.818v93.091
+	c0,9.413,5.669,17.9,14.367,21.501c2.878,1.193,5.904,1.773,8.901,1.773c6.056,0,12.009-2.365,16.46-6.819l116.364-116.364
+	C514.273,263.368,514.273,248.633,505.183,239.544z" />
         </svg>
     );
 }

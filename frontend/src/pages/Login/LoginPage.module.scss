@@ -1,0 +1,123 @@
+@use '../../styles/global.scss';
+@use '../../styles/form.scss';
+@use 'sass:map';
+@use 'sass:color';
+
+$color-error: #e53935;
+
+.login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: var(--space-2xl) 0;
+  
+  .container {
+    @include global.container-form;
+    margin-top: var(--space-2xl);
+    margin-bottom: var(--space-m);
+  }
+}
+
+.container {
+  h1 {
+    font-size: var(--step-3);
+    font-weight: 700;
+    color: global.$secondary-color;
+    text-align: center;
+    letter-spacing: 0.06em;
+    margin-bottom: var(--space-m);
+  }
+
+  Input {
+    font-size: var(--step--1);
+    font-family: global.$font-family;
+    color: global.$text-color2;
+    width: 100%;
+    height: auto;
+    min-height: 48px;
+    background: form.$input-bg;
+    outline: none;
+    border: 1px solid form.$input-border;
+    border-radius: 4px;
+    padding: var(--space-2xs) var(--space-s);
+    margin-bottom: var(--space-2xs);
+
+    &::placeholder { color: form.$placeholder; }
+    &:focus { 
+      background: form.$input-focus;
+      border-color: form.$primary;
+    }
+  }
+
+  .errorText {
+    font-size: var(--step--2);
+    color: $color-error;
+    text-align: left;
+    margin-bottom: var(--space-2xs);
+  }
+
+  .forgotLink {
+    display: block;
+    width: fit-content;
+    font-size: var(--step--1);
+    color: global.$link-color;
+    text-align: left;
+    margin-bottom: var(--space-s);
+    transition: color 0.3s ease;
+
+    &:hover { 
+      color: color.adjust(global.$link-color, $lightness: -25%);
+      text-decoration: underline; 
+    }
+  }
+
+  .loginBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    padding: var(--space-xs) var(--space-m);
+    gap: 1ch;
+
+    font-size: var(--step--2);
+    font-family: global.$font-family;
+    font-weight: 600;
+    color: global.$white;
+
+    background: form.$primary;
+    border: 1px solid form.$primary;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+
+    &:hover {
+      background: transparent; 
+      color: form.$primary;
+    }
+    &:disabled { opacity: 0.7; cursor: not-allowed; }
+
+    svg {
+      width: 1em;
+      height: 1em;
+      transform: scale(1.2);
+    }
+  }
+
+  .registerText {
+    font-size: var(--step--1);
+    color: global.$text-color;
+    text-align: center;
+    margin-top: var(--space-s);
+
+    a {
+      color: global.$link-color;
+      font-weight: 600;
+      transition: color 0.2s ease;
+
+      &:hover { 
+        text-decoration: underline; 
+        color: color.adjust(global.$link-color, $lightness: 10%);
+      }
+    }
+  }
+}

@@ -4,7 +4,7 @@ export const headerNavLinks: HeaderNavLinks[] = [
     { to: "/#home", label: "Beranda", hashId: "home" },
     { to: "/#gelombang", label: "Gelombang", hashId: "gelombang" },
     { to: "/info-umum", label: "Informasi Umum" },
-    { to: "/#kontak", label: "Kontak", hashId: "kontak" },
+    { to: "#kontak", label: "Kontak", hashId: "kontak" },
     { to: "/panduan", label: "Panduan" },
     { to: "/login", label: "Daftar/Login" },
 ]
