@@ -1,0 +1,115 @@
+@use '../styles/global.scss' as global;
+
+/* ================= WRAPPER ================= */
+.wrapper {
+  position: relative;
+  margin: 2rem 0 3rem 0;
+
+  --step-count: 3;
+  --progress: 0%;
+  --circle-size: 2.4rem;
+  --active-color: #16a34a;
+  --line-color: #e5e7eb;
+  --text-color: #374151;
+}
+
+/* ================= STEPS ================= */
+.steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+
+  /* 🔥 ini kunci biar garis gak tembus */
+  --offset: calc(100% / (var(--step-count) * 2));
+}
+
+/* ================= LINE GRAY ================= */
+.steps::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--circle-size) / 2);
+  left: var(--offset);
+  right: var(--offset);
+  height: 2px;
+  background: var(--line-color);
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+/* ================= LINE PROGRESS ================= */
+.steps::after {
+  content: "";
+  position: absolute;
+  top: calc(var(--circle-size) / 2);
+  left: var(--offset);
+  right: var(--offset); /* 🔥 tambahin ini */
+  width: var(--progress);
+  height: 2px;
+  background: var(--active-color);
+  transform: translateY(-50%);
+  transition: width 0.35s ease;
+  z-index: 1;
+}
+
+/* ================= STEP ================= */
+.stepWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+/* ================= CIRCLE ================= */
+.circle {
+  width: var(--circle-size);
+  height: var(--circle-size);
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: #6b7280;
+  transition: all 0.25s ease;
+  z-index: 2;
+}
+
+/* ACTIVE */
+.active {
+  border-color: var(--active-color);
+  color: var(--active-color);
+}
+
+/* DONE */
+.done {
+  background: var(--active-color);
+  color: white;
+  border-color: var(--active-color);
+}
+
+/* ================= LABEL ================= */
+.label {
+  margin-top: 0.6rem;
+  text-align: center;
+}
+
+.main {
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.sub {
+  font-size: var(--step--2);
+  color: #9ca3af;
+}

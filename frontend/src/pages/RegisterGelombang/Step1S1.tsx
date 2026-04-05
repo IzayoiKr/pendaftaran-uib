@@ -1,5 +1,7 @@
 import { useState } from "react";
 import styles from "./Step1.module.scss";
+import form from "../../styles/form.module.scss";
+import ProgressBar from "../../hooks/ProgressBar";
 import useSchoolSearch from "../../hooks/useSchoolSearch";
 import useUniversitySearch from "../../hooks/useUniversitySearch";
 
@@ -7,9 +9,10 @@ type Props = {
   formData: any;
   setFormData: (data: any) => void;
   next: () => void;
+  goToStep: (n: number) => void;
+  currentStep: number;
 };
 
-// Daftar semua prodi sesuai website asli
 const PRODI_OPTIONS = [
   { value: "42", label: "Akuntansi (Accounting)" },
   { value: "12", label: "Arsitektur (Architecture)" },
@@ -26,14 +29,23 @@ const PRODI_OPTIONS = [
   { value: "32", label: "Teknologi Informasi (Information Technology)" },
 ];
 
-export default function Step1S1({ formData, setFormData, next }: Props) {
-  const [jenisDaftar, setJenisDaftar] = useState(formData.jenisdaftar || "");
+export default function Step1S1({
+  formData,
+  setFormData,
+  next,
+  goToStep,
+  currentStep,
+}: Props) {
+  const [jenisDaftar, setJenisDaftar] = useState(
+    formData.jenisdaftar || ""
+  );
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
+
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
@@ -41,10 +53,15 @@ export default function Step1S1({ formData, setFormData, next }: Props) {
   };
 
   const handleNext = () => {
-    if (!formData.nik || !formData.email || !formData.nama || !formData.nohp) {
-      alert("Lengkapi data wajib!");
+    const required = ["nik", "email", "nama", "nohp"];
+
+    const missing = required.filter((f) => !formData[f]);
+
+    if (missing.length > 0) {
+      alert(`Field wajib belum diisi: ${missing.join(", ")}`);
       return;
     }
+
     next();
   };
 
@@ -71,7 +88,6 @@ export default function Step1S1({ formData, setFormData, next }: Props) {
 
   return (
     <div className={styles.container}>
-      {/* ================= FORM ================= */}
       <div className={styles.formWrapper}>
 
         {/* HEADER */}
@@ -83,33 +99,25 @@ export default function Step1S1({ formData, setFormData, next }: Props) {
             (Undergraduate Student Registration Form)
           </p>
 
-          <div className={styles.steps}>
-            <div className={`${styles.step} ${styles.active}`}>
-              <div className={styles.circle}>1</div>
-              <p>BIODATA DIRI</p>
-              <span>(PERSONAL DATA)</span>
-            </div>
-            <div className={styles.step}>
-              <div className={styles.circle}>2</div>
-              <p>DOKUMEN</p>
-              <span>(DOCUMENT)</span>
-            </div>
-            <div className={styles.step}>
-              <div className={styles.circle}>3</div>
-              <p>SELESAI</p>
-              <span>(DONE)</span>
-            </div>
-          </div>
+          <ProgressBar
+            currentStep={currentStep}
+            goToStep={goToStep}
+            steps={[
+              { label: "BIODATA DIRI", sub: "PERSONAL DATA" },
+              { label: "DOKUMEN", sub: "DOCUMENT" },
+              { label: "SELESAI", sub: "DONE" },
+            ]}
+          />
         </div>
 
         <h2 className={styles.title}>BIODATA PRIBADI (Personal Data)</h2>
         <p className={styles.requiredNote}>* Wajib di Isi (Required)</p>
 
         {/* NIK */}
-        <div className={styles.formGroup}>
-          <label className={styles.label}>NIK (National Identification Number) *</label>
+        <div className={form.formGroup}>
+          <label className={form.label}>NIK (National Identification Number) *</label>
           <input
-            className={styles.input}
+            className={form.input}
             name="nik"
             value={formData.nik || ""}
             onChange={handleChange}
@@ -117,10 +125,10 @@ export default function Step1S1({ formData, setFormData, next }: Props) {
         </div>
 
         {/* EMAIL */}
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Email *</label>
+        <div className={form.formGroup}>
+          <label className={form.label}>Email *</label>
           <input
-            className={styles.input}
+            className={form.input}
             type="email"
             name="email"
             value={formData.email || ""}
@@ -129,10 +137,10 @@ export default function Step1S1({ formData, setFormData, next }: Props) {
         </div>
 
         {/* NAMA */}
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Nama Lengkap (Full Name) *</label>
+        <div className={form.formGroup}>
+          <label className={form.label}>Nama Lengkap (Full Name) *</label>
           <input
-            className={styles.input}
+            className={form.input}
             name="nama"
             value={formData.nama || ""}
             onChange={handleChange}
@@ -140,55 +148,56 @@ export default function Step1S1({ formData, setFormData, next }: Props) {
         </div>
 
         {/* JENIS KELAMIN */}
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Jenis Kelamin (Gender) *</label>
-        <div className={styles.selectWrapper}>
-          <select
-            className={styles.select}
-            name="jk"
-            value={formData.jk || ""}
-            onChange={handleChange}
-          >
-            <option value="">Jenis Kelamin (Gender) *</option>
-            <option value="l">Laki - Laki (Male)</option>
-            <option value="p">Perempuan (Female)</option>
-          </select>
+        <div className={form.formGroup}>
+          <label className={form.label}>Jenis Kelamin (Gender) *</label>
+          <div className={form.selectWrapper}>
+            <select
+              className={form.select}
+              name="jk"
+              value={formData.jk || ""}
+              onChange={handleChange}
+            >
+              <option value="">Jenis Kelamin (Gender) *</option>
+              <option value="l">Laki - Laki (Male)</option>
+              <option value="p">Perempuan (Female)</option>
+            </select>
+          </div>
         </div>
-      </div>
 
-        {/* KEWARGANEGARAAN — nilai angka sesuai backend */}
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Kewarganegaraan (Nationality) *</label>
-        <div className={styles.selectWrapper}>
-          <select
-            className={styles.select}
-            name="kewarganegaraan"
-            value={formData.kewarganegaraan || ""}
-            onChange={handleChange}
-          >
-            <option value="">Kewarganegaraan (Nationality) *</option>
-            <option value="1">WNI</option>
-            <option value="2">WNA</option>
-            <option value="3">TIDAK ADA WN</option>
-          </select>
+        {/* KEWARGANEGARAAN */}
+        <div className={form.formGroup}>
+          <label className={form.label}>Kewarganegaraan (Nationality) *</label>
+          <div className={form.selectWrapper}>
+            <select
+              className={form.select}
+              name="kewarganegaraan"
+              value={formData.kewarganegaraan || ""}
+              onChange={handleChange}
+            >
+              <option value="">Kewarganegaraan (Nationality) *</option>
+              <option value="1">WNI</option>
+              <option value="2">WNA</option>
+              <option value="3">TIDAK ADA WN</option>
+            </select>
+          </div>
         </div>
-      </div>
+
         {/* TEMPAT & TANGGAL LAHIR */}
-        <div className={styles.row}>
-          <div className={styles.col}>
-            <label className={styles.label}>Tempat Lahir (Place of Birth) *</label>
+        <div className={form.row}>
+          <div className={form.col}>
+            <label className={form.label}>Tempat Lahir (Place of Birth) *</label>
             <input
-              className={styles.input}
+              className={form.input}
               name="tempatlahir"
               value={formData.tempatlahir || ""}
               onChange={handleChange}
             />
           </div>
 
-          <div className={styles.col}>
-            <label className={styles.label}>Tanggal Lahir (Date of Birth) *</label>
+          <div className={form.col}>
+            <label className={form.label}>Tanggal Lahir (Date of Birth) *</label>
             <input
-              className={styles.input}
+              className={form.input}
               type="date"
               name="tanggallahir"
               max="2011-03-26"
@@ -199,10 +208,10 @@ export default function Step1S1({ formData, setFormData, next }: Props) {
         </div>
 
         {/* NO HP */}
-        <div className={styles.formGroup}>
-          <label className={styles.label}>No. Hp (First Phone Number) *</label>
+        <div className={form.formGroup}>
+          <label className={form.label}>No. Hp (First Phone Number) *</label>
           <input
-            className={styles.input}
+            className={form.input}
             type="number"
             name="nohp"
             value={formData.nohp || ""}
@@ -211,10 +220,10 @@ export default function Step1S1({ formData, setFormData, next }: Props) {
         </div>
 
         {/* NO WA */}
-        <div className={styles.formGroup}>
-          <label className={styles.label}>No. WA (WhatsApp Number) *</label>
+        <div className={form.formGroup}>
+          <label className={form.label}>No. WA (WhatsApp Number) *</label>
           <input
-            className={styles.input}
+            className={form.input}
             type="number"
             name="nohp2"
             value={formData.nohp2 || ""}
@@ -223,145 +232,130 @@ export default function Step1S1({ formData, setFormData, next }: Props) {
         </div>
 
         {/* JENIS PENDAFTARAN */}
-        <div className={styles.formGroup}>
-          <label className={styles.label}>
-            Jenis Pendaftaran (Registration Type) *
-          </label>
-        <div className={styles.selectWrapper}>
-          <select
-            className={styles.select}
-            name="jenisdaftar"
-            value={jenisDaftar}
-            onChange={(e) => {
-              handleChange(e);
-              setJenisDaftar(e.target.value);
-            }}
-          >
-            <option value="">Jenis Pendaftaran (Registration Type) *</option>
-            <option value="baru">Baru (Newly Registered)</option>
-            <option value="alihjenjang">Alih Jenjang (Extension Course)</option>
-            <option value="transfer">Transfer (Transfer Student)</option>
-          </select>
-        </div>
-      </div>
-
-        {/* ===== EXTRA FORM: Alih Jenjang / Transfer ===== */}
-        {isAlihjenjangOrTransfer && (
-          <div className={styles.extraBox}>
-            <h3 className={styles.sectionTitle}>
-              Informasi Pendidikan Sebelumnya (Prior Education Information)
-            </h3>
-
-        <div className={styles.formGroup}>
-          <label className={styles.label}>
-            Nama Universitas (Name of University) *
-          </label>
-
-          <div className={styles.selectWrapper}>
-            <input
-              className={styles.input}
-              name="universitas_asal"
-              value={queryUni}
-              placeholder="Masukan nama Universitas (Name Of University)"
-              onFocus={() => setOpenUni(true)}
-              onBlur={() => setTimeout(() => setOpenUni(false), 200)}
+        <div className={form.formGroup}>
+          <label className={form.label}>Jenis Pendaftaran (Registration Type) *</label>
+          <div className={form.selectWrapper}>
+            <select
+              className={form.select}
+              name="jenisdaftar"
+              value={jenisDaftar}
               onChange={(e) => {
-                const val = e.target.value;
-
-                setQueryUni(val);
-
-                setFormData({
-                  ...formData,
-                  universitas_asal: val,
-                });
+                handleChange(e);
+                setJenisDaftar(e.target.value);
               }}
-            />
-
-            {openUni && (
-              <div className={styles.dropdown}>
-                {queryUni.length < 3 ? (
-                  <div className={styles.notFound}>
-                    Please enter 3 or more characters
-                  </div>
-                ) : filteredUni.length === 0 ? (
-                  <div className={styles.notFound}>
-                    Universitas tidak ditemukan
-                  </div>
-                ) : (
-                  filteredUni.map((u: string, i: number) => (
-                    <div
-                      key={i}
-                      className={styles.option}
-                      onMouseDown={() => {
-                        setQueryUni(u);
-
-                        setFormData({
-                          ...formData,
-                          universitas_asal: u,
-                        });
-
-                        setOpenUni(false);
-                      }}
-                    >
-                      {u}
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
+            >
+              <option value="">Jenis Pendaftaran (Registration Type) *</option>
+              <option value="baru">Baru (Newly Registered)</option>
+              <option value="alihjenjang">Alih Jenjang (Change Level)</option>
+              <option value="transfer">Transfer</option>
+            </select>
           </div>
         </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Asal Program Studi (Last Study Program) *</label>
+        {/* DATA PENDIDIKAN SEBELUMNYA - hanya muncul jika Alih Jenjang atau Transfer */}
+        {isAlihjenjangOrTransfer && (
+          <div className={form.extraBox}>
+            <h3>Data Pendidikan Sebelumnya (Previous Education Data)</h3>
+
+            {/* UNIVERSITAS ASAL */}
+            <div className={form.formGroup}>
+              <label className={form.label}>Universitas Asal (Last University) *</label>
+              <div className={form.selectWrapper}>
+                <input
+                  className={form.input}
+                  name="universitas_asal"
+                  value={queryUni}
+                  placeholder="Masukkan nama Universitas"
+                  onFocus={() => setOpenUni(true)}
+                  onBlur={() => setTimeout(() => setOpenUni(false), 150)}
+                  onChange={(e) => {
+                    setQueryUni(e.target.value);
+                    setFormData({
+                      ...formData,
+                      universitas_asal: e.target.value,
+                    });
+                  }}
+                />
+                {openUni && (
+                  <div className={form.dropdown}>
+                    {filteredUni.length === 0 ? (
+                      <div className={form.notFound}>Universitas tidak ditemukan</div>
+                    ) : (
+                      filteredUni.map((u: string, i: number) => (
+                        <div
+                          key={i}
+                          className={form.option}
+                          onMouseDown={() => {
+                            selectUniversity(u);
+                            setFormData({
+                              ...formData,
+                              universitas_asal: u,
+                            });
+                            setOpenUni(false);
+                          }}
+                        >
+                          {u}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ASAL PROGRAM STUDI */}
+            <div className={form.formGroup}>
+              <label className={form.label}>Asal Program Studi (Last Study Program) *</label>
               <input
-                className={styles.input}
+                className={form.input}
                 name="prodi_asal"
                 value={formData.prodi_asal || ""}
                 onChange={handleChange}
               />
             </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>IPK (GPA) *</label>
-            <div className={styles.selectWrapper}>
-              <input
-                className={styles.input}
-                type="number"
-                step="0.01"
-                max={4}
-                name="ipk"
-                value={formData.ipk || ""}
-                onChange={handleChange}
-              />
+            {/* IPK */}
+            <div className={form.formGroup}>
+              <label className={form.label}>IPK (GPA) *</label>
+              <div className={form.selectWrapper}>
+                <input
+                  className={form.input}
+                  type="number"
+                  step="0.01"
+                  max={4}
+                  name="ipk"
+                  value={formData.ipk || ""}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
-          </div>
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>
+            {/* JENJANG PENDIDIKAN TERAKHIR */}
+            <div className={form.formGroup}>
+              <label className={form.label}>
                 Jenjang Pendidikan Terakhir (Last Education Level) *
               </label>
-              <div className={styles.selectWrapper}>
-              <input
-                className={styles.input}
-                name="jenjang_pendidikan"
-                value={formData.jenjang_pendidikan || ""}
-                onChange={handleChange}
-              />
+              <div className={form.selectWrapper}>
+                <input
+                  className={form.input}
+                  name="jenjang_pendidikan"
+                  value={formData.jenjang_pendidikan || ""}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
           </div>
-        </div>
         )}
 
         {/* ===== INFORMASI PERKULIAHAN ===== */}
         <h3 className={styles.sectionTitle}>Informasi Perkuliahan (Study Program)</h3>
 
-        {/* NAMA UNIVERSITAS — search dropdown */}
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Nama Universitas *</label>
-          <div className={styles.selectWrapper}>
+        {/* NAMA UNIVERSITAS */}
+        <div className={form.formGroup}>
+          <label className={form.label}>Nama Universitas *</label>
+          <div className={form.selectWrapper}>
             <input
-              className={styles.input}
+              className={form.input}
               name="universitas"
               value={queryUni}
               placeholder="Masukkan nama Universitas"
@@ -373,14 +367,14 @@ export default function Step1S1({ formData, setFormData, next }: Props) {
               }}
             />
             {openUni && (
-              <div className={styles.dropdown}>
+              <div className={form.dropdown}>
                 {filteredUni.length === 0 ? (
-                  <div className={styles.notFound}>Universitas tidak ditemukan</div>
+                  <div className={form.notFound}>Universitas tidak ditemukan</div>
                 ) : (
                   filteredUni.map((u: string, i: number) => (
                     <div
                       key={i}
-                      className={styles.option}
+                      className={form.option}
                       onMouseDown={() => selectUniversity(u)}
                     >
                       {u}
@@ -392,90 +386,95 @@ export default function Step1S1({ formData, setFormData, next }: Props) {
           </div>
         </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.label}>
+        {/* PROGRAM STUDI PILIHAN 1 */}
+        <div className={form.formGroup}>
+          <label className={form.label}>
             Program Studi Pilihan (First Selected Study Program) *
           </label>
-        <div className={styles.selectWrapper}>
-          <select
-            className={styles.select}
-            name="prodipil"
-            value={formData.prodipil || ""}
-            onChange={handleChange}
-          >
-            <option value="">Program Studi Pilihan (Selected Study Program) *</option>
-            {PRODI_OPTIONS.map((p) => (
-              <option key={p.value} value={p.value}>{p.label}</option>
-            ))}
-          </select>
+          <div className={form.selectWrapper}>
+            <select
+              className={form.select}
+              name="prodipil"
+              value={formData.prodipil || ""}
+              onChange={handleChange}
+            >
+              <option value="">Program Studi Pilihan (Selected Study Program) *</option>
+              {PRODI_OPTIONS.map((p) => (
+                <option key={p.value} value={p.value}>{p.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
-      </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.label}>
+        {/* PROGRAM STUDI PILIHAN 2 */}
+        <div className={form.formGroup}>
+          <label className={form.label}>
             Program Studi Pilihan 2 (Second Selected Study Program)
           </label>
-        <div className={styles.selectWrapper}>
-          <select
-            className={styles.select}
-            name="prodipil2"
-            value={formData.prodipil2 || ""}
-            onChange={handleChange}
-          >
-            <option value="">Program Studi Pilihan 2 (Second Selected Study Program)</option>
-            {PRODI_OPTIONS.map((p) => (
-              <option key={p.value} value={p.value}>{p.label}</option>
-            ))}
-          </select>
+          <div className={form.selectWrapper}>
+            <select
+              className={form.select}
+              name="prodipil2"
+              value={formData.prodipil2 || ""}
+              onChange={handleChange}
+            >
+              <option value="">Program Studi Pilihan 2 (Second Selected Study Program)</option>
+              {PRODI_OPTIONS.map((p) => (
+                <option key={p.value} value={p.value}>{p.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
-      </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.label}>
+        {/* PROGRAM STUDI PILIHAN 3 */}
+        <div className={form.formGroup}>
+          <label className={form.label}>
             Program Studi Pilihan 3 (Third Selected Study Program)
           </label>
-        <div className={styles.selectWrapper}>
-          <select
-            className={styles.select}
-            name="prodipil3"
-            value={formData.prodipil3 || ""}
-            onChange={handleChange}
-          >
-            <option value="">Program Studi Pilihan 3 (Third Selected Study Program)</option>
-            {PRODI_OPTIONS.map((p) => (
-              <option key={p.value} value={p.value}>{p.label}</option>
-            ))}
-          </select>
+          <div className={form.selectWrapper}>
+            <select
+              className={form.select}
+              name="prodipil3"
+              value={formData.prodipil3 || ""}
+              onChange={handleChange}
+            >
+              <option value="">Program Studi Pilihan 3 (Third Selected Study Program)</option>
+              {PRODI_OPTIONS.map((p) => (
+                <option key={p.value} value={p.value}>{p.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
-      </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Waktu Kuliah (Shift) *</label>
-        <div className={styles.selectWrapper}>
-          <select
-            className={styles.select}
-            name="waktukuliah"
-            value={formData.waktukuliah || ""}
-            onChange={handleChange}
-          >
-            <option value="">Waktu Kuliah (Shift) *</option>
-            <option value="pagi">Pagi (Morning Class)</option>
-            <option value="malam">Malam (Night Class)</option>
-          </select>
+        {/* WAKTU KULIAH */}
+        <div className={form.formGroup}>
+          <label className={form.label}>Waktu Kuliah (Shift) *</label>
+          <div className={form.selectWrapper}>
+            <select
+              className={form.select}
+              name="waktukuliah"
+              value={formData.waktukuliah || ""}
+              onChange={handleChange}
+            >
+              <option value="">Waktu Kuliah (Shift) *</option>
+              <option value="pagi">Pagi (Morning Class)</option>
+              <option value="malam">Malam (Night Class)</option>
+            </select>
+          </div>
         </div>
-      </div>
 
         {/* ===== INFORMASI SEKOLAH ===== */}
         <h3 className={styles.sectionTitle}>
           Informasi Sekolah (High School Information)
         </h3>
 
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Nama Asal Sekolah (Name of High School) *</label>
+        {/* NAMA ASAL SEKOLAH */}
+        <div className={form.formGroup}>
+          <label className={form.label}>Nama Asal Sekolah (Name of High School) *</label>
 
-          <div className={styles.selectWrapper}>
+          <div className={form.selectWrapper}>
             <input
-              className={styles.input}
+              className={form.input}
               name="asal_sekolah"
               value={query}
               placeholder="Masukkan nama sekolah (Name Of High-School)"
@@ -488,14 +487,14 @@ export default function Step1S1({ formData, setFormData, next }: Props) {
             />
 
             {open && (
-              <div className={styles.dropdown}>
+              <div className={form.dropdown}>
                 {filtered.length === 0 ? (
-                  <div className={styles.notFound}>Sekolah tidak ditemukan*</div>
+                  <div className={form.notFound}>Sekolah tidak ditemukan*</div>
                 ) : (
                   filtered.map((s, i) => (
                     <div
                       key={i}
-                      className={styles.option}
+                      className={form.option}
                       onMouseDown={() => selectSchool(s)}
                     >
                       {s}
@@ -509,8 +508,8 @@ export default function Step1S1({ formData, setFormData, next }: Props) {
 
         {/* CHECKBOX — hanya muncul saat "baru" */}
         {jenisDaftar === "baru" && (
-          <div className={styles.extraBox}>
-            <label className={styles.checkbox}>
+          <div className={form.extraBox}>
+            <label className={form.checkbox}>
               <input
                 type="checkbox"
                 name="konfirmasi"
@@ -526,14 +525,18 @@ export default function Step1S1({ formData, setFormData, next }: Props) {
         )}
 
         {/* BUTTON */}
-        <div className={styles.buttonGroup}>
-          <button type="button" className={styles.cancel}>
-            Batal (Cancel)
+        <div className={form.buttonGroup}>
+          <button className={`${form.btn} ${form.btnDanger}`}>
+            Batal
           </button>
-          <button type="button" className={styles.next} onClick={handleNext}>
-            Selanjutnya (Next)
+          <button
+            className={`${form.btn} ${form.btnPrimary}`}
+            onClick={handleNext}
+          >
+            Selanjutnya
           </button>
         </div>
+
       </div>
     </div>
   );

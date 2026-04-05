@@ -1,0 +1,57 @@
+.container {
+  display: flex;
+  justify-content: center;
+}
+
+.formWrapper {
+  width: 100%;
+  max-width: 60rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.mainTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.subTitle {
+  font-size: var(--step-2);
+  font-weight: 600;
+  margin-bottom: var(--space-s);
+  color: #0b3c5d;
+
+}
+.sectionTitle {
+  font-size: 1.2rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.infoBox {
+  background: #eef6ff;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.summaryBox {
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.warningBox {
+  background: #fff3cd;
+  padding: 1rem;
+  margin-top: 1rem;
+  border-radius: 0.5rem;
+}
