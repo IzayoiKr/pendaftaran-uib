@@ -3,60 +3,66 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"net/http"
 
-	"golang.org/x/crypto/bcrypt"
+	"pendaftaran-uib/backend/internal/auth"
+	"pendaftaran-uib/backend/internal/models"
 
-	"github.com/IzayoiKr/pendaftaran-uib/backend/internal/auth"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type loginRequest struct {
-	Email    string `json:"email"`
+	Email string `json:"email"`
 	Password string `json:"password"`
 }
 
-func LoginHandler(db *sql.DB, ts *auth.TokenStore) http.HandlerFunc {
+type authResponse struct {
+	Token string `json:"token"`
+	User models.UserDTO `json:"user"`
+}
+
+func Login(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req loginRequest
+		var req loginRequest 
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, `{"error":"invalid request body"}`, http.StatusBadRequest)
+			writeJSON(w, http.StatusBadRequest, errJSON("permintaan tidak valid"))
 			return
 		}
 		if req.Email == "" || req.Password == "" {
-			http.Error(w, `{"error":"email and password are required"}`, http.StatusBadRequest)
+			writeJSON(w, http.StatusBadRequest, errJSON("email dan password wajib diisi"))
 			return
 		}
 
-		var userID int
-		var username, passwordHash string
+		var user models.User
 		err := db.QueryRowContext(r.Context(),
-			"SELECT id, username, password_hash FROM users WHERE email = ?",
+			`SELECT id, full_name, nik, email, password_hash
+			 FROM users WHERE email = ?`,
 			req.Email,
-		).Scan(&userID, &username, &passwordHash)
-		if err == sql.ErrNoRows {
-			// Return generic message to avoid user enumeration
-			http.Error(w, `{"error":"invalid email or password"}`, http.StatusUnauthorized)
+		).Scan(&user.ID, &user.FullName, &user.NIK, &user.Email, &user.PasswordHash)
+
+		if errors.Is(err, sql.ErrNoRows) {
+			writeJSON(w, http.StatusUnauthorized, errJSON("email atau password salah"))
 			return
 		}
 		if err != nil {
-			http.Error(w, `{"error":"internal server error"}`, http.StatusInternalServerError)
+			writeJSON(w, http.StatusInternalServerError, errJSON("server error"))
 			return
 		}
 
-		if err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(req.Password)); err != nil {
-			http.Error(w, `{"error":"invalid email or password"}`, http.StatusUnauthorized)
+		if err := bcrypt.CompareHashAndPassword(
+			[]byte(user.PasswordHash), []byte(req.Password),
+		); err != nil {
+			writeJSON(w, http.StatusUnauthorized, errJSON("email atau password salah"))
 			return
 		}
 
-		tokenStr, _, err := auth.GenerateToken(userID, username)
+		token, err := auth.GenerateToken(user.ID, user.Email)
 		if err != nil {
-			http.Error(w, `{"error":"failed to generate token"}`, http.StatusInternalServerError)
+			writeJSON(w, http.StatusInternalServerError, errJSON("server error"))
 			return
 		}
 
-		json.NewEncoder(w).Encode(map[string]string{
-			"token":    tokenStr,
-			"username": username,
-		})
+		writeJSON(w, http.StatusOK, authResponse{Token: token, User: user.ToDTO()})
 	}
 }

@@ -6,56 +6,78 @@ import (
 	"net/http"
 	"strings"
 
+	"pendaftaran-uib/backend/internal/auth"
+	"pendaftaran-uib/backend/internal/models"
+
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type registerRequest struct {
-	Email    string `json:"email"`
-	Username string `json:"username"`
+	FullName string `json:"full_name"`
+	NIK string `json:"nik"`
+	Email string `json:"email"`
 	Password string `json:"password"`
 }
 
-func RegisterHandler(db *sql.DB) http.HandlerFunc {
+func Register(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req registerRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, `{"error":"invalid request body"}`, http.StatusBadRequest)
+		if err:= json.NewDecoder(r.Body).Decode(&req); err != nil {
+			writeJSON(w, http.StatusBadRequest, errJSON("permintaan tidak valid"))
 			return
 		}
 
-		req.Email = strings.TrimSpace(req.Email)
-		req.Username = strings.TrimSpace(req.Username)
-
-		if req.Email == "" || req.Username == "" || req.Password == "" {
-			http.Error(w, `{"error":"email, username, and password are required"}`, http.StatusBadRequest)
+		switch {
+		case strings.TrimSpace(req.FullName) == "":
+			writeJSON(w, http.StatusBadRequest, errJSON("name lengkap wajib diisi"))
 			return
-		}
-		if len(req.Password) < 8 {
-			http.Error(w, `{"error":"password must be at least 8 characters"}`, http.StatusBadRequest)
+		case len(req.NIK) != 16:
+			writeJSON(w, http.StatusBadRequest, errJSON("NIK harus 16 digit"))
+			return
+		case req.Email == "":
+			writeJSON(w, http.StatusBadRequest, errJSON("email wajib diisi"))
+			return
+		case len(req.Password) < 8:
+			writeJSON(w, http.StatusBadRequest, errJSON("password minimal 8 karakter"))
 			return
 		}
 
 		hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err != nil {
-			http.Error(w, `{"error":"internal server error"}`, http.StatusInternalServerError)
+			writeJSON(w, http.StatusInternalServerError, errJSON("server error"))
 			return
 		}
+
+		id := uuid.NewString()
 
 		_, err = db.ExecContext(r.Context(),
-			"INSERT INTO users (email, username, password_hash) VALUES (?, ?, ?)",
-			req.Email, req.Username, string(hash),
+			`INSERT INTO users (id, full_name, nik, email, password_hash)
+			 VALUES (?, ?, ?, ?, ?)`,
+		 id, strings.TrimSpace(req.FullName), req.NIK, req.Email, string(hash),
 		)
 		if err != nil {
-			// MySQL error 1062 = duplicate entry
-			if strings.Contains(err.Error(), "1062") || strings.Contains(err.Error(), "Duplicate entry") {
-				http.Error(w, `{"error":"email is already registered"}`, http.StatusConflict)
+			if strings.Contains(err.Error(), "1062") {
+				writeJSON(w, http.StatusConflict, errJSON("email atau NIK sudah terdaftar"))
 				return
 			}
-			http.Error(w, `{"error":"internal server error"}`, http.StatusInternalServerError)
+			writeJSON(w, http.StatusInternalServerError, errJSON("server error"))
 			return
 		}
 
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(map[string]string{"message": "registration successful"})
+		user := models.User{
+			ID: id,
+			FullName: strings.TrimSpace(req.FullName),
+			NIK: req.NIK,
+			Email: req.Email,
+		}
+		
+		token, err := auth.GenerateToken(user.ID, user.Email)
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, errJSON("server error"))
+			return
+		}
+
+		writeJSON(w, http.StatusCreated, authResponse{Token: token, User: user.ToDTO()})
 	}
 }
