@@ -13,7 +13,7 @@ export default defineConfig({
             clientPort: 8989,
         },
         proxy: {
-            '/api': 'http://localhost:8888'
+            '/api': 'http://localhost:9999'
         }
     },
     plugins: [

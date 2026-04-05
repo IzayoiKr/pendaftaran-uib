@@ -5,7 +5,7 @@ A university registration system with a React (Vite) frontend and a Go backend.
 | Layer     | Technology              | Purpose                          |
 |-----------|-------------------------|----------------------------------|
 | Frontend  | React + Vite            | UI served on port 8989           |
-| Backend   | Go + Chi                | REST API served on port 8888     |
+| Backend   | Go + Chi                | REST API served on port 9999     |
 | Database  | **MySQL 8**             | User registration data           |
 | Tokens    | **MongoDB 7**           | JWT blacklist (logout / revoke)  |
 
@@ -123,7 +123,7 @@ MONGO_URI=mongodb://admin:babualdo@localhost:27017
 MONGO_DB=pendaftaran-uib-db
 
 JWT_SECRET=your-very-secret-key-change-this
-SERVER_PORT=8888
+SERVER_PORT=9999
 ```
 
 Generate a secure `JWT_SECRET`:
@@ -157,7 +157,7 @@ air
 # Option 2 – plain go run
 go run cmd/server/main.go
 ```
-Backend available at **http://localhost:8888**.
+Backend available at **http://localhost:9999**.
 
 ### 7. Start the frontend
 ```bash
@@ -210,7 +210,7 @@ docker compose up --build -d
 | Service    | URL                        |
 |------------|----------------------------|
 | Frontend   | http://localhost:8989      |
-| Backend    | http://localhost:8888      |
+| Backend    | http://localhost:9999      |
 | MySQL      | localhost:3300             |
 | MongoDB    | localhost:27000            |
 

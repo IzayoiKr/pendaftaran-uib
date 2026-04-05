@@ -100,6 +100,7 @@ services:
       MONGO_URI: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongodb:${MONGO_PORT}
       MONGO_DB: ${MONGO_DATABASE}
       JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: ${CORS_ORIGIN}
       SERVER_PORT: ${SERVER_PORT}
     ports:
       - ${BACKEND_PORTS}
