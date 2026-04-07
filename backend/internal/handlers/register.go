@@ -58,7 +58,7 @@ func Register(db *sql.DB) http.HandlerFunc {
 		)
 		if err != nil {
 			if strings.Contains(err.Error(), "1062") {
-				writeJSON(w, http.StatusConflict, errJSON("email atau NIK sudah terdaftar"))
+				writeJSON(w, http.StatusConflict, errJSON("email sudah terdaftar"))
 				return
 			}
 			writeJSON(w, http.StatusInternalServerError, errJSON("server error"))

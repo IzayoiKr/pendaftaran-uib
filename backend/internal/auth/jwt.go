@@ -36,12 +36,12 @@ func GenerateToken(userID, email string) (string , error) {
 			ID: jti,
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TokenTTL)),
 			IssuedAt: jwt.NewNumericDate(time.Now()),
-			Issuer: "uib-registration",
+			Issuer: "pendaftaran-uib",
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(getJWTSecret)
+	return token.SignedString(getJWTSecret())
 }
 
 func Validatetoken(raw string) (*Claims, error) {

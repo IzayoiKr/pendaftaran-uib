@@ -58,10 +58,10 @@ func (ts *TokenStore) Revoke(ctx context.Context, claims *Claims) error {
 func (ts *TokenStore) IsRevoked(ctx context.Context, jti string) (bool, error) {
 	err := ts.col.FindOne(ctx, bson.M{"jti": jti}).Err()
 	if errors.Is(err, mongo.ErrNoDocuments) {
-		return false, nil
+		return false, err
 	}
 	if err != nil {
-		return false, nil
+		return false, err
 	}
 	return true, nil
 }
