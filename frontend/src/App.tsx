@@ -1,7 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import '@fontsource-variable/rubik';
-import '@fontsource/poppins';
-import './styles/global.scss';
+import { createBrowserRouter, RouterProvider, Outlet, ScrollRestoration } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import ScrollToHash from './components/ScrollToHash';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -18,29 +16,53 @@ import Register from './pages/RegisterPage';
 import Account from './pages/MyAccountPage';
 import NotFound from './components/NotFound/NotFound';
 
-export default function App() {
+function RootLayout() {
     return (
-        <BrowserRouter>
+        <>
+            <Toaster
+                toastOptions={{
+                    classNames: {
+                        toast: 'toast',
+                        title: 'toast-title',
+                        description: 'toast-desc',
+                        closeButton: 'toast-closeBtn'
+                    }
+                }}
+                position="top-center"
+                richColors
+                closeButton
+                duration={4000}
+            />
+            <ScrollRestoration />
             <ScrollToHash />
-            <Routes>
-                <Route path='/' element={<Home />} />
-                <Route path='/login' element={<Login />} />
-                <Route path='/register/:id' element={<RegisterGelombang />} />
-                <Route path='*' element={<NotFound />} />
-                <Route path='/register' element= {<Register/>} />
-                <Route path='/forgot' element= {<Forgot/>} />
-                <Route path='/account' element= {<Account/>} />
-                <Route path='/transferproof' element={<BuktiTransfer />} />
-                <Route path='/uploadtransferproof' element={<UploadBuktiTransferPage />} />
-                <Route path='/prasyaratospek' element={<PrasyaratOspekPage />} />
-                <Route path='/changeprodi' element={<PerubahanProdiPage />} />
-                <Route path='/requestchangeprodi' element={<RequestPindahProdiPage />} />
-                <Route path='/profilechange' element={<UbahProfilePage />} />
-                <Route path='/passwordchange' element={<UbahPasswordPage />} />
-                
-                
-            </Routes>
-        </BrowserRouter>
-    );
+            <Outlet />
+        </>
+    )
+}
+
+const router = createBrowserRouter([
+    {
+        element: <RootLayout />,
+        children: [
+            { path: '/', element: <Home /> },
+            { path: '/login', element: <Login /> },
+            { path: '/login/forgot', element: <Forgot /> },
+            { path: '/login/passwordchange', element: <UbahPasswordPage /> },
+            { path: '/register', element: <Register /> },
+            { path: '/register/:id', element: <RegisterGelombang /> },
+            { path: '/account', element: <Account /> },
+            { path: '/transferproof', element: <BuktiTransfer /> },
+            { path: '/uploadtransferproof', element: <UploadBuktiTransferPage /> },
+            { path: '/prasyaratospek', element: <PrasyaratOspekPage /> },
+            { path: '/changeprodi', element: <PerubahanProdiPage /> },
+            { path: '/requestchangeprodi', element: <RequestPindahProdiPage /> },
+            { path: '/profilechange', element: <UbahProfilePage /> },
+            { path: '*', element: <NotFound /> }
+        ]
+    }
+])
+
+export default function App() {
+    return <RouterProvider router={router} />;
 }
 

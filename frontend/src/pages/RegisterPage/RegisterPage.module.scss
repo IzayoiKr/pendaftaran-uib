@@ -1,53 +1,53 @@
 @use '../../styles/global.scss';
 @use '../../styles/form.scss';
-@use 'sass:map';
 @use 'sass:color';
 
-.login {
+.register {
   @include form.form;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .container {
   @include global.container-form;
-    
+  text-align: center;
+
   h1 {
     font-size: var(--step-3);
     font-weight: 700;
     color: global.$secondary-color;
-    text-align: center;
     letter-spacing: 0.06em;
+  }
+
+  p {
+    font-size: var(--step--1);
+    color: global.$text-color;
     margin-bottom: var(--space-m);
   }
 
-  input {
-    @include form.input-template;
-  }
-
-  .forgotLink {
-    display: block;
-    width: fit-content;
-    font-size: var(--step--1);
-    color: global.$link-color;
+ 
+  form {
     text-align: left;
     margin-bottom: var(--space-s);
-    transition: color 0.3s ease;
 
-    &:hover { 
-      color: color.adjust(global.$link-color, $lightness: -25%);
-      text-decoration: underline; 
+    label {
+      font-size: var(--step--1);
+      color: global.$text-color2;
+    }
+
+    input {
+      @include form.input-template;
     }
   }
 
-  .loginBtn {
+  .registerBtn {
     @include form.submit-button;
   }
 
-  .registerText {
+  .backLogin {
     font-size: var(--step--1);
     color: global.$text-color;
     text-align: center;
-    margin-top: var(--space-s);
+    margin-top: var(--space-2xs);
 
     a {
       color: global.$link-color;

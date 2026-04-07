@@ -1,3 +1,4 @@
+@use './global.scss';
 @use 'sass:map';
 
 $input-bg:      #f9f9ff;
@@ -6,3 +7,61 @@ $input-border:  #d0d5dd;
 $primary:       #29b6f6;
 $primary-hover: #039be5;
 $placeholder:   #888;
+
+@mixin form {
+  display: flex;
+  justify-content: center;
+  margin: calc(var(--space-2xl) + var(--space-xl)) 0 var(--space-2xl);
+}
+
+@mixin input-template {
+  font-size: var(--step--1);
+  font-family: global.$font-family;
+  color: global.$text-color2;
+  width: 100%;
+  height: auto;
+  min-height: 48px;
+  background: $input-bg;
+  outline: none;
+  border: 1px solid $input-border;
+  border-radius: 4px;
+  padding: var(--space-2xs) var(--space-s);
+  margin-bottom: var(--space-2xs);
+
+  &::placeholder { color: $placeholder; }
+  &:focus { 
+    background: $input-focus;
+    border-color: $primary;
+  }
+}
+
+@mixin submit-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    padding: var(--space-xs) var(--space-m);
+    gap: 1ch;
+
+    font-size: var(--step--1);
+    font-family: global.$font-family;
+    font-weight: 600;
+    color: global.$white;
+
+    background: $primary;
+    border: 1px solid $primary;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+
+    &:hover {
+      background: transparent; 
+      color: $primary;
+    }
+
+    svg {
+      width: 1em;
+      height: 1em;
+      transform: scale(1.2);
+    }
+}

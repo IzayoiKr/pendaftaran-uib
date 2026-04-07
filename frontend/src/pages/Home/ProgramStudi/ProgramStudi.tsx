@@ -45,7 +45,7 @@ const ProgramCard = memo(function ProgramCard({ title, faculty, degree, descript
     );
 })
 
-const DotButton = memo(function DotButton({ active, onClick }: { active: boolean; onClick: () => void }) {
+function DotButton({ active, onClick }: { active: boolean; onClick: () => void }) {
     return (
         <button
             className={`${styles.dot} ${active ? styles.dotActive : ''}`}
@@ -53,7 +53,7 @@ const DotButton = memo(function DotButton({ active, onClick }: { active: boolean
             aria-label={active ? 'Current slide' : 'Go to slide'}
         />
     );
-})
+}
 
 export default function ProgramStudi() {
     const autoplay = useRef(Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true }));
@@ -90,9 +90,9 @@ export default function ProgramStudi() {
         };
     }, [emblaApi, onInit, onSelect]);
 
-    const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
-    const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
-    const scrollTo = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi]);
+    const scrollPrev = () => emblaApi?.scrollPrev();
+    const scrollNext = () => emblaApi?.scrollNext();
+    const scrollTo = (i: number) => emblaApi?.scrollTo(i);
 
     return (
         <section className={styles.programStudi} id="program">

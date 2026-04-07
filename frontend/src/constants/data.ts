@@ -1,4 +1,4 @@
-import type { Hero, Program, Event, Feature, Guide } from "../types";
+import type { Hero, Program, Event, Feature, Guide, Form } from "../types";
 
 const assetImages = import.meta.glob('../assets/**/*.{jpg,png,jpeg,webp,avif}', {
     eager: true,
@@ -248,6 +248,58 @@ export const guides: Guide[] = [
         title: 'Re-registration Guideline',
         description: 'Silahkan ikuti video di bawah ini.',
         embedUrl: 'https://www.youtube.com/embed/WWaq2Hs6kq0?vq=hd1080si=poy1zeAo5OMuMauu'
+    }
+]
+
+export const login: Form[] = [
+    {
+        name: "email",
+        type: "email",
+        placeholder: "Email",
+        autoComplete: "email"
+    },
+    {
+        name: "password",
+        type: "password",
+        placeholder: "Password",
+        autoComplete: "current-password",
+        minLength: 8
+    }
+]
+
+export const register: Form[] = [
+    {
+        name: "fullName",
+        label: "Nama Lengkap (FullName)",
+        type: "text",
+        autoComplete: "name",
+    },
+    {
+        name: "nik",
+        label: "No NIK (National Identification Number)",
+        type: "text",
+        autoComplete: "off",
+        maxLength: 16
+    },
+    {
+        name: "email",
+        label: "Email *",
+        type: "email",
+        autoComplete: "email"
+    },
+    {
+        name: "password",
+        label: "Password *",
+        type: "password",
+        autoComplete: "new-password",
+        minLength: 8
+    },
+    {
+        name: "retypePassword",
+        label: "Retype Password *",
+        type: "password",
+        autoComplete: "new-password",
+        minLength: 8
     }
 ]
 

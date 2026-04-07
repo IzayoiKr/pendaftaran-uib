@@ -1,112 +1,93 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
-import "./RegisterPage.scss";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import type { Form } from "../../types";
+import { register } from "../../constants/data";
+import { api, saveSession } from "../../api";
+import { RightArrowIcon } from "../../components/Icons";
+import styles from "./RegisterPage.module.scss";
 
-interface RegisterForm {
-    fullName: string;
-    nik: string;
-    email: string;
-    password: string;
-    retypePassword: string;
-}
-
-// Field config — driven by data, bukan hardcode per field
-const FIELDS: {
-    name: keyof RegisterForm;
-    label: string;
-    type: "text" | "email" | "password";
-    autoComplete: string;
-}[] = [
-    { name: "fullName",       label: "Nama Lengkap (FullName) *",                                    type: "text",     autoComplete: "name" },
-    { name: "nik",            label: "No NIK (National Identification Number) *",                     type: "text",     autoComplete: "off" },
-    { name: "email",          label: "Email *",                                                       type: "email",    autoComplete: "email" },
-    { name: "password",       label: "Password *",                                                    type: "password", autoComplete: "new-password" },
-    { name: "retypePassword", label: "Retype Password *",                                             type: "password", autoComplete: "new-password" },
-];
-
-function RegisterField({ label, type, name, value, autoComplete, onChange }: {
-    label: string;
-    type: "text" | "email" | "password";
-    name: keyof RegisterForm;
-    value: string;
-    autoComplete: string;
-    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-}) {
+function RegisterField({ label, type, name, value, autoComplete, minLength, maxLength, onChange }: Form) {
     return (
-        <div className="field-group">
+        <>
             <label htmlFor={name}>{label}</label>
             <input
                 id={name}
                 type={type}
                 name={name}
-                className="single-input"
                 value={value}
                 autoComplete={autoComplete}
+                minLength={minLength}
+                maxLength={maxLength}
                 onChange={onChange}
                 required
             />
-        </div>
+        </>
     );
 }
 
-function RegisterButton({ isLoading }: { isLoading: boolean }) {
+function RegisterAction() {
     return (
-        <button type="submit" className="register-btn" disabled={isLoading} aria-busy={isLoading}>
-            {isLoading
-                ? <><div className="spinner" aria-hidden="true" /> Daftar</>
-                : <>Daftar (Register) &#8594;</>
-            }
-        </button>
+        <>
+            <button type="submit" className={styles.registerBtn}>
+                Daftar (Register) <RightArrowIcon />
+            </button>
+            <p className={styles.backLogin}>
+                Sudah memiliki akun?{" "}
+                <Link to="/login">Login</Link>
+            </p>
+        </>
     );
 }
 
 export default function RegisterPage() {
-    const [form, setForm] = useState<RegisterForm>({
-        fullName: "", nik: "", email: "", password: "", retypePassword: "",
-    });
-    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        fullName: "",
+        nik: "",
+        email: "",
+        password: "",
+        retypePassword: ""
+    })
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
-    };
+    const handleChange = (name: string, value: string) => {
+        const cleanValue = name === "nik" ? value.replace(/\D/g, "") : value;
+        setFormData(prev => ({ ...prev, [name]: cleanValue }));
+    }
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setIsLoading(true);
+        const { fullName, nik, email, password, retypePassword } = formData;
+
+        if (nik.length != 16 || !/^\d+$/.test(nik)) {
+            return;
+        if (password !== retypePassword) {
+            return;
         try {
-            await new Promise(r => setTimeout(r, 1000)); // TODO: ganti API call
-        } finally {
-            setIsLoading(false);
+            const res = await api.auth.register({ full_name: fullName, nik, email, password })
+            saveSession(res);
+            toast.success("Registrasi berhasil! Silahkan login kembali.")
+            navigate("/login");
+        } catch (err) {
         }
     };
 
     return (
-        <div className="page-content">
-            <div className="register-box">
-                <h3 className="register-title">Register Akun Baru</h3>
-                <p className="register-required">* Wajib di Isi (Required)</p>
+        <section className={styles.register}>
+            <div className={styles.container}>
+                <h1>Register Akun Baru</h1>
+                <p>* Wajib di Isi (Required)</p>
                 <form onSubmit={handleSubmit} noValidate>
-                    {FIELDS.map(field => (
+                    {register.map((props) => (
                         <RegisterField
-                            key={field.name}
-                            label={field.label}
-                            type={field.type}
-                            name={field.name}
-                            value={form[field.name]}
-                            autoComplete={field.autoComplete}
-                            onChange={handleChange}
+                            key={props.name}
+                            {...props}
+                            value={formData[props.name as keyof typeof formData]}
+                            onChange={(e) => handleChange(props.name, e.target.value)}
                         />
                     ))}
-                    <div className="captcha-wrapper">
-                        {/* TODO: pasang reCAPTCHA key dari Google */}
-                        {/* <ReCAPTCHA sitekey="YOUR_SITE_KEY" /> */}
-                        <p style={{ fontSize: "0.8em", color: "#888" }}>[reCAPTCHA here]</p>
-                    </div>
-                    <div>
-                        <RegisterButton isLoading={isLoading} />
-                    </div>
+                    <RegisterAction />
                 </form>
             </div>
-        </div>
+        </section>
     );
 }

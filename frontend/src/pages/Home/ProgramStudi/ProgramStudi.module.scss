@@ -42,6 +42,11 @@ $dot-size: var(--step--2);
 .viewport {
   overflow: hidden;
   margin: var(--space-l) 0;
+  transition: cursor 0.2s ease;
+
+  &:active {
+    cursor: grabbing;
+  }
 }
 
 .track {
@@ -200,6 +205,12 @@ $dot-size: var(--step--2);
   justify-content: center;
   gap: var(--space-xs);
   margin-top: var(--space-l);
+
+  @media(max-width: map.get(global.$breakpoints, sm)) {
+    display: none;
+    margin: 0;
+    gap: 0;
+  }
 }
 
 .dot {

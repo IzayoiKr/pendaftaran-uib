@@ -39,7 +39,7 @@ apiClient.interceptors.response.use(
 export const api = {
     auth: {
         login: (email: string, password: string) =>
-            apiClient.post<AuthResponse>("/api/auth/login", { email, password }),
+            apiClient.post<never, AuthResponse>("/api/auth/login", { email, password }),
         register: (data: {
             full_name: string;
             nik: string;
@@ -47,6 +47,12 @@ export const api = {
             password: string;
         }) =>
             apiClient.post<never, AuthResponse>("/api/auth/register", data),
+
+        // logout: () =>
+        //     apiClient.post<never, {message: string }>("/api/auth/logout"),
+        //
+        // profile: () =>
+        //     apiClient.get<never, UserDTO>("api/auth/me")
     }
 }
 

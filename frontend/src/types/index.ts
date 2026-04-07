@@ -79,3 +79,15 @@ export interface Guide {
     description: string;
     embedUrl: string
 }
+
+export interface Form {
+    name: string;
+    label?: string;
+    type: "text" | "email" | "password";
+    placeholder?: string;
+    autoComplete: string;
+    minLength?: number;
+    maxLength?: number;
+    value?: string;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}

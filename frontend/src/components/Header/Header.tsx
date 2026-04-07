@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback, memo } from 'react';
+import { useEffect, useState, useRef, memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from './Header.module.scss';
 import { headerNavLinks, spyIds } from '../../constants/navigation';
@@ -47,7 +47,7 @@ const HamburgerButton = memo(function HamburgerButton({ isOpen, setIsOpen }: Ham
     )
 })
 
-const NavMenu = memo(function NavMenu({ isOpen, activeId, pathname, onLinkClick }: NavMenuProps) {
+function NavMenu({ isOpen, activeId, pathname, onLinkClick }: NavMenuProps) {
     return (
         <div className={`${styles.menuContainer} ${isOpen ? styles.show : ''}`}>
             <nav className={styles.nav}>
@@ -79,7 +79,7 @@ const NavMenu = memo(function NavMenu({ isOpen, activeId, pathname, onLinkClick 
             </nav>
         </div>
     )
-})
+}
 
 export default function Header() {
     const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -108,8 +108,6 @@ export default function Header() {
 
     const activeId = useScrollSpy({ ids: spyIds, offset: headerHeight });
 
-    const handleLinkClick = useCallback(() => setIsOpen(false), []);
-
     return (
         <header className={isScrolled ? styles.fixed : ''} ref={headerRef}>
             <div className={styles.container}>
@@ -119,7 +117,7 @@ export default function Header() {
                     isOpen={isOpen}
                     activeId={activeId}
                     pathname={pathname}
-                    onLinkClick={handleLinkClick}
+                    onLinkClick={() => setIsOpen(false)}
                 />
             </div>
         </header >

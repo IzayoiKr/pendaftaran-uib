@@ -1,32 +1,21 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import type { Form } from "../../types";
+import { login } from "../../constants/data";
 import { api, saveSession } from "../../api";
 import { RightArrowIcon } from "../../components/Icons";
 import styles from "./LoginPage.module.scss";
-
-interface LoginPlaceholderProps {
-    type: string;
-    placeholder: string;
-    autoComplete: string;
-    minLength?: number;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
 
 interface LoginFormProps {
     onLogin: (email: string, password: string) => Promise<void>;
 }
 
-interface LoginActionProps {
-    error: string | null;
-}
-
-function LoginPlaceholder({ type, placeholder, autoComplete, minLength, value, onChange }: LoginPlaceholderProps) {
+function LoginPlaceholder({ name, type, placeholder, autoComplete, minLength, value, onChange }: Form) {
     return (
         <>
             <input
-                id={type}
-                name={type}
+                id={name}
+                name={name}
                 type={type}
                 placeholder={placeholder}
                 autoComplete={autoComplete}
@@ -39,11 +28,9 @@ function LoginPlaceholder({ type, placeholder, autoComplete, minLength, value, o
     )
 }
 
-function LoginAction({ error }: LoginActionProps) {
+function LoginAction() {
     return (
         <>
-            {error && <p className={styles.errorText} role="alert">{error}</p>}
-
             <Link to="/forgot" className={styles.forgotLink}>Lupa Password?</Link>
 
             <button type="submit" className={styles.loginBtn}>
@@ -61,37 +48,34 @@ function LoginAction({ error }: LoginActionProps) {
 function LoginForm({ onLogin }: LoginFormProps) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setError(null);
         try {
             await onLogin(email, password);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Terjadi kesalahan");
         }
     };
 
     return (
         <>
             <form onSubmit={handleSubmit} noValidate>
-                <LoginPlaceholder
-                    type="email"
-                    placeholder="Email"
-                    autoComplete="email"
-                    value={email}
-                    onChange={(e) => { setEmail(e.target.value); setError(null); }}
-                />
-                <LoginPlaceholder
-                    type="password"
-                    placeholder="Password"
-                    autoComplete="current-password"
-                    minLength={8}
-                    value={password}
-                    onChange={(e) => { setPassword(e.target.value); setError(null); }}
-                />
-                <LoginAction error={error} />
+                {login.map((props) => {
+                    const isEmail = props.name === "email";
+
+                    return (
+                        <LoginPlaceholder
+                            key={props.name}
+                            name={props.name}
+                            type={props.type}
+                            placeholder={props.placeholder}
+                            autoComplete={props.autoComplete}
+                            value={isEmail ? email : password}
+                            onChange={(e) => (isEmail ? setEmail : setPassword)(e.target.value)}
+                        />
+                    );
+                })}
+                <LoginAction />
             </form>
 
         </>
