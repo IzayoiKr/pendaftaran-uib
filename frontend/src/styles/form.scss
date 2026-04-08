@@ -29,7 +29,7 @@ $placeholder:   #888;
   margin-bottom: var(--space-2xs);
 
   &::placeholder { color: $placeholder; }
-  &:focus { 
+  &:focus {
     background: $input-focus;
     border-color: $primary;
   }
@@ -55,7 +55,7 @@ $placeholder:   #888;
     transition: background 0.2s, color 0.2s, border-color 0.2s;
 
     &:hover {
-      background: transparent; 
+      background: transparent;
       color: $primary;
     }
 

@@ -147,7 +147,7 @@ const handleSubmit = () => {
           <p className={styles.subTitle}>
             (Undergraduate Student Registration Form)
           </p>
-    
+
           <ProgressBar
             currentStep={currentStep}
             goToStep={goToStep}
@@ -162,10 +162,10 @@ const handleSubmit = () => {
         {/* ================= STATUS DOKUMEN ================= */}
         <div className={styles.statusSection}>
           <h5 className={styles.sectionHeading}>Status Dokumen (Document Status)</h5>
-          
+
           <div className={styles.infoBox}>
             <div className={styles.statusItem}>
-              <strong>Kelengkapan Dokumen (Completion of Requirement):</strong> 
+              <strong>Kelengkapan Dokumen (Completion of Requirement):</strong>
               <span className={styles.statusValue}>{completeness}</span>
             </div>
             <div className={styles.statusItem}>

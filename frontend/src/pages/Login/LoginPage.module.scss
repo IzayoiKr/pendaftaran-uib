@@ -10,7 +10,7 @@
 
 .container {
   @include global.container-form;
-    
+
   h1 {
     font-size: var(--step-3);
     font-weight: 700;
@@ -33,9 +33,9 @@
     margin-bottom: var(--space-s);
     transition: color 0.3s ease;
 
-    &:hover { 
+    &:hover {
       color: color.adjust(global.$link-color, $lightness: -25%);
-      text-decoration: underline; 
+      text-decoration: underline;
     }
   }
 
@@ -54,8 +54,8 @@
       font-weight: 600;
       transition: color 0.2s ease;
 
-      &:hover { 
-        text-decoration: underline; 
+      &:hover {
+        text-decoration: underline;
         color: color.adjust(global.$link-color, $lightness: 10%);
       }
     }

@@ -6,9 +6,9 @@ export default function BuktiTransfer() {
     return (
         <>
             <Header />
-            
+
                 <PrasyaratOspekPage/>
-                
+
             <Footer />
         </>
     );

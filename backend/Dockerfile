@@ -27,4 +27,3 @@ COPY --from=builder --chown=admin:admin /app/server .
 COPY --from=builder --chown=admin:admin /app/migrations ./migrations
 COPY --from=builder --chown=admin:admin /go/bin/migrate /usr/local/bin/migrate
 CMD ["./server"]
-

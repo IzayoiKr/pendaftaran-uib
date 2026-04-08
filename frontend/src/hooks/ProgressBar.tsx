@@ -26,7 +26,7 @@ export default function ProgressBar({
   const adjustedProgress = `calc(${progressPercent}% * (1 - (2 / ${totalSteps})))`;
 
   return (
-    <div 
+    <div
       className={styles.wrapper}
       style={
         {

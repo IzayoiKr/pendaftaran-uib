@@ -24,7 +24,7 @@ type authResponse struct {
 
 func Login(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req loginRequest 
+		var req loginRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			writeJSON(w, http.StatusBadRequest, errJSON("permintaan tidak valid"))
 			return

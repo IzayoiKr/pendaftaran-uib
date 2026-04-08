@@ -221,4 +221,3 @@ docker compose down
 # Also delete volumes (resets all data):
 docker compose down -v
 ```
-

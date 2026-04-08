@@ -19,4 +19,3 @@ tmp_dir = "tmp"
     watcher = "cyan"
     build = "yellow"
     runner = "green"
-

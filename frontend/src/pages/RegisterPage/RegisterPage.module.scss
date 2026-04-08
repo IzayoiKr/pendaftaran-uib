@@ -24,7 +24,7 @@
     margin-bottom: var(--space-m);
   }
 
- 
+
   form {
     text-align: left;
     margin-bottom: var(--space-s);
@@ -59,8 +59,8 @@
       font-weight: 600;
       transition: color 0.2s ease;
 
-      &:hover { 
-        text-decoration: underline; 
+      &:hover {
+        text-decoration: underline;
         color: color.adjust(global.$link-color, $lightness: 10%);
       }
     }

@@ -54,6 +54,8 @@ func main() {
 
 	r.Group(func(r chi.Router) {
 		r.Use(auth.Middleware(tokenStore))
+		// r.Post("/api/auth/logout", handlers.Logout(tokenStore))
+		// r.Post("/api/auth/profile", handlers.Profile(mysql))
 	})
 
 	port := os.Getenv("SERVER_PORT")

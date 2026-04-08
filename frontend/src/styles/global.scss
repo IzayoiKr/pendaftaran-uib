@@ -39,7 +39,7 @@
     "positiveSteps": 4,
     "negativeSteps": 2,
   ));
- 
+
   @include utopia.generateSpaceScale((
     "minWidth":       320,
     "maxWidth":       1600,
@@ -107,7 +107,7 @@ $container-form-max-widths: (
   width: 100%;
   margin: 0 auto;
   padding: 0 15px;
-  
+
   @each $name, $container-width in $container-form-max-widths {
     @media (min-width: map.get($breakpoints, $name)) {
       max-width: $container-width;
