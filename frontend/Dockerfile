@@ -2,6 +2,9 @@ FROM node:22-alpine AS base
 WORKDIR /app
 COPY package*.json ./
 
+ARG VITE_TURNSTILE_SITE_KEY
+ENV VITE_TURNSTILE_SITE_KEY=$VITE_TURNSTILE_SITE_KEY
+
 FROM base AS development
 RUN --mount=type=cache,target=/home/node/.npm npm install --legacy-peer-deps
 COPY --chown=node:node . .

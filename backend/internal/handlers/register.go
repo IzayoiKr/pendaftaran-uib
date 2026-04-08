@@ -3,7 +3,12 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
+	"io"
+	"net"
 	"net/http"
+	"net/url"
+	"os"
 	"strings"
 
 	"pendaftaran-uib/backend/internal/auth"
@@ -18,6 +23,62 @@ type registerRequest struct {
 	NIK string `json:"nik"`
 	Email string `json:"email"`
 	Password string `json:"password"`
+	TurnstileToken string `json:"cf_turnstile_token"`
+}
+
+type turnstileResponse struct {
+	Success bool `json:"success"`
+	ErrorCodes []string `json:"error-codes"`
+}
+
+func verifyTurnstile(token, remoteIP string) (bool, error) {
+	secret := os.Getenv("TURNSTILE_SECRET")
+	if secret == "" {
+		return false, fmt.Errorf("TURNSTILE_SECRET not set")
+	}
+ 
+	form := url.Values{}
+	form.Set("secret", secret)
+	form.Set("response", token)
+	if remoteIP != "" {
+		form.Set("remoteip", remoteIP)
+	}
+ 
+	resp, err := http.Post(
+		"https://challenges.cloudflare.com/turnstile/v0/siteverify",
+		"application/x-www-form-urlencoded",
+		strings.NewReader(form.Encode()),
+	)
+	if err != nil {
+		return false, fmt.Errorf("turnstile request failed: %w", err)
+	}
+	defer resp.Body.Close()
+ 
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return false, fmt.Errorf("reading turnstile response: %w", err)
+	}
+ 
+	var result turnstileResponse
+	if err := json.Unmarshal(body, &result); err != nil {
+		return false, fmt.Errorf("parsing turnstile response: %w", err)
+	}
+ 
+	return result.Success, nil
+}
+ 
+func realIP(r *http.Request) string {
+	if ip := r.Header.Get("X-Real-IP"); ip != "" {
+		return ip
+	}
+	if fwd := r.Header.Get("X-Forwarded-For"); fwd != "" {
+		return strings.TrimSpace(strings.SplitN(fwd, ",", 2)[0])
+	}
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		return r.RemoteAddr
+	}
+	return host
 }
 
 func Register(db *sql.DB) http.HandlerFunc {
@@ -40,6 +101,19 @@ func Register(db *sql.DB) http.HandlerFunc {
 			return
 		case len(req.Password) < 8:
 			writeJSON(w, http.StatusBadRequest, errJSON("password minimal 8 karakter"))
+			return
+		case req.TurnstileToken == "":
+			writeJSON(w, http.StatusBadRequest, errJSON("verifikasi CAPTCHA diperlukan"))
+			return
+		}
+
+		ok, err := verifyTurnstile(req.TurnstileToken, realIP(r))
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, errJSON("server error"))
+			return
+		}
+		if !ok {
+			writeJSON(w, http.StatusForbidden, errJSON("verifikasi CAPTCHA gagal, coba lagi"))
 			return
 		}
 

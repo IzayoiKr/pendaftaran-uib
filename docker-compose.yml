@@ -101,6 +101,7 @@ services:
       MONGO_DB: ${MONGO_DATABASE}
       JWT_SECRET: ${JWT_SECRET}
       CORS_ORIGIN: ${CORS_ORIGIN}
+      TURNSTILE_SECRET: ${TURNSTILE_SECRET}
       SERVER_PORT: ${SERVER_PORT}
     ports:
       - ${BACKEND_PORTS}
@@ -113,6 +114,8 @@ services:
     build:
       context: ./frontend
       target: development
+      args:
+        - VITE_TURNSTILE_SITE_KEY=${VITE_TURNSTILE_SITE_KEY}
     container_name: frontend-pendaftaran-uib-dev
     depends_on:
       - backend

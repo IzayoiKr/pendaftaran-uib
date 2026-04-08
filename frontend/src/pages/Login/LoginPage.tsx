@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import type { Form } from "../../types";
 import { login } from "../../constants/data";
 import { api, saveSession } from "../../api";
@@ -54,6 +55,8 @@ function LoginForm({ onLogin }: LoginFormProps) {
         try {
             await onLogin(email, password);
         } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");
+
         }
     };
 
@@ -88,6 +91,7 @@ export default function LoginPage() {
     const handleLogin = async (email: string, password: string) => {
         const res = await api.auth.login(email, password);
         saveSession(res);
+        toast.success("Login berhasil!");
         navigate("/");
     }
     return (

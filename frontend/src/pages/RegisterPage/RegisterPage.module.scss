@@ -39,6 +39,11 @@
     }
   }
 
+  .turnstile {
+    display: flex;
+    margin: var(--space-xs) 0;
+  }
+
   .registerBtn {
     @include form.submit-button;
   }

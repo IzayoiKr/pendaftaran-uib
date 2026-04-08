@@ -45,6 +45,7 @@ export const api = {
             nik: string;
             email: string;
             password: string;
+            cf_turnstile_token: string;
         }) =>
             apiClient.post<never, AuthResponse>("/api/auth/register", data),
 

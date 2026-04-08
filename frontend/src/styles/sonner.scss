@@ -1,0 +1,29 @@
+@use './global.scss';
+
+$primary: global.$tertiary-color;
+$secondary: global.$primary-color;
+$tertiary: global.$white;
+$toast-error-text: #be123c;
+
+.toast {
+  font-size: var(--step--1) !important;
+  font-family: global.$font-family;
+  font-weight: 800;
+  background-color: $primary !important;
+
+  border: 1px solid $tertiary !important;
+  border-radius: 8px !important;
+  border-color: $secondary !important;
+
+  width: fit-content !important;
+}
+
+.toast-title {
+  color: $secondary !important;
+}
+
+.toast-closeBtn {
+  background-color: $tertiary !important;
+  color: $primary !important;
+  border-color: $primary !important;
+}
