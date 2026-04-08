@@ -5,7 +5,7 @@ import { Turnstile } from "@marsidev/react-turnstile";
 import type { TurnstileInstance } from "@marsidev/react-turnstile";
 import type { Form } from "../../types";
 import { register } from "../../constants/data";
-import { api, saveSession } from "../../api";
+import { api } from "../../api";
 import { RightArrowIcon } from "../../components/Icons";
 import styles from "./RegisterPage.module.scss";
 
@@ -118,14 +118,14 @@ export default function RegisterPage() {
         }
 
         try {
-            const res = await api.auth.register({
+            await api.auth.register({
                 full_name: fullName,
                 nik,
                 email,
                 password,
                 cf_turnstile_token: turnstileToken
             });
-            saveSession(res);
+            
             toast.success("Registrasi berhasil! Silahkan login kembali.")
             navigate("/login");
         } catch (err) {
