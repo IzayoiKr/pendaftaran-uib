@@ -5,6 +5,7 @@ import { Turnstile } from "@marsidev/react-turnstile";
 import type { TurnstileInstance } from "@marsidev/react-turnstile";
 import type { Form } from "../../types";
 import { register } from "../../constants/data";
+import { registerSchema } from "../../validation/schema";
 import { api, saveSession } from "../../api";
 import { RightArrowIcon } from "../../components/Icons";
 import styles from "./RegisterPage.module.scss";
@@ -83,7 +84,6 @@ function RegisterAction() {
 export default function RegisterPage() {
     const navigate = useNavigate();
     const turnstileRef = useRef<TurnstileHandle>(null);
-    const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
     const [formData, setFormData] = useState({
         fullName: "",
@@ -93,6 +93,8 @@ export default function RegisterPage() {
         retypePassword: ""
     })
 
+    const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
     const handleChange = (name: string, value: string) => {
         const cleanValue = name === "nik" ? value.replace(/\D/g, "") : value;
         setFormData(prev => ({ ...prev, [name]: cleanValue }));
@@ -101,21 +103,18 @@ export default function RegisterPage() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        const valid = registerSchema.safeParse(formData);
+        if (!valid.success) {
+            toast.error(valid.error.issues[0].message);
+            return;
+        }
+
         if (!turnstileToken) {
             toast.error("Verifikasi CAPTCHA belum selesai, coba lagi");
             turnstileRef.current?.reset();
             return;
         }
-        const { fullName, nik, email, password, retypePassword } = formData;
-
-        if (nik.length != 16 || !/^\d+$/.test(nik)) {
-            toast.error("NIK harus 16 digit angka");
-            return;
-        }
-        if (password !== retypePassword) {
-            toast.error("Password dan konfirmasi password tidak cocok");
-            return;
-        }
+        const { fullName, nik, email, password } = formData;
 
         try {
             const res = await api.auth.register({

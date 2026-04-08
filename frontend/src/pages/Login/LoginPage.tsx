@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import type { Form } from "../../types";
 import { login } from "../../constants/data";
+import { loginSchema } from "../../validation/schema";
 import { api, saveSession } from "../../api";
 import { RightArrowIcon } from "../../components/Icons";
 import styles from "./LoginPage.module.scss";
@@ -52,6 +53,13 @@ function LoginForm({ onLogin }: LoginFormProps) {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        const valid = loginSchema.safeParse({ email, password });
+        if (!valid.success) {
+            toast.error(valid.error.issues[0].message);
+            return;
+        }
+
         try {
             await onLogin(email, password);
         } catch (err) {
@@ -69,10 +77,7 @@ function LoginForm({ onLogin }: LoginFormProps) {
                     return (
                         <LoginPlaceholder
                             key={props.name}
-                            name={props.name}
-                            type={props.type}
-                            placeholder={props.placeholder}
-                            autoComplete={props.autoComplete}
+                            {...props}
                             value={isEmail ? email : password}
                             onChange={(e) => (isEmail ? setEmail : setPassword)(e.target.value)}
                         />
