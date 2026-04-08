@@ -54,6 +54,7 @@ func main() {
 
 	r.Group(func(r chi.Router) {
 		r.Use(auth.Middleware(tokenStore))
+		r.Get("/api/account", handlers.GetAccount(mysql))
 	})
 
 	port := os.Getenv("SERVER_PORT")
