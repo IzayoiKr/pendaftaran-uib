@@ -1,19 +1,20 @@
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet, ScrollRestoration } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import ScrollToHash from './components/ScrollToHash';
 import Home from './pages/Home';
-import Login from './pages/Login';
-import Forgot from './pages/ForgotPassword';
-import BuktiTransfer from './pages/TransferProof';
-import UploadBuktiTransferPage from './pages/UploadTransferProof/UploadBuktiTransferPage';
-import PrasyaratOspekPage from './pages/PrasyaratOSPEK/PrasyaratOspekPage';
-import PerubahanProdiPage from './pages/ProdiChange/PerubahanProdiPage';
-import RequestPindahProdiPage from './pages/RequestProdiChange/RequestPindahProdiPage';
-import UbahPasswordPage from './pages/PasswordChange/UbahPasswordPage';
-import UbahProfilePage from './pages/ProfilChange/UbahProfilePage';
-import RegisterGelombang from './pages/RegisterGelombang';
-import Register from './pages/RegisterPage';
-import Account from './pages/MyAccountPage';
+const Login = lazy(() => import('./pages/Login'))
+const Register = lazy(() => import('./pages/Register'))
+const Account = lazy(() => import('./pages/MyAccountPage'))
+const Forgot = lazy(() => import('./pages/ForgotPassword'))
+const BuktiTransfer = lazy(() => import('./pages/TransferProof'))
+const UploadBuktiTransferPage = lazy(() => import('./pages/UploadTransferProof/UploadBuktiTransferPage'))
+const PrasyaratOspekPage = lazy(() => import('./pages/PrasyaratOSPEK/PrasyaratOspekPage'))
+const PerubahanProdiPage = lazy(() => import('./pages/ProdiChange/PerubahanProdiPage'))
+const RequestPindahProdiPage = lazy(() => import('./pages/RequestProdiChange/RequestPindahProdiPage'))
+const UbahPasswordPage = lazy(() => import('./pages/PasswordChange/UbahPasswordPage'))
+const UbahProfilePage = lazy(() => import('./pages/ProfilChange/UbahProfilePage'))
+const RegisterGelombang = lazy(() => import('./pages/RegisterGelombang'))
 import NotFound from './components/NotFound/NotFound';
 
 function RootLayout() {
@@ -63,5 +64,9 @@ const router = createBrowserRouter([
 ])
 
 export default function App() {
-    return <RouterProvider router={router} />;
+    return (
+        <Suspense fallback={<div>Loading pages...</div>}>
+            <RouterProvider router={router} />
+        </Suspense>
+    )
 }

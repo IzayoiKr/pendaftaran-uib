@@ -1,10 +1,10 @@
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
 import Header from '../../components/Header/Header';
 import Hero from './Hero/Hero';
 const ProgramStudi = lazy(() => import('./ProgramStudi/ProgramStudi'));
 const Gelombang = lazy(() => import('./Gelombang/Gelombang'));
 const Guides = lazy(() => import('./Guides/Guides'));
-import Feature from './Feature/Feature';
+const Feature = lazy(() => import('./Feature/Feature'))
 import Footer from '../../components/Footer/Footer';
 
 export default function Home() {
@@ -13,10 +13,18 @@ export default function Home() {
             <Header />
             <main>
                 <Hero />
-                <ProgramStudi />
-                <Gelombang />
-                <Guides />
-                <Feature />
+                <Suspense fallback={<div>Loading Program Studi...</div>}>
+                    <ProgramStudi />
+                </Suspense>
+                <Suspense fallback={<div>Loading Gelombang...</div>}>
+                    <Gelombang />
+                </Suspense>
+                <Suspense fallback={<div>Loading Guides...</div>}>
+                    <Guides />
+                </Suspense>
+                <Suspense fallback={<div>Loading Awesome Features...</div>}>
+                    <Feature />
+                </Suspense>
             </main>
             <Footer />
         </>
