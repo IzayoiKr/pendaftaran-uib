@@ -1,12 +1,8 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getStoredUser, clearSession, type UserDTO } from "../../api"; 
+import { toast } from "sonner"; 
 import "./AccountPage.scss";
-
-// ── Types ──────────────────────────────────────────────────────────────────────
-interface UserInfo {
-    fullName: string;
-    email:    string;
-    nik:      string;
-}
 
 type BiodataStatus = "Belum Lengkap" | "Telah Lengkap";
 type PaymentStatus = "Belum Lunas"   | "Telah Lunas";
@@ -32,15 +28,13 @@ interface RegistrationHandlers {
     onPrasyaratOspek:      (reg: Registration) => void;
 }
 
-// ── Sub-components ─────────────────────────────────────────────────────────────
-
-function AccountInfo({ user }: { user: UserInfo }) {
+function AccountInfo({ user }: { user: UserDTO }) {
     return (
         <div className="account-info">
             {([
-                ["Nama Lengkap", user.fullName],
-                ["Alamat Email", user.email],
-                ["Nomor NIK",    user.nik],
+                ["Nama Lengkap", user.full_name || "-"],
+                ["Alamat Email", user.email || "-"],
+                ["Nomor NIK",    user.nik || "-"],
             ] as [string, string][]).map(([label, value]) => (
                 <div key={label} className="info-row">
                     <span className="info-label">{label}</span>
@@ -57,83 +51,46 @@ function StatusBadge({ status }: { status: BiodataStatus | PaymentStatus }) {
         status === "Belum Lengkap" ? "status-incomplete"  :
         status === "Telah Lunas"   ? "status-paid"        :
         "status-unpaid";
-    return <span className={cls}>{status}</span>;
+    return <span className={cls}>{status || "-"}</span>;
 }
 
-// Buttons tampil kondisional sesuai referensi:
-// Row belum lengkap/lunas → hanya Check Pendaftaran + Ubah Biodata
-// Row sudah lengkap & lunas → semua button muncul
-function RegistrationActions({ reg, handlers }: {
-    reg:      Registration;
-    handlers: RegistrationHandlers;
-}) {
+function RegistrationActions({ reg, handlers }: { reg: Registration; handlers: RegistrationHandlers; }) {
     const isComplete = reg.biodata === "Telah Lengkap" && reg.pembayaran === "Telah Lunas";
-
     return (
         <div className="action-group">
-            <button className="btn btn-warning"
-                onClick={() => handlers.onCheckPendaftaran(reg)}>
-                Check Pendaftaran
-            </button>
-            <button className="btn btn-primary"
-                onClick={() => handlers.onUbahBiodata(reg)}>
-                Ubah Biodata
-            </button>
-
+            <button className="btn btn-warning" onClick={() => handlers.onCheckPendaftaran(reg)}>Check Pendaftaran</button>
+            <button className="btn btn-primary" onClick={() => handlers.onUbahBiodata(reg)}>Ubah Biodata</button>
             {isComplete && (
                 <>
-                    <button className="btn btn-success"
-                        onClick={() => handlers.onDownloadSuratHasil(reg)}>
-                        Surat Hasil
-                    </button>
-                    <button className="btn btn-info"
-                        onClick={() => handlers.onBuktiTransfer(reg)}>
-                        Bukti Transfer
-                    </button>
-                    <button className="btn btn-primary"
-                        onClick={() => handlers.onPerubahanProdi(reg)}>
-                        Perubahan Prodi
-                    </button>
-                    <button className="btn btn-danger"
-                        onClick={() => handlers.onDownloadPengunduran(reg)}>
-                        Pengunduran Diri
-                    </button>
-                    <button className="btn btn-warning"
-                        onClick={() => handlers.onPrasyaratOspek(reg)}>
-                        Prasyarat Ospek
-                    </button>
+                    <button className="btn btn-success" onClick={() => handlers.onDownloadSuratHasil(reg)}>Surat Hasil</button>
+                    <button className="btn btn-info" onClick={() => handlers.onBuktiTransfer(reg)}>Bukti Transfer</button>
+                    <button className="btn btn-primary" onClick={() => handlers.onPerubahanProdi(reg)}>Perubahan Prodi</button>
+                    <button className="btn btn-danger" onClick={() => handlers.onDownloadPengunduran(reg)}>Pengunduran Diri</button>
+                    <button className="btn btn-warning" onClick={() => handlers.onPrasyaratOspek(reg)}>Prasyarat Ospek</button>
                 </>
             )}
         </div>
     );
 }
 
-const TABLE_HEADERS = [
-    "Nomor Daftar", "Periode", "Gelombang", "Jurusan",
-    "Biodata", "Pembayaran", "USM", "Password USM", "Aksi",
-];
+const TABLE_HEADERS = ["Nomor Daftar", "Periode", "Gelombang", "Jurusan", "Biodata", "Pembayaran", "USM", "Password USM", "Aksi"];
 
-function RegistrationTable({ registrations, handlers }: {
-    registrations: Registration[];
-    handlers:      RegistrationHandlers;
-}) {
+function RegistrationTable({ registrations, handlers }: { registrations: Registration[]; handlers: RegistrationHandlers; }) {
     return (
         <div className="table-wrapper">
             <table>
-                <thead>
-                    <tr>{TABLE_HEADERS.map(h => <th key={h}>{h}</th>)}</tr>
-                </thead>
+                <thead><tr>{TABLE_HEADERS.map(h => <th key={h}>{h}</th>)}</tr></thead>
                 <tbody>
                     {registrations.map(reg => (
                         <tr key={reg.nomorDaftar}>
-                            <td>{reg.nomorDaftar}</td>
-                            <td>{reg.periode}</td>
-                            <td>{reg.gelombang}</td>
-                            <td>{reg.jurusan}</td>
+                            <td>{reg.nomorDaftar || "-"}</td>
+                            <td>{reg.periode || "-"}</td>
+                            <td>{reg.gelombang || "-"}</td>
+                            <td>{reg.jurusan || "-"}</td>
                             <td><StatusBadge status={reg.biodata} /></td>
                             <td><StatusBadge status={reg.pembayaran} /></td>
-                            <td>{reg.usm}</td>
-                            <td>{reg.passwordUSM}</td>
+                            <td>{reg.usm || "-"}</td>
+                            <td>{reg.passwordUSM || "-"}</td>
                             <td><RegistrationActions reg={reg} handlers={handlers} /></td>
                         </tr>
                     ))}
@@ -143,40 +100,30 @@ function RegistrationTable({ registrations, handlers }: {
     );
 }
 
-// ── Dummy data sesuai referensi gambar ────────────────────────────────────────
-// TODO: ganti dengan data dari API/auth context
-const DUMMY_USER: UserInfo = {
-    fullName: "Karenina",
-    email:    "izayoikareninalover@gmail.com",
-    nik:      "02032007",
-};
-
-const DUMMY_REGISTRATIONS: Registration[] = [
-    {
-        nomorDaftar: "BM2510078",
-        periode:     2025,
-        gelombang:   "Gelombang 01",
-        jurusan:     "Sistem Informasi - Malam",
-        biodata:     "Belum Lengkap",
-        pembayaran:  "Belum Lunas",
-        usm:         "KAMPUS UIB, 08 Oct 2024 (09:00 - 18:00)",
-        passwordUSM: "",
-    },
-    {
-        nomorDaftar: "OL2520068",
-        periode:     2025,
-        gelombang:   "Beasiswa II",
-        jurusan:     "Teknologi Informasi - Malam",
-        biodata:     "Telah Lengkap",
-        pembayaran:  "Telah Lunas",
-        usm:         "Online, 03 Nov 2024 (09:00 - 16:00)",
-        passwordUSM: "V8IECG",
-    },
-];
-
-// ── Parent — semua navigate di sini ───────────────────────────────────────────
 export default function AccountPage() {
     const navigate = useNavigate();
+    const [user, setUser] = useState<UserDTO | null>(null);
+    const [registrations, setRegistrations] = useState<Registration[]>([]);
+
+    useEffect(() => {
+        const storedUser = getStoredUser();
+        if (!storedUser) {
+            navigate("/login");
+        } else {
+            setUser(storedUser);
+            // Cek riwayat pendaftaran dari form Gelombang
+            const savedRegs = localStorage.getItem(`registrations_${storedUser.id}`);
+            if (savedRegs) {
+                setRegistrations(JSON.parse(savedRegs));
+            }
+        }
+    }, [navigate]);
+
+    const handleLogout = () => {
+        clearSession();
+        toast.success("Logout Berhasil!"); 
+        navigate("/login");
+    };
 
     const downloadPdf = (filename: string) => {
         const link = document.createElement("a");
@@ -187,7 +134,7 @@ export default function AccountPage() {
 
     const handlers: RegistrationHandlers = {
         onCheckPendaftaran:    ()    => navigate("/"),
-        onUbahBiodata:         (reg) => navigate("MASIH KOSONG TUNGGU ALDO",         { state: { nomorDaftar: reg.nomorDaftar } }),
+        onUbahBiodata:         (reg) => navigate("MASIH KOSONG TUNGGU ALDO", { state: { nomorDaftar: reg.nomorDaftar } }),
         onDownloadSuratHasil:  (reg) => downloadPdf(`surat-hasil-${reg.nomorDaftar}.pdf`),
         onBuktiTransfer:       (reg) => navigate("/transferproof",  { state: { nomorDaftar: reg.nomorDaftar } }),
         onPerubahanProdi:      (reg) => navigate("/changeprodi", { state: { nomorDaftar: reg.nomorDaftar } }),
@@ -195,28 +142,31 @@ export default function AccountPage() {
         onPrasyaratOspek:      (reg) => navigate("/prasyaratospek", { state: { nomorDaftar: reg.nomorDaftar } }),
     };
 
+    if (!user) return null; 
+
     return (
         <div className="page-content">
             <div className="account-box">
                 <h2 className="account-title">Akun Saya</h2>
-                <AccountInfo user={DUMMY_USER} />
+                <AccountInfo user={user} /> 
 
                 <h3 className="section-title">Pendaftaran</h3>
-                <RegistrationTable registrations={DUMMY_REGISTRATIONS} handlers={handlers} />
+                
+                {registrations.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "3rem", background: "#f8f9fa", borderRadius: "10px", border: "1px dashed #ccc", marginBottom: "2rem" }}>
+                        <p style={{ color: "#6c757d", fontSize: "1.1rem", marginBottom: "1.5rem" }}>Anda belum melakukan pendaftaran program studi apapun.</p>
+                        <button className="btn btn-primary btn-lg" onClick={() => navigate("/#gelombang")}>
+                            Daftar Gelombang Sekarang
+                        </button>
+                    </div>
+                ) : (
+                    <RegistrationTable registrations={registrations} handlers={handlers} />
+                )}
 
                 <div className="bottom-actions">
-                    <button className="btn btn-warning btn-lg"
-                        onClick={() => navigate("/passwordchange")}>
-                        UBAH PASSWORD
-                    </button>
-                    <button className="btn btn-primary btn-lg"
-                        onClick={() => navigate("/profilechange")}>
-                        UBAH PROFILE
-                    </button>
-                    <button className="btn btn-danger btn-lg"
-                        onClick={() => navigate("/login")}>
-                        ⏻ LOGOUT
-                    </button>
+                    <button className="btn btn-warning btn-lg" onClick={() => navigate("/passwordchange")}>UBAH PASSWORD</button>
+                    <button className="btn btn-primary btn-lg" onClick={() => navigate("/profilechange")}>UBAH PROFILE</button>
+                    <button className="btn btn-danger btn-lg" onClick={handleLogout}>⏻ LOGOUT</button>
                 </div>
             </div>
         </div>
