@@ -48,15 +48,18 @@ export const api = {
             cf_turnstile_token: string;
         }) =>
             apiClient.post<never, AuthResponse>("/api/auth/register", data),
-
+},	
         // logout: () =>
         //     apiClient.post<never, {message: string }>("/api/auth/logout"),
         //
         // profile: () =>
         //     apiClient.get<never, UserDTO>("api/auth/me")
+
+account: {
+        me: () => apiClient.get<never, UserDTO>("/api/account"),
     }
 }
-
+	
 export function saveSession(res: AuthResponse): void {
     localStorage.setItem("token", res.token);
     localStorage.setItem("user", JSON.stringify(res.user))
