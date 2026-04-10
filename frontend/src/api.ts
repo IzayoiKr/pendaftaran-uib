@@ -1,45 +1,82 @@
 import axios, { AxiosError } from 'axios';
 import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import useAuthStore from './store/useAuthStore';
+import type { AccessTokenResponse } from './types';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export interface UserDTO {
-    id: string;
-    full_name: string;
-    nik: string;
-    email: string;
-}
-
-export interface AuthResponse {
-    token: string;
-    user: UserDTO;
-}
-
 const apiClient: AxiosInstance = axios.create({
     baseURL: BASE_URL,
+    withCredentials: true,
     headers: { "Content-Type": "application/json" },
 });
 
+let refreshPromise: Promise<string> | null = null;
+
+async function refreshAccessToken(): Promise<string> {
+    if (refreshPromise) return refreshPromise;
+
+    refreshPromise = fetch(`${BASE_URL}/api/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include'
+    })
+        .then(async (res) => {
+            if (!res.ok) throw new Error('Refresh failed');
+            const data: { access_token: string; user: import('./types').User } = await res.json();
+            useAuthStore.getState().setAccessToken(data.access_token);
+            useAuthStore.getState().setUser(data.user);
+            return data.access_token;
+        })
+        .finally(() => {
+            refreshPromise = null;
+        });
+
+    return refreshPromise;
+}
+
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem("token");
-    if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
+    const { accessToken } = useAuthStore.getState();
+    if (accessToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
-})
+}, (error) => Promise.reject(error))
+
+
+interface RetryableRequest extends InternalAxiosRequestConfig {
+    _retry?: boolean;
+}
 
 apiClient.interceptors.response.use(
     (response) => response.data,
-    (error: AxiosError<{ error?: string }>) => {
-        const message = error.response?.data?.error ?? "Terjadi kesalahan";
-        throw new Error(message);
+    async (error: AxiosError<{ error?: string }>) => {
+        const originalRequest = error.config as RetryableRequest;
+
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            originalRequest._retry = true;
+
+            try {
+                const newToken = await refreshAccessToken();
+                originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                return apiClient(originalRequest);
+
+            } catch {
+                useAuthStore.getState().logout();
+                window.location.href = '/login';
+                return Promise.reject(error);
+            }
+        }
+
+        const message = error.response?.data?.error ?? 'Terjadi kesalahan';
+        return Promise.reject(new Error(message));
     }
 );
 
 export const api = {
     auth: {
         login: (email: string, password: string) =>
-            apiClient.post<never, AuthResponse>("/api/auth/login", { email, password }),
+            apiClient.post<never, AccessTokenResponse>("/api/auth/login", { email, password }),
+
         register: (data: {
             full_name: string;
             nik: string;
@@ -47,32 +84,12 @@ export const api = {
             password: string;
             cf_turnstile_token: string;
         }) =>
-            apiClient.post<never, AuthResponse>("/api/auth/register", data),
+            apiClient.post<never, AccessTokenResponse>("/api/auth/register", data),
 
-        // logout: () =>
-        //     apiClient.post<never, {message: string }>("/api/auth/logout"),
-        //
+        logout: () =>
+            apiClient.post<never, { message: string }>("/api/auth/logout"),
+
         // profile: () =>
         //     apiClient.get<never, UserDTO>("api/auth/me")
-    }
-}
-
-export function saveSession(res: AuthResponse): void {
-    localStorage.setItem("token", res.token);
-    localStorage.setItem("user", JSON.stringify(res.user))
-}
-
-export function clearSession(): void {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-}
-
-export function getStoredUser(): UserDTO | null {
-    const raw = localStorage.getItem("user");
-    if (!raw) return null;
-    try {
-        return JSON.parse(raw) as UserDTO;
-    } catch {
-        return null;
     }
 }

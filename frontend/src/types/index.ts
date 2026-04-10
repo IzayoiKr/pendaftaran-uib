@@ -91,3 +91,22 @@ export interface Form {
     value?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
+
+export interface User {
+    id: string;
+    full_name: string;
+    nik: string;
+    email: string;
+}
+
+export interface AuthState {
+    user: User | null;
+    accessToken: string | null;
+    isAuthenticated: boolean;
+    isLoading: boolean;
+}
+
+export interface AccessTokenResponse {
+    access_token: string;
+    user: User;
+}

@@ -9,7 +9,8 @@ import (
 	"github.com/google/uuid"
 )
 
-const TokenTTL = 24 * time.Hour
+const AccessTokenTTL = 15 * time.Minute
+const RefreshTokenTTL = 24 * time.Hour
 
 func getJWTSecret() []byte {
 	secret := os.Getenv("JWT_SECRET")
@@ -20,21 +21,36 @@ func getJWTSecret() []byte {
 
 }
 
+type TokenType string
+
+const (
+	TokenTypeAccess TokenType = "access"
+	TokenTypeRefresh TokenType = "refresh"
+)
+
 type Claims struct {
 	UserID string `json:"user_id"`
 	Email string `json:"email"`
+	TokenType TokenType `json:"token_type"`
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(userID, email string) (string , error) {
-	jti := uuid.NewString()
+func GenerateAccessToken(userID, email string) (string, error) {
+	return generateToken(userID, email, TokenTypeAccess, AccessTokenTTL)
+}
 
+func GenerateRefreshToken(userID, email string) (string, error) {
+	return generateToken(userID, email, TokenTypeRefresh, RefreshTokenTTL)
+}
+
+func generateToken(userID, email string, tokenType TokenType, ttl time.Duration) (string , error) {
 	claims := Claims{
 		UserID: userID,
 		Email: email,
+		TokenType: tokenType,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ID: jti,
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(TokenTTL)),
+			ID: uuid.NewString(),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(ttl)),
 			IssuedAt: jwt.NewNumericDate(time.Now()),
 			Issuer: "pendaftaran-uib",
 		},

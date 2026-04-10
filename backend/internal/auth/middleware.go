@@ -21,7 +21,12 @@ func Middleware(ts *TokenStore) func(http.Handler) http.Handler {
 
 			claims, err := Validatetoken(strings.TrimPrefix(header, "Bearer "))
 			if err != nil {
-				http.Error(w, `{"error":"token has been revoked"}`, http.StatusUnauthorized)
+				http.Error(w, `{"error":"invalid token"}`, http.StatusUnauthorized)
+				return
+			}
+
+			if claims.TokenType != TokenTypeAccess {
+				http.Error(w, `{"error":"invalid token type"}`, http.StatusUnauthorized)
 				return
 			}
 

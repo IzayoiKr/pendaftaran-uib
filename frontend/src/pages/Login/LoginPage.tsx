@@ -4,7 +4,8 @@ import { toast } from "sonner";
 import type { Form } from "../../types";
 import { login } from "../../constants/data";
 import { loginSchema } from "../../validation/schema";
-import { api, saveSession } from "../../api";
+import { api } from "../../api";
+import useAuthStore from "../../store/useAuthStore";
 import { RightArrowIcon } from "../../components/Icons";
 import styles from "./LoginPage.module.scss";
 
@@ -92,13 +93,15 @@ function LoginForm({ onLogin }: LoginFormProps) {
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const login = useAuthStore((state) => state.login);
 
     const handleLogin = async (email: string, password: string) => {
         const res = await api.auth.login(email, password);
-        saveSession(res);
+        login(res.user, res.access_token);
         toast.success("Login berhasil!");
         navigate("/");
     }
+
     return (
         <main id="login" className={styles.login}>
             <div className={styles.container}>

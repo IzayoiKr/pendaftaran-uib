@@ -146,12 +146,23 @@ func Register(db *sql.DB) http.HandlerFunc {
 			Email: req.Email,
 		}
 
-		token, err := auth.GenerateToken(user.ID, user.Email)
+		accessToken, err := auth.GenerateAccessToken(user.ID, user.Email)
 		if err != nil {
 			writeJSON(w, http.StatusInternalServerError, errJSON("server error"))
 			return
 		}
 
-		writeJSON(w, http.StatusCreated, authResponse{Token: token, User: user.ToDTO()})
+		refreshToken, err := auth.GenerateRefreshToken(user.ID, user.Email)
+		if err != nil {
+			writeJSON(w, http.StatusInternalServerError, errJSON("server error"))
+			return
+		}
+
+		setRefreshCookie(w, refreshToken)
+
+		writeJSON(w, http.StatusCreated, accessTokenResponse{
+			AccessToken: accessToken,
+			User: user.ToDTO(),
+		})
 	}
 }

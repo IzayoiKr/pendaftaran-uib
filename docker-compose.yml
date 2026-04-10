@@ -102,6 +102,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       CORS_ORIGIN: ${CORS_ORIGIN}
       TURNSTILE_SECRET: ${TURNSTILE_SECRET}
+      APP_ENV: ${APP_ENV}
       SERVER_PORT: ${SERVER_PORT}
     ports:
       - ${BACKEND_PORTS}

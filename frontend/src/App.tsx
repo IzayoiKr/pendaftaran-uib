@@ -1,8 +1,12 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { createBrowserRouter, RouterProvider, Outlet, ScrollRestoration } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import ScrollToHash from './components/ScrollToHash';
+import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
+import NotFound from './components/NotFound/NotFound';
+import useAuthStore from './store/useAuthStore';
+
 const Login = lazy(() => import('./pages/Login'))
 const Register = lazy(() => import('./pages/Register'))
 const Account = lazy(() => import('./pages/MyAccountPage'))
@@ -15,9 +19,12 @@ const RequestPindahProdiPage = lazy(() => import('./pages/RequestProdiChange/Req
 const UbahPasswordPage = lazy(() => import('./pages/PasswordChange/UbahPasswordPage'))
 const UbahProfilePage = lazy(() => import('./pages/ProfilChange/UbahProfilePage'))
 const RegisterGelombang = lazy(() => import('./pages/RegisterGelombang'))
-import NotFound from './components/NotFound/NotFound';
 
 function RootLayout() {
+    const restoreSession = useAuthStore((state) => state.restoreSession);
+
+    useEffect(() => { restoreSession() }, []);
+
     return (
         <>
             <Toaster
@@ -48,16 +55,23 @@ const router = createBrowserRouter([
             { path: '/', element: <Home /> },
             { path: '/login', element: <Login /> },
             { path: '/login/forgot', element: <Forgot /> },
-            { path: '/login/passwordchange', element: <UbahPasswordPage /> },
             { path: '/register', element: <Register /> },
-            { path: '/register/:id', element: <RegisterGelombang /> },
-            { path: '/account', element: <Account /> },
-            { path: '/transferproof', element: <BuktiTransfer /> },
-            { path: '/uploadtransferproof', element: <UploadBuktiTransferPage /> },
-            { path: '/prasyaratospek', element: <PrasyaratOspekPage /> },
-            { path: '/changeprodi', element: <PerubahanProdiPage /> },
-            { path: '/requestchangeprodi', element: <RequestPindahProdiPage /> },
-            { path: '/profilechange', element: <UbahProfilePage /> },
+
+            {
+                element: <ProtectedRoute />,
+                children: [
+                    { path: '/login/passwordchange', element: <UbahPasswordPage /> },
+                    { path: '/account', element: <Account /> },
+                    { path: '/transferproof', element: <BuktiTransfer /> },
+                    { path: '/uploadtransferproof', element: <UploadBuktiTransferPage /> },
+                    { path: '/prasyaratospek', element: <PrasyaratOspekPage /> },
+                    { path: '/changeprodi', element: <PerubahanProdiPage /> },
+                    { path: '/requestchangeprodi', element: <RequestPindahProdiPage /> },
+                    { path: '/profilechange', element: <UbahProfilePage /> },
+                    { path: '/register/:id', element: <RegisterGelombang /> },
+                ]
+            },
+
             { path: '*', element: <NotFound /> }
         ]
     }

@@ -14,7 +14,7 @@
         "@fontsource-variable/rubik": "^5.2.8",
         "@fontsource/poppins": "^5.2.7",
         "@marsidev/react-turnstile": "^1.5.0",
-        "axios": "1.13.5",
+        "axios": "^1.15.0",
         "embla-carousel-autoplay": "^8.6.0",
         "embla-carousel-react": "^8.6.0",
         "react": "^19.2.0",
@@ -22,7 +22,8 @@
         "react-router-dom": "^7.13.0",
         "sonner": "^2.0.7",
         "utopia-core-scss": "^1.3.1",
-        "zod": "^4.3.6"
+        "zod": "^4.3.6",
+        "zustand": "^5.0.12"
     },
     "devDependencies": {
         "@eslint/js": "^9.39.1",

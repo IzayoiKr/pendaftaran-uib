@@ -51,10 +51,11 @@ func main() {
 
 	r.Post("/api/auth/login", handlers.Login(mysql))
 	r.Post("/api/auth/register", handlers.Register(mysql))
+	r.Post("/api/auth/refresh", handlers.Refresh(mysql, tokenStore))
 
 	r.Group(func(r chi.Router) {
 		r.Use(auth.Middleware(tokenStore))
-		// r.Post("/api/auth/logout", handlers.Logout(tokenStore))
+		r.Post("/api/auth/logout", handlers.Logout(tokenStore))
 		// r.Post("/api/auth/profile", handlers.Profile(mysql))
 	})
 
@@ -71,6 +72,7 @@ func corsMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Origin", origin)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
 			return
