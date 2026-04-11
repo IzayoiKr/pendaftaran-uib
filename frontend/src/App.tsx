@@ -62,7 +62,7 @@ const router = createBrowserRouter([
             {
                 element: <ProtectedRoute />,
                 children: [
-                    { path: '/login/passwordchange', element: <UbahPasswordPage /> },
+                    { path: '/passwordchange', element: <UbahPasswordPage /> },
                     { path: '/account', element: <Account /> },
                     { path: '/transferproof', element: <BuktiTransfer /> },
                     { path: '/uploadtransferproof', element: <UploadBuktiTransferPage /> },
