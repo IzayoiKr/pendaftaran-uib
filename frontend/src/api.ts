@@ -3,7 +3,7 @@ import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import useAuthStore from './store/useAuthStore';
 import type { AccessTokenResponse } from './types';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 const apiClient: AxiosInstance = axios.create({
     baseURL: BASE_URL,
@@ -40,8 +40,7 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
         config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
-}, (error) => Promise.reject(error))
-
+}, (error) => Promise.reject(error));
 
 interface RetryableRequest extends InternalAxiosRequestConfig {
     _retry?: boolean;
@@ -88,8 +87,5 @@ export const api = {
 
         logout: () =>
             apiClient.post<never, { message: string }>("/api/auth/logout"),
-
-        // profile: () =>
-        //     apiClient.get<never, UserDTO>("api/auth/me")
     }
-}
+};
