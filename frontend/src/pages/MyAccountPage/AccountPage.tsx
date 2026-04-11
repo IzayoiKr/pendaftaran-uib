@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getStoredUser, clearSession, type UserDTO } from "../../api"; 
+import { api } from "../../api";
+import useAuthStore from "../../store/useAuthStore";
+import type { User } from "../../types";
 import { toast } from "sonner"; 
 import "./AccountPage.scss";
 
@@ -28,7 +30,7 @@ interface RegistrationHandlers {
     onPrasyaratOspek:      (reg: Registration) => void;
 }
 
-function AccountInfo({ user }: { user: UserDTO }) {
+function AccountInfo({ user }: { user: User }) {
     return (
         <div className="account-info">
             {([
@@ -102,25 +104,29 @@ function RegistrationTable({ registrations, handlers }: { registrations: Registr
 
 export default function AccountPage() {
     const navigate = useNavigate();
-    const [user, setUser] = useState<UserDTO | null>(null);
+    
+    // Langsung destructure user dan logout dari Zustand Store
+    const { user, logout } = useAuthStore();
     const [registrations, setRegistrations] = useState<Registration[]>([]);
 
     useEffect(() => {
-        const storedUser = getStoredUser();
-        if (!storedUser) {
+        if (!user) {
             navigate("/login");
         } else {
-            setUser(storedUser);
-            // Cek riwayat pendaftaran dari form Gelombang
-            const savedRegs = localStorage.getItem(`registrations_${storedUser.id}`);
+            const savedRegs = localStorage.getItem(`registrations_${user.id}`);
             if (savedRegs) {
                 setRegistrations(JSON.parse(savedRegs));
             }
         }
-    }, [navigate]);
+    }, [navigate, user]);
 
-    const handleLogout = () => {
-        clearSession();
+    const handleLogout = async () => {
+        try {
+            await api.auth.logout(); // Panggil API backend untuk mematikan token di server
+        } catch {
+            // Abaikan jika token di server sudah mati duluan
+        }
+        logout(); // Hapus user dari state lokal (Zustand)
         toast.success("Logout Berhasil!"); 
         navigate("/login");
     };
