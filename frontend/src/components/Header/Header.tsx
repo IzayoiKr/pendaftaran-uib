@@ -5,7 +5,7 @@ import { headerNavLinks, spyIds } from '../../constants/navigation';
 import { getImg } from '../../constants/data';
 import useScrollSpy from '../../hooks/useScrollSpy';
 import scrollToId from '../ScrollToId';
-import { getStoredUser } from '../../api'; // <-- Import your session helper
+import useAuthStore from '../../store/useAuthStore';
 
 interface HamburgerButtonProps {
     isOpen?: boolean;
@@ -17,7 +17,7 @@ interface NavMenuProps {
     activeId: string;
     pathname: string;
     onLinkClick: () => void;
-    isLoggedIn: boolean; // <-- Add prop to know if user is logged in
+    isAuthenticated: boolean;
 }
 
 function UIBLogo() {
@@ -49,18 +49,16 @@ const HamburgerButton = memo(function HamburgerButton({ isOpen, setIsOpen }: Ham
     )
 })
 
-function NavMenu({ isOpen, activeId, pathname, onLinkClick, isLoggedIn }: NavMenuProps) {
+function NavMenu({ isOpen, activeId, pathname, onLinkClick, isAuthenticated }: NavMenuProps) {
     return (
         <div className={`${styles.menuContainer} ${isOpen ? styles.show : ''}`}>
             <nav className={styles.nav}>
                 <ul className={styles.menu}>
                     {headerNavLinks.map(link => {
-                        // Default to the original link data
                         let displayTo = link.to;
                         let displayLabel = link.label;
 
-                        // If this is the login link AND the user is logged in, change it
-                        if (link.to === '/login' && isLoggedIn) {
+                        if (link.to === '/login' && isAuthenticated) {
                             displayTo = '/account';
                             displayLabel = 'Akun Saya';
                         }
@@ -96,16 +94,13 @@ function NavMenu({ isOpen, activeId, pathname, onLinkClick, isLoggedIn }: NavMen
 export default function Header() {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isScrolled, setIsScrolled] = useState<boolean>(false);
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // <-- Track auth state
     const { pathname } = useLocation();
+    
+    // Langsung ambil status dari Zustand
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
     const headerRef = useRef<HTMLElement>(null);
     const [headerHeight, setHeaderHeight] = useState(80);
-
-    // Check login status on mount and whenever the URL path changes
-    useEffect(() => {
-        setIsLoggedIn(!!getStoredUser());
-    }, [pathname]);
 
     useEffect(() => {
         const update = () => {
@@ -136,7 +131,7 @@ export default function Header() {
                     activeId={activeId}
                     pathname={pathname}
                     onLinkClick={() => setIsOpen(false)}
-                    isLoggedIn={isLoggedIn} // <-- Pass state down to NavMenu
+                    isAuthenticated={isAuthenticated}
                 />
             </div>
         </header >
