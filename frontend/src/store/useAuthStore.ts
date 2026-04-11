@@ -12,7 +12,9 @@ interface AuthActions {
 
 type AuthStore = AuthState & AuthActions;
 
-const useAuthStore = create<AuthStore>((set) => ({
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
+const useAuthStore = create<AuthStore>()((set) => ({
     user: null,
     accessToken: null,
     isAuthenticated: false,
@@ -36,7 +38,7 @@ const useAuthStore = create<AuthStore>((set) => ({
     restoreSession: async () => {
         set({ isLoading: true });
         try {
-            const response = await fetch('/api/auth/refresh', {
+            const response = await fetch(`${BASE_URL}/api/auth/refresh`, {
                 method: 'POST',
                 credentials: 'include',
             });
