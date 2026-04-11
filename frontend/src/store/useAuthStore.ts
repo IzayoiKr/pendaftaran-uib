@@ -12,7 +12,7 @@ interface AuthActions {
 
 type AuthStore = AuthState & AuthActions;
 
-const useAuthStore = create<AuthStore>()((set) => ({
+const useAuthStore = create<AuthStore>((set) => ({
     user: null,
     accessToken: null,
     isAuthenticated: false,
