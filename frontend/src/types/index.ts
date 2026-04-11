@@ -110,3 +110,16 @@ export interface AccessTokenResponse {
     access_token: string;
     user: User;
 }
+
+export interface BlogPost {
+    id: number;
+    title: string;
+    description: string;
+    image?: string;
+    imageWebp?: string;
+    imageAvif?: string;
+    author: string;
+    date: string;
+    category: string;
+    detailLink: string;
+}

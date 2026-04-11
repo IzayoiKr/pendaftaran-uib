@@ -1,0 +1,129 @@
+// ============================================
+// InfoUmum Content Page Styles
+// ============================================
+
+$primary-color: #2d3436;
+$secondary-color: #6c5ce7;
+$text-color: #333;
+$light-gray: #f8f9fa;
+$border-color: #e0e0e0;
+$white: #ffffff;
+$shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+.info-umum-section {
+  width: 100%;
+  min-height: 100vh;
+  background-color: $light-gray;
+}
+
+.blog_area {
+  width: 100%;
+  padding-top: 60px;
+  padding-bottom: 60px;
+
+  .container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 15px;
+  }
+
+  .row {
+    display: flex;
+    margin: 0 -15px;
+  }
+
+  .col-lg-12 {
+    flex: 0 0 100%;
+    padding: 0 15px;
+  }
+}
+
+.blog_left_sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+
+  &.empty {
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// ============================================
+// Loading & No Posts States
+// ============================================
+
+.loading-container,
+.no-posts {
+  background-color: $white;
+  padding: 60px 40px;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: $shadow;
+
+  p {
+    margin: 0;
+    font-size: 18px;
+    color: $text-color;
+    font-weight: 500;
+  }
+}
+
+.loading-container {
+  animation: fade-in 0.3s ease-in;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// ============================================
+// Responsive Layout
+// ============================================
+
+@media (max-width: 768px) {
+  .blog_area {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+
+  .blog_left_sidebar {
+    gap: 25px;
+  }
+
+  .loading-container,
+  .no-posts {
+    padding: 40px 25px;
+
+    p {
+      font-size: 16px;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .blog_area {
+    padding-top: 30px;
+    padding-bottom: 30px;
+  }
+
+  .blog_left_sidebar {
+    gap: 20px;
+  }
+
+  .loading-container,
+  .no-posts {
+    padding: 30px 20px;
+
+    p {
+      font-size: 14px;
+    }
+  }
+}

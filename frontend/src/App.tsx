@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import NotFound from './components/NotFound/NotFound';
 import useAuthStore from './store/useAuthStore';
+import InfoUmum from "./pages/InfoUmum";
 
 const Login = lazy(() => import('./pages/Login'))
 const Register = lazy(() => import('./pages/Register'))
@@ -56,6 +57,7 @@ const router = createBrowserRouter([
             { path: '/login', element: <Login /> },
             { path: '/forgot', element: <Forgot /> },
             { path: '/register', element: <Register /> },
+            { path: '/infoumum', element: <InfoUmum /> },
 
             {
                 element: <ProtectedRoute />,
