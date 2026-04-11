@@ -1,90 +1,97 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
-import "./ForgotPasswordPage.scss";
+import { useState } from "react";
+import { toast } from "sonner";
+import { api } from "../../api";
+import { RightArrowIcon } from "../../components/Icons";
+import styles from "./ForgotPasswordPage.module.scss";
 
 interface ForgotForm {
     email: string;
     nik: string;
 }
 
-function ForgotInput({ type, name, placeholder, value, autoComplete, onChange }: {
-    type: "email" | "text";
+interface ForgotFormProps {
+    onReset: (email: string, nik: string) => Promise<void>;
+}
+
+function ForgotInput({ name, type, placeholder, autoComplete, value, onChange }: {
     name: keyof ForgotForm;
+    type: "email" | "text";
     placeholder: string;
-    value: string;
     autoComplete: string;
-    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
     return (
         <input
-            type={type}
+            id={name}
             name={name}
-            className="single-input"
+            type={type}
             placeholder={placeholder}
-            value={value}
             autoComplete={autoComplete}
+            value={value}
             onChange={onChange}
             required
         />
     );
 }
 
-function ResetButton({ isLoading }: { isLoading: boolean }) {
+function ForgotAction() {
     return (
-        <button type="submit" className="reset-btn" disabled={isLoading} aria-busy={isLoading}>
-            {isLoading
-                ? <><div className="spinner" aria-hidden="true" /> Reset</>
-                : <>Reset &#8594;</>
-            }
+        <button type="submit" className={styles.resetBtn}>
+            Reset <RightArrowIcon />
         </button>
     );
 }
 
-export default function ForgotPasswordPage() {
-    const [form, setForm] = useState<ForgotForm>({ email: "", nik: "" });
-    const [isLoading, setIsLoading] = useState(false);
+function ForgotForm({ onReset }: ForgotFormProps) {
+    const [email, setEmail] = useState("");
+    const [nik, setNik] = useState("");
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setIsLoading(true);
         try {
-            await new Promise(r => setTimeout(r, 1000)); // TODO: ganti API call
-        } finally {
-            setIsLoading(false);
+            await onReset(email, nik);
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");
         }
     };
 
     return (
-        <div className="page-content">
-            <div className="forgot-box">
-                <h3 className="forgot-title">Lupa Password</h3>
-                <p className="forgot-required">* Wajib di Isi (Required)</p>
-                <form onSubmit={handleSubmit} noValidate>
-                    <ForgotInput
-                        type="email"
-                        name="email"
-                        placeholder="Email saat daftar (Registration Email) *"
-                        value={form.email}
-                        autoComplete="email"
-                        onChange={handleChange}
-                    />
-                    <ForgotInput
-                        type="text"
-                        name="nik"
-                        placeholder="NIK saat daftar (Registration National Identification Number) *"
-                        value={form.nik}
-                        autoComplete="off"
-                        onChange={handleChange}
-                    />
-                    <div>
-                        <ResetButton isLoading={isLoading} />
-                    </div>
-                </form>
+        <form onSubmit={handleSubmit} noValidate>
+            <ForgotInput
+                name="email"
+                type="email"
+                placeholder="Email saat daftar (Registration Email) *"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+            />
+            <ForgotInput
+                name="nik"
+                type="text"
+                placeholder="NIK saat daftar (Registration National Identification Number) *"
+                autoComplete="off"
+                value={nik}
+                onChange={(e) => setNik(e.target.value)}
+            />
+            <ForgotAction />
+        </form>
+    );
+}
+
+export default function ForgotPasswordPage() {
+    const handleReset = async (email: string, nik: string) => {
+        await api.auth.forgotPassword(email, nik); // TODO: pastikan endpoint ini ada
+        toast.success("Email reset password telah dikirim!");
+    };
+
+    return (
+        <main className={styles.forgot}>
+            <div className={styles.container}>
+                <h1>Lupa Password</h1>
+                <p className={styles.required}>* Wajib di Isi (Required)</p>
+                <ForgotForm onReset={handleReset} />
             </div>
-        </div>
+        </main>
     );
 }
