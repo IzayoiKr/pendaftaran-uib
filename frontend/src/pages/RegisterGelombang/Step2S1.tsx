@@ -41,10 +41,8 @@ export default function Step2S1({
       setFormData({
         ...formData,
 
-        // simpan file
         [name]: file,
 
-        // 🔥 TAMBAHAN INI
         [`${name}Url`]: URL.createObjectURL(file),
       });
     }
@@ -99,7 +97,6 @@ const handleSubmit = () => {
   submit();
 };
 
-  // Helper function untuk render file input
   const renderFileInput = (label: string, name: string) => (
     <div className={form.formGroup} key={name}>
       <label className={form.label}>{label} *</label>
