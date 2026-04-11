@@ -1,4 +1,5 @@
 @use '../../styles/global.scss';
+@use '../../styles/form.scss';
 
 $color-primary:       #29b6f6;
 $color-primary-hover: #039be5;
@@ -24,7 +25,6 @@ $header-height: var(--space-2xl);
 .account-box {
   @include global.container;
 
-  // ── Akun Saya ──
   .account-title {
     font-size: var(--step-3);
     font-weight: 700;
@@ -55,7 +55,6 @@ $header-height: var(--space-2xl);
     }
   }
 
-  // ── Pendaftaran ──
   .section-title {
     font-size: var(--step-1);
     font-weight: 700;
@@ -94,30 +93,30 @@ $header-height: var(--space-2xl);
     }
   }
 
-  // Status text
   .status-incomplete { color: $color-danger;  font-weight: 600; }
   .status-complete   { color: $color-success; font-weight: 600; }
   .status-unpaid     { color: $color-danger;  font-weight: 600; }
   .status-paid       { color: $color-success; font-weight: 600; }
 
-  // Action buttons in table
   .action-group {
     display: flex;
     flex-direction: column;
     gap: var(--space-2xs);
   }
 
-  // ── Bottom buttons ──
+  // Bottom buttons — pakai flex-wrap + justify-content center
+  // supaya tidak melebar di semua ukuran layar
   .bottom-actions {
     display: flex;
     justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
-    gap: var(--space-s);
+    gap: 0;
     margin-top: var(--space-l);
   }
 }
 
-// ── Shared button base ──
+// ── Shared button ──
 .btn {
   display: inline-flex;
   align-items: center;
@@ -135,17 +134,20 @@ $header-height: var(--space-2xl);
 
   &:disabled { opacity: 0.6; cursor: not-allowed; }
 
-  &.btn-primary  { background: $color-primary;  color: global.$white; &:hover { background: $color-primary-hover; } }
-  &.btn-warning  { background: $color-warning;  color: global.$white; &:hover { background: $color-warning-hover; } }
-  &.btn-danger   { background: $color-danger;   color: global.$white; &:hover { background: $color-danger-hover;  } }
-  &.btn-success  { background: $color-success;  color: global.$white; &:hover { background: $color-success-hover; } }
-  &.btn-info     { background: $color-info;     color: global.$white; &:hover { background: $color-info-hover;    } }
+  &.btn-primary { background: $color-primary;  color: global.$white; &:hover { background: $color-primary-hover; } }
+  &.btn-warning { background: $color-warning;  color: global.$white; &:hover { background: $color-warning-hover; } }
+  &.btn-danger  { background: $color-danger;   color: global.$white; &:hover { background: $color-danger-hover;  } }
+  &.btn-success { background: $color-success;  color: global.$white; &:hover { background: $color-success-hover; } }
+  &.btn-info    { background: $color-info;     color: global.$white; &:hover { background: $color-info-hover;    } }
 
-  // Larger for bottom actions
+  // Bottom action buttons — pakai mixin dari form.scss, tidak ada width: 100%
   &.btn-lg {
-    padding: 0.6em var(--space-m);
-    font-size: var(--step--1);
-    border-radius: 6.25em;
+    @include form.submit-button;
+    background: $color-primary;
+    border-color: $color-primary;
+
+    &.btn-warning { background: $color-warning; border-color: $color-warning; &:hover { background: $color-warning-hover; color: global.$white; } }
+    &.btn-danger  { background: $color-danger;  border-color: $color-danger;  &:hover { background: $color-danger-hover;  color: global.$white; } }
   }
 }
 
@@ -166,11 +168,12 @@ $header-height: var(--space-2xl);
       gap: 0;
     }
 
+    // Bottom buttons tetap wrap tapi tidak stretch — ukuran tidak berubah
     .bottom-actions {
-      flex-direction: column;
-      align-items: stretch;
-
-      .btn { justify-content: center; }
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
     }
   }
 }

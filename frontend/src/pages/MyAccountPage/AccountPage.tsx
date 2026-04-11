@@ -3,40 +3,40 @@ import { useEffect, useState } from "react";
 import { api } from "../../api";
 import useAuthStore from "../../store/useAuthStore";
 import type { User } from "../../types";
-import { toast } from "sonner"; 
+import { toast } from "sonner";
 import "./AccountPage.scss";
 
 type BiodataStatus = "Belum Lengkap" | "Telah Lengkap";
-type PaymentStatus = "Belum Lunas"   | "Telah Lunas";
+type PaymentStatus = "Belum Lunas" | "Telah Lunas";
 
 interface Registration {
     nomorDaftar: string;
-    periode:     number;
-    gelombang:   string;
-    jurusan:     string;
-    biodata:     BiodataStatus;
-    pembayaran:  PaymentStatus;
-    usm:         string;
+    periode: number;
+    gelombang: string;
+    jurusan: string;
+    biodata: BiodataStatus;
+    pembayaran: PaymentStatus;
+    usm: string;
     passwordUSM: string;
 }
 
 interface RegistrationHandlers {
-    onCheckPendaftaran:    (reg: Registration) => void;
-    onUbahBiodata:         (reg: Registration) => void;
-    onDownloadSuratHasil:  (reg: Registration) => void;
-    onBuktiTransfer:       (reg: Registration) => void;
-    onPerubahanProdi:      (reg: Registration) => void;
+    onCheckPendaftaran: (reg: Registration) => void;
+    onUbahBiodata: (reg: Registration) => void;
+    onDownloadSuratHasil: (reg: Registration) => void;
+    onBuktiTransfer: (reg: Registration) => void;
+    onPerubahanProdi: (reg: Registration) => void;
     onDownloadPengunduran: (reg: Registration) => void;
-    onPrasyaratOspek:      (reg: Registration) => void;
+    onPrasyaratOspek: (reg: Registration) => void;
 }
 
 function AccountInfo({ user }: { user: User }) {
     return (
         <div className="account-info">
             {([
-                ["Nama Lengkap", user.full_name || "-"],
-                ["Alamat Email", user.email || "-"],
-                ["Nomor NIK",    user.nik || "-"],
+                ["Nama Lengkap : ", user.full_name || "-"],
+                ["Alamat Email : ", user.email || "-"],
+                ["Nomor NIK    : ", user.nik || "-"],
             ] as [string, string][]).map(([label, value]) => (
                 <div key={label} className="info-row">
                     <span className="info-label">{label}</span>
@@ -49,10 +49,10 @@ function AccountInfo({ user }: { user: User }) {
 
 function StatusBadge({ status }: { status: BiodataStatus | PaymentStatus }) {
     const cls =
-        status === "Telah Lengkap" ? "status-complete"   :
-        status === "Belum Lengkap" ? "status-incomplete"  :
-        status === "Telah Lunas"   ? "status-paid"        :
-        "status-unpaid";
+        status === "Telah Lengkap" ? "status-complete" :
+            status === "Belum Lengkap" ? "status-incomplete" :
+                status === "Telah Lunas" ? "status-paid" :
+                    "status-unpaid";
     return <span className={cls}>{status || "-"}</span>;
 }
 
@@ -104,7 +104,7 @@ function RegistrationTable({ registrations, handlers }: { registrations: Registr
 
 export default function AccountPage() {
     const navigate = useNavigate();
-    
+
     // Langsung destructure user dan logout dari Zustand Store
     const { user, logout } = useAuthStore();
     const [registrations, setRegistrations] = useState<Registration[]>([]);
@@ -127,7 +127,7 @@ export default function AccountPage() {
             // Abaikan jika token di server sudah mati duluan
         }
         logout(); // Hapus user dari state lokal (Zustand)
-        toast.success("Logout Berhasil!"); 
+        toast.success("Logout Berhasil!");
         navigate("/login");
     };
 
@@ -139,25 +139,25 @@ export default function AccountPage() {
     };
 
     const handlers: RegistrationHandlers = {
-        onCheckPendaftaran:    ()    => navigate("/"),
-        onUbahBiodata:         (reg) => navigate("MASIH KOSONG TUNGGU ALDO", { state: { nomorDaftar: reg.nomorDaftar } }),
-        onDownloadSuratHasil:  (reg) => downloadPdf(`surat-hasil-${reg.nomorDaftar}.pdf`),
-        onBuktiTransfer:       (reg) => navigate("/transferproof",  { state: { nomorDaftar: reg.nomorDaftar } }),
-        onPerubahanProdi:      (reg) => navigate("/changeprodi", { state: { nomorDaftar: reg.nomorDaftar } }),
+        onCheckPendaftaran: () => navigate("/"),
+        onUbahBiodata: (reg) => navigate("MASIH KOSONG TUNGGU ALDO", { state: { nomorDaftar: reg.nomorDaftar } }),
+        onDownloadSuratHasil: (reg) => downloadPdf(`surat-hasil-${reg.nomorDaftar}.pdf`),
+        onBuktiTransfer: (reg) => navigate("/transferproof", { state: { nomorDaftar: reg.nomorDaftar } }),
+        onPerubahanProdi: (reg) => navigate("/changeprodi", { state: { nomorDaftar: reg.nomorDaftar } }),
         onDownloadPengunduran: (reg) => downloadPdf(`pengunduran-diri-${reg.nomorDaftar}.pdf`),
-        onPrasyaratOspek:      (reg) => navigate("/prasyaratospek", { state: { nomorDaftar: reg.nomorDaftar } }),
+        onPrasyaratOspek: (reg) => navigate("/prasyaratospek", { state: { nomorDaftar: reg.nomorDaftar } }),
     };
 
-    if (!user) return null; 
+    if (!user) return null;
 
     return (
         <div className="page-content">
             <div className="account-box">
                 <h2 className="account-title">Akun Saya</h2>
-                <AccountInfo user={user} /> 
+                <AccountInfo user={user} />
 
                 <h3 className="section-title">Pendaftaran</h3>
-                
+
                 {registrations.length === 0 ? (
                     <div style={{ textAlign: "center", padding: "3rem", background: "#f8f9fa", borderRadius: "10px", border: "1px dashed #ccc", marginBottom: "2rem" }}>
                         <p style={{ color: "#6c757d", fontSize: "1.1rem", marginBottom: "1.5rem" }}>Anda belum melakukan pendaftaran program studi apapun.</p>
