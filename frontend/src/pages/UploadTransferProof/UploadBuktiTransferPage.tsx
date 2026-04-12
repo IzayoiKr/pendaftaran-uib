@@ -1,290 +1,158 @@
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import "./UploadBuktiTransferPage.scss";
+import styles from "./UploadBuktiTransferPage.module.scss";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
 interface BiodataPendaftaran {
-    nomorDaftar: string;
-    periode:     string;
-    gelombang:   string;
-    jurusan:     string;
-    namaLengkap: string;
-    alamatEmail: string;
-    nomorNIK:    string;
+    nomorDaftar: string; periode: string; gelombang: string;
+    jurusan: string; namaLengkap: string; alamatEmail: string; nomorNIK: string;
 }
 
 interface TambahBuktiTransferForm {
     pemilikRekening: string;
-    bank:            string;
-    file:            File | null;
+    bank: string;
+    file: File | null;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-/** Biodata summary — mirrors BuktiTransferPage's BiodataSection style. */
 function BiodataSection({ data }: { data: BiodataPendaftaran }) {
     const rows: [string, string][] = [
-        ["Nomor Daftar (Registration Number)",                data.nomorDaftar],
-        ["Periode (Period)",                                   data.periode],
-        ["Gelombang (Group)",                                  data.gelombang],
-        ["Jurusan (Study Program)",                            data.jurusan],
-        ["Nama Lengkap (Full Name)",                           data.namaLengkap],
-        ["Alamat Email (Email)",                               data.alamatEmail],
-        ["Nomor NIK (National Identification Number)",         data.nomorNIK],
+        ["Nomor Daftar (Registration Number)", data.nomorDaftar],
+        ["Periode (Period)", data.periode],
+        ["Gelombang (Group)", data.gelombang],
+        ["Jurusan (Study Program)", data.jurusan],
+        ["Nama Lengkap (Full Name)", data.namaLengkap],
+        ["Alamat Email (Email)", data.alamatEmail],
+        ["Nomor NIK (National Identification Number)", data.nomorNIK],
     ];
-
     return (
-        <div className="biodata-info">
+        <div className={styles.biodataInfo}>
             {rows.map(([label, value]) => (
-                <div key={label} className="info-row">
-                    <span className="info-label">{label}</span>
-                    <span className="info-value">: {value}</span>
+                <div key={label} className={styles.infoRow}>
+                    <span className={styles.infoLabel}>{label}</span>
+                    <span className={styles.infoValue}>: {value}</span>
                 </div>
             ))}
         </div>
     );
 }
 
-/** Download VA guide banner. */
 function DownloadBanner({ href }: { href: string }) {
     return (
-        <div className="download-banner">
-            <a
-                href={href}
-                className="download-btn"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Download Panduan Pembayaran dengan VA"
-            >
-                <span className="download-icon" aria-hidden="true">⬇</span>
-                Klik disini untuk Download Panduan Pembayaran dengan VA
+        <div className={styles.downloadBanner}>
+            <a href={href} className={styles.downloadBtn} target="_blank" rel="noopener noreferrer">
+                ⬇ Klik disini untuk Download Panduan Pembayaran dengan VA
             </a>
         </div>
     );
 }
 
-/** Reusable labeled text input. */
-function FormTextInput({
-    id,
-    label,
-    placeholder,
-    value,
-    autoComplete,
-    onChange,
-}: {
-    id:            string;
-    label:         string;
-    placeholder:   string;
-    value:         string;
-    autoComplete?: string;
-    onChange:      (e: ChangeEvent<HTMLInputElement>) => void;
+function FormTextInput({ id, label, placeholder, value, autoComplete, onChange }: {
+    id: string; label: string; placeholder: string;
+    value: string; autoComplete?: string;
+    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
     return (
-        <div className="form-field">
-            <label htmlFor={id} className="field-label">
-                {label}<span className="required-star" aria-hidden="true"> *</span>
+        <div className={styles.formField}>
+            <label htmlFor={id} className={styles.fieldLabel}>
+                {label}<span className={styles.requiredStar}> *</span>
             </label>
-            <input
-                id={id}
-                type="text"
-                className="single-input"
-                placeholder={`${placeholder}*`}
-                value={value}
-                autoComplete={autoComplete}
-                onChange={onChange}
-                required
-            />
+            <input id={id} type="text" placeholder={`${placeholder}*`}
+                value={value} autoComplete={autoComplete} onChange={onChange} required />
         </div>
     );
 }
 
-/** Custom file picker — hidden native input, custom Browse button. */
-function FileInputField({
-    id,
-    label,
-    file,
-    onFileChange,
-}: {
-    id:           string;
-    label:        string;
-    file:         File | null;
+function FileInputField({ id, label, file, onFileChange }: {
+    id: string; label: string; file: File | null;
     onFileChange: (file: File | null) => void;
 }) {
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const handleBrowseClick = () => inputRef.current?.click();
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        onFileChange(e.target.files?.[0] ?? null);
-    };
-
     return (
-        <div className="form-field">
-            <label htmlFor={id} className="field-label">
-                {label}<span className="required-star" aria-hidden="true"> *</span>
+        <div className={styles.formField}>
+            <label htmlFor={id} className={styles.fieldLabel}>
+                {label}<span className={styles.requiredStar}> *</span>
             </label>
-            <div className="file-input-row">
-                <span
-                    className={`file-name-display${file ? " has-file" : ""}`}
-                    aria-live="polite"
-                >
+            <div className={styles.fileInputRow}>
+                <span className={`${styles.fileNameDisplay}${file ? ` ${styles.hasFile}` : ""}`} aria-live="polite">
                     {file ? file.name : "Bukti Transfer *"}
                 </span>
-                <button
-                    type="button"
-                    className="browse-btn"
-                    onClick={handleBrowseClick}
-                    aria-controls={id}
-                >
-                    Browse
-                </button>
-                <input
-                    ref={inputRef}
-                    id={id}
-                    type="file"
-                    accept="image/*,application/pdf"
-                    onChange={handleChange}
-                    aria-label={label}
-                />
+                <button type="button" className={styles.browseBtn} onClick={() => inputRef.current?.click()}>Browse</button>
+                <input ref={inputRef} id={id} type="file" accept="image/*,application/pdf"
+                    onChange={(e) => onFileChange(e.target.files?.[0] ?? null)} />
             </div>
-            <span className="uploaded-hint">
+            <span className={styles.uploadedHint}>
                 Dokumen Terupload :{file && <strong> {file.name}</strong>}
             </span>
         </div>
     );
 }
 
-/** Batal + Upload buttons — uses same .btn convention as BuktiTransferPage. */
-function ActionRow({
-    isLoading,
-    onCancel,
-}: {
-    isLoading: boolean;
-    onCancel:  () => void;
-}) {
+function ActionRow({ isLoading, onCancel }: { isLoading: boolean; onCancel: () => void }) {
     return (
-        <div className="bottom-actions">
-            <button
-                type="button"
-                className="btn btn-danger"
-                onClick={onCancel}
-                disabled={isLoading}
-            >
-                Batal
-            </button>
-            <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={isLoading}
-                aria-busy={isLoading}
-            >
-                {isLoading
-                    ? <><div className="spinner" aria-hidden="true" /> Upload</>
-                    : "Upload"
-                }
+        <div className={styles.bottomActions}>
+            <button type="button" className={styles.btnDanger} onClick={onCancel} disabled={isLoading}>Batal</button>
+            <button type="submit" className={styles.btn} disabled={isLoading} aria-busy={isLoading}>
+                {isLoading ? <><div className={styles.spinner} aria-hidden="true" /> Upload</> : "Upload"}
             </button>
         </div>
     );
 }
 
-// ─── Mock data — ganti dengan data dari props / context / API ─────────────────
-
+// ─── Mock data ────────────────────────────────────────────────────────────────
 const MOCK_BIODATA: BiodataPendaftaran = {
-    nomorDaftar: "OL2520068",
-    periode:     "2025/2026",
-    gelombang:   "Beasiswa II",
-    jurusan:     "Teknologi Informasi",
-    namaLengkap: "karenina",
-    alamatEmail: "izayoi",
-    nomorNIK:    "2323",
+    nomorDaftar: "OL2520068", periode: "2025/2026", gelombang: "Beasiswa II",
+    jurusan: "Teknologi Informasi", namaLengkap: "Jonatan",
+    alamatEmail: "theeclipseicy9@gmail.com", nomorNIK: "2171092002079006",
 };
+const PANDUAN_URL = "https://pendaftaran.uib.ac.id/panduan/pembayaran-va";
 
-const PANDUAN_URL = "https://pendaftaran.uib.ac.id/panduan/pembayaran-va"; // ganti ke URL asli
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
+// ─── Parent ───────────────────────────────────────────────────────────────────
 export default function UploadBuktiTransferPage() {
     const navigate = useNavigate();
-
-    const [form, setForm] = useState<TambahBuktiTransferForm>({
-        pemilikRekening: "",
-        bank:            "",
-        file:            null,
-    });
+    const [form, setForm] = useState<TambahBuktiTransferForm>({ pemilikRekening: "", bank: "", file: null });
     const [isLoading, setIsLoading] = useState(false);
 
-    // ── Handlers ──────────────────────────────────────────────────────────────
-
-    const handleTextChange =
-        (field: keyof Pick<TambahBuktiTransferForm, "pemilikRekening" | "bank">) =>
-        (e: ChangeEvent<HTMLInputElement>) =>
-            setForm(prev => ({ ...prev, [field]: e.target.value }));
-
-    const handleFileChange = (file: File | null) =>
-        setForm(prev => ({ ...prev, file }));
-
-    const handleCancel = () => navigate(-1);
+    const handleTextChange = (field: keyof Pick<TambahBuktiTransferForm, "pemilikRekening" | "bank">) =>
+        (e: ChangeEvent<HTMLInputElement>) => setForm(prev => ({ ...prev, [field]: e.target.value }));
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!form.file) return;
         setIsLoading(true);
         try {
-            // TODO: ganti dengan real API call, e.g. await uploadBuktiTransfer(form);
-            await new Promise(r => setTimeout(r, 1500));
-            navigate(-1); // kembali ke BuktiTransferPage setelah berhasil
+            await new Promise(r => setTimeout(r, 1500)); // TODO: ganti API call
+            navigate(-1);
         } finally {
             setIsLoading(false);
         }
     };
 
-    // ── Render ────────────────────────────────────────────────────────────────
-
     return (
-        <div className="page-content">
-            <div className="upload-bukti-box">
-
-                {/* ── Biodata ── */}
-                <h2 className="section-title">Biodata Pendaftaran</h2>
+        <main className={styles.page}>
+            <div className={styles.container}>
+                <h2 className={styles.sectionTitle}>Biodata Pendaftaran</h2>
                 <BiodataSection data={MOCK_BIODATA} />
 
-                {/* ── Form upload ── */}
-                <h3 className="table-title">
-                    Daftar Bukti Transfer (List of Receipt Payment)
-                </h3>
-
+                <h3 className={styles.tableTitle}>Daftar Bukti Transfer (List of Receipt Payment)</h3>
                 <DownloadBanner href={PANDUAN_URL} />
 
                 <form onSubmit={handleSubmit} noValidate>
-                    <div className="field-group">
-                        <FormTextInput
-                            id="pemilikRekening"
-                            label="Pemilik Rekening (Account Owner)"
-                            placeholder="Pemilik Rekening"
-                            value={form.pemilikRekening}
-                            autoComplete="name"
-                            onChange={handleTextChange("pemilikRekening")}
-                        />
-                        <FormTextInput
-                            id="bank"
-                            label="Bank"
-                            placeholder="Bank"
-                            value={form.bank}
-                            onChange={handleTextChange("bank")}
-                        />
-                        <FileInputField
-                            id="buktiTransfer"
-                            label="Bukti Transfer (Proof of Payment)"
-                            file={form.file}
-                            onFileChange={handleFileChange}
-                        />
+                    <div className={styles.fieldGroup}>
+                        <FormTextInput id="pemilikRekening" label="Pemilik Rekening (Account Owner)"
+                            placeholder="Pemilik Rekening" value={form.pemilikRekening}
+                            autoComplete="name" onChange={handleTextChange("pemilikRekening")} />
+                        <FormTextInput id="bank" label="Bank" placeholder="Bank"
+                            value={form.bank} onChange={handleTextChange("bank")} />
+                        <FileInputField id="buktiTransfer" label="Bukti Transfer (Proof of Payment)"
+                            file={form.file} onFileChange={(file) => setForm(prev => ({ ...prev, file }))} />
                     </div>
-
-                    <ActionRow isLoading={isLoading} onCancel={handleCancel} />
+                    <ActionRow isLoading={isLoading} onCancel={() => navigate(-1)} />
                 </form>
-
             </div>
-        </div>
+        </main>
     );
 }
+

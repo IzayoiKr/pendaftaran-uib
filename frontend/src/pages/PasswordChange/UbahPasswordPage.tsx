@@ -1,32 +1,30 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import "./UbahPasswordPage.scss";
+import { RightArrowIcon } from "../../components/Icons";
+import styles from "./UbahPasswordPage.module.scss";
 
 interface PasswordForm {
-    oldPassword:     string;
-    newPassword:     string;
+    oldPassword: string;
+    newPassword: string;
     confirmPassword: string;
 }
 
-const FIELDS: {
-    name:        keyof PasswordForm;
-    placeholder: string;
-}[] = [
-    { name: "oldPassword",     placeholder: "Password Lama (Old Password) *" },
-    { name: "newPassword",     placeholder: "Password Baru (New Password) *" },
+const FIELDS: { name: keyof PasswordForm; placeholder: string }[] = [
+    { name: "oldPassword", placeholder: "Password Lama (Old Password) *" },
+    { name: "newPassword", placeholder: "Password Baru (New Password) *" },
     { name: "confirmPassword", placeholder: "Konfirmasi Password Baru (Confirm New Password) *" },
 ];
 
 function PasswordInput({ name, placeholder, value, onChange }: {
-    name:        keyof PasswordForm;
+    name: keyof PasswordForm;
     placeholder: string;
-    value:       string;
-    onChange:    (e: ChangeEvent<HTMLInputElement>) => void;
+    value: string;
+    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
     return (
         <input
             type="password"
+            id={name}
             name={name}
-            className="single-input"
             placeholder={placeholder}
             value={value}
             autoComplete={name === "oldPassword" ? "current-password" : "new-password"}
@@ -37,21 +35,19 @@ function PasswordInput({ name, placeholder, value, onChange }: {
     );
 }
 
-function SubmitButton({ isLoading }: { isLoading: boolean }) {
+function SubmitAction({ isLoading }: { isLoading: boolean }) {
     return (
-        <button type="submit" className="submit-btn" disabled={isLoading} aria-busy={isLoading}>
+        <button type="submit" className={styles.submitBtn} disabled={isLoading} aria-busy={isLoading}>
             {isLoading
-                ? <><div className="spinner" aria-hidden="true" /> Menyimpan...</>
-                : <>Ubah Password &#8594;</>
+                ? <><div className={styles.spinner} aria-hidden="true" /> Menyimpan...</>
+                : <>Ubah Password <RightArrowIcon /></>
             }
         </button>
     );
 }
 
 export default function UbahPasswordPage() {
-    const [form, setForm] = useState<PasswordForm>({
-        oldPassword: "", newPassword: "", confirmPassword: "",
-    });
+    const [form, setForm] = useState<PasswordForm>({ oldPassword: "", newPassword: "", confirmPassword: "" });
     const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -70,25 +66,19 @@ export default function UbahPasswordPage() {
     };
 
     return (
-        <div className="page-content">
-            <div className="ubah-password-box">
-                <h3 className="page-title">Ubah Password (Change Password)</h3>
-                <p className="page-required">* Wajib di Isi (Required)</p>
+        <main className={styles.page}>
+            <div className={styles.container}>
+                <h1>Ubah Password (Change Password)</h1>
+                <p className={styles.required}>* Wajib di Isi (Required)</p>
                 <form onSubmit={handleSubmit} noValidate>
                     {FIELDS.map(f => (
-                        <PasswordInput
-                            key={f.name}
-                            name={f.name}
-                            placeholder={f.placeholder}
-                            value={form[f.name]}
-                            onChange={handleChange}
-                        />
+                        <PasswordInput key={f.name} name={f.name}
+                            placeholder={f.placeholder} value={form[f.name]} onChange={handleChange} />
                     ))}
-                    <div>
-                        <SubmitButton isLoading={isLoading} />
-                    </div>
+                    <SubmitAction isLoading={isLoading} />
                 </form>
             </div>
-        </div>
+        </main>
     );
 }
+
