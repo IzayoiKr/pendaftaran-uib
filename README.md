@@ -39,7 +39,7 @@ cd pendaftaran-uib
 #### A1. Install MySQL locally
 Install MySQL 8 from mysql.com. Then create the database and user:
 ```sql
-CREATE USER 'admin'@'localhost' IDENTIFIED BY 'babualdo';
+CREATE USER 'admin'@'localhost' IDENTIFIED BY '<your-mysql-password-for-admin-user-here>';
 CREATE DATABASE `pendaftaran-uib-db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 GRANT ALL PRIVILEGES ON `pendaftaran-uib-db`.* TO 'admin'@'localhost';
 FLUSH PRIVILEGES;
@@ -50,7 +50,7 @@ FLUSH PRIVILEGES;
 docker run --name mysql-dev \
   -e MYSQL_ROOT_PASSWORD=rootpassword \
   -e MYSQL_USER=admin \
-  -e MYSQL_PASSWORD=babualdo \
+  -e MYSQL_PASSWORD=<your-mysql-password-for-admin-user-here> \
   -e MYSQL_DATABASE=pendaftaran-uib-db \
   -p 3300:3300 \
   -d mysql:8.0 \
@@ -75,9 +75,9 @@ Then open a `mongosh` shell and create the admin user and application database:
 use admin
 
 db.createUser({
-  user: "admin",
-  pwd:  "babualdo",
-  roles: [{ role: "root", db: "admin" }]
+  user: "<your-mongo-root-account-name>",
+  pwd:  "<your-mongo-root-password-here>",
+  roles: [{ role: "root", db: "<your-root-database-here>" }]
 })
 
 // 2. Switch to the application database and create a dedicated user
@@ -85,7 +85,7 @@ use pendaftaran-uib-db
 
 db.createUser({
   user: "admin",
-  pwd:  "babualdo",
+  pwd:  "<your-mongo-admin-password-here>",
   roles: [{ role: "readWrite", db: "pendaftaran-uib-db" }]
 })
 
@@ -94,13 +94,13 @@ show users
 ```
 
 > **Note:** After creating users you should enable authentication in your MongoDB config (`/etc/mongod.conf`) by setting `security.authorization: enabled`, then restart the service.
-> The local backend `.env` uses `MONGO_URI=mongodb://admin:babualdo@localhost:27017` once auth is enabled.
+> The local backend `.env` uses `MONGO_URI=mongodb://admin:<your-mongo-admin-password-here>@localhost:27017` once auth is enabled.
 
 #### A2. Run MongoDB in Docker (easier)
 ```bash
 docker run --name mongo-dev \
   -e MONGO_INITDB_ROOT_USERNAME=admin \
-  -e MONGO_INITDB_ROOT_PASSWORD=babualdo \
+  -e MONGO_INITDB_ROOT_PASSWORD=<your-mongo-admin-password-here> \
   -e MONGO_INITDB_DATABASE=pendaftaran-uib-db \
   -p 27017:27017 \
   -d mongo:7
@@ -113,17 +113,34 @@ cp .env.example .env
 ```
 Edit `.env` if your credentials differ from the defaults:
 ```dotenv
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=admin
-DB_PASSWORD=babualdo
-DB_NAME=pendaftaran-uib-db
+# ─── MySQL ────────────────────────────────────────────────
+MYSQL_ROOT_PASSWORD=your-mysql-root-password
+MYSQL_USER=admin
+MYSQL_PASSWORD=your-mysql-password
+MYSQL_DATABASE=pendaftaran-uib-db
+MYSQL_PORTS="3300:3300"
+MYSQL_PORT=3300
 
-MONGO_URI=mongodb://admin:babualdo@localhost:27017
-MONGO_DB=pendaftaran-uib-db
+# ─── MongoDB ────────────────────────────────────────────────
+MONGO_USER=admin
+MONGO_PASSWORD=your-mongo-password
+MONGO_DATABASE=pendaftaran-uib-db
+MONGO_PORTS="27000:27000"
+MONGO_PORT=27000
 
+# ─── Backend ────────────────────────────────────────────────
+# Generate with: openssl rand -base64 32
 JWT_SECRET=your-very-secret-key-change-this
+CORS_ORIGIN=http://localhost:8989
+TURNSTILE_SECRET=your_secret_key_here
+APP_ENV=development
 SERVER_PORT=9999
+BACKEND_PORTS="9999:9999"
+
+# ─── Frontend ─────────────────────────────────────────────
+FRONTEND_PORTS="8989:8989"
+VITE_TURNSTILE_SITE_KEY=your_site_key_here
+APP_ENV=development
 ```
 
 Generate a secure `JWT_SECRET`:
@@ -142,7 +159,7 @@ go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
 migrate \
   -path migrations \
-  -database "mysql://admin:babualdo@tcp(localhost:3300)/pendaftaran-uib-db" \
+  -database "mysql://admin:<your-mysql-password-here>@tcp(localhost:3300)/pendaftaran-uib-db" \
   up
 ```
 
@@ -197,7 +214,7 @@ newgrp docker
 # From the project root
 cp .env.example .env
 ```
-Edit `.env` and set a strong `JWT_SECRET`.
+Edit `.env` and set a strong sql password, `JWT_SECRET`, and add turnstile both keys from cloudflare.
 
 ### 3. Build and start
 ```bash
