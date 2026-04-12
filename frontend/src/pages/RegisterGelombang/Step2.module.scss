@@ -5,7 +5,7 @@
 .container {
   display: flex;
   justify-content: center;
-  padding: var(--space-2xl) 1rem;
+  padding: var(--space-2xl) 1rem; // FIX: sebelumnya var(--space-2xl (terlalu jauh))
   
   @media (max-width: map.get(global.$breakpoints, 'md')) {
     padding: var(--space-s) 0;
@@ -27,10 +27,10 @@
 /* ================= HEADER ================= */
 .header {
   text-align: center;
-  margin-bottom: 0;
+  margin-bottom: var(--space-m); // FIX: sebelumnya 0 (terlalu nempel)
   
   @media (max-width: map.get(global.$breakpoints, 'md')) {
-    margin-bottom: var(--space-l);
+    margin-bottom: var(--space-m); // FIX: sebelumnya var(--space-l (terlalu jauh))
   }
 }
 
@@ -57,7 +57,7 @@
   font-size: var(--step-1);
   font-weight: 600;
   color: #333;
-  margin: var(--space-l) 0 var(--space-m) 0;
+  margin: var(--space-m) 0 var(--space-s) 0; // FIX: sebelumnya space-l / space-m (terlalu besar)
   display: block;
 }
 
@@ -65,13 +65,13 @@
   font-size: var(--step-1);
   font-weight: 600;
   color: #0b3c5d;
-  margin: var(--space-l) 0 var(--space-m) 0;
+  margin: var(--space-m) 0 var(--space-s) 0; // FIX: sebelumnya space-l / space-m
   padding-bottom: var(--space-xs);
 }
 
 /* ================= STATUS SECTION ================= */
 .statusSection {
-  margin-bottom: var(--space-l);
+  margin-bottom: var(--space-m); // FIX: sebelumnya var(--space-l)
 }
 
 .infoBox {
@@ -79,7 +79,7 @@
   border: 1px solid #ddd;
   border-radius: 0.4rem;
   padding: var(--space-m);
-  margin-bottom: var(--space-l);
+  margin-bottom: var(--space-m); // FIX: sebelumnya var(--space-l)
   
   @media (max-width: map.get(global.$breakpoints, 'sm')) {
     padding: var(--space-s);
@@ -89,7 +89,7 @@
 .statusItem {
   display: flex;
   flex-direction: column;
-  margin-bottom: var(--space-s);
+  margin-bottom: var(--space-xs); // FIX: sebelumnya var(--space-s (terlalu renggang))
   
   strong {
     font-size: var(--step--1);
@@ -111,17 +111,17 @@
 .requiredNote {
   font-size: var(--step--1);
   color: #666;
-  margin: var(--space-m) 0 0 0;
+  margin: var(--space-2xs) 0; // FIX: kecil & seimbang
 }
 
 /* ================= DOCUMENT SECTIONS ================= */
 .documentsSection {
-  margin-bottom: var(--space-l);
+  margin-bottom: var(--space-m); // FIX: sebelumnya 0.75rem (tidak konsisten)
 }
 
 .transferSection {
   margin-bottom: var(--space-l);
-  padding: var(--space-l);
+  padding: var(--space-m); // FIX: sebelumnya var(--space-l (terlalu dalam))
   background-color: #f0f9ff;
   border-left: 4px solid #3b82f6;
   border-radius: 0.4rem;
@@ -129,7 +129,7 @@
 
 /* ================= PAYMENT SECTION ================= */
 .paymentSection {
-  margin-bottom: var(--space-l);
+  margin-bottom: var(--space-m); // FIX: sebelumnya var(--space-l)
 }
 
 .paymentInfo {
@@ -154,7 +154,7 @@
 .fileBox {
   display: flex;
   flex-direction: column;
-  gap: var(--space-s);
+  gap: var(--space-xs); // FIX: dari xs → lebih rapat
 }
 
 .fileInputWrapper {
@@ -212,8 +212,8 @@
 .uploadedDoc {
   font-size: var(--step--2);
   color: #666;
-  margin: 0;
-  padding: var(--space-2xs) 0;
+  margin-top: 0; // FIX: hilangkan jarak tambahan
+  padding: 0;    // FIX: hilangkan padding atas
   
   span {
     font-weight: 600;
@@ -224,12 +224,12 @@
 /* ================= GRID ================= */
 .row {
   display: flex;
-  gap: var(--space-s);
-  margin-bottom: var(--space-m);
+  gap: var(--space-xs);
+  margin-bottom: var(--space-s); // FIX: sebelumnya 0.5rem (disamakan system)
   
   @media (max-width: map.get(global.$breakpoints, 'sm')) {
     flex-direction: column;
-    gap: 0;
+    gap: var(--space-2xs); // FIX: sebelumnya 0 (terlalu nempel)
   }
 }
 
@@ -241,7 +241,7 @@
 .note {
   font-size: var(--step--2);
   color: #666;
-  margin-top: var(--space-s);
+  margin-top: var(--space-xs); // FIX: sebelumnya var(--space-s)
   padding: var(--space-s);
   background-color: #fef3c7;
   border-left: 3px solid #f59e0b;

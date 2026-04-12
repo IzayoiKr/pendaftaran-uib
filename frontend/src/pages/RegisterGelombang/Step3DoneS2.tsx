@@ -64,17 +64,33 @@ export default function Step3DoneS2({
             <span>Program</span>
             <strong>{formData.prodi || "-"}</strong>
           </div>
+          <div className={styles.summaryItem}>
+            <span>Nama Ayah</span>
+            <strong>{formData.nama_ayah || "-"}</strong>
+          </div>
+          <div className={styles.summaryItem}>
+            <span>Nama Ibu</span>
+            <strong>{formData.nama_ibu || "-"}</strong>
+          </div>
         </div>
 
         {/* ================= STATUS DOKUMEN ================= */}
         <h3 className={styles.sectionTitle}>Dokumen</h3>
 
         <div className={styles.summaryBox}>
-          {["pp", "ktp", "kk", "buktibayar"].map((doc) => (
-            <div key={doc} className={styles.summaryItem}>
-              <span>{doc.toUpperCase()}</span>
+          {[
+            { key: "pp", label: "Pas Photo (PP)" },
+            { key: "ktp", label: "Kartu Tanda Penduduk (KTP)" },
+            { key: "kk", label: "Kartu Keluarga (KK)" },
+            { key: "al", label: "Akta Lahir (AL)" },
+            { key: "r1", label: "Ijazah Sarjana (R1)" },
+            { key: "r4", label: "Transkrip Nilai Sarjana (R4)" },
+            { key: "buktibayar", label: "Bukti Pembayaran (Bukti Bayar)" },
+          ].map(({ key, label }) => (
+            <div key={key} className={styles.summaryItem}>
+              <span>{label}</span>
               <strong>
-                {formData[doc] ? "✔ Sudah Upload" : "❌ Belum"}
+                {formData[key] ? "✔ Sudah Upload" : "❌ Belum"}
               </strong>
             </div>
           ))}

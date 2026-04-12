@@ -1,57 +1,84 @@
-import { useState } from "react";
-import { schools } from "../constants/data";
+import { useState, useCallback } from "react";
+import axios from "axios";
 
 const NOT_FOUND_OPTION = "Sekolah tidak ditemukan";
-
-// School search works purely from the local list in constants/data.ts.
-// There is no free global school API available.
-// Strategy:
-//   - Show matching schools from the local list as suggestions
-//   - Always show "Sekolah tidak ditemukan" as last option
-//   - If selected, save whatever the user typed as the value
-//   - The input itself is always free-text so users can type any school name
+const API_BASE = "/school-api";  // ✅ Use proxy instead of direct URL
 
 export default function useSchoolSearch(
   formData: any,
   setFormData: (data: any) => void
 ) {
-  const [query, setQuery] = useState("");
-  const [open, setOpen]   = useState(false);
+  const [query, setQuery] = useState(formData.asal_sekolah || "");
+  const [open, setOpen] = useState(false);
+  const [filtered, setFiltered] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const localMatches = query.trim().length > 0
-    ? schools.filter((s) => s.toLowerCase().includes(query.toLowerCase()))
-    : [];
+  const searchSchools = useCallback(
+    async (searchQuery: string) => {
+      if (searchQuery.trim().length < 2) {
+        setFiltered([]);
+        return;
+      }
 
-  // Always append tidak ditemukan so user can confirm their school isn't listed
-  const filtered = query.trim().length > 0
-    ? [...localMatches, NOT_FOUND_OPTION]
-    : [];
+      setLoading(true);
+      try {
+        const response = await axios.get(`${API_BASE}/sekolah`, {
+          params: {
+            sekolah: searchQuery,
+            page: 1,
+            perPage: 50,
+          },
+          timeout: 5000,
+        });
 
-  const selectSchool = (name: string) => {
-    if (name === NOT_FOUND_OPTION) {
-      // Save the raw text the user typed — not the "tidak ditemukan" string
-      setFormData({ ...formData, asal_sekolah: query });
-      setOpen(false);
-      return;
-    }
-    setQuery(name);
-    setFormData({ ...formData, asal_sekolah: name });
-    setOpen(false);
-  };
+        const schools = response.data?.dataSekolah || [];
+                // ✅ FIX: langsung mapping saja
+        const filtered_schools = Array.isArray(schools)
+          ? schools.map((s: any) => s.sekolah)
+          : [];
 
-  // Also save on every keystroke so free-typed school names are captured
-  // even if the user never picks from the dropdown
+        setFiltered([...filtered_schools, NOT_FOUND_OPTION]);
+      } catch (error) {
+        console.error("School search error:", error);
+        setFiltered([NOT_FOUND_OPTION]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
   const handleQueryChange = (value: string) => {
     setQuery(value);
     setFormData({ ...formData, asal_sekolah: value });
+
+    if (value.trim().length >= 2) {
+      searchSchools(value);
+    } else {
+      setFiltered([]);
+    }
+  };
+
+  const selectSchool = (name: string) => {
+    if (name === NOT_FOUND_OPTION) {
+      setFormData({ ...formData, asal_sekolah: query });
+      setQuery(query);
+      setOpen(false);
+      return;
+    }
+
+    setFormData({ ...formData, asal_sekolah: name });
+    setQuery(name);
+    setOpen(false);
   };
 
   return {
     query,
-    setQuery: handleQueryChange,  // replaces bare setQuery — saves on every keystroke
+    setQuery: handleQueryChange,
     open,
     setOpen,
     filtered,
+    loading,
     selectSchool,
   };
 }

@@ -19,6 +19,33 @@ const S2_STEPS = [
   { label: "SELESAI",          sub: "DONE" },
 ];
 
+// ✅ STRICT VALIDATION — same as Step1S1
+const validateField = (value: any): boolean => {
+  if (value === null || value === undefined) return false;
+  if (typeof value === "string" && value.trim() === "") return false;
+  if (typeof value === "boolean" && !value) return false;
+  if (typeof value === "number" && value === 0) return false;
+  return true;
+};
+
+const validateEmailFormat = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const validateNIK = (nik: string): boolean => {
+  return /^\d{16}$/.test(nik);
+};
+
+const validatePhoneNumber = (phone: string): boolean => {
+  return /^\d{8,}$/.test(phone);
+};
+
+const validateIPK = (ipk: string): boolean => {
+  const ipkNum = parseFloat(ipk);
+  return !isNaN(ipkNum) && ipkNum >= 0 && ipkNum <= 4;
+};
+
 export default function Step1S2({
   formData,
   setFormData,
@@ -27,7 +54,7 @@ export default function Step1S2({
   currentStep,
 }: Props) {
   const { queryUni, setQueryUni, openUni, setOpenUni, filteredUni, loading, selectUniversity } =
-  useUniversitySearch(formData, setFormData);  // ← add formData
+    useUniversitySearch(formData, setFormData);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -37,12 +64,47 @@ export default function Step1S2({
   };
 
   const handleNext = () => {
-    const required = ["nik", "nama", "email", "nohp"];
-    const missing = required.filter((f) => !formData[f]);
+    // ✅ ALL required fields for S2 biodata
+    const required = [
+      "nik",
+      "nama",
+      "jk",
+      "kewarganegaraan",
+      "tempatlahir",
+      "tanggallahir",
+      "email",
+      "nohp",
+      "prodi",
+    ];
+
+    const missing = required.filter((f) => !validateField(formData[f]));
+
     if (missing.length > 0) {
-      alert(`Field wajib belum diisi: ${missing.join(", ")}`);
+      alert(`❌ Field wajib belum diisi:\n\n${missing.join("\n")}`);
       return;
     }
+
+    // ✅ Format validations
+    if (!validateNIK(formData.nik)) {
+      alert("❌ NIK harus berupa angka dan tepat 16 digit.");
+      return;
+    }
+
+    if (!validateEmailFormat(formData.email)) {
+      alert("❌ Email tidak valid. Gunakan format: nama@email.com");
+      return;
+    }
+
+    if (!validatePhoneNumber(formData.nohp)) {
+      alert("❌ No. Telepon harus berupa angka dan minimal 8 digit.");
+      return;
+    }
+
+    if (validateField(formData.ipk) && !validateIPK(formData.ipk)) {
+      alert("❌ IPK harus berupa angka desimal antara 0 dan 4 (contoh: 3.45).");
+      return;
+    }
+
     next();
   };
 
@@ -62,14 +124,14 @@ export default function Step1S2({
 
         {/* NIK */}
         <div className={form.formGroup}>
-          <label className={form.label}>NIK (National Identification Number) *</label>
-          <input className={form.input} name="nik" value={formData.nik || ""} onChange={handleChange} />
+          <label className={form.label}>NIK (National Identification Number) * (16 digit)</label>
+          <input className={form.input} name="nik" value={formData.nik || ""} onChange={handleChange} placeholder="Contoh: 1234567890123456" />
         </div>
 
         {/* NAMA */}
         <div className={form.formGroup}>
           <label className={form.label}>Nama Lengkap (Full Name) *</label>
-          <input className={form.input} name="nama" value={formData.nama || ""} onChange={handleChange} />
+          <input className={form.input} name="nama" value={formData.nama || ""} onChange={handleChange} placeholder="Masukkan nama lengkap Anda" />
         </div>
 
         {/* JENIS KELAMIN */}
@@ -77,7 +139,7 @@ export default function Step1S2({
           <label className={form.label}>Jenis Kelamin (Gender) *</label>
           <div className={form.selectWrapper}>
             <select className={form.select} name="jk" value={formData.jk || ""} onChange={handleChange}>
-              <option value="">Jenis Kelamin (Gender) *</option>
+              <option value="">Pilih Jenis Kelamin (Select Gender) *</option>
               <option value="l">Laki - Laki (Male)</option>
               <option value="p">Perempuan (Female)</option>
             </select>
@@ -89,7 +151,7 @@ export default function Step1S2({
           <label className={form.label}>Kewarganegaraan (Nationality) *</label>
           <div className={form.selectWrapper}>
             <select className={form.select} name="kewarganegaraan" value={formData.kewarganegaraan || ""} onChange={handleChange}>
-              <option value="">Kewarganegaraan (Nationality) *</option>
+              <option value="">Pilih Kewarganegaraan (Select Nationality) *</option>
               <option value="1">WNI</option>
               <option value="2">WNA</option>
               <option value="3">TIDAK ADA WN</option>
@@ -101,7 +163,7 @@ export default function Step1S2({
         <div className={form.row}>
           <div className={form.col}>
             <label className={form.label}>Tempat Lahir (Place of Birth) *</label>
-            <input className={form.input} name="tempatlahir" value={formData.tempatlahir || ""} onChange={handleChange} />
+            <input className={form.input} name="tempatlahir" value={formData.tempatlahir || ""} onChange={handleChange} placeholder="Masukkan kota kelahiran" />
           </div>
           <div className={form.col}>
             <label className={form.label}>Tanggal Lahir (Date of Birth) *</label>
@@ -118,13 +180,13 @@ export default function Step1S2({
         {/* EMAIL */}
         <div className={form.formGroup}>
           <label className={form.label}>Email *</label>
-          <input className={form.input} type="email" name="email" value={formData.email || ""} onChange={handleChange} />
+          <input className={form.input} type="email" name="email" value={formData.email || ""} onChange={handleChange} placeholder="Contoh: nama@email.com" />
         </div>
 
         {/* NO HP */}
         <div className={form.formGroup}>
           <label className={form.label}>No. Telepon (Phone Number) *</label>
-          <input className={form.input} name="nohp" value={formData.nohp || ""} onChange={handleChange} />
+          <input className={form.input} name="nohp" value={formData.nohp || ""} onChange={handleChange} placeholder="Contoh: 08123456789" />
         </div>
 
         {/* AGAMA */}
@@ -132,7 +194,7 @@ export default function Step1S2({
           <label className={form.label}>Agama (Religion) *</label>
           <div className={form.selectWrapper}>
             <select className={form.select} name="agama" value={formData.agama || ""} onChange={handleChange}>
-              <option value="">Agama (Religion) *</option>
+              <option value="">Pilih Agama (Select Religion) *</option>
               <option value="5">BUDDHA</option>
               <option value="4">HINDU</option>
               <option value="1">ISLAM</option>
@@ -250,17 +312,17 @@ export default function Step1S2({
         </div>
 
         <div className={form.formGroup}>
-          <label className={form.label}>Jurusan (Major) *</label>
+          <label className={form.label}>Jurusan (Major)</label>
           <input className={form.input} name="jurusan" value={formData.jurusan || ""} onChange={handleChange} />
         </div>
 
         <div className={form.formGroup}>
-          <label className={form.label}>IPK (GPA) *</label>
-          <input className={form.input} type="number" max={4} step="0.01" name="ipk" value={formData.ipk || ""} onChange={handleChange} />
+          <label className={form.label}>IPK (GPA) (0.00 - 4.00)</label>
+          <input className={form.input} type="number" max={4} min={0} step="0.01" name="ipk" value={formData.ipk || ""} onChange={handleChange} placeholder="Contoh: 3.45" />
         </div>
 
         <div className={form.formGroup}>
-          <label className={form.label}>Gelar (Degree) *</label>
+          <label className={form.label}>Gelar (Degree)</label>
           <input className={form.input} name="gelar" value={formData.gelar || ""} onChange={handleChange} />
         </div>
 
@@ -312,10 +374,10 @@ export default function Step1S2({
         <h3 className={styles.sectionTitle}>Informasi Perkuliahan (Post-graduate Program)</h3>
 
         <div className={form.formGroup}>
-          <label className={form.label}>Program Studi Pilihan (Selected Study Program)</label>
+          <label className={form.label}>Program Studi Pilihan (Selected Study Program) *</label>
           <div className={form.selectWrapper}>
             <select className={form.select} name="prodi" value={formData.prodi || ""} onChange={handleChange}>
-              <option value="">Program Studi Pilihan (Selected Study Program)</option>
+              <option value="">Pilih Program Studi (Select Study Program) *</option>
               {PRODI_S2_OPTIONS.map((p) => (
                 <option key={p.value} value={p.value}>{p.label}</option>
               ))}

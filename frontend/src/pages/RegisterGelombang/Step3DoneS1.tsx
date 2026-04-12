@@ -69,11 +69,22 @@ export default function Step3DoneS1({
         <h3 className={styles.sectionTitle}>Dokumen</h3>
 
         <div className={styles.summaryBox}>
-          {["pp", "ktp", "kk", "buktibayar"].map((doc) => (
-            <div key={doc} className={styles.summaryItem}>
-              <span>{doc.toUpperCase()}</span>
+          {[
+            { key: "pp", label: "Pas Photo (PP)" },
+            { key: "ktp", label: "Kartu Tanda Penduduk / SIM / Passport (KTP)" },
+            { key: "kk", label: "Kartu Keluarga (KK)" },
+            { key: "buktibayar", label: "Bukti Pembayaran (Bukti Bayar)" },
+            ...(formData.jenisdaftar === "alihjenjang" || formData.jenisdaftar === "transfer"
+              ? [
+                  { key: "transkrip_nilai", label: "Transkrip Nilai (Transcript)" },
+                  { key: "ijazah_dok", label: "Ijazah (Diploma)" },
+                ]
+              : []),
+          ].map(({ key, label }) => (
+            <div key={key} className={styles.summaryItem}>
+              <span>{label}</span>
               <strong>
-                {formData[doc] ? "✔ Sudah Upload" : "❌ Belum"}
+                {formData[key] ? "✔ Sudah Upload" : "❌ Belum"}
               </strong>
             </div>
           ))}

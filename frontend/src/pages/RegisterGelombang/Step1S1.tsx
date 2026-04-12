@@ -20,6 +20,33 @@ const S1_STEPS = [
   { label: "SELESAI",      sub: "DONE" },
 ];
 
+// ✅ STRICT VALIDATION
+const validateField = (value: any): boolean => {
+  if (value === null || value === undefined) return false;
+  if (typeof value === "string" && value.trim() === "") return false;
+  if (typeof value === "boolean" && !value) return false;
+  if (typeof value === "number" && value === 0) return false;
+  return true;
+};
+
+const validateEmailFormat = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const validateNIK = (nik: string): boolean => {
+  return /^\d{16}$/.test(nik);
+};
+
+const validatePhoneNumber = (phone: string): boolean => {
+  return /^\d+$/.test(phone) && phone.length >= 10;
+};
+
+const validateIPK = (ipk: string): boolean => {
+  const ipkNum = parseFloat(ipk);
+  return !isNaN(ipkNum) && ipkNum >= 0 && ipkNum <= 4;
+};
+
 export default function Step1S1({
   formData,
   setFormData,
@@ -38,20 +65,88 @@ export default function Step1S1({
   };
 
   const handleNext = () => {
-    const required = ["nik", "email", "nama", "nohp"];
-    const missing = required.filter((f) => !formData[f]);
+    const required = [
+      "nik",
+      "email",
+      "nama",
+      "jk",
+      "kewarganegaraan",
+      "tempatlahir",
+      "tanggallahir",
+      "nohp",
+      "nohp2",
+      "jenisdaftar",
+      "universitas",
+      "prodipil",
+      "waktukuliah",
+      "asal_sekolah",
+    ];
+
+    if (jenisDaftar === "baru") {
+      required.push("konfirmasi");
+    }
+
+    if (jenisDaftar === "alihjenjang" || jenisDaftar === "transfer") {
+      required.push("universitas_asal", "prodi_asal", "ipk", "jenjang_pendidikan");
+    }
+
+    // ✅ STRICT — checks truly filled
+    const missing = required.filter((f) => !validateField(formData[f]));
+
     if (missing.length > 0) {
-      alert(`Field wajib belum diisi: ${missing.join(", ")}`);
+      alert(`❌ Field wajib belum diisi:\n\n${missing.join("\n")}`);
       return;
     }
+
+    if (!validateEmailFormat(formData.email)) {
+      alert("❌ Email tidak valid. Silakan gunakan format yang benar (contoh: nama@email.com)");
+      return;
+    }
+
+    if (!validateNIK(formData.nik)) {
+      alert("❌ NIK harus berupa angka dan tepat 16 digit.");
+      return;
+    }
+
+    if (!validatePhoneNumber(formData.nohp)) {
+      alert("❌ No. HP harus berupa angka dan minimal 10 digit.");
+      return;
+    }
+
+    if (!validatePhoneNumber(formData.nohp2)) {
+      alert("❌ No. WA harus berupa angka dan minimal 10 digit.");
+      return;
+    }
+
+    if (jenisDaftar === "alihjenjang" || jenisDaftar === "transfer") {
+      if (!validateIPK(formData.ipk)) {
+        alert("❌ IPK harus berupa angka desimal antara 0 dan 4 (contoh: 3.45)");
+        return;
+      }
+    }
+
     next();
   };
 
-  const { query, setQuery, open, setOpen, filtered, selectSchool } =
-  useSchoolSearch(formData, setFormData);  // ← add formData
+  // ✅ NEW hook signatures — (formData, setFormData)
+  const {
+    query,
+    setQuery,
+    open,
+    setOpen,
+    filtered,
+    selectSchool,
+  } = useSchoolSearch(formData, setFormData);
 
-  const { queryUni, setQueryUni, openUni, setOpenUni, filteredUni, loading, selectUniversity } =
-  useUniversitySearch(formData, setFormData);  // ← add formData
+  const {
+    queryUni,
+    setQueryUni,
+    openUni,
+    setOpenUni,
+    filteredUni,
+    loading: loadingUni,
+    selectUniversity,
+  } = useUniversitySearch(formData, setFormData);
 
   const isAlihjenjangOrTransfer =
     jenisDaftar === "alihjenjang" || jenisDaftar === "transfer";
@@ -74,20 +169,45 @@ export default function Step1S1({
 
         {/* NIK */}
         <div className={form.formGroup}>
-          <label className={form.label}>NIK (National Identification Number) *</label>
-          <input className={form.input} name="nik" value={formData.nik || ""} onChange={handleChange} />
+          <label className={form.label}>NIK (National Identification Number) * (16 digit)</label>
+          <input
+            type="text"
+            className={form.input}
+            name="nik"
+            value={formData.nik || ""}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, "").slice(0, 16);
+              setFormData({ ...formData, nik: value });
+            }}
+            inputMode="numeric"
+            maxLength={16}
+            placeholder="Contoh: 1234567890123456"
+          />
         </div>
 
         {/* EMAIL */}
         <div className={form.formGroup}>
           <label className={form.label}>Email *</label>
-          <input className={form.input} type="email" name="email" value={formData.email || ""} onChange={handleChange} />
+          <input
+            className={form.input}
+            type="email"
+            name="email"
+            value={formData.email || ""}
+            onChange={handleChange}
+            placeholder="Contoh: nama@email.com"
+          />
         </div>
 
         {/* NAMA */}
         <div className={form.formGroup}>
           <label className={form.label}>Nama Lengkap (Full Name) *</label>
-          <input className={form.input} name="nama" value={formData.nama || ""} onChange={handleChange} />
+          <input
+            className={form.input}
+            name="nama"
+            value={formData.nama || ""}
+            onChange={handleChange}
+            placeholder="Masukkan nama lengkap Anda"
+          />
         </div>
 
         {/* JENIS KELAMIN */}
@@ -95,7 +215,7 @@ export default function Step1S1({
           <label className={form.label}>Jenis Kelamin (Gender) *</label>
           <div className={form.selectWrapper}>
             <select className={form.select} name="jk" value={formData.jk || ""} onChange={handleChange}>
-              <option value="">Jenis Kelamin (Gender) *</option>
+              <option value="">Pilih Jenis Kelamin (Select Gender) *</option>
               <option value="l">Laki - Laki (Male)</option>
               <option value="p">Perempuan (Female)</option>
             </select>
@@ -107,7 +227,7 @@ export default function Step1S1({
           <label className={form.label}>Kewarganegaraan (Nationality) *</label>
           <div className={form.selectWrapper}>
             <select className={form.select} name="kewarganegaraan" value={formData.kewarganegaraan || ""} onChange={handleChange}>
-              <option value="">Kewarganegaraan (Nationality) *</option>
+              <option value="">Pilih Kewarganegaraan (Select Nationality) *</option>
               <option value="1">WNI</option>
               <option value="2">WNA</option>
               <option value="3">TIDAK ADA WN</option>
@@ -119,7 +239,13 @@ export default function Step1S1({
         <div className={form.row}>
           <div className={form.col}>
             <label className={form.label}>Tempat Lahir (Place of Birth) *</label>
-            <input className={form.input} name="tempatlahir" value={formData.tempatlahir || ""} onChange={handleChange} />
+            <input
+              className={form.input}
+              name="tempatlahir"
+              value={formData.tempatlahir || ""}
+              onChange={handleChange}
+              placeholder="Masukkan kota kelahiran"
+            />
           </div>
           <div className={form.col}>
             <label className={form.label}>Tanggal Lahir (Date of Birth) *</label>
@@ -137,13 +263,27 @@ export default function Step1S1({
         {/* NO HP */}
         <div className={form.formGroup}>
           <label className={form.label}>No. Hp (First Phone Number) *</label>
-          <input className={form.input} type="number" name="nohp" value={formData.nohp || ""} onChange={handleChange} />
+          <input
+            className={form.input}
+            type="number"
+            name="nohp"
+            value={formData.nohp || ""}
+            onChange={handleChange}
+            placeholder="Contoh: 08123456789"
+          />
         </div>
 
         {/* NO WA */}
         <div className={form.formGroup}>
           <label className={form.label}>No. WA (WhatsApp Number) *</label>
-          <input className={form.input} type="number" name="nohp2" value={formData.nohp2 || ""} onChange={handleChange} />
+          <input
+            className={form.input}
+            type="number"
+            name="nohp2"
+            value={formData.nohp2 || ""}
+            onChange={handleChange}
+            placeholder="Contoh: 08123456789"
+          />
         </div>
 
         {/* JENIS PENDAFTARAN */}
@@ -153,38 +293,106 @@ export default function Step1S1({
             <select
               className={form.select}
               name="jenisdaftar"
-              value={formData.jenisdaftar || ""}
+              value={jenisDaftar}
               onChange={(e) => {
-                setJenisDaftar(e.target.value);
                 handleChange(e);
+                setJenisDaftar(e.target.value);
               }}
             >
-              <option value="">Jenis Pendaftaran (Registration Type) *</option>
-              <option value="baru">Mahasiswa Baru (New Student)</option>
-              <option value="alihjenjang">Alih Jenjang (Level Transfer)</option>
-              <option value="transfer">Pindahan (Transfer)</option>
+              <option value="">Pilih Jenis Pendaftaran (Select Registration Type) *</option>
+              <option value="baru">Baru (Newly Registered)</option>
+              <option value="alihjenjang">Alih Jenjang (Change Level)</option>
+              <option value="transfer">Transfer</option>
             </select>
           </div>
         </div>
 
-        {/* TRANSFER / ALIH JENJANG — extra fields */}
+        {/* DATA PENDIDIKAN SEBELUMNYA — hanya muncul jika Alih Jenjang atau Transfer */}
         {isAlihjenjangOrTransfer && (
           <div className={form.extraBox}>
+            <h3>Data Pendidikan Sebelumnya (Previous Education Data)</h3>
+
+            {/* UNIVERSITAS ASAL — uses university search hook */}
             <div className={form.formGroup}>
-              <label className={form.label}>Asal Universitas (Former University) *</label>
-              <input className={form.input} name="univ_asal" value={formData.univ_asal || ""} onChange={handleChange} />
+              <label className={form.label}>Universitas Asal (Last University) *</label>
+              <div className={form.selectWrapper}>
+                <input
+                  className={form.input}
+                  name="universitas_asal"
+                  value={queryUni}
+                  placeholder="Ketik nama universitas (min. 2 huruf)..."
+                  autoComplete="off"
+                  onFocus={() => setOpenUni(true)}
+                  onBlur={() => setTimeout(() => setOpenUni(false), 150)}
+                  onChange={(e) => {
+                    setQueryUni(e.target.value);
+                    setFormData({ ...formData, universitas_asal: e.target.value });
+                  }}
+                />
+                {openUni && queryUni.trim().length >= 2 && (
+                  <div className={form.dropdown}>
+                    {loadingUni ? (
+                      <div className={form.notFound}>Mencari universitas...</div>
+                    ) : (
+                      filteredUni.map((u, i) => {
+                        const isNotFound = u === "Universitas tidak ditemukan";
+                        return (
+                          <div
+                            key={i}
+                            className={`${form.option} ${isNotFound ? form.optionNotFound : ""}`}
+                            onMouseDown={() => {
+                              selectUniversity(u);
+                              setFormData({ ...formData, universitas_asal: u });
+                            }}
+                          >
+                            {isNotFound ? "⚠ Universitas tidak ditemukan" : u}
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
+
+            {/* ASAL PROGRAM STUDI */}
             <div className={form.formGroup}>
               <label className={form.label}>Asal Program Studi (Last Study Program) *</label>
-              <input className={form.input} name="prodi_asal" value={formData.prodi_asal || ""} onChange={handleChange} />
+              <input
+                className={form.input}
+                name="prodi_asal"
+                value={formData.prodi_asal || ""}
+                onChange={handleChange}
+                placeholder="Masukkan nama program studi"
+              />
             </div>
+
+            {/* IPK */}
             <div className={form.formGroup}>
-              <label className={form.label}>IPK (GPA) *</label>
-              <input className={form.input} type="number" step="0.01" max={4} name="ipk" value={formData.ipk || ""} onChange={handleChange} />
+              <label className={form.label}>IPK (GPA) * (0.00 - 4.00)</label>
+              <input
+                className={form.input}
+                type="number"
+                step="0.01"
+                min={0}
+                max={4}
+                name="ipk"
+                value={formData.ipk || ""}
+                onChange={handleChange}
+                placeholder="Contoh: 3.45"
+              />
             </div>
+
+            {/* JENJANG PENDIDIKAN TERAKHIR */}
             <div className={form.formGroup}>
               <label className={form.label}>Jenjang Pendidikan Terakhir (Last Education Level) *</label>
-              <input className={form.input} name="jenjang_pendidikan" value={formData.jenjang_pendidikan || ""} onChange={handleChange} />
+              <input
+                className={form.input}
+                name="jenjang_pendidikan"
+                value={formData.jenjang_pendidikan || ""}
+                onChange={handleChange}
+                placeholder="Contoh: S1"
+              />
             </div>
           </div>
         )}
@@ -208,7 +416,7 @@ export default function Step1S1({
             />
             {openUni && queryUni.trim().length >= 2 && (
               <div className={form.dropdown}>
-                {loading ? (
+                {loadingUni ? (
                   <div className={form.notFound}>Mencari universitas...</div>
                 ) : (
                   filteredUni.map((u, i) => {
@@ -229,30 +437,51 @@ export default function Step1S1({
           </div>
         </div>
 
-        {/* PROGRAM STUDI PILIHAN 1, 2, 3 */}
-        {(["prodipil", "prodipil2", "prodipil3"] as const).map((name, idx) => (
-          <div className={form.formGroup} key={name}>
-            <label className={form.label}>
-              Program Studi Pilihan {idx > 0 ? idx + 1 : ""}{" "}
-              ({["First", "Second", "Third"][idx]} Selected Study Program){idx === 0 ? " *" : ""}
-            </label>
-            <div className={form.selectWrapper}>
-              <select className={form.select} name={name} value={formData[name] || ""} onChange={handleChange}>
-                <option value="">Program Studi Pilihan {idx > 0 ? idx + 1 : ""}</option>
-                {PRODI_S1_OPTIONS.map((p) => (
-                  <option key={p.value} value={p.value}>{p.label}</option>
-                ))}
-              </select>
-            </div>
+        {/* PROGRAM STUDI PILIHAN 1 */}
+        <div className={form.formGroup}>
+          <label className={form.label}>Program Studi Pilihan (First Selected Study Program) *</label>
+          <div className={form.selectWrapper}>
+            <select className={form.select} name="prodipil" value={formData.prodipil || ""} onChange={handleChange}>
+              <option value="">Pilih Program Studi Pilihan *</option>
+              {PRODI_S1_OPTIONS.map((p) => (
+                <option key={p.value} value={p.value}>{p.label}</option>
+              ))}
+            </select>
           </div>
-        ))}
+        </div>
+
+        {/* PROGRAM STUDI PILIHAN 2 */}
+        <div className={form.formGroup}>
+          <label className={form.label}>Program Studi Pilihan 2 (Second Selected Study Program)</label>
+          <div className={form.selectWrapper}>
+            <select className={form.select} name="prodipil2" value={formData.prodipil2 || ""} onChange={handleChange}>
+              <option value="">Pilih Program Studi Pilihan 2</option>
+              {PRODI_S1_OPTIONS.map((p) => (
+                <option key={p.value} value={p.value}>{p.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* PROGRAM STUDI PILIHAN 3 */}
+        <div className={form.formGroup}>
+          <label className={form.label}>Program Studi Pilihan 3 (Third Selected Study Program)</label>
+          <div className={form.selectWrapper}>
+            <select className={form.select} name="prodipil3" value={formData.prodipil3 || ""} onChange={handleChange}>
+              <option value="">Pilih Program Studi Pilihan 3</option>
+              {PRODI_S1_OPTIONS.map((p) => (
+                <option key={p.value} value={p.value}>{p.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
 
         {/* WAKTU KULIAH */}
         <div className={form.formGroup}>
           <label className={form.label}>Waktu Kuliah (Shift) *</label>
           <div className={form.selectWrapper}>
             <select className={form.select} name="waktukuliah" value={formData.waktukuliah || ""} onChange={handleChange}>
-              <option value="">Waktu Kuliah (Shift) *</option>
+              <option value="">Pilih Waktu Kuliah (Select Shift) *</option>
               <option value="pagi">Pagi (Morning Class)</option>
               <option value="malam">Malam (Night Class)</option>
             </select>
@@ -262,7 +491,7 @@ export default function Step1S1({
         {/* ===== INFORMASI SEKOLAH ===== */}
         <h3 className={styles.sectionTitle}>Informasi Sekolah (High School Information)</h3>
 
-        {/* NAMA SEKOLAH — local list + tidak ditemukan selectable */}
+        {/* NAMA SEKOLAH — your existing school search, now with tidak ditemukan option */}
         <div className={form.formGroup}>
           <label className={form.label}>Nama Asal Sekolah (Name of High School) *</label>
           <div className={form.selectWrapper}>
@@ -270,7 +499,7 @@ export default function Step1S1({
               className={form.input}
               name="asal_sekolah"
               value={query}
-              placeholder="Ketik nama sekolah..."
+              placeholder="Ketik nama sekolah (minimal 1 karakter)..."
               autoComplete="off"
               onFocus={() => setOpen(true)}
               onBlur={() => setTimeout(() => setOpen(false), 150)}
@@ -305,9 +534,10 @@ export default function Step1S1({
                 checked={formData.konfirmasi || false}
                 onChange={handleChange}
               />
-              Dengan ini saya menyatakan bahwa saya siswa yang belum pernah mengikuti perkuliahan
-              pada perguruan tinggi lain (I Hearby Declare that i am a student that have not attended
-              any lectures from another institution).
+              Dengan ini saya menyatakan bahwa saya siswa yang belum pernah
+              mengikuti perkuliahan pada perguruan tinggi lain (I Hearby Declare
+              that i am a student that have not attended any lectures from another
+              institution).
             </label>
           </div>
         )}

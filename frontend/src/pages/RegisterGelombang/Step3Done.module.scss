@@ -1,26 +1,30 @@
 @use '../../styles/global.scss' as global;
-@use 'sass:map';
 
 /* ================= LAYOUT ================= */
 .container {
   display: flex;
   justify-content: center;
-  padding: var(--space-2xl) 1rem;
-  
-  @media (max-width: map.get(global.$breakpoints, 'md')) {
-    padding: var(--space-s) 0;
+
+  @media (max-width: map-get(global.$breakpoints, md)) {
+    padding: 1rem 0;
   }
 }
 
 .formWrapper {
-  @include global.container-form;
-  
-  @media (max-width: map.get(global.$breakpoints, 'md')) {
-    padding: var(--space-m);
+  width: 100%;
+  max-width: 48rem;
+  min-width: 48rem;
+  padding: 0 1.5rem;
+  box-sizing: border-box;
+
+  @media (max-width: map-get(global.$breakpoints, md)) {
+    min-width: auto;
+    max-width: 100%;
+    padding: 1.5rem;
   }
-  
-  @media (max-width: map.get(global.$breakpoints, 'sm')) {
-    padding: var(--space-s);
+
+  @media (max-width: map-get(global.$breakpoints, sm)) {
+    padding: 1rem;
   }
 }
 
@@ -28,96 +32,120 @@
 .header {
   text-align: center;
   margin-bottom: var(--space-l);
+
+  @media (max-width: map-get(global.$breakpoints, md)) {
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: map-get(global.$breakpoints, sm)) {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+  }
 }
 
 .mainTitle {
   font-size: var(--step-2);
-  font-weight: 600;
+  font-weight: 700;
   color: #0b3c5d;
   line-height: 1.4;
-  
-  @media (max-width: map.get(global.$breakpoints, 'sm')) {
+
+  @media (max-width: map-get(global.$breakpoints, sm)) {
     font-size: var(--step-1);
   }
 }
 
-/* ================= SECTION TITLE ================= */
+/* ================= SECTION HEADINGS ================= */
 .sectionTitle {
-  font-size: var(--step-1);
+  font-size: 1.1rem;
   font-weight: 600;
   color: #0b3c5d;
-  margin: var(--space-l) 0 var(--space-m) 0;
-  padding-bottom: var(--space-xs);
+  margin: 1.5rem 0 0.75rem;
+
+  @media (max-width: map-get(global.$breakpoints, sm)) {
+    font-size: 1rem;
+    margin: 1.2rem 0 0.5rem;
+  }
 }
 
 /* ================= INFO BOX ================= */
 .infoBox {
-  background: #f9fafb;
-  border: 1px solid #ddd;
-  border-radius: 0.4rem;
-  padding: var(--space-m);
-  margin-bottom: var(--space-l);
-  
+  background: #eef6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+
   p {
     margin: 0;
-    font-size: var(--step--1);
-    color: #333;
+    font-size: 0.95rem;
+    color: #1e40af;
   }
-  
-  @media (max-width: map.get(global.$breakpoints, 'sm')) {
-    padding: var(--space-s);
-    
-    p {
-      font-size: var(--step--2);
-    }
+
+  @media (max-width: map-get(global.$breakpoints, sm)) {
+    padding: 0.75rem;
   }
 }
 
 /* ================= SUMMARY BOX ================= */
 .summaryBox {
-  background: global.$white;
-  border: 1px solid #e0e0e0;
-  border-radius: 0.4rem;
-  padding: var(--space-m);
-  margin-bottom: var(--space-l);
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
 }
 
 .summaryItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-s) 0;
-  border-bottom: 1px solid #f0f0f0;
-  
-  span {
-    font-size: var(--step--1);
-    color: #666;
-    font-weight: 500;
-  }
-  
-  strong {
-    font-size: var(--step--1);
-    color: #0b3c5d;
-    font-weight: 600;
-  }
-  
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #eee;
+
   &:last-child {
     border-bottom: none;
+  }
+
+  span {
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  strong {
+    font-size: 0.95rem;
+    color: #1a1a1a;
+    text-align: right;
+    max-width: 60%;
+    word-break: break-word;
+  }
+
+  @media (max-width: map-get(global.$breakpoints, sm)) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+
+    strong {
+      max-width: 100%;
+      text-align: left;
+    }
   }
 }
 
 /* ================= WARNING BOX ================= */
 .warningBox {
-  background: #fee2e2;
-  border-left: 4px solid #ef4444;
-  border-radius: 0.4rem;
-  padding: var(--space-m);
-  margin-bottom: var(--space-l);
-  
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  padding: 1rem 1.25rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0.5rem;
+
   p {
     margin: 0;
-    font-size: var(--step--1);
-    color: #991b1b;
-    line-height: 1.5;
+    font-size: 0.9rem;
+    color: #856404;
+  }
+
+  @media (max-width: map-get(global.$breakpoints, sm)) {
+    padding: 0.75rem;
   }
 }

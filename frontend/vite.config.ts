@@ -19,6 +19,16 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/uni-api/, ''),
       },
+      '/school-api': {
+        target: 'https://api-sekolah-indonesia.vercel.app',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/school-api/, ''),
+      },
+      '/uni-data-api': {
+        target: 'https://use.api.co.id',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/uni-data-api/, ''),
+      },
     },
   },
   plugins: [

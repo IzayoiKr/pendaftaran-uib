@@ -12,7 +12,6 @@ type Props = {
   currentStep: number;
 };
 
-// S2 flow: Step1S2 → StepParentS2 → Step2S2 → Step3DoneS2
 const S2_STEPS = [
   { label: "BIODATA DIRI",     sub: "PERSONAL DATA" },
   { label: "BIODATA ORANGTUA", sub: "PARENTAL DATA" },
@@ -20,7 +19,17 @@ const S2_STEPS = [
   { label: "SELESAI",          sub: "DONE" },
 ];
 
-const REQUIRED_DOCS = ["al", "kk", "pp", "ktp", "r1", "r4", "buktibayar"];
+const MAX_FILE_SIZE_MB = 2;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+// ✅ STRICT VALIDATION — same as Step1S1
+const validateField = (value: any): boolean => {
+  if (value === null || value === undefined) return false;
+  if (typeof value === "string" && value.trim() === "") return false;
+  if (typeof value === "boolean" && !value) return false;
+  if (typeof value === "number" && value === 0) return false;
+  return true;
+};
 
 export default function Step2S2({
   formData,
@@ -40,7 +49,23 @@ export default function Step2S2({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, files: fileList } = e.target;
     if (!fileList?.[0]) return;
+
     const file = fileList[0];
+
+    // ✅ PDF ONLY check
+    if (file.type !== "application/pdf") {
+      alert("❌ File harus berformat PDF.");
+      e.target.value = "";
+      return;
+    }
+
+    // ✅ 2MB SIZE check
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      alert(`❌ Ukuran file tidak boleh lebih dari ${MAX_FILE_SIZE_MB}MB. File Anda: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+      e.target.value = "";
+      return;
+    }
+
     setFiles((prev) => ({ ...prev, [name]: file }));
     setFormData({ ...formData, [name]: file, [`${name}Url`]: URL.createObjectURL(file) });
   };
@@ -51,27 +76,34 @@ export default function Step2S2({
   };
 
   const handleSubmit = () => {
-    const missing = REQUIRED_DOCS.filter((f) => !formData[f]);
+    // ✅ ALL required fields validated in ONE pass — no bypass possible
+    const required = ["al", "kk", "pp", "ktp", "r1", "r4", "buktibayar", "pemilikrek", "bank"];
+
+    const missing = required.filter((f) => !validateField(formData[f]));
 
     if (missing.length > 0) {
       setCompleteness("Tidak Lengkap");
       setCheckStatus("Rejected");
-      setCheckNotes(`Dokumen kurang: ${missing.join(", ")}`);
-      alert(`Dokumen belum lengkap: ${missing.join(", ")}`);
+      setCheckNotes(`Field/Dokumen kurang: ${missing.join(", ")}`);
+      alert(`❌ Field wajib belum lengkap:\n\n${missing.join("\n")}`);
       return;
     }
 
+    // ✅ Payment text field format validation
+    if (formData.pemilikrek.trim().length < 3) {
+      alert("❌ Nama pemilik rekening tidak valid.");
+      return;
+    }
+
+    if (formData.bank.trim().length < 2) {
+      alert("❌ Nama bank tidak valid.");
+      return;
+    }
+
+    // ✅ All passed
     setCompleteness("Lengkap");
     setCheckStatus("Pending");
     setCheckNotes("Menunggu verifikasi admin");
-
-    if (!formData.pemilikrek || !formData.bank) {
-      setPaymentStatus("Belum Dibayar");
-      setPaymentNotes("Data pembayaran belum lengkap");
-      alert("Data pembayaran belum lengkap");
-      return;
-    }
-
     setPaymentStatus("Sudah Dibayar");
     setPaymentNotes("Menunggu konfirmasi pembayaran");
     submit();
@@ -79,7 +111,7 @@ export default function Step2S2({
 
   const renderFileInput = (label: string, name: string) => (
     <div className={form.formGroup} key={name}>
-      <label className={form.label}>{label} *</label>
+      <label className={form.label}>{label} * (PDF, maks. {MAX_FILE_SIZE_MB}MB)</label>
       <div className={styles.fileBox}>
         <div className={styles.fileInputWrapper}>
           <input
@@ -121,18 +153,11 @@ export default function Step2S2({
         <div className={styles.statusSection}>
           <h5 className={styles.sectionHeading}>Status Dokumen (Document Status)</h5>
           <div className={styles.infoBox}>
-            {[
-              ["Kelengkapan Dokumen (Completion of Requirement)",         completeness],
-              ["Status Pemeriksaan Dokumen (Document Check Status)",      checkStatus],
-              ["Catatan Pemeriksaan Dokumen (Document Assessment Notes)", checkNotes || "-"],
-              ["Status Pemeriksaan Pembayaran (Payment Check Status)",    paymentStatus],
-              ["Catatan Pemeriksaan Keuangan (Payment Notes)",            paymentNotes || "-"],
-            ].map(([label, value]) => (
-              <div key={label} className={styles.statusItem}>
-                <strong>{label}:</strong>
-                <span className={styles.statusValue}>{value}</span>
-              </div>
-            ))}
+            <div className={styles.statusItem}><strong>Kelengkapan Dokumen (Completion of Requirement):</strong><span className={styles.statusValue}>{completeness}</span></div>
+            <div className={styles.statusItem}><strong>Status Pemeriksaan Dokumen (Document Check Status):</strong><span className={styles.statusValue}>{checkStatus}</span></div>
+            <div className={styles.statusItem}><strong>Catatan Pemeriksaan Dokumen (Document Assessment Notes):</strong><span className={styles.statusValue}>{checkNotes || "-"}</span></div>
+            <div className={styles.statusItem}><strong>Status Pemeriksaan Pembayaran (Payment Check Status):</strong><span className={styles.statusValue}>{paymentStatus}</span></div>
+            <div className={styles.statusItem}><strong>Catatan Pemeriksaan Keuangan (Payment Notes):</strong><span className={styles.statusValue}>{paymentNotes || "-"}</span></div>
           </div>
           <p className={styles.requiredNote}>* Wajib di Isi (Required)</p>
         </div>
@@ -161,37 +186,25 @@ export default function Step2S2({
               <p><strong>Nama Bank (Bank Name) :</strong> OCBC NISP</p>
               <p><strong>No Rekening (Account Number) :</strong> 094800007802</p>
               <p><strong>Nama Pemilik Rekening (Account Owner) :</strong> Universitas Internasional Batam</p>
-              <p>
-                <strong>Panduan (Guide) :</strong>{" "}
-                <a href="https://pendaftaran.uib.ac.id/dokumen/panduanpenggunaanqris.pdf" target="_blank" rel="noopener noreferrer" download>
-                  Klik untuk Download (Click Here to Download)
-                </a>
-              </p>
+              <p><strong>Panduan (Guide) :</strong> <a href="https://pendaftaran.uib.ac.id/dokumen/panduanpenggunaanqris.pdf" target="_blank" rel="noopener noreferrer" download>Klik untuk Download (Click Here to Download)</a></p>
               <p><strong>Biaya Formulir Pendaftaran (Form Fee) S2 :</strong> Rp. 1.500.000</p>
             </div>
           </div>
-
           <div className={form.formGroup}>
             <label className={form.label}>Pemilik Rekening (Account owner) *</label>
             <input type="text" className={form.input} name="pemilikrek" value={formData.pemilikrek || ""} onChange={handleChange} placeholder="Masukkan nama pemilik rekening" />
           </div>
-
           <div className={form.formGroup}>
-            <label className={form.label}>Bank (Bank Name)</label>
+            <label className={form.label}>Bank (Bank Name) *</label>
             <input type="text" className={form.input} name="bank" value={formData.bank || ""} onChange={handleChange} placeholder="Masukkan nama bank" />
           </div>
-
           {renderFileInput("Bukti Pembayaran (Receipt of Payment)", "buktibayar")}
         </div>
 
         {/* BUTTON */}
         <div className={form.buttonGroup}>
-          <button type="button" onClick={prev} className={`${form.btn} ${form.btnDanger}`}>
-            Kembali (Back)
-          </button>
-          <button type="button" onClick={handleSubmit} className={`${form.btn} ${form.btnPrimary}`}>
-            Upload (Submit)
-          </button>
+          <button type="button" onClick={prev} className={`${form.btn} ${form.btnDanger}`}>Kembali (Back)</button>
+          <button type="button" onClick={handleSubmit} className={`${form.btn} ${form.btnPrimary}`}>Upload (Submit)</button>
         </div>
 
       </div>
