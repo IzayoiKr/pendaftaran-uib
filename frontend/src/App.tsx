@@ -10,7 +10,7 @@ import InfoUmum from "./pages/InfoUmum";
 
 const Login = lazy(() => import('./pages/Login'))
 const Register = lazy(() => import('./pages/Register'))
-const Account = lazy(() => import('./pages/MyAccountPage'))
+const Account = lazy(() => import('./pages/MyAccountPage/AccountPage'))
 const Forgot = lazy(() => import('./pages/ForgotPassword'))
 const BuktiTransfer = lazy(() => import('./pages/TransferProof'))
 const UploadBuktiTransferPage = lazy(() => import('./pages/UploadTransferProof/UploadBuktiTransferPage'))
