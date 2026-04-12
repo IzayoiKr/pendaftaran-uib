@@ -85,7 +85,7 @@ export default function RegisterPageGelombang() {
         const newRegistration = {
             nomorDaftar: "REG" + Math.floor(100000 + Math.random() * 900000),
             periode: new Date().getFullYear(),
-            gelombang: event.title,
+            gelombang: event.batchName,
             jurusan: prodiChoices || "Belum Memilih Program Studi",
             biodata: "Telah Lengkap",
             pembayaran: "Belum Lunas",

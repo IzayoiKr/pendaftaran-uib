@@ -1,129 +1,72 @@
-// ============================================
-// InfoUmum Content Page Styles
-// ============================================
+@use '../../styles/global.scss' as global;
+@use 'sass:map';
 
-$primary-color: #2d3436;
-$secondary-color: #6c5ce7;
-$text-color: #333;
-$light-gray: #f8f9fa;
-$border-color: #e0e0e0;
-$white: #ffffff;
-$shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-.info-umum-section {
-  width: 100%;
-  min-height: 100vh;
-  background-color: $light-gray;
-}
-
+/* Section with proper spacing using calc */
 .blog_area {
-  width: 100%;
-  padding-top: 60px;
-  padding-bottom: 60px;
+  margin-top: calc(var(--space-xl) * 2);
+  margin-bottom: calc(var(--space-xl) * 2);
+  background-color: #f9f9ff;
 
-  .container {
-    max-width: 1140px;
-    margin: 0 auto;
-    padding: 0 15px;
+  @media (max-width: map.get(global.$breakpoints, 'lg')) {
+    margin-top: calc(var(--space-xl) * 1.5);
+    margin-bottom: calc(var(--space-xl) * 1.5);
   }
 
-  .row {
-    display: flex;
-    margin: 0 -15px;
+  @media (max-width: map.get(global.$breakpoints, 'md')) {
+    margin-top: calc(var(--space-xl) * 1.25);
+    margin-bottom: calc(var(--space-xl) * 1.25);
   }
 
-  .col-lg-12 {
-    flex: 0 0 100%;
-    padding: 0 15px;
+  @media (max-width: map.get(global.$breakpoints, 'sm')) {
+    margin-top: calc(var(--space-l) * 1.5);
+    margin-bottom: calc(var(--space-l) * 1.5);
   }
 }
 
+/* Container using global mixin */
+.container {
+  @include global.container;
+}
+
+/* Sidebar with responsive gap */
 .blog_left_sidebar {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: var(--space-m);
 
-  &.empty {
-    min-height: 400px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  @media (max-width: map.get(global.$breakpoints, 'md')) {
+    gap: var(--space-s);
   }
 }
 
-// ============================================
-// Loading & No Posts States
-// ============================================
-
-.loading-container,
+/* Empty state */
 .no-posts {
-  background-color: $white;
-  padding: 60px 40px;
+  background-color: global.$white;
+  padding: var(--space-l);
   text-align: center;
-  border-radius: 8px;
-  box-shadow: $shadow;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
 
   p {
     margin: 0;
-    font-size: 18px;
-    color: $text-color;
+    font-size: var(--step-0);
+    color: #2d3436;
     font-weight: 500;
   }
-}
 
-.loading-container {
-  animation: fade-in 0.3s ease-in;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-// ============================================
-// Responsive Layout
-// ============================================
-
-@media (max-width: 768px) {
-  .blog_area {
-    padding-top: 40px;
-    padding-bottom: 40px;
-  }
-
-  .blog_left_sidebar {
-    gap: 25px;
-  }
-
-  .loading-container,
-  .no-posts {
-    padding: 40px 25px;
+  @media (max-width: map.get(global.$breakpoints, 'md')) {
+    padding: var(--space-m);
 
     p {
-      font-size: 16px;
+      font-size: var(--step--1);
     }
   }
-}
 
-@media (max-width: 576px) {
-  .blog_area {
-    padding-top: 30px;
-    padding-bottom: 30px;
-  }
-
-  .blog_left_sidebar {
-    gap: 20px;
-  }
-
-  .loading-container,
-  .no-posts {
-    padding: 30px 20px;
+  @media (max-width: map.get(global.$breakpoints, 'sm')) {
+    padding: var(--space-s);
 
     p {
-      font-size: 14px;
+      font-size: var(--step--2);
     }
   }
 }

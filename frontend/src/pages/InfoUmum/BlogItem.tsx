@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import "./BlogItem.scss";
+import { BlogIconMap } from '../../components/Icons';
 
 interface BlogItemProps {
-  id: number;
   title: string;
   description: string;
   image?: string;
@@ -27,7 +27,7 @@ export default function BlogItem({
     <article className="blog_item">
       <div className="blog_item_container">
 
-        {/* LEFT */}
+        {/* LEFT — category tag + meta */}
         <div className="blog_item_left">
           <div className="blog_info">
             <div className="post_tag">
@@ -36,43 +36,37 @@ export default function BlogItem({
             <ul className="blog_meta list">
               <li>
                 <span className="meta-link">
-                  {author} <i className="ti-user"></i>
+                  {author} {BlogIconMap.Person}
                 </span>
               </li>
               <li>
                 <span className="meta-link">
-                  {date} <i className="ti-calendar"></i>
+                  {date} {BlogIconMap.Calendar}
                 </span>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* RIGHT */}
+        {/* RIGHT — image + content */}
         <div className="blog_item_right">
-          <div className="blog_post">
-            {image && (
-              <img
-                src={image}
-                alt={title}
-                className="blog_post_image"
-              />
-            )}
-            <div className="blog_details">
-              <span
-                className="blog_title_link"
-                onClick={() => navigate(detailLink)}
-              >
-                <h2>{title}</h2>
-              </span>
-              <p className="blog_description">{description}</p>
-              <button
-                className="read-more-btn"
-                onClick={() => navigate(detailLink)}
-              >
-                Read More
-              </button>
-            </div>
+          {image && (
+            <img src={image} alt={title} className="blog_post_image" />
+          )}
+          <div className="blog_details">
+            <h2
+              className="blog_title_link"
+              onClick={() => navigate(detailLink)}
+            >
+              {title}
+            </h2>
+            <p className="blog_description">{description}</p>
+            <button
+              className="read-more-btn"
+              onClick={() => navigate(detailLink)}
+            >
+              Read More
+            </button>
           </div>
         </div>
 

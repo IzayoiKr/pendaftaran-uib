@@ -1,153 +1,59 @@
 @use './global.scss' as global;
+@use 'sass:map';
 
-/* ================= FORM BASE ================= */
-.formGroup {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 0.7rem;
-  position: relative;
+.formGroup { 
+  display: flex; 
+  flex-direction: column; 
+  margin: 0.5rem 0;
+  position: relative; 
 }
 
-.label {
-  font-size: var(--step--1);
-  margin-bottom: 0.1em;
-  color: #333;
-}
+.label { font-size: var(--step--1); margin-bottom: 0.1em; color: #333; font-weight: 500; }
 
-/* ================= INPUT ================= */
-.input,
-.select,
-.textarea {
+.input, .select, .textarea {
   width: 100%;
   border: 1px solid #ccc;
   border-radius: 0.25em;
   font-size: var(--step--1);
   background: #fff;
   box-sizing: border-box;
-  transition: border 0.2s ease;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+  color: black;
+  
+  &:focus { outline: none; border-color: #666; box-shadow: 0 0 0 2px rgba(100, 100, 100, 0.1); }
 }
 
 .input {
   height: 2.3em;
   padding: 0 0.75em;
-
-  &:focus {
-    outline: none;
-    border-color: #999;
+  
+  &[type="number"] {
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 0;
+    }
+    -moz-appearance: textfield;
+    appearance: textfield;
   }
 }
 
-.textarea {
-  padding: 0.5em 0.75em;
-  min-height: 5em;
-  resize: vertical;
-}
+.textarea { padding: 0.5em 0.75em; min-height: 5em; resize: vertical; }
+.select { height: 3em; padding: 0 2em 0 0.75em; appearance: none; }
+.selectWrapper { position: relative; }
+.checkbox { display: flex; gap: 0.4em; font-size: var(--step--1); align-items: center; }
+.inputError { border-color: #ef4444 !important; }
+.errorText { font-size: 0.75em; color: #ef4444; margin-top: 0.2em; }
 
-/* ================= SELECT ================= */
-.select {
-  height: 3em;
-  padding: 0 2em 0 0.75em;
-  appearance: none;
-}
-
-/* ================= SELECT WRAPPER ================= */
-.selectWrapper {
-  position: relative;
-
-  &::after {
-    content: "▾";
-    position: absolute;
-    right: 0.75em;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.8em;
-    color: #666;
-    pointer-events: none;
-  }
-}
-
-/* ================= DROPDOWN ================= */
-.dropdown {
-  position: absolute;
-  width: 100%;
-  top: 100%;
-  margin-top: 0.25em;
-
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 0.3em;
-
-  max-height: 14em;
-  overflow-y: auto;
-  z-index: 10;
-}
-
-.option {
-  padding: 0.6em;
-  cursor: pointer;
-  font-size: 0.9em;
-
-  &:hover {
-    background: #f3f4f6;
-  }
-}
-
-.notFound {
-  padding: 0.6em;
-  font-size: 0.85em;
-  color: #888;
-}
-
-/* ================= SCROLLBAR ================= */
-.dropdown::-webkit-scrollbar {
-  width: 0.35em;
-}
-
-.dropdown::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 0.2em;
-}
-
-/* ================= GRID ================= */
-.row {
-  display: flex;
-  gap: var(--space-s);
-  margin-bottom: 0.7rem;
-}
-
-.col {
-  flex: 1;
-}
-
-/* ================= EXTRA BOX ================= */
-.extraBox {
-  background: #f9fafb;
-  border: 1px solid #ddd;
-  padding: 0.75em;
-}
-
-.checkbox {
-  display: flex;
-  gap: 0.4em;
-  font-size: var(--step--1);
-}
-
-/* ================= ERROR (OPTIONAL PRO) ================= */
-.inputError {
-  border-color: #ef4444 !important;
-}
-
-.errorText {
-  font-size: 0.75em;
-  color: #ef4444;
-  margin-top: 0.2em;
-}
-
-/* ================= BUTTON ================= */
 .buttonGroup {
   display: flex;
   justify-content: space-between;
+  gap: 1rem;
   margin-top: var(--space-m);
+  flex-wrap: wrap;
+  
+  @media (max-width: map.get(global.$breakpoints, sm)) { flex-direction: column; }
 }
 
 .btn {
@@ -157,22 +63,39 @@
   padding: 0 var(--space-l);
   font-weight: 600;
   cursor: pointer;
+  font-size: var(--step--1);
+  transition: all 0.2s ease;
+  flex: 1;
+  min-width: 120px;
+  
+  @media (max-width: map.get(global.$breakpoints, sm)) { flex: 0 0 100%; min-width: auto; }
+  
+  &:active { transform: scale(0.98); }
+  &:disabled { background: #ccc; cursor: not-allowed; }
 }
 
-.btnPrimary {
-  background: #007bff;
-  color: white;
+.btnPrimary { background: #007bff; color: white; &:hover { background: #0056b3; } }
+.btnDanger { background: #ef4444; color: white; &:hover { background: #dc2626; } }
 
-  &:hover {
-    background: #0056b3;
-  }
+.row { display: flex; gap: var(--space-s); margin-bottom: 0.7rem; @media (max-width: map.get(global.$breakpoints, sm)) { flex-direction: column; gap: 0; } }
+.col { flex: 1; }
+.extraBox { background: #f9fafb; border: 1px solid #ddd; padding: 0.75em; border-radius: 0.25em; }
+
+.dropdown {
+  position: absolute;
+  width: 100%;
+  top: 100%;
+  margin-top: 0.25em;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 0.3em;
+  max-height: 14em;
+  overflow-y: auto;
+  z-index: 10;
 }
 
-.btnDanger {
-  background: #ef4444;
-  color: white;
+.option { padding: 0.6em; cursor: pointer; font-size: 0.9em; &:hover { background: #f3f4f6; } }
+.notFound { padding: 0.6em; font-size: 0.85em; color: #888; }
 
-  &:hover {
-    background: #dc2626;
-  }
-}
+.dropdown::-webkit-scrollbar { width: 0.35em; }
+.dropdown::-webkit-scrollbar-thumb { background: #ccc; border-radius: 0.2em; }

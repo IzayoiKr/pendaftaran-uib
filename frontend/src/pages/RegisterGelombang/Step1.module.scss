@@ -1,20 +1,17 @@
-@use '../../styles/global.scss' as global;
+@use '../../styles/global' as global;
+@use 'sass:map';
 
 /* ================= LAYOUT ================= */
 .container {
   display: flex;
   justify-content: center;
+  padding: var(--space-2xl) 1rem;
 }
 
 .formWrapper {
-  width: 100%;
-  max-width: 48rem;
-  min-width: 48rem;
-  padding: 0 1.5rem;
-  box-sizing: border-box;
-
-  @media (max-width: map-get(global.$breakpoints, md)) {
-    min-width: auto;
+  @include global.container-form;
+  
+  @media (max-width: map.get(global.$breakpoints, 'md')) {
     padding: 0 1rem;
   }
 }
@@ -31,16 +28,6 @@
   color: #0b3c5d;
 }
 
-/* ================= TITLE ================= */
-.title {
-  text-align: center;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #0b3c5d;
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
-}
-
 .subTitle {
   font-size: var(--step-2);
   font-weight: 600;
@@ -48,20 +35,24 @@
   color: #0b3c5d;
 }
 
-.sectionTitle {
-  text-align: center;
-  font-size: 1rem;
+/* ================= TITLES & SECTIONS ================= */
+.title {
+  font-size: var(--step-0);
   font-weight: 600;
   color: #0b3c5d;
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
+  margin: var(--space-2xs) 0;
 }
 
-/* ================= REQUIRED SMALL TEXT ================= */
+.sectionTitle {
+  font-size: var(--step-1);
+  font-weight: 600;
+  color: #0b3c5d;
+  margin: var(--space-m) 0 var(--space-s) 0;
+}
+
+/* ================= REQUIRED NOTE ================= */
 .requiredNote {
-  text-align: center;
-  font-size: 1rem;
-  color: #5A5A5A ; // abu soft (mirip UIB)
-  margin-top: 0.2rem;
-  margin-bottom: 0.5rem;
+  font-size: var(--step--1);
+  color: #5a5a5a;
+  margin: var(--space-s) 0;
 }

@@ -138,6 +138,36 @@ export function RightArrowIcon() {
     );
 }
 
+function CalendarIcon() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+        >
+            <path d="M19,4H17V3a1,1,0,0,0-2,0V4H9V3A1,1,0,0,0,7,3V4H5A3,3,0,0,0,2,7V19a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3V7A3,3,0,0,0,19,4Zm1,15a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V12H20Zm0-9H4V7A1,1,0,0,1,5,6H7V7A1,1,0,0,0,9,7V6h6V7a1,1,0,0,0,2,0V6h2a1,1,0,0,1,1,1Z" />
+        </svg>
+    )
+}
+
+function PersonIcon() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 32 32"
+            fill="currentColor"
+            aria-hidden="true"
+        >
+            <path d="M16 15.503A5.041 5.041 0 1 0 16 5.42a5.041 5.041 0 0 0 0 10.083zm0 2.215c-6.703 0-11 3.699-11 5.5v3.363h22v-3.363c0-2.178-4.068-5.5-11-5.5z" />
+        </svg>
+    )
+}
+
 export const socialIconMap: Record<string, React.ReactNode> = {
     Instagram: <InstagramIcon />,
     Youtube: <YoutubeIcon />,
@@ -153,4 +183,9 @@ export const featureIconMap: Record<string, React.ReactNode> = {
 export const gelombangIconMap: Record<string, React.ReactNode> = {
     Clock: <ClockIcon />,
     Pin: <PinIcon />
+}
+
+export const BlogIconMap: Record<string, React.ReactNode> = {
+    Calendar: <CalendarIcon />,
+    Person: <PersonIcon />,
 }
