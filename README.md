@@ -114,33 +114,23 @@ cp .env.example .env
 Edit `.env` if your credentials differ from the defaults:
 ```dotenv
 # ─── MySQL ────────────────────────────────────────────────
-MYSQL_ROOT_PASSWORD=your-mysql-root-password
-MYSQL_USER=admin
-MYSQL_PASSWORD=your-mysql-password
-MYSQL_DATABASE=pendaftaran-uib-db
-MYSQL_PORTS="3300:3300"
-MYSQL_PORT=3300
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=admin
+DB_PASSWORD=your-mysql-password
+DB_NAME=pendaftaran-uib-db
 
-# ─── MongoDB ────────────────────────────────────────────────
-MONGO_USER=admin
-MONGO_PASSWORD=your-mongo-password
-MONGO_DATABASE=pendaftaran-uib-db
-MONGO_PORTS="27000:27000"
-MONGO_PORT=27000
+# ─── MongoDB ──────────────────────────────────────────────
+MONGO_URI=mongodb://admin:<your-mongo-password-here>@mongodb:27017
+MONGO_DB=pendaftaran-uib-db
 
-# ─── Backend ────────────────────────────────────────────────
+# ─── App ──────────────────────────────────────────────────
 # Generate with: openssl rand -base64 32
 JWT_SECRET=your-very-secret-key-change-this
 CORS_ORIGIN=http://localhost:8989
-TURNSTILE_SECRET=your_secret_key_here
+TURNSTILE_SECRET=your_turnstile_secret_key_here
 APP_ENV=development
-SERVER_PORT=9999
-BACKEND_PORTS="9999:9999"
-
-# ─── Frontend ─────────────────────────────────────────────
-FRONTEND_PORTS="8989:8989"
-VITE_TURNSTILE_SITE_KEY=your_site_key_here
-APP_ENV=development
+SERVER_PORT=8989
 ```
 
 Generate a secure `JWT_SECRET`:
@@ -229,7 +219,9 @@ docker compose up --build -d
 | Frontend   | http://localhost:8989      |
 | Backend    | http://localhost:9999      |
 | MySQL      | localhost:3300             |
+| PhpMyAdmin | localhost:8081             |
 | MongoDB    | localhost:27000            |
+| MERN       | localhost:8082             |
 
 ### 5. Stop
 ```bash
