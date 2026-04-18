@@ -1,4 +1,4 @@
-import type { HeaderNavLinks, FooterNavLinks } from "../types"
+import type { HeaderNavLinks, FooterNavLinks } from "@/types"
 
 export const headerNavLinks: HeaderNavLinks[] = [
     { to: "/#home", label: "Beranda", hashId: "home" },

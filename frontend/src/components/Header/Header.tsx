@@ -1,11 +1,15 @@
+'use client';
+
 import { useEffect, useState, useRef, memo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import styles from './Header.module.scss';
-import { headerNavLinks, spyIds } from '../../constants/navigation';
-import { getImg } from '../../constants/data';
-import useScrollSpy from '../../hooks/useScrollSpy';
-import scrollToId from '../ScrollToId';
-import useAuthStore from '../../store/useAuthStore';
+import { headerNavLinks, spyIds } from '@/constants/navigation';
+import { images } from '@/constants/image';
+import useScrollSpy from '@/hooks/useScrollSpy';
+import scrollToId from '@/components/ScrollToId';
+import useAuthStore from '@/store/useAuthStore';
 
 interface HamburgerButtonProps {
     isOpen?: boolean;
@@ -22,18 +26,14 @@ interface NavMenuProps {
 
 function UIBLogo() {
     return (
-        <Link to="/#home" className={styles.logoUIB}>
-            <picture>
-                <source srcSet={getImg('logo.avif')} type='image/avif' />
-                <source srcSet={getImg('logo.webp')} type='image/webp' />
-                <img
-                    src={getImg('logo.png')}
-                    alt='Universitas Internasional Batam Logo'
-                    width='197'
-                    height='47'
-                    fetchPriority='high'
-                />
-            </picture>
+        <Link href="/#home" className={styles.logoUIB}>
+            <Image
+                src={images.logo}
+                alt='Universitas Internasional Batam Logo'
+                width={197}
+                height={47}
+                priority
+            />
         </Link>
     )
 }
@@ -77,7 +77,7 @@ function NavMenu({ isOpen, activeId, pathname, onLinkClick, isAuthenticated }: N
                             <li className={styles.navItem} key={link.to}>
                                 <Link
                                     className={`${styles.navLink} ${isActive ? styles.active : ''}`}
-                                    to={displayTo}
+                                    href={displayTo}
                                     onClick={handleClick}
                                 >
                                     {displayLabel}
@@ -94,9 +94,8 @@ function NavMenu({ isOpen, activeId, pathname, onLinkClick, isAuthenticated }: N
 export default function Header() {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isScrolled, setIsScrolled] = useState<boolean>(false);
-    const { pathname } = useLocation();
-    
-    // Langsung ambil status dari Zustand
+    const pathname = usePathname();
+
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
     const headerRef = useRef<HTMLElement>(null);
@@ -122,7 +121,7 @@ export default function Header() {
     const activeId = useScrollSpy({ ids: spyIds, offset: headerHeight });
 
     return (
-        <header className={isScrolled ? styles.fixed : ''} ref={headerRef}>
+        <header className={`${styles.header} ${isScrolled ? styles.fixed : ''}`} ref={headerRef}>
             <div className={styles.container}>
                 <UIBLogo />
                 <HamburgerButton isOpen={isOpen} setIsOpen={setIsOpen} />

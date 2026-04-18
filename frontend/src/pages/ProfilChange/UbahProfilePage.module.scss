@@ -1,4 +1,4 @@
-@use '../../styles/global.scss';
+@use '@/styles/config.scss' as global;
 @use '../../styles/form.scss';
 @use 'sass:map';
 
@@ -52,4 +52,3 @@
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
-

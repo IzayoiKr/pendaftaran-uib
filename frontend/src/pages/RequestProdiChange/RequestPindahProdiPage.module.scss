@@ -1,4 +1,4 @@
-@use '../../styles/global.scss';
+@use '@/styles/config.scss' as global;
 @use '../../styles/form.scss';
 @use 'sass:map';
 
@@ -116,4 +116,3 @@ $color-danger-hover:  #c0392b;
     .bottomActions { flex-direction: column; align-items: stretch; }
   }
 }
-

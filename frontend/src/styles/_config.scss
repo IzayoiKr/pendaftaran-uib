@@ -1,0 +1,65 @@
+@use 'sass:map';
+
+$primary-color: #fdc632;
+$secondary-color: #333;
+$tertiary-color: #002347;
+$background-color: #ffffff;
+$card-bg: #f9f9ff;
+$link-color: #4a76ee;
+$text-color: #666;
+$text-color2: #1a1c20;
+$white: #fff;
+$font-family: "Rubik Variable", "Poppins", sans-serif;
+
+$form-cap: 700px;
+
+$breakpoints: (
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px,
+  xxxl: 1600px
+);
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1320px,
+  xxxl: 1520px
+);
+
+$container-form-max-widths: (
+  sm: 540px,
+  md: 640px,
+  lg: $form-cap,
+  xl: $form-cap,
+  xxl: $form-cap,
+  xxxl: $form-cap
+);
+
+@mixin container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 15px;
+
+  @each $name, $container-width in $container-max-widths {
+    @media (min-width: map.get($breakpoints, $name)) {
+      max-width: $container-width;
+    }
+  }
+}
+
+@mixin container-form {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 15px;
+
+  @each $name, $container-width in $container-form-max-widths {
+    @media (min-width: map.get($breakpoints, $name)) {
+      max-width: $container-width;
+    }
+  }
+}

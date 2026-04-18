@@ -1,5 +1,5 @@
-@use '../../styles/global.scss';
-@use '../../styles/form.scss';
+@use '@/styles/config.scss' as global;
+@use '@/styles/form.scss';
 @use 'sass:color';
 
 .register {

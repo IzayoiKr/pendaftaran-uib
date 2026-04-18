@@ -1,13 +1,16 @@
+'use client';
+
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import type { Form } from "../../types";
-import { login } from "../../constants/data";
-import { loginSchema } from "../../validation/schema";
-import { api } from "../../api";
-import useAuthStore from "../../store/useAuthStore";
-import { RightArrowIcon } from "../../components/Icons";
-import styles from "./LoginPage.module.scss";
+import type { Form } from "@/types";
+import { login } from "@/constants/data";
+import { loginSchema } from "@/validation/schema";
+import { api } from "@/api";
+import useAuthStore from "@/store/useAuthStore";
+import { RightArrowIcon } from "@/components/Icons";
+import styles from "./Login.module.scss";
 
 interface LoginFormProps {
     onLogin: (email: string, password: string) => Promise<void>;
@@ -34,7 +37,7 @@ function LoginPlaceholder({ name, type, placeholder, autoComplete, minLength, va
 function LoginAction() {
     return (
         <>
-            <Link to="/forgot" className={styles.forgotLink}>Lupa Password?</Link>
+            <Link href="/forgot" className={styles.forgotLink}>Lupa Password?</Link>
 
             <button type="submit" className={styles.loginBtn}>
                 Login <RightArrowIcon />
@@ -42,7 +45,7 @@ function LoginAction() {
 
             <p className={styles.registerText}>
                 Belum memiliki akun?{" "}
-                <Link to="/register">Buat Akun</Link>
+                <Link href="/register">Buat Akun</Link>
             </p>
         </>
     )
@@ -91,15 +94,15 @@ function LoginForm({ onLogin }: LoginFormProps) {
     )
 }
 
-export default function LoginPage() {
-    const navigate = useNavigate();
+export default function Login() {
+    const router = useRouter();
     const login = useAuthStore((state) => state.login);
 
     const handleLogin = async (email: string, password: string) => {
         const res = await api.auth.login(email, password);
         login(res.user, res.access_token);
         toast.success("Login berhasil!");
-        navigate("/");
+        router.push("/");
     }
 
     return (

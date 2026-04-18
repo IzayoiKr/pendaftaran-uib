@@ -1,3 +1,5 @@
+import type { StaticImageData } from "next/image";
+
 export interface HeaderNavLinks {
     to: string;
     label: string;
@@ -41,17 +43,13 @@ export interface Program {
     faculty: string;
     degree: 'S1' | 'S2';
     description: string;
-    image: string;
-    imageWebp: string;
-    imageAvif: string;
+    image: StaticImageData;
     link: string;
 }
 
 export interface Event {
     id: string;
-    image: string;
-    imageWebp: string;
-    imageAvif: string;
+    image: StaticImageData;
     programType: string;
     programTypeEn: string;
     academicYear: string;
@@ -115,9 +113,7 @@ export interface BlogPost {
     id: number;
     title: string;
     description: string;
-    image?: string;
-    imageWebp?: string;
-    imageAvif?: string;
+    image: StaticImageData;
     author: string;
     date: string;
     category: string;

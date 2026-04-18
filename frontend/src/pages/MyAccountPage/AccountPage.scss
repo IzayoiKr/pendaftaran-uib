@@ -1,4 +1,4 @@
-@use '../../styles/global.scss';
+@use '@/styles/config.scss' as global;
 @use '../../styles/form.scss';
 
 $color-primary:       #29b6f6;

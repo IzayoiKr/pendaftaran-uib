@@ -1,7 +1,11 @@
+'use client';
+
+import { useCallback, useEffect, useState, useRef, memo } from 'react';
+import Image from 'next/image';
+import type { StaticImageData } from 'next/image';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
-import { useCallback, useEffect, useState, useRef, memo } from 'react';
-import { programs } from '../../../constants/data';
+import { programs } from '@/constants/data';
 import styles from './ProgramStudi.module.scss';
 
 interface ProgramCardProps {
@@ -9,27 +13,21 @@ interface ProgramCardProps {
     faculty: string;
     degree: 'S1' | 'S2';
     description: string;
-    image: string;
-    imageWebp: string;
-    imageAvif: string;
+    image: StaticImageData;
     link: string
 }
 
-const ProgramCard = memo(function ProgramCard({ title, faculty, degree, description, image, imageWebp, imageAvif, link }: ProgramCardProps) {
+const ProgramCard = memo(function ProgramCard({ title, faculty, degree, description, image, link }: ProgramCardProps) {
     return (
         <div className={styles.card}>
             <div className={styles.courseHead}>
-                <picture>
-                    <source srcSet={imageAvif} type='image/avif' />
-                    <source srcSet={imageWebp} type='image/webp' />
-                    <img
-                        src={image}
-                        alt={title}
-                        loading='lazy'
-                        width='1080'
-                        height='849'
-                    />
-                </picture>
+                <Image
+                    src={image}
+                    alt={title}
+                    width={1080}
+                    height={849}
+                    loading='lazy'
+                />
             </div>
             <div className={styles.courseContent}>
                 <span className={styles.badge}>{degree}</span>

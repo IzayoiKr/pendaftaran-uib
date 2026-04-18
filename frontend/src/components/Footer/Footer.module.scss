@@ -1,4 +1,4 @@
-@use '../../styles/global.scss';
+@use '@/styles/config.scss' as global;
 @use 'sass:map';
 @use 'sass:color';
 
@@ -6,7 +6,7 @@ $widget-color: global.$white;
 $widget-link-color: #007bff;
 $social-bg: #334f6c;
 
-footer {
+.footer {
   background-color: global.$tertiary-color;
 
   .container {
@@ -30,6 +30,21 @@ footer {
     font-weight: 600;
     margin-bottom: var(--space-s);
   }
+
+  address {
+    font-style: normal;
+    color: $widget-color;
+    line-height: 1.8;
+
+    a {
+      color: $widget-link-color;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: color.adjust($widget-link-color, $lightness: -10%);
+      }
+    }
+  }
 }
 
 .widgetList {
@@ -45,21 +60,6 @@ footer {
       &:hover {
         color: global.$white;
       }
-    }
-  }
-}
-
-address {
-  font-style: normal;
-  color: $widget-color;
-  line-height: 1.8;
-
-  a {
-    color: $widget-link-color;
-    transition: color 0.3s ease;
-
-    &:hover {
-      color: color.adjust($widget-link-color, $lightness: -10%);
     }
   }
 }

@@ -1,7 +1,8 @@
-import type { Event } from '../../../types';
-import { events } from '../../../constants/data';
-import { gelombangIconMap } from '../../../components/Icons';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
+import Image from 'next/image';
+import type { Event } from '@/types';
+import { events } from '@/constants/data';
+import { gelombangIconMap } from '@/components/Icons';
 import styles from './Gelombang.module.scss';
 
 interface EventCardProps {
@@ -11,17 +12,13 @@ interface EventCardProps {
 function EventCard({ event }: EventCardProps) {
     return (
         <div className={styles.card}>
-            <picture>
-                <source srcSet={event.imageAvif} type='image/avif' />
-                <source srcSet={event.imageWebp} type='image/webp' />
-                <img
-                    src={event.image}
-                    alt={event.id}
-                    loading='lazy'
-                    width='555'
-                    height='400'
-                />
-            </picture>
+            <Image
+                src={event.image}
+                alt={event.id}
+                width={555}
+                height={400}
+                loading='lazy'
+            />
             <div className={styles.details}>
                 <h3>
                     Ujian Saringan Masuk <br />
@@ -72,7 +69,7 @@ function EventCard({ event }: EventCardProps) {
                     </a>
                 ) : (
                     <Link
-                        to={`/register/${event.id}`}
+                        href={`/register/${event.id}`}
                         className={styles.registerBtn}
                     >
                         Daftar (Register)

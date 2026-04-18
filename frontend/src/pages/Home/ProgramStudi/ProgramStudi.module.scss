@@ -1,4 +1,4 @@
-@use '../../../styles/global.scss';
+@use '@/styles/config.scss' as global;
 @use 'sass:map';
 
 $badge-size: clamp(3rem, 2.7344rem + 1.3281vw, 4.0625rem);
@@ -100,17 +100,13 @@ $dot-size: var(--step--2);
   position: relative;
   overflow: hidden;
 
-  picture {
+  img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+    display: block;
     transition: transform 0.3s ease;
-
-    img {
-      width: 100%;
-      height: auto;
-      object-fit: contain;
-      object-position: center;
-      display: block;
-      transition: transform 0.3s ease;
-    }
   }
 }
 

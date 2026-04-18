@@ -1,7 +1,11 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import Link from 'next/link';
+import Image from 'next/image';
 import styles from './Hero.module.scss';
-import { heroes, getImg } from '../../../constants/data';
-import scrollToId from '../../../components/ScrollToId';
+import { heroes } from '@/constants/data';
+import { images } from '@/constants/image';
+import scrollToId from '@/components/ScrollToId';
 
 interface handleClickProps {
     e: React.MouseEvent<HTMLAnchorElement>,
@@ -17,15 +21,11 @@ const handleClick = ({ e, hashId }: handleClickProps) => {
 
 function HeroPicture() {
     return (
-        <picture>
-            <source srcSet={getImg('hero-bg.avif')} type='image/avif' />
-            <source srcSet={getImg('hero-bg.webp')} type='image/webp' />
-            <img
-                src={getImg('hero-bg.jpg')}
-                alt='A group of international students gathering'
-                fetchPriority='high'
-            />
-        </picture>
+        <Image
+            src={images.heroBg}
+            alt='A group of international students gathering'
+            priority
+        />
     )
 }
 
@@ -42,14 +42,14 @@ function HeroButtons() {
     return (
         <div className={styles.heroButtons}>
             <Link
-                to="#gelombang"
+                href="#gelombang"
                 className={styles.btnPrimary}
                 onClick={(e) => handleClick({ e: e, hashId: "gelombang" })}
             >
                 {heroes.registrationButtonDesc}
             </Link>
             <Link
-                to="#program"
+                href="#program"
                 className={styles.btnSecondary}
                 onClick={(e) => handleClick({ e: e, hashId: "program" })}
             >

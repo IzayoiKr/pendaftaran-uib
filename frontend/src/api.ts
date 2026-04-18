@@ -1,12 +1,9 @@
-import axios, { AxiosError } from 'axios';
-import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
-import useAuthStore from './store/useAuthStore';
-import type { AccessTokenResponse } from './types';
-
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import axios from 'axios';
+import type { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
+import type { User, AccessTokenResponse } from '@/types';
+import useAuthStore from '@/store/useAuthStore';
 
 const apiClient: AxiosInstance = axios.create({
-    baseURL: BASE_URL,
     withCredentials: true,
     headers: { "Content-Type": "application/json" },
 });
@@ -16,13 +13,13 @@ let refreshPromise: Promise<string> | null = null;
 async function refreshAccessToken(): Promise<string> {
     if (refreshPromise) return refreshPromise;
 
-    refreshPromise = fetch(`${BASE_URL}/api/auth/refresh`, {
+    refreshPromise = fetch('/api/auth/refresh', {
         method: 'POST',
         credentials: 'include'
     })
         .then(async (res) => {
             if (!res.ok) throw new Error('Refresh failed');
-            const data: { access_token: string; user: import('./types').User } = await res.json();
+            const data: { access_token: string; user: User } = await res.json();
             useAuthStore.getState().setAccessToken(data.access_token);
             useAuthStore.getState().setUser(data.user);
             return data.access_token;

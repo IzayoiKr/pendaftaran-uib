@@ -1,16 +1,19 @@
+'use client';
+
 import { useState, useRef, forwardRef, useImperativeHandle } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Turnstile } from "@marsidev/react-turnstile";
 import type { TurnstileInstance } from "@marsidev/react-turnstile";
-import type { Form } from "../../types";
-import { register } from "../../constants/data";
-import { registerSchema } from "../../validation/schema";
-import { api } from "../../api";
-import { RightArrowIcon } from "../../components/Icons";
-import styles from "./RegisterPage.module.scss";
+import type { Form } from "@/types";
+import { register } from "@/constants/data";
+import { registerSchema } from "@/validation/schema";
+import { api } from "@/api";
+import { RightArrowIcon } from "@/components/Icons";
+import styles from "./Register.module.scss";
 
-const SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY as string;
+const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY as string;
 
 interface RegisterTurnstileProps {
     onTokenChange: (token: string | null) => void;
@@ -67,6 +70,8 @@ const RegisterTurnstile = forwardRef<TurnstileHandle, RegisterTurnstileProps>(
     }
 );
 
+RegisterTurnstile.displayName = "RegisterTurnstile";
+
 function RegisterAction() {
     return (
         <>
@@ -75,14 +80,14 @@ function RegisterAction() {
             </button>
             <p className={styles.backLogin}>
                 Sudah memiliki akun?{" "}
-                <Link to="/login">Login</Link>
+                <Link href="/login">Login</Link>
             </p>
         </>
     );
 }
 
-export default function RegisterPage() {
-    const navigate = useNavigate();
+export default function Register() {
+    const router = useRouter();
     const turnstileRef = useRef<TurnstileHandle>(null);
 
     const [formData, setFormData] = useState({
@@ -125,7 +130,7 @@ export default function RegisterPage() {
                 cf_turnstile_token: turnstileToken
             });
             toast.success("Registrasi berhasil!")
-            navigate("/login");
+            router.push("/login");
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");
             turnstileRef.current?.reset();

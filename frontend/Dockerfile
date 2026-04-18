@@ -2,26 +2,33 @@ FROM node:22-alpine AS base
 WORKDIR /app
 COPY package*.json ./
 
-ARG VITE_TURNSTILE_SITE_KEY
-ENV VITE_TURNSTILE_SITE_KEY=$VITE_TURNSTILE_SITE_KEY
+ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY
+ENV NEXT_PUBLIC_TURNSTILE_SITE_KEY=$NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
 FROM base AS development
 RUN --mount=type=cache,target=/home/node/.npm npm install --legacy-peer-deps
 COPY --chown=node:node . .
 USER node
 EXPOSE 8989
-CMD [ "npm", "run", "dev", "--", "--host" ]
+CMD [ "npm", "run", "dev", "--", "-H", "0.0.0.0" ]
 
 FROM base AS builder
+ENV NEXT_TELEMETRY_DISABLED=1
 RUN --mount=type=cache,target=/home/node/.npm npm ci
 COPY . .
 RUN npm run build
 
-FROM nginx:alpine AS production
-WORKDIR /usr/share/nginx/html
-RUN rm -rf ./*
-COPY --from=builder /app/dist .
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-RUN chmod -R 755 /usr/share/nginx/html
+FROM node:22-alpine AS production
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+USER nextjs
 EXPOSE 8989
-CMD [ "nginx", "-g", "daemon off;" ]
+ENV PORT=8989
+ENV HOSTNAME="0.0.0.0"
+CMD ["node", "server.js"]

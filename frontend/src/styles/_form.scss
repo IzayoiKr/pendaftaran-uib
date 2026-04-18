@@ -1,4 +1,4 @@
-@use './global.scss';
+@use '@/styles/config.scss' as global;
 @use 'sass:map';
 
 $input-bg:      #f9f9ff;

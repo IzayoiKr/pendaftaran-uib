@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { api } from "../../api";
-import { RightArrowIcon } from "../../components/Icons";
+import { api } from "@/api";
+import { RightArrowIcon } from "@/components/Icons";
 import styles from "./ForgotPasswordPage.module.scss";
 
 interface ForgotForm {
@@ -79,7 +79,7 @@ function ForgotForm({ onReset }: ForgotFormProps) {
     );
 }
 
-export default function ForgotPasswordPage() {
+export default function ForgotPassword() {
     const handleReset = async (email: string, nik: string) => {
         await api.auth.forgotPassword(email, nik); // TODO: pastikan endpoint ini ada
         toast.success("Email reset password telah dikirim!");

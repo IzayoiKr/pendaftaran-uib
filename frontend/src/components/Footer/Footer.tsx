@@ -1,9 +1,11 @@
-import { Link } from "react-router-dom";
+'use client';
+
+import Link from "next/link";
 import styles from './Footer.module.scss';
-import { footerNavLinks } from "../../constants/navigation";
-import { contactInfo, externalLinks } from "../../constants/contact";
-import scrollToId from "../ScrollToId";
-import { socialIconMap } from "../Icons";
+import { footerNavLinks } from "@/constants/navigation";
+import { contactInfo, externalLinks } from "@/constants/contact";
+import scrollToId from "@/components/ScrollToId";
+import { socialIconMap } from "@/components/Icons";
 
 function FooterMenu() {
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, to: string) => {
@@ -25,7 +27,7 @@ function FooterMenu() {
                             {isExternal ? (
                                 <a href={link.to} target="_blank" rel="noopener noreferrer">{link.label}</a>
                             ) : (
-                                <Link to={link.to} onClick={(e) => handleClick(e, link.to)}>{link.label}</Link>
+                                <Link href={link.to} onClick={(e) => handleClick(e, link.to)}>{link.label}</Link>
                             )}
                         </li>
                     )
@@ -109,7 +111,7 @@ function FooterBottom() {
 
 export default function Footer() {
     return (
-        <footer>
+        <footer className={styles.footer}>
             <div className={styles.container}>
                 <FooterTop />
                 <FooterBottom />

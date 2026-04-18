@@ -1,4 +1,4 @@
-import type { ContactInfo, ExternalLinks } from "../types";
+import type { ContactInfo, ExternalLinks } from "@/types";
 
 export const contactInfo: ContactInfo = {
     university: "Universitas Internasional Batam",

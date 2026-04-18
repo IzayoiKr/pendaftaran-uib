@@ -146,18 +146,20 @@ services:
       context: ./frontend
       target: development
       args:
-        - VITE_TURNSTILE_SITE_KEY=${VITE_TURNSTILE_SITE_KEY}
+        - NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
     container_name: frontend-pendaftaran-uib-dev
     depends_on:
       - backend
     environment:
-      - NODE_ENV=development
-      - CHOKIDAR_USEPOLLING=true
+      - NODE_ENV=${NODE_ENV}
+      - BACKEND_URL=${BACKEND_URL}
+      - CHOKIDAR_USEPOLLING=${CHOKIDAR_USEPOLLING}
     ports:
       - ${FRONTEND_PORTS}
     volumes:
       - ./frontend:/app
       - /app/node_modules
+      - /app/.next
 
 volumes:
   mysql_data:
