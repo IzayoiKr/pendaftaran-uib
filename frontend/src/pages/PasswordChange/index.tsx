@@ -2,7 +2,7 @@ import Header from "../../components/Header/Header";
 import UbahPasswordPage from "./UbahPasswordPage";
 import Footer from "../../components/Footer/Footer";
 
-export default function Login() {
+export default function UbahPassword() {
     return (
         <>
             <Header />
@@ -11,3 +11,5 @@ export default function Login() {
         </>
     )
 }
+
+

@@ -2,7 +2,7 @@ import Header from "../../components/Header/Header";
 import PerubahanProdiPage from "./PerubahanProdiPage";
 import Footer from "../../components/Footer/Footer";
 
-export default function Login() {
+export default function UbahProdi() {
     return (
         <>
             <Header />
@@ -11,3 +11,4 @@ export default function Login() {
         </>
     )
 }
+

@@ -2,7 +2,7 @@ import Header from "../../components/Header/Header";
 import Footer from "../../components/Footer/Footer";
 import AccountPage from "./AccountPage";
 
-export default function Login() {
+export default function MyAccount() {
     return (
         <>
             <Header />
