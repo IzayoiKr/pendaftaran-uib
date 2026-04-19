@@ -10,7 +10,7 @@ RUN --mount=type=cache,target=/home/node/.npm npm install --legacy-peer-deps
 COPY --chown=node:node . .
 USER node
 EXPOSE 8989
-CMD [ "npm", "run", "dev", "--", "-H", "0.0.0.0" ]
+CMD [ "npm", "run", "dev", "--", "--webpack", "-H", "0.0.0.0" ]
 
 FROM base AS builder
 ENV NEXT_TELEMETRY_DISABLED=1

@@ -4,7 +4,7 @@ const backendUrl = process.env.BACKEND_URL ?? 'http://localhost:9999'
 
 const nextConfig: NextConfig = {
     reactCompiler: true,
-    allowedDevOrigins: ['*'],
+    allowedDevOrigins: process.env.EXTRA_DEV_ORIGINS ? [process.env.EXTRA_DEV_ORIGINS] : [],
     sassOptions: {
         loadPaths: ['node_modules']
     },
@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
             }
         ];
     },
-    output: 'standalone'
+    output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined
 };
 
 export default nextConfig;

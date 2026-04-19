@@ -65,12 +65,9 @@ services:
       test:
         - CMD-SHELL
         - >-
-          mongosh --port ${MONGO_PORT}
-          --username "${MONGO_USER}"
-          --password "${MONGO_PASSWORD}"
-          --authenticationDatabase admin
-          --eval "db.adminCommand('ping')"
-          --quiet
+          mongosh --port ${MONGO_PORT} --username "${MONGO_USER}" --password
+          "${MONGO_PASSWORD}" --authenticationDatabase admin --eval
+          "db.adminCommand('ping')" --quiet
       interval: 10s
       timeout: 5s
       retries: 10
@@ -106,9 +103,8 @@ services:
       DB_PASSWORD: ${MYSQL_PASSWORD}
       DB_NAME: ${MYSQL_DATABASE}
     command: >-
-      migrate
-      -path /app/migrations
-      -database "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(mysql:${MYSQL_PORT})/${MYSQL_DATABASE}"
+      migrate -path /app/migrations -database
+      "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(mysql:${MYSQL_PORT})/${MYSQL_DATABASE}"
       up
 
   backend:
@@ -153,7 +149,7 @@ services:
     environment:
       - NODE_ENV=${NODE_ENV}
       - BACKEND_URL=${BACKEND_URL}
-      - CHOKIDAR_USEPOLLING=${CHOKIDAR_USEPOLLING}
+      - WATCHPACK_POLLING=true
     ports:
       - ${FRONTEND_PORTS}
     volumes:
