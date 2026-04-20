@@ -1,38 +1,41 @@
-import { useNavigate } from "react-router-dom";
+'use client';
+
+import { useRouter } from "next/navigation";
 import styles from "./PerubahanProdiPage.module.scss";
 
-// ── Types ──────────────────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 interface BiodataPendaftaran {
     nomorDaftar: string;
-    periode: string;
-    gelombang: string;
-    jurusan: string;
+    periode:     string;
+    gelombang:   string;
+    jurusan:     string;
     namaLengkap: string;
     alamatEmail: string;
-    nomorNIK: string;
+    nomorNIK:    string;
 }
 
 interface RequestPerpindahan {
-    tanggalRequest: string;
-    programStudiSebelumnya: string;
+    tanggalRequest:          string;
+    programStudiSebelumnya:  string;
     programStudiPerpindahan: string;
-    waktuKuliahSebelumnya: string;
-    waktuKuliahPerpindahan: string;
-    statusValidasi: string;
-    tanggalValidasi: string;
+    waktuKuliahSebelumnya:   string;
+    waktuKuliahPerpindahan:  string;
+    statusValidasi:          string;
+    tanggalValidasi:         string;
 }
 
-// ── Sub-components ─────────────────────────────────────────────────────────────
+// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function BiodataSection({ data }: { data: BiodataPendaftaran }) {
     const rows: [string, string][] = [
         ["Nomor Daftar", data.nomorDaftar],
-        ["Periode", data.periode],
-        ["Gelombang", data.gelombang],
-        ["Jurusan", data.jurusan],
+        ["Periode",      data.periode],
+        ["Gelombang",    data.gelombang],
+        ["Jurusan",      data.jurusan],
         ["Nama Lengkap", data.namaLengkap],
         ["Alamat Email", data.alamatEmail],
-        ["Nomor NIK", data.nomorNIK],
+        ["Nomor NIK",    data.nomorNIK],
     ];
 
     return (
@@ -87,15 +90,19 @@ function RequestTable({ requests }: { requests: RequestPerpindahan[] }) {
     );
 }
 
-// ── Parent ─────────────────────────────────────────────────────────────────────
+// ─── Mock data — ganti dengan data dari backend / props / context ─────────────
+
 const MOCK_BIODATA: BiodataPendaftaran = {
     nomorDaftar: "", periode: "", gelombang: "", jurusan: "",
     namaLengkap: "", alamatEmail: "", nomorNIK: "",
 };
+
 const MOCK_REQUESTS: RequestPerpindahan[] = []; // TODO: fetch dari backend
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function PerubahanProdiPage() {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     return (
         <main className={styles.page}>
@@ -107,11 +114,14 @@ export default function PerubahanProdiPage() {
                 <RequestTable requests={MOCK_REQUESTS} />
 
                 <div className={styles.bottomActions}>
-                    <button className={styles.btnWarning} onClick={() => navigate(-1)}>← Kembali</button>
-                    <button className={styles.btnSuccess} onClick={() => navigate("/perubahan-prodi/request")}>+ Request Perpindahan Prodi</button>
+                    <button className={styles.btnWarning} onClick={() => router.back()}>
+                        ← Kembali
+                    </button>
+                    <button className={styles.btnSuccess} onClick={() => router.push("/perubahan-prodi/request")}>
+                        + Request Perpindahan Prodi
+                    </button>
                 </div>
             </div>
         </main>
     );
 }
-

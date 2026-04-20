@@ -1,24 +1,33 @@
+'use client';
+
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import { RightArrowIcon } from "../../components/Icons";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { api } from "@/api";
+import { RightArrowIcon } from "@/components/Icons";
 import styles from "./UbahPasswordPage.module.scss";
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 interface PasswordForm {
-    oldPassword: string;
-    newPassword: string;
+    oldPassword:     string;
+    newPassword:     string;
     confirmPassword: string;
 }
 
 const FIELDS: { name: keyof PasswordForm; placeholder: string }[] = [
-    { name: "oldPassword", placeholder: "Password Lama (Old Password) *" },
-    { name: "newPassword", placeholder: "Password Baru (New Password) *" },
-    { name: "confirmPassword", placeholder: "Konfirmasi Password Baru (Confirm New Password) *" },
+    { name: "oldPassword",     placeholder: "Password Lama (Old Password) *"                       },
+    { name: "newPassword",     placeholder: "Password Baru (New Password) *"                       },
+    { name: "confirmPassword", placeholder: "Konfirmasi Password Baru (Confirm New Password) *"    },
 ];
 
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
 function PasswordInput({ name, placeholder, value, onChange }: {
-    name: keyof PasswordForm;
+    name:        keyof PasswordForm;
     placeholder: string;
-    value: string;
-    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    value:       string;
+    onChange:    (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
     return (
         <input
@@ -46,7 +55,10 @@ function SubmitAction({ isLoading }: { isLoading: boolean }) {
     );
 }
 
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function UbahPasswordPage() {
+    const router = useRouter();
     const [form, setForm] = useState<PasswordForm>({ oldPassword: "", newPassword: "", confirmPassword: "" });
     const [isLoading, setIsLoading] = useState(false);
 
@@ -57,9 +69,19 @@ export default function UbahPasswordPage() {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (form.newPassword !== form.confirmPassword) {
+            toast.error("Password baru dan konfirmasi tidak cocok.");
+            return;
+        }
+
         setIsLoading(true);
         try {
-            await new Promise(r => setTimeout(r, 1000)); // TODO: ganti API call
+            await api.auth.changePassword(form.oldPassword, form.newPassword); // TODO: pastikan endpoint ini ada
+            toast.success("Password berhasil diubah!");
+            router.push("/account");
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");
         } finally {
             setIsLoading(false);
         }
@@ -72,8 +94,13 @@ export default function UbahPasswordPage() {
                 <p className={styles.required}>* Wajib di Isi (Required)</p>
                 <form onSubmit={handleSubmit} noValidate>
                     {FIELDS.map(f => (
-                        <PasswordInput key={f.name} name={f.name}
-                            placeholder={f.placeholder} value={form[f.name]} onChange={handleChange} />
+                        <PasswordInput
+                            key={f.name}
+                            name={f.name}
+                            placeholder={f.placeholder}
+                            value={form[f.name]}
+                            onChange={handleChange}
+                        />
                     ))}
                     <SubmitAction isLoading={isLoading} />
                 </form>
@@ -81,4 +108,3 @@ export default function UbahPasswordPage() {
         </main>
     );
 }
-
