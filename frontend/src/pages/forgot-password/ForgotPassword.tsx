@@ -1,25 +1,31 @@
+'use client';
+
 import { useState } from "react";
 import { toast } from "sonner";
 import { api } from "@/api";
 import { RightArrowIcon } from "@/components/Icons";
 import styles from "./ForgotPasswordPage.module.scss";
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 interface ForgotForm {
     email: string;
-    nik: string;
+    nik:   string;
 }
 
 interface ForgotFormProps {
     onReset: (email: string, nik: string) => Promise<void>;
 }
 
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
 function ForgotInput({ name, type, placeholder, autoComplete, value, onChange }: {
-    name: keyof ForgotForm;
-    type: "email" | "text";
-    placeholder: string;
+    name:         keyof ForgotForm;
+    type:         "email" | "text";
+    placeholder:  string;
     autoComplete: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    value:        string;
+    onChange:     (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
     return (
         <input
@@ -45,7 +51,7 @@ function ForgotAction() {
 
 function ForgotForm({ onReset }: ForgotFormProps) {
     const [email, setEmail] = useState("");
-    const [nik, setNik] = useState("");
+    const [nik,   setNik]   = useState("");
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -78,6 +84,8 @@ function ForgotForm({ onReset }: ForgotFormProps) {
         </form>
     );
 }
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ForgotPassword() {
     const handleReset = async (email: string, nik: string) => {

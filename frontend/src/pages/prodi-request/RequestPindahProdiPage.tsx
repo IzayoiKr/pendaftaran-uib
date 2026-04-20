@@ -1,48 +1,65 @@
+'use client';
+
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { api } from "@/api";
 import styles from "./RequestPindahProdiPage.module.scss";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+
 interface BiodataPendaftaran {
     nomorDaftar: string;
-    periode: string;
-    gelombang: string;
-    jurusan: string;
+    periode:     string;
+    gelombang:   string;
+    jurusan:     string;
     namaLengkap: string;
     alamatEmail: string;
-    nomorNIK: string;
+    nomorNIK:    string;
 }
 
 interface RequestPindahForm {
-    prodiTujuan: string;
+    prodiTujuan:           string;
     waktuKuliahSebelumnya: string;
-    waktuKuliahBaru: string;
+    waktuKuliahBaru:       string;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
+
 const PRODI_OPTIONS = [
-    "Akuntansi (Accounting)", "Arsitektur (Architecture)", "Biologi (Biology)",
-    "Gizi (Nutrition)", "Ilmu Hukum (Law Science)", "Kedokteran (Medicine)",
-    "Manajemen (Management)", "Pariwisata (Tourism)",
+    "Akuntansi (Accounting)",
+    "Arsitektur (Architecture)",
+    "Biologi (Biology)",
+    "Gizi (Nutrition)",
+    "Ilmu Hukum (Law Science)",
+    "Kedokteran (Medicine)",
+    "Manajemen (Management)",
+    "Pariwisata (Tourism)",
     "Pendidikan Bahasa Inggris (English Language Education)",
-    "Profesi Kedokteran (Medicine)", "Sistem Informasi (Information System)",
-    "Teknik Sipil (Civil Engineering)", "Teknologi Informasi (Information Technology)",
+    "Profesi Kedokteran (Medicine)",
+    "Sistem Informasi (Information System)",
+    "Teknik Sipil (Civil Engineering)",
+    "Teknologi Informasi (Information Technology)",
 ] as const;
 
 const WAKTU_KULIAH_OPTIONS = [
-    { value: "pagi", label: "Pagi (Morning Class)" },
-    { value: "malam", label: "Malam (Night Class)" },
+    { value: "pagi",  label: "Pagi (Morning Class)" },
+    { value: "malam", label: "Malam (Night Class)"  },
 ] as const;
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function BiodataSection({ data }: { data: BiodataPendaftaran }) {
     const rows: [string, string][] = [
-        ["Nomor Daftar", data.nomorDaftar], ["Periode", data.periode],
-        ["Gelombang", data.gelombang], ["Jurusan", data.jurusan],
-        ["Nama Lengkap", data.namaLengkap], ["Alamat Email", data.alamatEmail],
-        ["Nomor NIK", data.nomorNIK],
+        ["Nomor Daftar", data.nomorDaftar],
+        ["Periode",      data.periode],
+        ["Gelombang",    data.gelombang],
+        ["Jurusan",      data.jurusan],
+        ["Nama Lengkap", data.namaLengkap],
+        ["Alamat Email", data.alamatEmail],
+        ["Nomor NIK",    data.nomorNIK],
     ];
+
     return (
         <div className={styles.biodataInfo}>
             {rows.map(([label, value]) => (
@@ -67,12 +84,12 @@ function ReadonlySelect({ label, value }: { label: string; value: string }) {
 }
 
 function EditableSelect({ id, label, value, required, onChange, children }: {
-    id: string;
-    label: string;
-    value: string;
+    id:        string;
+    label:     string;
+    value:     string;
     required?: boolean;
-    onChange: (e: ChangeEvent<HTMLSelectElement>) => void;
-    children: React.ReactNode;
+    onChange:  (e: ChangeEvent<HTMLSelectElement>) => void;
+    children:  React.ReactNode;
 }) {
     return (
         <div className={styles.formField}>
@@ -90,31 +107,46 @@ function EditableSelect({ id, label, value, required, onChange, children }: {
 function ActionRow({ isLoading, onCancel }: { isLoading: boolean; onCancel: () => void }) {
     return (
         <div className={styles.bottomActions}>
-            <button type="button" className={styles.btnDanger} onClick={onCancel} disabled={isLoading}>Batal</button>
+            <button type="button" className={styles.btnDanger} onClick={onCancel} disabled={isLoading}>
+                Batal
+            </button>
             <button type="submit" className={styles.btn} disabled={isLoading} aria-busy={isLoading}>
-                {isLoading ? <><div className={styles.spinner} aria-hidden="true" /> Simpan</> : "Simpan"}
+                {isLoading
+                    ? <><div className={styles.spinner} aria-hidden="true" /> Simpan</>
+                    : "Simpan"
+                }
             </button>
         </div>
     );
 }
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
+// ─── Mock data — ganti dengan data dari backend / props / context ─────────────
+
 const MOCK_BIODATA: BiodataPendaftaran = {
-    nomorDaftar: "OL2520068", periode: "2025/2026", gelombang: "Beasiswa II",
-    jurusan: "Teknologi Informasi", namaLengkap: "Jonatan",
-    alamatEmail: "theeclipseicy9@gmail.com", nomorNIK: "2171092002079006",
+    nomorDaftar: "OL2520068",
+    periode:     "2025/2026",
+    gelombang:   "Beasiswa II",
+    jurusan:     "Teknologi Informasi",
+    namaLengkap: "Jonatan",
+    alamatEmail: "theeclipseicy9@gmail.com",
+    nomorNIK:    "2171092002079006",
 };
+
 const WAKTU_KULIAH_SEBELUMNYA = "Malam (Night Class)";
 
-// ─── Parent ───────────────────────────────────────────────────────────────────
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function RequestPindahProdiPage() {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [form, setForm] = useState<RequestPindahForm>({
-        prodiTujuan: "", waktuKuliahSebelumnya: WAKTU_KULIAH_SEBELUMNYA, waktuKuliahBaru: "",
+        prodiTujuan:           "",
+        waktuKuliahSebelumnya: WAKTU_KULIAH_SEBELUMNYA,
+        waktuKuliahBaru:       "",
     });
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleSelectChange = (field: keyof RequestPindahForm) =>
+    const handleSelectChange =
+        (field: keyof RequestPindahForm) =>
         (e: ChangeEvent<HTMLSelectElement>) =>
             setForm(prev => ({ ...prev, [field]: e.target.value }));
 
@@ -122,8 +154,11 @@ export default function RequestPindahProdiPage() {
         e.preventDefault();
         setIsLoading(true);
         try {
-            await new Promise(r => setTimeout(r, 1500)); // TODO: ganti API call
-            navigate(-1);
+            await api.prodi.requestPindah(form); // TODO: pastikan endpoint ini ada
+            toast.success("Request perpindahan prodi berhasil dikirim!");
+            router.back();
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");
         } finally {
             setIsLoading(false);
         }
@@ -136,23 +171,45 @@ export default function RequestPindahProdiPage() {
                 <BiodataSection data={MOCK_BIODATA} />
 
                 <h3 className={styles.formTitle}>Form Request Pindah Program Studi</h3>
+
                 <form onSubmit={handleSubmit} noValidate>
                     <div className={styles.formGrid}>
-                        <ReadonlySelect label="Program Studi Sebelumnya (Previous Major)" value={`${MOCK_BIODATA.jurusan} (Information Technology)`} />
-                        <EditableSelect id="prodiTujuan" label="Program Studi Baru (New Major)" value={form.prodiTujuan} required onChange={handleSelectChange("prodiTujuan")}>
+                        <ReadonlySelect
+                            label="Program Studi Sebelumnya (Previous Major)"
+                            value={`${MOCK_BIODATA.jurusan} (Information Technology)`}
+                        />
+                        <EditableSelect
+                            id="prodiTujuan"
+                            label="Program Studi Baru (New Major)"
+                            value={form.prodiTujuan}
+                            required
+                            onChange={handleSelectChange("prodiTujuan")}
+                        >
                             <option value="" disabled>Program Studi Pilihan (Selected Study Program) *</option>
                             {PRODI_OPTIONS.map(p => <option key={p} value={p}>{p}</option>)}
                         </EditableSelect>
-                        <ReadonlySelect label="Waktu Kuliah Sebelumnya (Previous Shift) *" value={WAKTU_KULIAH_SEBELUMNYA} />
-                        <EditableSelect id="waktuKuliahBaru" label="Waktu Kuliah Baru (New Shift)" value={form.waktuKuliahBaru} required onChange={handleSelectChange("waktuKuliahBaru")}>
+
+                        <ReadonlySelect
+                            label="Waktu Kuliah Sebelumnya (Previous Shift)"
+                            value={WAKTU_KULIAH_SEBELUMNYA}
+                        />
+                        <EditableSelect
+                            id="waktuKuliahBaru"
+                            label="Waktu Kuliah Baru (New Shift)"
+                            value={form.waktuKuliahBaru}
+                            required
+                            onChange={handleSelectChange("waktuKuliahBaru")}
+                        >
                             <option value="" disabled>Pilih Waktu Kuliah *</option>
-                            {WAKTU_KULIAH_OPTIONS.map(({ value, label }) => <option key={value} value={value}>{label}</option>)}
+                            {WAKTU_KULIAH_OPTIONS.map(({ value, label }) => (
+                                <option key={value} value={value}>{label}</option>
+                            ))}
                         </EditableSelect>
                     </div>
-                    <ActionRow isLoading={isLoading} onCancel={() => navigate(-1)} />
+
+                    <ActionRow isLoading={isLoading} onCancel={() => router.back()} />
                 </form>
             </div>
         </main>
     );
 }
-
