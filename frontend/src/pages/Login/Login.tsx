@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import type { Form } from "@/types";
 import { login } from "@/constants/data";
@@ -96,13 +96,16 @@ function LoginForm({ onLogin }: LoginFormProps) {
 
 export default function Login() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const login = useAuthStore((state) => state.login);
+
+    const url = searchParams?.get('from') || '/';
 
     const handleLogin = async (email: string, password: string) => {
         const res = await api.auth.login(email, password);
         login(res.user, res.access_token);
         toast.success("Login berhasil!");
-        router.push("/");
+        router.push(url);
     }
 
     return (

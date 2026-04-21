@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { api } from "@/api";
 import useAuthStore from "@/store/useAuthStore";
 import type { User } from "@/types";
-import styles from "./AccountPage.module.scss";
+import styles from "./Account.module.scss";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -15,23 +15,23 @@ type PaymentStatus = "Belum Lunas" | "Telah Lunas";
 
 interface Registration {
     nomorDaftar: string;
-    periode:     number;
-    gelombang:   string;
-    jurusan:     string;
-    biodata:     BiodataStatus;
-    pembayaran:  PaymentStatus;
-    usm:         string;
+    periode: number;
+    gelombang: string;
+    jurusan: string;
+    biodata: BiodataStatus;
+    pembayaran: PaymentStatus;
+    usm: string;
     passwordUSM: string;
 }
 
 interface RegistrationHandlers {
-    onCheckPendaftaran:    (reg: Registration) => void;
-    onUbahBiodata:         (reg: Registration) => void;
-    onDownloadSuratHasil:  (reg: Registration) => void;
-    onBuktiTransfer:       (reg: Registration) => void;
-    onPerubahanProdi:      (reg: Registration) => void;
+    onCheckPendaftaran: (reg: Registration) => void;
+    onUbahBiodata: (reg: Registration) => void;
+    onDownloadSuratHasil: (reg: Registration) => void;
+    onBuktiTransfer: (reg: Registration) => void;
+    onPerubahanProdi: (reg: Registration) => void;
     onDownloadPengunduran: (reg: Registration) => void;
-    onPrasyaratOspek:      (reg: Registration) => void;
+    onPrasyaratOspek: (reg: Registration) => void;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -39,8 +39,8 @@ interface RegistrationHandlers {
 function AccountInfo({ user }: { user: User }) {
     const rows: [string, string][] = [
         ["Nama Lengkap", user.full_name || "-"],
-        ["Alamat Email", user.email     || "-"],
-        ["Nomor NIK",    user.nik       || "-"],
+        ["Alamat Email", user.email || "-"],
+        ["Nomor NIK", user.nik || "-"],
     ];
 
     return (
@@ -58,9 +58,9 @@ function AccountInfo({ user }: { user: User }) {
 function StatusBadge({ status }: { status: BiodataStatus | PaymentStatus }) {
     const cls =
         status === "Telah Lengkap" ? styles.statusComplete :
-        status === "Belum Lengkap" ? styles.statusIncomplete :
-        status === "Telah Lunas"   ? styles.statusPaid :
-                                     styles.statusUnpaid;
+            status === "Belum Lengkap" ? styles.statusIncomplete :
+                status === "Telah Lunas" ? styles.statusPaid :
+                    styles.statusUnpaid;
     return <span className={cls}>{status || "-"}</span>;
 }
 
@@ -69,14 +69,14 @@ function RegistrationActions({ reg, handlers }: { reg: Registration; handlers: R
 
     return (
         <div className={styles.actionGroup}>
-            <button className={`${styles.btn} ${styles.btnWarning}`}  onClick={() => handlers.onCheckPendaftaran(reg)}>Check Pendaftaran</button>
-            <button className={`${styles.btn} ${styles.btnPrimary}`}  onClick={() => handlers.onUbahBiodata(reg)}>Ubah Biodata</button>
+            <button className={`${styles.btn} ${styles.btnWarning}`} onClick={() => handlers.onCheckPendaftaran(reg)}>Check Pendaftaran</button>
+            <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => handlers.onUbahBiodata(reg)}>Ubah Biodata</button>
             {isComplete && (
                 <>
                     <button className={`${styles.btn} ${styles.btnSuccess}`} onClick={() => handlers.onDownloadSuratHasil(reg)}>Surat Hasil</button>
-                    <button className={`${styles.btn} ${styles.btnInfo}`}    onClick={() => handlers.onBuktiTransfer(reg)}>Bukti Transfer</button>
+                    <button className={`${styles.btn} ${styles.btnInfo}`} onClick={() => handlers.onBuktiTransfer(reg)}>Bukti Transfer</button>
                     <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => handlers.onPerubahanProdi(reg)}>Perubahan Prodi</button>
-                    <button className={`${styles.btn} ${styles.btnDanger}`}  onClick={() => handlers.onDownloadPengunduran(reg)}>Pengunduran Diri</button>
+                    <button className={`${styles.btn} ${styles.btnDanger}`} onClick={() => handlers.onDownloadPengunduran(reg)}>Pengunduran Diri</button>
                     <button className={`${styles.btn} ${styles.btnWarning}`} onClick={() => handlers.onPrasyaratOspek(reg)}>Prasyarat Ospek</button>
                 </>
             )}
@@ -100,12 +100,12 @@ function RegistrationTable({ registrations, handlers }: { registrations: Registr
                     {registrations.map(reg => (
                         <tr key={reg.nomorDaftar}>
                             <td>{reg.nomorDaftar || "-"}</td>
-                            <td>{reg.periode     || "-"}</td>
-                            <td>{reg.gelombang   || "-"}</td>
-                            <td>{reg.jurusan     || "-"}</td>
-                            <td><StatusBadge status={reg.biodata}    /></td>
+                            <td>{reg.periode || "-"}</td>
+                            <td>{reg.gelombang || "-"}</td>
+                            <td>{reg.jurusan || "-"}</td>
+                            <td><StatusBadge status={reg.biodata} /></td>
                             <td><StatusBadge status={reg.pembayaran} /></td>
-                            <td>{reg.usm         || "-"}</td>
+                            <td>{reg.usm || "-"}</td>
                             <td>{reg.passwordUSM || "-"}</td>
                             <td><RegistrationActions reg={reg} handlers={handlers} /></td>
                         </tr>
@@ -118,19 +118,32 @@ function RegistrationTable({ registrations, handlers }: { registrations: Registr
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function AccountPage() {
+export default function Account() {
+    const { user, isLoading, logout } = useAuthStore();
     const router = useRouter();
-    const { user, logout } = useAuthStore();
     const [registrations, setRegistrations] = useState<Registration[]>([]);
 
     useEffect(() => {
-        if (!user) {
-            router.push("/login");
-        } else {
-            const saved = localStorage.getItem(`registrations_${user.id}`);
-            if (saved) setRegistrations(JSON.parse(saved));
+        if (user) {
+            api.auth.profile()
+                .then(freshUser => {
+                    const current = useAuthStore.getState().user;
+                    if (JSON.stringify(current) !== JSON.stringify(freshUser)) {
+                        useAuthStore.getState().setUser(freshUser);
+                    }
+                })
+                .catch(() => {/* TODO handle errors */ })
         }
-    }, [router, user]);
+    }, [user]);
+
+    useEffect(() => {
+        if (!isLoading && !user) {
+            router.push("/login");
+        }
+    }, [isLoading, user, router])
+
+    if (isLoading) return <div>Loading...</div>;
+    if (!user) return null;
 
     const handleLogout = async () => {
         try {
@@ -140,7 +153,6 @@ export default function AccountPage() {
         }
         logout();
         toast.success("Logout Berhasil!");
-        router.push("/login");
     };
 
     const downloadPdf = (filename: string) => {
@@ -151,16 +163,14 @@ export default function AccountPage() {
     };
 
     const handlers: RegistrationHandlers = {
-        onCheckPendaftaran:    ()    => router.push("/"),
-        onUbahBiodata:         (reg) => router.push(`/biodata?nomorDaftar=${reg.nomorDaftar}`), // TODO: ganti route sesuai Aldo
-        onDownloadSuratHasil:  (reg) => downloadPdf(`surat-hasil-${reg.nomorDaftar}.pdf`),
-        onBuktiTransfer:       (reg) => router.push(`/transferproof?nomorDaftar=${reg.nomorDaftar}`),
-        onPerubahanProdi:      (reg) => router.push(`/changeprodi?nomorDaftar=${reg.nomorDaftar}`),
+        onCheckPendaftaran: () => router.push("/"),
+        onUbahBiodata: (reg) => router.push(`/biodata?nomorDaftar=${reg.nomorDaftar}`), // TODO: ganti route sesuai Aldo
+        onDownloadSuratHasil: (reg) => downloadPdf(`surat-hasil-${reg.nomorDaftar}.pdf`),
+        onBuktiTransfer: (reg) => router.push(`/transferproof?nomorDaftar=${reg.nomorDaftar}`),
+        onPerubahanProdi: (reg) => router.push(`/changeprodi?nomorDaftar=${reg.nomorDaftar}`),
         onDownloadPengunduran: (reg) => downloadPdf(`pengunduran-diri-${reg.nomorDaftar}.pdf`),
-        onPrasyaratOspek:      (reg) => router.push(`/prasyaratospek?nomorDaftar=${reg.nomorDaftar}`),
+        onPrasyaratOspek: (reg) => router.push(`/prasyaratospek?nomorDaftar=${reg.nomorDaftar}`),
     };
-
-    if (!user) return null;
 
     return (
         <div className={styles.pageContent}>
@@ -185,9 +195,18 @@ export default function AccountPage() {
                 )}
 
                 <div className={styles.bottomActions}>
-                    <button className={`${styles.btnLg} ${styles.btnWarning}`} onClick={() => router.push("/passwordchange")}>UBAH PASSWORD</button>
-                    <button className={`${styles.btnLg} ${styles.btnPrimary}`} onClick={() => router.push("/profilechange")}>UBAH PROFILE</button>
-                    <button className={`${styles.btnLg} ${styles.btnDanger}`}  onClick={handleLogout}>⏻ LOGOUT</button>
+                    <button
+                        className={`${styles.btnLg} ${styles.btnWarning}`}
+                        onClick={() => router.push("/account/change-password")}>UBAH PASSWORD
+                    </button>
+                    <button
+                        className={`${styles.btnLg} ${styles.btnPrimary}`}
+                        onClick={() => router.push("/account/change-profile")}>UBAH PROFILE
+                    </button>
+                    <button
+                        className={`${styles.btnLg} ${styles.btnDanger}`}
+                        onClick={handleLogout}>⏻ LOGOUT
+                    </button>
                 </div>
             </div>
         </div>

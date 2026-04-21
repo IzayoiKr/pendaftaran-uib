@@ -11,7 +11,6 @@ import (
 	"os"
 	"strings"
 
-	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/models"
 
 	"github.com/google/uuid"
@@ -146,23 +145,6 @@ func Register(db *sql.DB) http.HandlerFunc {
 			Email: req.Email,
 		}
 
-		accessToken, err := auth.GenerateAccessToken(user.ID, user.Email)
-		if err != nil {
-			writeJSON(w, http.StatusInternalServerError, errJSON("server error"))
-			return
-		}
-
-		refreshToken, err := auth.GenerateRefreshToken(user.ID, user.Email)
-		if err != nil {
-			writeJSON(w, http.StatusInternalServerError, errJSON("server error"))
-			return
-		}
-
-		setRefreshCookie(w, refreshToken)
-
-		writeJSON(w, http.StatusCreated, accessTokenResponse{
-			AccessToken: accessToken,
-			User: user.ToDTO(),
-		})
+		writeJSON(w, http.StatusCreated, user.ToDTO())
 	}
 }

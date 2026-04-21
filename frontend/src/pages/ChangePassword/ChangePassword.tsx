@@ -1,33 +1,34 @@
 'use client';
 
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/api";
 import { RightArrowIcon } from "@/components/Icons";
-import styles from "./UbahPasswordPage.module.scss";
+import styles from "./ChangePassword.module.scss";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface PasswordForm {
-    oldPassword:     string;
-    newPassword:     string;
+    oldPassword: string;
+    newPassword: string;
     confirmPassword: string;
 }
 
 const FIELDS: { name: keyof PasswordForm; placeholder: string }[] = [
-    { name: "oldPassword",     placeholder: "Password Lama (Old Password) *"                       },
-    { name: "newPassword",     placeholder: "Password Baru (New Password) *"                       },
-    { name: "confirmPassword", placeholder: "Konfirmasi Password Baru (Confirm New Password) *"    },
+    { name: "oldPassword", placeholder: "Password Lama (Old Password) *" },
+    { name: "newPassword", placeholder: "Password Baru (New Password) *" },
+    { name: "confirmPassword", placeholder: "Konfirmasi Password Baru (Confirm New Password) *" },
 ];
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function PasswordInput({ name, placeholder, value, onChange }: {
-    name:        keyof PasswordForm;
+    name: keyof PasswordForm;
     placeholder: string;
-    value:       string;
-    onChange:    (e: ChangeEvent<HTMLInputElement>) => void;
+    value: string;
+    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
     return (
         <input
@@ -57,7 +58,7 @@ function SubmitAction({ isLoading }: { isLoading: boolean }) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function UbahPasswordPage() {
+export default function ChangePassword() {
     const router = useRouter();
     const [form, setForm] = useState<PasswordForm>({ oldPassword: "", newPassword: "", confirmPassword: "" });
     const [isLoading, setIsLoading] = useState(false);

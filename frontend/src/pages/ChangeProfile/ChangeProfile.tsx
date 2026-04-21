@@ -1,42 +1,43 @@
 'use client';
 
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/api";
 import { RightArrowIcon } from "@/components/Icons";
-import styles from "./UbahProfilePage.module.scss";
+import styles from "./ChangeProfile.module.scss";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface ProfileForm {
     namaLengkap: string;
-    nik:         string;
-    email:       string;
+    nik: string;
+    email: string;
 }
 
 const FIELDS: {
-    name:         keyof ProfileForm;
-    placeholder:  string;
-    type:         "text" | "email";
+    name: keyof ProfileForm;
+    placeholder: string;
+    type: "text" | "email";
     autoComplete: string;
-    editable:     boolean;
+    editable: boolean;
 }[] = [
-    { name: "namaLengkap", placeholder: "Nama Lengkap (Fullname) *", type: "text",  autoComplete: "name",  editable: true  },
-    { name: "nik",         placeholder: "Nomor NIK",                 type: "text",  autoComplete: "off",   editable: false },
-    { name: "email",       placeholder: "Alamat Email",              type: "email", autoComplete: "email", editable: false },
-];
+        { name: "namaLengkap", placeholder: "Nama Lengkap (Fullname) *", type: "text", autoComplete: "name", editable: true },
+        { name: "nik", placeholder: "Nomor NIK", type: "text", autoComplete: "off", editable: false },
+        { name: "email", placeholder: "Alamat Email", type: "email", autoComplete: "email", editable: false },
+    ];
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function ProfileInput({ name, placeholder, type, autoComplete, value, editable, onChange }: {
-    name:         keyof ProfileForm;
-    placeholder:  string;
-    type:         "text" | "email";
+    name: keyof ProfileForm;
+    placeholder: string;
+    type: "text" | "email";
     autoComplete: string;
-    value:        string;
-    editable:     boolean;
-    onChange:     (e: ChangeEvent<HTMLInputElement>) => void;
+    value: string;
+    editable: boolean;
+    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
     return (
         <input
@@ -66,13 +67,13 @@ function SubmitAction({ isLoading }: { isLoading: boolean }) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function UbahProfilePage() {
+export default function ChangeProfile() {
     const router = useRouter();
     // TODO: pre-fill dari backend / auth context
     const [form, setForm] = useState<ProfileForm>({
         namaLengkap: "",
-        nik:         "",
-        email:       "",
+        nik: "",
+        email: "",
     });
     const [isLoading, setIsLoading] = useState(false);
 

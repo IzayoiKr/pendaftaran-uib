@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export function proxy(request: NextRequest) {
-    const refreshToken = request.cookies.get('refresh_token');
+    const isAuthenticated = request.cookies.has('auth_hint');
 
-    if (!refreshToken) {
+    if (!isAuthenticated) {
         const loginUrl = new URL('/login', request.url);
         loginUrl.searchParams.set('from', request.nextUrl.pathname);
         return NextResponse.redirect(loginUrl);
@@ -13,14 +13,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: [
-        '/account/:path*',
-        '/transferproof/:path*',
-        '/uploadtransferproof/:path*',
-        '/prasyaratospek/:path*',
-        '/changeprodi/:path*',
-        '/requestchangeprodi/:path*',
-        '/profilechange/:path*',
-        '/login/passwordchange',
-    ]
-}
+    matcher: ['/account/:path*'],
+};

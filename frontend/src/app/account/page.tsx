@@ -1,8 +1,8 @@
 'use client';
 
 
-import AccountPage from '@/pages/account/AccountPage';
+import Account from '@/pages/Account/Account';
 
-export default function Account() {
-    return <AccountPage />;
+export default function AccountPage() {
+    return <Account />;
 }

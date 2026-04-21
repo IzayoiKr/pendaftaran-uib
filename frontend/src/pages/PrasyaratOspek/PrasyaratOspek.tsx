@@ -4,22 +4,22 @@ import { useRef, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/api";
-import styles from "./PrasyaratOspekPage.module.scss";
+import styles from "./PrasyaratOspek.module.scss";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface UploadField {
-    name:        string;
-    label:       string;
-    contohUrl?:  string;
+    name: string;
+    label: string;
+    contohUrl?: string;
     uploadedUrl?: string;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function FileUploadRow({ field, file, onChange }: {
-    field:    UploadField;
-    file:     File | null;
+    field: UploadField;
+    file: File | null;
     onChange: (name: string, file: File | null) => void;
 }) {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -72,12 +72,12 @@ function FileUploadRow({ field, file, onChange }: {
 
 const UPLOAD_FIELDS: UploadField[] = [
     { name: "pasFoto", label: "Pas Photo Final (Untuk KTM)", contohUrl: "/files/contoh-pas-foto.jpg" },
-    { name: "ijazah",  label: "Ijazah" },
+    { name: "ijazah", label: "Ijazah" },
 ];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function PrasyaratOspekPage() {
+export default function PrasyaratOspek() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [files, setFiles] = useState<Record<string, File | null>>(

@@ -10,7 +10,7 @@ import (
 )
 
 const AccessTokenTTL = 15 * time.Minute
-const RefreshTokenTTL = 24 * time.Hour
+const RefreshTokenTTL = 12 * time.Hour
 
 func getJWTSecret() []byte {
 	secret := os.Getenv("JWT_SECRET")

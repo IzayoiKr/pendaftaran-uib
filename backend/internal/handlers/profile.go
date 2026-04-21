@@ -8,9 +8,8 @@ import (
 	"pendaftaran-uib/backend/internal/models"
 )
 
-func GetAccount(db *sql.DB) http.HandlerFunc {
+func Profile(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Ambil ID user dari token JWT yang divalidasi oleh middleware
 		claims := auth.GetClaims(r)
 		if claims == nil {
 			writeJSON(w, http.StatusUnauthorized, errJSON("unauthorized"))
@@ -18,7 +17,6 @@ func GetAccount(db *sql.DB) http.HandlerFunc {
 		}
 
 		var user models.User
-		// Cari user di database berdasarkan ID dari token
 		err := db.QueryRow(
 			"SELECT id, full_name, nik, email FROM users WHERE id = ?",
 			claims.UserID,
@@ -33,7 +31,6 @@ func GetAccount(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Kirim data kembali ke frontend
 		writeJSON(w, http.StatusOK, user.ToDTO())
 	}
 }

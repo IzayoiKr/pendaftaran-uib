@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"os"
 
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/models"
@@ -19,7 +18,7 @@ type loginRequest struct {
 }
 
 type accessTokenResponse struct {
-	AccessToken string `json:"token"`
+	AccessToken string `json:"access_token"`
 	User models.UserDTO `json:"user"`
 }
 
@@ -70,23 +69,11 @@ func Login(db *sql.DB) http.HandlerFunc {
 		}
 
 		setRefreshCookie(w, refreshToken)
+		setAuthHintCookie(w)
 
 		writeJSON(w, http.StatusOK, accessTokenResponse{
 			AccessToken: accessToken,
 			User: user.ToDTO(),
 		})
 	}
-}
-
-func setRefreshCookie(w http.ResponseWriter, refreshToken string) {
-	secure := os.Getenv("APP_ENV") == "production"
-	http.SetCookie(w, &http.Cookie{
-		Name: "refresh_token",
-		Value: refreshToken,
-		Path: "/api/auth",
-		HttpOnly: true,
-		Secure: secure,
-		SameSite: http.SameSiteStrictMode,
-		MaxAge: 24 * 60 * 60,
-	})
 }

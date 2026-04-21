@@ -1,11 +1,11 @@
 'use client';
 
-import ForgotPassword from "@/pages/forgot-password/ForgotPassword";
+import ForgotPassword from "@/pages/ForgotPassword/ForgotPassword";
 
 
-export default function forgotpassword(){
+export default function ForgotPasswordPage() {
 
-    return <ForgotPassword/>
+    return <ForgotPassword />
 
 
 }

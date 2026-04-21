@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
+	"os"
 
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/models"
@@ -70,12 +71,55 @@ func Refresh(db *sql.DB, ts *auth.TokenStore) http.HandlerFunc {
 	}
 }
 
+
+func setRefreshCookie(w http.ResponseWriter, refreshToken string) {
+	secure := os.Getenv("APP_ENV") == "production"
+	http.SetCookie(w, &http.Cookie{
+		Name: "refresh_token",
+		Value: refreshToken,
+		Path: "/api/auth",
+		HttpOnly: true,
+		Secure: secure,
+		SameSite: http.SameSiteStrictMode,
+		MaxAge: 12 * 60 * 60,
+	})
+}
+
 func clearRefreshCookie(w http.ResponseWriter) {
+	secure := os.Getenv("APP_ENV") == "production"
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    "",
 		Path:     "/api/auth",
 		HttpOnly: true,
+		Secure: secure,
+		SameSite: http.SameSiteStrictMode,
 		MaxAge:   -1,
 	})
+}
+
+func setAuthHintCookie(w http.ResponseWriter) {
+    secure := os.Getenv("APP_ENV") == "production"
+    http.SetCookie(w, &http.Cookie{
+        Name:     "auth_hint",
+        Value:    "1",
+        Path:     "/",
+        HttpOnly: true,
+        Secure:   secure,
+        SameSite: http.SameSiteStrictMode,
+        MaxAge:   12 * 60 * 60,
+    })
+}
+
+func clearAuthHintCookie(w http.ResponseWriter) {
+    secure := os.Getenv("APP_ENV") == "production"
+    http.SetCookie(w, &http.Cookie{
+        Name:     "auth_hint",
+        Value:    "",
+        Path:     "/",
+        HttpOnly: true,
+        Secure:   secure,
+        SameSite: http.SameSiteStrictMode,
+        MaxAge:   -1,
+    })
 }

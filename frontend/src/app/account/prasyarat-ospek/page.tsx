@@ -1,12 +1,7 @@
 'use client';
 
-import PrasyaratOspekPage from "@/pages/prasyarat-ospek/PrasyaratOspekPage";
+import PrasyaratOspek from "@/pages/PrasyaratOspek/PrasyaratOspek";
 
-
-
-export default function prasyartospek(){
-
-    return <PrasyaratOspekPage/>
-
-
+export default function prasyartospek() {
+    return <PrasyaratOspek />;
 }

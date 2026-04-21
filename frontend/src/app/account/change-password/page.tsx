@@ -1,10 +1,7 @@
 'use client';
 
-import UbahPasswordPage from "@/pages/change-password/UbahPasswordPage";
+import ChangePassword from "@/pages/ChangePassword/ChangePassword";
 
-export default function changepassword(){
-
-    return <UbahPasswordPage/>
-
-
+export default function ChangePasswordPage() {
+    return <ChangePassword />;
 }

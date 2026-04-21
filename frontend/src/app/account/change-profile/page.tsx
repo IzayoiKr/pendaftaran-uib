@@ -1,10 +1,7 @@
 'use client';
 
-import UbahProfilePage from "@/pages/change-profile/UbahProfilePage";
+import ChangeProfile from "@/pages/ChangeProfile/ChangeProfile";
 
-export default function changeprofile(){
-
-    return <UbahProfilePage/>
-
-
+export default function changeprofile() {
+    return <ChangeProfile />;
 }

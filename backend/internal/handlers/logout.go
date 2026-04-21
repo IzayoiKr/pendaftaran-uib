@@ -19,6 +19,7 @@ func Logout(ts *auth.TokenStore) http.HandlerFunc {
 		}
 
 		clearRefreshCookie(w)
+		clearAuthHintCookie(w)
 
 		writeJSON(w, http.StatusOK, map[string]string{
 			"message": "logout berhasil",

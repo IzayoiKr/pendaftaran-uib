@@ -56,10 +56,11 @@ apiClient.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${newToken}`;
                 return apiClient(originalRequest);
 
-            } catch {
+            } catch (err) {
+                const errCode = err instanceof Error ? err.message : 'unknown';
                 useAuthStore.getState().logout();
-                window.location.href = '/login';
-                return Promise.reject(error);
+                window.location.href = `/login?code=${encodeURIComponent(errCode)}`;
+                return Promise.reject(err);
             }
         }
 
@@ -84,5 +85,7 @@ export const api = {
 
         logout: () =>
             apiClient.post<never, { message: string }>("/api/auth/logout"),
+
+        profile: () => apiClient.get<never, User>("/api/auth/profile"),
     }
 };
