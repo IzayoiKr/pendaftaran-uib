@@ -15,17 +15,20 @@ func Middleware(ts *TokenStore) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			header := r.Header.Get("Authorization")
 			if !strings.HasPrefix(header, "Bearer ") {
+				w.Header().Set("X-Auth-Error", "token")
 				http.Error(w, `{"error":"unauthorized"}`, http.StatusUnauthorized)
 				return
 			}
 
 			claims, err := Validatetoken(strings.TrimPrefix(header, "Bearer "))
 			if err != nil {
+				w.Header().Set("X-Auth-Error", "token")
 				http.Error(w, `{"error":"invalid token"}`, http.StatusUnauthorized)
 				return
 			}
 
 			if claims.TokenType != TokenTypeAccess {
+				w.Header().Set("X-Auth-Error", "token")
 				http.Error(w, `{"error":"invalid token type"}`, http.StatusUnauthorized)
 				return
 			}
@@ -36,6 +39,7 @@ func Middleware(ts *TokenStore) func(http.Handler) http.Handler {
 				return
 			}
 			if revoked {
+				w.Header().Set("X-Auth-Error", "token")
 				http.Error(w, `{"error":"token has been revoked"}`, http.StatusUnauthorized)
 				return
 			}

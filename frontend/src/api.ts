@@ -47,8 +47,9 @@ apiClient.interceptors.response.use(
     (response) => response.data,
     async (error: AxiosError<{ error?: string }>) => {
         const originalRequest = error.config as RetryableRequest;
+        const authErrType = error.response?.headers['x-auth-error'];
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 && authErrType !== 'credentials' && !originalRequest._retry) {
             originalRequest._retry = true;
 
             try {

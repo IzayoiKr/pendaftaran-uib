@@ -7,6 +7,7 @@ import { api } from "@/api";
 import useAuthStore from "@/store/useAuthStore";
 import type { User } from "@/types";
 import styles from "./Account.module.scss";
+import type { error } from "console";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -122,6 +123,7 @@ export default function Account() {
     const { user, isLoading, logout } = useAuthStore();
     const router = useRouter();
     const [registrations, setRegistrations] = useState<Registration[]>([]);
+    const [isLogout, setIsLogout] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -146,13 +148,17 @@ export default function Account() {
     if (!user) return null;
 
     const handleLogout = async () => {
+        setIsLogout(true);
+        const toastId = toast.loading("Sedang logout...");
         try {
             await api.auth.logout();
-        } catch {
-            // token sudah mati di server, lanjutkan logout lokal
+            logout();
+            toast.success("Logout berhasil!", { id: toastId });
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Logout gagal! Coba lagi...", { id: toastId });
+        } finally {
+            setIsLogout(false);
         }
-        logout();
-        toast.success("Logout Berhasil!");
     };
 
     const downloadPdf = (filename: string) => {
@@ -197,15 +203,23 @@ export default function Account() {
                 <div className={styles.bottomActions}>
                     <button
                         className={`${styles.btnLg} ${styles.btnWarning}`}
-                        onClick={() => router.push("/account/change-password")}>UBAH PASSWORD
+                        onClick={() => router.push("/account/change-password")}
+                    >
+                        UBAH PASSWORD
                     </button>
                     <button
                         className={`${styles.btnLg} ${styles.btnPrimary}`}
-                        onClick={() => router.push("/account/change-profile")}>UBAH PROFILE
+                        onClick={() => router.push("/account/change-profile")}
+                    >
+                        UBAH PROFILE
                     </button>
                     <button
                         className={`${styles.btnLg} ${styles.btnDanger}`}
-                        onClick={handleLogout}>⏻ LOGOUT
+                        onClick={handleLogout}
+                        disabled={isLogout}
+                        aria-busy={isLogout}
+                    >
+                        ⏻ LOGOUT
                     </button>
                 </div>
             </div>

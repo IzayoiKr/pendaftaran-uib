@@ -19,6 +19,10 @@ interface RegisterTurnstileProps {
     onTokenChange: (token: string | null) => void;
 }
 
+interface RegisterActionProps {
+    isLoading: boolean;
+}
+
 interface TurnstileHandle {
     reset: () => void;
 }
@@ -72,10 +76,10 @@ const RegisterTurnstile = forwardRef<TurnstileHandle, RegisterTurnstileProps>(
 
 RegisterTurnstile.displayName = "RegisterTurnstile";
 
-function RegisterAction() {
+function RegisterAction({ isLoading }: RegisterActionProps) {
     return (
         <>
-            <button type="submit" className={styles.registerBtn}>
+            <button type="submit" className={styles.registerBtn} disabled={isLoading} aria-busy={isLoading}>
                 Daftar (Register) <RightArrowIcon />
             </button>
             <p className={styles.backLogin}>
@@ -99,6 +103,7 @@ export default function Register() {
     })
 
     const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (name: string, value: string) => {
         const cleanValue = name === "nik" ? value.replace(/\D/g, "") : value;
@@ -121,6 +126,8 @@ export default function Register() {
         }
         const { fullName, nik, email, password } = formData;
 
+        setIsLoading(true);
+        const toastId = toast.loading("Sedang register...")
         try {
             await api.auth.register({
                 full_name: fullName,
@@ -129,12 +136,14 @@ export default function Register() {
                 password,
                 cf_turnstile_token: turnstileToken
             });
-            toast.success("Registrasi berhasil!")
+            toast.success("Registrasi berhasil! Silahkan login kembali", { id: toastId });
             router.push("/login");
         } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");
+            toast.error(err instanceof Error ? err.message : "Registrasi gagal! Coba lagi...", { id: toastId });
             turnstileRef.current?.reset();
             setTurnstileToken(null);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -156,7 +165,7 @@ export default function Register() {
                         ref={turnstileRef}
                         onTokenChange={setTurnstileToken}
                     />
-                    <RegisterAction />
+                    <RegisterAction isLoading={isLoading} />
                 </form>
             </div>
         </section>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import type { Form } from "@/types";
+import type { AccessTokenResponse, Form } from "@/types";
 import { login } from "@/constants/data";
 import { loginSchema } from "@/validation/schema";
 import { api } from "@/api";
@@ -13,7 +13,11 @@ import { RightArrowIcon } from "@/components/Icons";
 import styles from "./Login.module.scss";
 
 interface LoginFormProps {
-    onLogin: (email: string, password: string) => Promise<void>;
+    onLogin: (email: string, password: string) => Promise<AccessTokenResponse>;
+}
+
+interface LoginActionProps {
+    isLoading: boolean;
 }
 
 function LoginPlaceholder({ name, type, placeholder, autoComplete, minLength, value, onChange }: Form) {
@@ -34,12 +38,12 @@ function LoginPlaceholder({ name, type, placeholder, autoComplete, minLength, va
     )
 }
 
-function LoginAction() {
+function LoginAction({ isLoading }: LoginActionProps) {
     return (
         <>
             <Link href="/forgot" className={styles.forgotLink}>Lupa Password?</Link>
 
-            <button type="submit" className={styles.loginBtn}>
+            <button type="submit" className={styles.loginBtn} disabled={isLoading} aria-busy={isLoading}>
                 Login <RightArrowIcon />
             </button>
 
@@ -54,6 +58,7 @@ function LoginAction() {
 function LoginForm({ onLogin }: LoginFormProps) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -64,11 +69,18 @@ function LoginForm({ onLogin }: LoginFormProps) {
             return;
         }
 
+        setIsLoading(true);
+        const toastId = toast.loading("Sedang login...");
         try {
             await onLogin(email, password);
+            toast.success("Login berhasil!", { id: toastId });
         } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");
-
+            toast.error(
+                err instanceof Error ? err.message : "Login gagal! Coba lagi...",
+                { id: toastId }
+            );
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -87,7 +99,7 @@ function LoginForm({ onLogin }: LoginFormProps) {
                         />
                     );
                 })}
-                <LoginAction />
+                <LoginAction isLoading={isLoading} />
             </form>
 
         </>
@@ -104,8 +116,8 @@ export default function Login() {
     const handleLogin = async (email: string, password: string) => {
         const res = await api.auth.login(email, password);
         login(res.user, res.access_token);
-        toast.success("Login berhasil!");
         router.push(url);
+        return res;
     }
 
     return (

@@ -18,12 +18,12 @@ $toast-error-text: #be123c;
 
   position: fixed !important;
   left: 50% !important;
-  transform: translateX(-50%) translateY(65%) !important;
+  transform: translateX(-50%) !important;
   width: max-content !important;
   margin-inline: 0 !important;
 
   @media(max-width: 590px) {
-    transform: translateX(-50%) translateY(100%) !important;
+    transform: translateX(-50%) translateY(60%) !important;
   }
 }
 

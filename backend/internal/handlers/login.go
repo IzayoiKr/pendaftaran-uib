@@ -42,6 +42,7 @@ func Login(db *sql.DB) http.HandlerFunc {
 		).Scan(&user.ID, &user.FullName, &user.NIK, &user.Email, &user.PasswordHash)
 
 		if errors.Is(err, sql.ErrNoRows) {
+			w.Header().Set("X-Auth-Error", "credentials")
 			writeJSON(w, http.StatusUnauthorized, errJSON("email atau password salah"))
 			return
 		}
@@ -53,6 +54,7 @@ func Login(db *sql.DB) http.HandlerFunc {
 		if err := bcrypt.CompareHashAndPassword(
 			[]byte(user.PasswordHash), []byte(req.Password),
 		); err != nil {
+			w.Header().Set("X-Auth-Error", "credentials")
 			writeJSON(w, http.StatusUnauthorized, errJSON("email atau password salah"))
 			return
 		}
