@@ -7,32 +7,31 @@ import { api } from "@/api";
 import useAuthStore from "@/store/useAuthStore";
 import type { User } from "@/types";
 import styles from "./Account.module.scss";
-import type { error } from "console";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type BiodataStatus = "Belum Lengkap" | "Telah Lengkap";
-type PaymentStatus = "Belum Lunas" | "Telah Lunas";
+type PaymentStatus = "Belum Lunas"   | "Telah Lunas";
 
 interface Registration {
     nomorDaftar: string;
-    periode: number;
-    gelombang: string;
-    jurusan: string;
-    biodata: BiodataStatus;
-    pembayaran: PaymentStatus;
-    usm: string;
+    periode:     number;
+    gelombang:   string;
+    jurusan:     string;
+    biodata:     BiodataStatus;
+    pembayaran:  PaymentStatus;
+    usm:         string;
     passwordUSM: string;
 }
 
 interface RegistrationHandlers {
-    onCheckPendaftaran: (reg: Registration) => void;
-    onUbahBiodata: (reg: Registration) => void;
-    onDownloadSuratHasil: (reg: Registration) => void;
-    onBuktiTransfer: (reg: Registration) => void;
-    onPerubahanProdi: (reg: Registration) => void;
+    onCheckPendaftaran:    (reg: Registration) => void;
+    onUbahBiodata:         (reg: Registration) => void;
+    onDownloadSuratHasil:  (reg: Registration) => void;
+    onBuktiTransfer:       (reg: Registration) => void;
+    onPerubahanProdi:      (reg: Registration) => void;
     onDownloadPengunduran: (reg: Registration) => void;
-    onPrasyaratOspek: (reg: Registration) => void;
+    onPrasyaratOspek:      (reg: Registration) => void;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -40,8 +39,8 @@ interface RegistrationHandlers {
 function AccountInfo({ user }: { user: User }) {
     const rows: [string, string][] = [
         ["Nama Lengkap", user.full_name || "-"],
-        ["Alamat Email", user.email || "-"],
-        ["Nomor NIK", user.nik || "-"],
+        ["Alamat Email", user.email     || "-"],
+        ["Nomor NIK",    user.nik       || "-"],
     ];
 
     return (
@@ -58,14 +57,17 @@ function AccountInfo({ user }: { user: User }) {
 
 function StatusBadge({ status }: { status: BiodataStatus | PaymentStatus }) {
     const cls =
-        status === "Telah Lengkap" ? styles.statusComplete :
-            status === "Belum Lengkap" ? styles.statusIncomplete :
-                status === "Telah Lunas" ? styles.statusPaid :
-                    styles.statusUnpaid;
+        status === "Telah Lengkap" ? styles.statusComplete   :
+        status === "Belum Lengkap" ? styles.statusIncomplete  :
+        status === "Telah Lunas"   ? styles.statusPaid        :
+        styles.statusUnpaid;
     return <span className={cls}>{status || "-"}</span>;
 }
 
-function RegistrationActions({ reg, handlers }: { reg: Registration; handlers: RegistrationHandlers }) {
+function RegistrationActions({ reg, handlers }: {
+    reg:      Registration;
+    handlers: RegistrationHandlers;
+}) {
     const isComplete = reg.biodata === "Telah Lengkap" && reg.pembayaran === "Telah Lunas";
 
     return (
@@ -75,9 +77,9 @@ function RegistrationActions({ reg, handlers }: { reg: Registration; handlers: R
             {isComplete && (
                 <>
                     <button className={`${styles.btn} ${styles.btnSuccess}`} onClick={() => handlers.onDownloadSuratHasil(reg)}>Surat Hasil</button>
-                    <button className={`${styles.btn} ${styles.btnInfo}`} onClick={() => handlers.onBuktiTransfer(reg)}>Bukti Transfer</button>
+                    <button className={`${styles.btn} ${styles.btnInfo}`}    onClick={() => handlers.onBuktiTransfer(reg)}>Bukti Transfer</button>
                     <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => handlers.onPerubahanProdi(reg)}>Perubahan Prodi</button>
-                    <button className={`${styles.btn} ${styles.btnDanger}`} onClick={() => handlers.onDownloadPengunduran(reg)}>Pengunduran Diri</button>
+                    <button className={`${styles.btn} ${styles.btnDanger}`}  onClick={() => handlers.onDownloadPengunduran(reg)}>Pengunduran Diri</button>
                     <button className={`${styles.btn} ${styles.btnWarning}`} onClick={() => handlers.onPrasyaratOspek(reg)}>Prasyarat Ospek</button>
                 </>
             )}
@@ -90,7 +92,10 @@ const TABLE_HEADERS = [
     "Biodata", "Pembayaran", "USM", "Password USM", "Aksi",
 ];
 
-function RegistrationTable({ registrations, handlers }: { registrations: Registration[]; handlers: RegistrationHandlers }) {
+function RegistrationTable({ registrations, handlers }: {
+    registrations: Registration[];
+    handlers:      RegistrationHandlers;
+}) {
     return (
         <div className={styles.tableWrapper}>
             <table>
@@ -101,12 +106,12 @@ function RegistrationTable({ registrations, handlers }: { registrations: Registr
                     {registrations.map(reg => (
                         <tr key={reg.nomorDaftar}>
                             <td>{reg.nomorDaftar || "-"}</td>
-                            <td>{reg.periode || "-"}</td>
-                            <td>{reg.gelombang || "-"}</td>
-                            <td>{reg.jurusan || "-"}</td>
+                            <td>{reg.periode     || "-"}</td>
+                            <td>{reg.gelombang   || "-"}</td>
+                            <td>{reg.jurusan     || "-"}</td>
                             <td><StatusBadge status={reg.biodata} /></td>
                             <td><StatusBadge status={reg.pembayaran} /></td>
-                            <td>{reg.usm || "-"}</td>
+                            <td>{reg.usm         || "-"}</td>
                             <td>{reg.passwordUSM || "-"}</td>
                             <td><RegistrationActions reg={reg} handlers={handlers} /></td>
                         </tr>
@@ -134,7 +139,7 @@ export default function Account() {
                         useAuthStore.getState().setUser(freshUser);
                     }
                 })
-                .catch(() => {/* TODO handle errors */ })
+                .catch(() => { /* TODO: handle error */ });
         }
     }, [user]);
 
@@ -142,7 +147,7 @@ export default function Account() {
         if (!isLoading && !user) {
             router.push("/login");
         }
-    }, [isLoading, user, router])
+    }, [isLoading, user, router]);
 
     if (isLoading) return <div>Loading...</div>;
     if (!user) return null;
@@ -154,6 +159,7 @@ export default function Account() {
             await api.auth.logout();
             logout();
             toast.success("Logout berhasil!", { id: toastId });
+            router.push("/login");
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Logout gagal! Coba lagi...", { id: toastId });
         } finally {
@@ -168,14 +174,15 @@ export default function Account() {
         link.click();
     };
 
+    // Semua route sesuai struktur folder src/app/account/
     const handlers: RegistrationHandlers = {
-        onCheckPendaftaran: () => router.push("/"),
-        onUbahBiodata: (reg) => router.push(`/biodata?nomorDaftar=${reg.nomorDaftar}`), // TODO: ganti route sesuai Aldo
-        onDownloadSuratHasil: (reg) => downloadPdf(`surat-hasil-${reg.nomorDaftar}.pdf`),
-        onBuktiTransfer: (reg) => router.push(`/transferproof?nomorDaftar=${reg.nomorDaftar}`),
-        onPerubahanProdi: (reg) => router.push(`/changeprodi?nomorDaftar=${reg.nomorDaftar}`),
-        onDownloadPengunduran: (reg) => downloadPdf(`pengunduran-diri-${reg.nomorDaftar}.pdf`),
-        onPrasyaratOspek: (reg) => router.push(`/prasyaratospek?nomorDaftar=${reg.nomorDaftar}`),
+        onCheckPendaftaran:    ()    => router.push("/"),
+        onUbahBiodata:         (reg) => router.push(`/biodata?nomorDaftar=${reg.nomorDaftar}`), // TODO: ganti route sesuai Aldo
+        onDownloadSuratHasil:  (reg) => downloadPdf(`surat-hasil-${reg.nomorDaftar}.pdf`), // TUNGGU PAGE ALDO SELESAI
+        onBuktiTransfer:       (reg) => router.push(`/account/transfer-proof?nomorDaftar=${reg.nomorDaftar}`), // TUNGGU PAGE ALDO SELESAI
+        onPerubahanProdi:      (reg) => router.push(`/account/prodi?nomorDaftar=${reg.nomorDaftar}`),
+        onDownloadPengunduran: (reg) => downloadPdf(`pengunduran-diri-${reg.nomorDaftar}.pdf`), // TUNGGU PAGE ALDO SELESAI
+        onPrasyaratOspek:      (reg) => router.push(`/account/prasyarat-ospek?nomorDaftar=${reg.nomorDaftar}`),
     };
 
     return (
@@ -202,19 +209,19 @@ export default function Account() {
 
                 <div className={styles.bottomActions}>
                     <button
-                        className={`${styles.btnLg} ${styles.btnWarning}`}
+                        className={`${styles.btnLg} ${styles.btnLgWarning}`}
                         onClick={() => router.push("/account/change-password")}
                     >
                         UBAH PASSWORD
                     </button>
                     <button
-                        className={`${styles.btnLg} ${styles.btnPrimary}`}
+                        className={styles.btnLg}
                         onClick={() => router.push("/account/change-profile")}
                     >
                         UBAH PROFILE
                     </button>
                     <button
-                        className={`${styles.btnLg} ${styles.btnDanger}`}
+                        className={`${styles.btnLg} ${styles.btnLgDanger}`}
                         onClick={handleLogout}
                         disabled={isLogout}
                         aria-busy={isLogout}
