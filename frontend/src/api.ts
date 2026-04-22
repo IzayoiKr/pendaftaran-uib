@@ -56,11 +56,10 @@ apiClient.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${newToken}`;
                 return apiClient(originalRequest);
 
-            } catch (err) {
-                const errCode = err instanceof Error ? err.message : 'unknown';
+            } catch {
                 useAuthStore.getState().logout();
-                window.location.href = `/login?code=${encodeURIComponent(errCode)}`;
-                return Promise.reject(err);
+                window.location.href = '/login';
+                return Promise.reject(error);
             }
         }
 

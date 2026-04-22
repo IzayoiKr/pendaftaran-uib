@@ -13,6 +13,7 @@ function EventCard({ event }: EventCardProps) {
     return (
         <div className={styles.card}>
             <Image
+                className={styles.cardImg}
                 src={event.image}
                 alt={event.id}
                 width={555}

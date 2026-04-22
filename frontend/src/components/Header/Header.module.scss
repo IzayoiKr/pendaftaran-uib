@@ -42,6 +42,10 @@ $mobile-nav-bg: #868686;
     display: block;
     width: auto;
     height: auto;
+
+    @media(max-width: map.get(global.$breakpoints, lg)) {
+      height: clamp(2.375rem, 2.1614rem + 0.9494vw, 2.75rem);
+    }
   }
 }
 

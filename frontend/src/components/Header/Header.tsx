@@ -26,7 +26,7 @@ interface NavMenuProps {
 
 function UIBLogo() {
     return (
-        <Link href="/#home" className={styles.logoUIB}>
+        <Link href="/" className={styles.logoUIB}>
             <Image
                 src={images.logo}
                 alt='Universitas Internasional Batam Logo'
