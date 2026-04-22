@@ -18,9 +18,9 @@ func Profile(db *sql.DB) http.HandlerFunc {
 
 		var user models.User
 		err := db.QueryRow(
-			"SELECT id, full_name, nik, email FROM users WHERE id = ?",
+			"SELECT full_name, nik, email FROM users WHERE id = ?",
 			claims.UserID,
-		).Scan(&user.ID, &user.FullName, &user.NIK, &user.Email)
+		).Scan(&user.FullName, &user.NIK, &user.Email)
 
 		if err != nil {
 			if err == sql.ErrNoRows {

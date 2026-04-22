@@ -86,6 +86,6 @@ export const api = {
         logout: () =>
             apiClient.post<never, { message: string }>("/api/auth/logout"),
 
-        profile: () => apiClient.get<never, User>("/api/auth/profile"),
+        profile: () => apiClient.get<never, User>("/api/profile"),
     }
 };

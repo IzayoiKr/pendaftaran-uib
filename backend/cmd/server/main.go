@@ -55,7 +55,7 @@ func main() {
 
 	r.Group(func(r chi.Router) {
 		r.Use(auth.Middleware(tokenStore))
-		r.Get("/api/auth/profile", handlers.Profile(mysql))
+		r.Get("/api/profile", handlers.Profile(mysql))
 		r.Post("/api/auth/logout", handlers.Logout(tokenStore))
 	})
 
