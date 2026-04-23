@@ -117,7 +117,7 @@ export default function PerubahanProdiPage() {
                     <button className={styles.btnWarning} onClick={() => router.back()}>
                         ← Kembali
                     </button>
-                    <button className={styles.btnSuccess} onClick={() => router.push("/perubahan-prodi/request")}>
+                    <button className={styles.btnSuccess} onClick={() => router.push("/account/prodi/prodi-request")}>
                         + Request Perpindahan Prodi
                     </button>
                 </div>
