@@ -1,11 +1,7 @@
 'use client';
 
-
 import PerubahanProdiPage from "@/pages/prodi/PerubahanProdiPage";
 
-export default function ChangeProdi(){
-
-    return <PerubahanProdiPage/>
-
-
+export default function ProdiPage() {
+    return <PerubahanProdiPage />;
 }
