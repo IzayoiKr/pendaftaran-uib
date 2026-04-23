@@ -139,7 +139,7 @@ export default function BuktiTransferPage() {
                     <button className={styles.btnWarning} onClick={() => router.back()}>
                         ← Kembali (Back)
                     </button>
-                    <button className={styles.btnSuccess} onClick={() => router.push("/bukti-transfer/upload")}>
+                    <button className={styles.btnSuccess} onClick={() => router.push("/account/transfer-proof/upload-transferproof")}>
                         + Tambah Bukti Transfer (Add Receipt of Payment)
                     </button>
                 </div>

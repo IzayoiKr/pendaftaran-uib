@@ -146,13 +146,13 @@ function ActionRow({ isLoading, onCancel }: { isLoading: boolean; onCancel: () =
 // ─── Mock data — ganti dengan data dari backend / props / context ─────────────
 
 const MOCK_BIODATA: BiodataPendaftaran = {
-    nomorDaftar: "OL2520068",
-    periode:     "2025/2026",
-    gelombang:   "Beasiswa II",
-    jurusan:     "Teknologi Informasi",
-    namaLengkap: "Jonatan",
-    alamatEmail: "theeclipseicy9@gmail.com",
-    nomorNIK:    "2171092002079006",
+    nomorDaftar: "-",
+    periode:     "-",
+    gelombang:   "-",
+    jurusan:     "-",
+    namaLengkap: "-",
+    alamatEmail: "-",
+    nomorNIK:    "-",
 };
 
 const PANDUAN_URL = "https://pendaftaran.uib.ac.id/panduan/pembayaran-va"; // ganti ke URL asli
