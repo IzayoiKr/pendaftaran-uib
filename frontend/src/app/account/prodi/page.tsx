@@ -3,7 +3,7 @@
 
 import PerubahanProdiPage from "@/pages/prodi/PerubahanProdiPage";
 
-export default function changeprodi(){
+export default function ChangeProdi(){
 
     return <PerubahanProdiPage/>
 

@@ -2,6 +2,6 @@
 
 import ChangeProfile from "@/pages/ChangeProfile/ChangeProfile";
 
-export default function changeprofile() {
+export default function ChangeProfilePage() {
     return <ChangeProfile />;
 }
