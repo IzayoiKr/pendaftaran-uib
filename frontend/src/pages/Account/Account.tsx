@@ -7,6 +7,7 @@ import { api } from "@/api";
 import useAuthStore from "@/store/useAuthStore";
 import type { User } from "@/types";
 import styles from "./Account.module.scss";
+import { RegisterIcon, EditIcon, LetterIcon, ReceiptIcon, ChangeIcon, EraserIcon, LockIcon, LogoutIcon, ProfileIcon} from "@/components/Icons";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -72,15 +73,15 @@ function RegistrationActions({ reg, handlers }: {
 
     return (
         <div className={styles.actionGroup}>
-            <button className={`${styles.btn} ${styles.btnWarning}`} onClick={() => handlers.onCheckPendaftaran(reg)}>Check Pendaftaran</button>
-            <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => handlers.onUbahBiodata(reg)}>Ubah Biodata</button>
+            <button className={`${styles.btn} ${styles.btnWarning}`} onClick={() => handlers.onCheckPendaftaran(reg)}><RegisterIcon/> Check Pendaftaran</button>
+            <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => handlers.onUbahBiodata(reg)}><EditIcon/> Ubah Biodata</button>
             {isComplete && (
                 <>
-                    <button className={`${styles.btn} ${styles.btnSuccess}`} onClick={() => handlers.onDownloadSuratHasil(reg)}>Surat Hasil</button>
-                    <button className={`${styles.btn} ${styles.btnInfo}`}    onClick={() => handlers.onBuktiTransfer(reg)}>Bukti Transfer</button>
-                    <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => handlers.onPerubahanProdi(reg)}>Perubahan Prodi</button>
-                    <button className={`${styles.btn} ${styles.btnDanger}`}  onClick={() => handlers.onDownloadPengunduran(reg)}>Pengunduran Diri</button>
-                    <button className={`${styles.btn} ${styles.btnWarning}`} onClick={() => handlers.onPrasyaratOspek(reg)}>Prasyarat Ospek</button>
+                    <button className={`${styles.btn} ${styles.btnSuccess}`} onClick={() => handlers.onDownloadSuratHasil(reg)}><LetterIcon /> Surat Hasil</button>
+                    <button className={`${styles.btn} ${styles.btnInfo}`}    onClick={() => handlers.onBuktiTransfer(reg)}> <ReceiptIcon/> Bukti Transfer</button>
+                    <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => handlers.onPerubahanProdi(reg)}><ChangeIcon/> Perubahan Prodi</button>
+                    <button className={`${styles.btn} ${styles.btnDanger}`}  onClick={() => handlers.onDownloadPengunduran(reg)}><EraserIcon/> Pengunduran Diri</button>
+                    <button className={`${styles.btn} ${styles.btnWarning}`} onClick={() => handlers.onPrasyaratOspek(reg)}><ProfileIcon/> Prasyarat Ospek</button>
                 </>
             )}
         </div>
@@ -127,7 +128,7 @@ function RegistrationTable({ registrations, handlers }: {
 export default function Account() {
     const { user, isLoading, logout } = useAuthStore();
     const router = useRouter();
-    const [registrations, setRegistrations] = useState<Registration[]>([]);
+    const [registrations] = useState<Registration[]>([]);
     const [isLogout, setIsLogout] = useState(false);
 
     useEffect(() => {
@@ -177,7 +178,7 @@ export default function Account() {
     // Semua route sesuai struktur folder src/app/account/
     const handlers: RegistrationHandlers = {
         onCheckPendaftaran:    ()    => router.push("/"),
-        onUbahBiodata:         (reg) => router.push(`/biodata?nomorDaftar=${reg.nomorDaftar}`), // TODO: ganti route sesuai Aldo
+        onUbahBiodata:         (reg) => router.push(`/biodata?nomorDaftar=${reg.nomorDaftar}`), // TODO: ganti route sesuai Aldo selesai baru bisa direct kesana
         onDownloadSuratHasil:  (reg) => downloadPdf(`surat-hasil-${reg.nomorDaftar}.pdf`), // TUNGGU PAGE ALDO SELESAI
         onBuktiTransfer:       (reg) => router.push(`/account/transfer-proof?nomorDaftar=${reg.nomorDaftar}`), // TUNGGU PAGE ALDO SELESAI
         onPerubahanProdi:      (reg) => router.push(`/account/prodi?nomorDaftar=${reg.nomorDaftar}`),
@@ -212,13 +213,13 @@ export default function Account() {
                         className={`${styles.btnLg} ${styles.btnLgWarning}`}
                         onClick={() => router.push("/account/change-password")}
                     >
-                        UBAH PASSWORD
+                        <LockIcon/> UBAH PASSWORD
                     </button>
                     <button
                         className={styles.btnLg}
                         onClick={() => router.push("/account/change-profile")}
                     >
-                        UBAH PROFILE
+                        <ProfileIcon/> UBAH PROFILE
                     </button>
                     <button
                         className={`${styles.btnLg} ${styles.btnLgDanger}`}
@@ -226,7 +227,7 @@ export default function Account() {
                         disabled={isLogout}
                         aria-busy={isLogout}
                     >
-                        ⏻ LOGOUT
+                        <LogoutIcon/> LOGOUT
                     </button>
                 </div>
             </div>
