@@ -3,6 +3,26 @@ import type { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axio
 import type { User, AccessTokenResponse } from '@/types';
 import useAuthStore from '@/store/useAuthStore';
 
+export class ApiError extends Error {
+    requireCaptcha: boolean;
+
+    constructor(message: string, requireCaptcha: false) {
+        super(message);
+        this.name = 'ApiError';
+        this.requireCaptcha = requireCaptcha;
+    }
+}
+
+function getDeviceId(): string {
+    if (typeof window === "undefined") return '';
+    let id = localStorage.getItem('device_id')
+    if (!id) {
+        id = crypto.randomUUID();
+        localStorage.setItem('device_id', id);
+    }
+    return id;
+}
+
 const apiClient: AxiosInstance = axios.create({
     withCredentials: true,
     headers: { "Content-Type": "application/json" },
@@ -64,15 +84,21 @@ apiClient.interceptors.response.use(
             }
         }
 
-        const message = error.response?.data?.error ?? 'Terjadi kesalahan';
-        return Promise.reject(new Error(message));
+        const data = error.response?.data;
+        const message = data?.error ?? 'Terjadi kesalahan';
+        const requireCaptcha = data?.require_captcha ?? false;
+        return Promise.reject(new ApiError(message, requireCaptcha));
     }
 );
 
 export const api = {
     auth: {
-        login: (email: string, password: string) =>
-            apiClient.post<never, AccessTokenResponse>("/api/auth/login", { email, password }),
+        login: (email: string, password: string, turnstileToken?: string) =>
+            apiClient.post<never, AccessTokenResponse>("/api/auth/login", {
+                email,
+                password,
+                ...(turnstileToken ? { cf_turnstile_token: turnstileToken } : {})
+            }),
 
         register: (data: {
             full_name: string;
@@ -81,7 +107,9 @@ export const api = {
             password: string;
             cf_turnstile_token: string;
         }) =>
-            apiClient.post<never, AccessTokenResponse>("/api/auth/register", data),
+            apiClient.post<never, User>("/api/auth/register", data, {
+                headers: { 'X-Device-ID': getDeviceId() },
+            }),
 
         logout: () =>
             apiClient.post<never, { message: string }>("/api/auth/logout"),

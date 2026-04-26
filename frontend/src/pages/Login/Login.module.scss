@@ -24,6 +24,17 @@
     @include form.input-template;
   }
 
+  .turnstile {
+    display: flex;
+    margin-top: var(--space-xs);
+  }
+
+  .captchaHint {
+    font-size: var(--step--2);
+    color: global.$error-color;
+    margin-bottom: var(--space-s);
+  }
+
   .forgotLink {
     display: block;
     width: fit-content;

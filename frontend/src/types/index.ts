@@ -91,7 +91,6 @@ export interface Form {
 }
 
 export interface User {
-    id: string;
     full_name: string;
     nik: string;
     email: string;
