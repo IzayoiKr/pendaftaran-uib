@@ -123,12 +123,21 @@ services:
       DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
       DB_NAME: ${MYSQL_DATABASE}
+      DB_MAX_OPEN_CONNS: ${MYSQL_MAX_OPEN_CONNS}
+      DB_MAX_IDLE_CONNS: ${MYSQL_MAX_IDLE_CONNS}
+      DB_MAX_LIFETIME_MIN: ${MYSQL_MAX_LIFETIME_MIN}
+      DB_MAX_IDLE_LIFETIME_MIN: ${MYSQL_MAX_IDLE_LIFETIME_MIN}
+
       MONGO_URI: ${MONGO_URI}
       MONGO_DB: ${MONGO_DATABASE}
+      MONGO_CONNECT_TIMEOUT: ${MONGO_CONNECT_TIMEOUT}
+      MONGO_PING_TIMEOUT: ${MONGO_PING_TIMEOUT}
+
       JWT_SECRET: ${JWT_SECRET}
       CORS_ORIGIN: ${CORS_ORIGIN}
       TURNSTILE_SECRET: ${TURNSTILE_SECRET}
       APP_ENV: ${APP_ENV}
+      APP_HEALTH_URL: ${APP_HEALTH_URL}
       SERVER_PORT: ${SERVER_PORT}
     ports:
       - ${BACKEND_PORTS}
@@ -136,6 +145,12 @@ services:
       - ./backend:/app
       - /app/tmp
     command: air -c .air.toml
+    healthcheck:
+      test: curl -f ${APP_HEALTH_URL} || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
 
   frontend:
     build:
