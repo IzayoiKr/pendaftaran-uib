@@ -1,39 +1,38 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
-	"os"
-	"time"
+	"log/slog"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func NewMySQL() (*sql.DB, error) {
-	required := []string{"DB_USER", "DB_PASSWORD", "DB_HOST", "DB_PORT", "DB_NAME"}
-	for _, key := range required {
-		if os.Getenv(key) == "" {
-			return nil, fmt.Errorf("MySQL missing required environment variable: %s", key)
-		}
-	}
+func NewMySQL(ctx context.Context, cfg MySQLConfig) (*sql.DB, error) {
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?parseTime=true&charset=utf8mb4&collation=utf8mb4_unicode_ci",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_NAME"),
+		"%s:%s@tcp(%s:%d)/%s?parseTime=true&charset=utf8mb4&collation=utf8mb4_unicode_ci",
+		cfg.User,
+		cfg.Password,
+		cfg.Host,
+		cfg.Port,
+		cfg.DBName,
 	)
+
 	conn, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("mysql open: %w", err)
 	}
 
-	conn.SetMaxOpenConns(25)
-	conn.SetMaxIdleConns(5)
-	conn.SetConnMaxLifetime(5 * time.Minute)
+	conn.SetMaxOpenConns(cfg.MaxOpenConns)
+	conn.SetMaxIdleConns(cfg.MaxIdleConns)
+	conn.SetConnMaxLifetime(cfg.MaxLifetime)
+	conn.SetConnMaxIdleTime(cfg.MaxIdleTime)
 
-	if err := conn.Ping(); err != nil {
+	if err := conn.PingContext(ctx); err != nil {
+		if closeErr := conn.Close(); closeErr != nil {
+			slog.Error("failed to close mysql connection after failed ping", "error", closeErr)
+		}
 		return nil, fmt.Errorf("mysql ping: %w", err)
 	}
 

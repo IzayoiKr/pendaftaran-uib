@@ -3,16 +3,19 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
+	"net/mail"
 	"net/url"
 	"os"
 	"strings"
 
 	"pendaftaran-uib/backend/internal/models"
+	"pendaftaran-uib/backend/internal/utils"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -66,59 +69,53 @@ func verifyTurnstile(token, remoteIP string) (bool, error) {
 	return result.Success, nil
 }
 
-func realIP(r *http.Request) string {
-	if ip := r.Header.Get("X-Real-IP"); ip != "" {
-		return ip
-	}
-	if fwd := r.Header.Get("X-Forwarded-For"); fwd != "" {
-		return strings.TrimSpace(strings.SplitN(fwd, ",", 2)[0])
-	}
-	host, _, err := net.SplitHostPort(r.RemoteAddr)
-	if err != nil {
-		return r.RemoteAddr
-	}
-	return host
-}
-
 func Register(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req registerRequest
 		if err:= json.NewDecoder(r.Body).Decode(&req); err != nil {
-			writeJSON(w, http.StatusBadRequest, errJSON("permintaan tidak valid"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("permintaan tidak valid"))
 			return
 		}
 
 		switch {
 		case strings.TrimSpace(req.FullName) == "":
-			writeJSON(w, http.StatusBadRequest, errJSON("name lengkap wajib diisi"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("name lengkap wajib diisi"))
 			return
 		case len(req.NIK) != 16:
-			writeJSON(w, http.StatusBadRequest, errJSON("NIK harus 16 digit"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("NIK harus 16 digit"))
+			return
+		case !utils.IsAllDigits(req.NIK):
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("NIK harus berupa angka"))
 			return
 		case req.Email == "":
-			writeJSON(w, http.StatusBadRequest, errJSON("email wajib diisi"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("email wajib diisi"))
 			return
 		case len(req.Password) < 8:
-			writeJSON(w, http.StatusBadRequest, errJSON("password minimal 8 karakter"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password minimal 8 karakter"))
 			return
 		case req.TurnstileToken == "":
-			writeJSON(w, http.StatusBadRequest, errJSON("verifikasi CAPTCHA diperlukan"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("verifikasi CAPTCHA diperlukan"))
 			return
 		}
 
-		ok, err := verifyTurnstile(req.TurnstileToken, realIP(r))
+		if _, err := mail.ParseAddress(req.Email); err != nil {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("format email tidak valid"))
+			return
+		}
+
+		ok, err := verifyTurnstile(req.TurnstileToken, utils.RealIP(r))
 		if err != nil {
-			writeJSON(w, http.StatusInternalServerError, errJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 		if !ok {
-			writeJSON(w, http.StatusForbidden, errJSON("verifikasi CAPTCHA gagal, coba lagi"))
+			utils.WriteJSON(w, http.StatusForbidden, utils.ErrJSON("verifikasi CAPTCHA gagal, coba lagi"))
 			return
 		}
 
 		hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 		if err != nil {
-			writeJSON(w, http.StatusInternalServerError, errJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
@@ -130,11 +127,12 @@ func Register(db *sql.DB) http.HandlerFunc {
 		 id, strings.TrimSpace(req.FullName), req.NIK, req.Email, string(hash),
 		)
 		if err != nil {
-			if strings.Contains(err.Error(), "1062") {
-				writeJSON(w, http.StatusConflict, errJSON("email sudah terdaftar"))
+			var mysqlErr *mysql.MySQLError
+			if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
+				utils.WriteJSON(w, http.StatusConflict, utils.ErrJSON("email sudah terdaftar"))
 				return
 			}
-			writeJSON(w, http.StatusInternalServerError, errJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
@@ -145,6 +143,6 @@ func Register(db *sql.DB) http.HandlerFunc {
 			Email: req.Email,
 		}
 
-		writeJSON(w, http.StatusCreated, user.ToDTO())
+		utils.WriteJSON(w, http.StatusCreated, user.ToDTO())
 	}
 }

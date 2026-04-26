@@ -12,15 +12,6 @@ import (
 const AccessTokenTTL = 15 * time.Minute
 const RefreshTokenTTL = 12 * time.Hour
 
-func getJWTSecret() []byte {
-	secret := os.Getenv("JWT_SECRET")
-	if secret == "" {
-		panic("JWT_SECRET environment variable is required")
-	}
-	return []byte(secret)
-
-}
-
 type TokenType string
 
 const (
@@ -31,36 +22,20 @@ const (
 type Claims struct {
 	UserID string `json:"user_id"`
 	Email string `json:"email"`
+	SessionID string `json:"session_id"`
 	TokenType TokenType `json:"token_type"`
 	jwt.RegisteredClaims
 }
 
-func GenerateAccessToken(userID, email string) (string, error) {
-	return generateToken(userID, email, TokenTypeAccess, AccessTokenTTL)
+func GenerateAccessToken(userID, sessionID, email string) (string, error) {
+	return generateToken(userID, sessionID, email, TokenTypeAccess, AccessTokenTTL)
 }
 
-func GenerateRefreshToken(userID, email string) (string, error) {
-	return generateToken(userID, email, TokenTypeRefresh, RefreshTokenTTL)
+func GenerateRefreshToken(userID, sessionID, email string) (string, error) {
+	return generateToken(userID, sessionID, email, TokenTypeRefresh, RefreshTokenTTL)
 }
 
-func generateToken(userID, email string, tokenType TokenType, ttl time.Duration) (string , error) {
-	claims := Claims{
-		UserID: userID,
-		Email: email,
-		TokenType: tokenType,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ID: uuid.NewString(),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(ttl)),
-			IssuedAt: jwt.NewNumericDate(time.Now()),
-			Issuer: "pendaftaran-uib",
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(getJWTSecret())
-}
-
-func Validatetoken(raw string) (*Claims, error) {
+func ValidateToken(raw string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(raw, &Claims{}, func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unexpected signing method")
@@ -76,4 +51,37 @@ func Validatetoken(raw string) (*Claims, error) {
 		return nil, errors.New("invalid token claims")
 	}
 	return claims, nil
+}
+
+func getJWTSecret() []byte {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		panic("JWT_SECRET environment variable is required")
+	}
+	return []byte(secret)
+
+}
+
+func generateToken(userID, sessionID, email string, tokenType TokenType, ttl time.Duration) (string , error) {
+	issuer := os.Getenv("JWT_ISSUER")
+	if issuer == "" {
+		issuer = "pendaftaran-uib"
+	}
+
+	claims := Claims{
+		UserID: userID,
+		Email: email,
+		SessionID: sessionID,
+		TokenType: tokenType,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ID: uuid.NewString(),
+			Subject: userID,
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(ttl)),
+			IssuedAt: jwt.NewNumericDate(time.Now()),
+			Issuer: issuer,
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(getJWTSecret())
 }

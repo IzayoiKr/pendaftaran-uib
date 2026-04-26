@@ -1,20 +1,20 @@
-package handlers
+package utils
 
 import (
 	"encoding/json"
 	"net/http"
 )
 
-func writeJSON(w http.ResponseWriter, status int, v any) {
+func WriteJSON(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(v)
 }
 
-type apiError struct {
+type APIError struct {
 	Error string `json:"error"`
 }
 
-func errJSON(msg string) apiError {
-	return apiError{Error: msg}
+func ErrJSON(msg string) APIError {
+	return APIError{Error: msg}
 }

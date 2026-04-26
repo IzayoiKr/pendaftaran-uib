@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"net/http"
+	"pendaftaran-uib/backend/internal/utils"
 	"strings"
 )
 
@@ -16,31 +17,31 @@ func Middleware(ts *TokenStore) func(http.Handler) http.Handler {
 			header := r.Header.Get("Authorization")
 			if !strings.HasPrefix(header, "Bearer ") {
 				w.Header().Set("X-Auth-Error", "token")
-				http.Error(w, `{"error":"unauthorized"}`, http.StatusUnauthorized)
+				utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("unauthorized"))
 				return
 			}
 
-			claims, err := Validatetoken(strings.TrimPrefix(header, "Bearer "))
+			claims, err := ValidateToken(strings.TrimPrefix(header, "Bearer "))
 			if err != nil {
 				w.Header().Set("X-Auth-Error", "token")
-				http.Error(w, `{"error":"invalid token"}`, http.StatusUnauthorized)
+				utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("invalid token"))
 				return
 			}
 
 			if claims.TokenType != TokenTypeAccess {
 				w.Header().Set("X-Auth-Error", "token")
-				http.Error(w, `{"error":"invalid token type"}`, http.StatusUnauthorized)
+				utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("invalid token type"))
 				return
 			}
 
 			revoked, err := ts.IsRevoked(r.Context(), claims.ID)
 			if err != nil {
-				http.Error(w, `{"error":"server error"}`, http.StatusInternalServerError)
+				utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 				return
 			}
 			if revoked {
 				w.Header().Set("X-Auth-Error", "token")
-				http.Error(w, `{"error":"token has been revoked"}`, http.StatusUnauthorized)
+				utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("token has been revoked"))
 				return
 			}
 
