@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { api } from "@/api";
 import { RightArrowIcon } from "@/components/Icons";
-import styles from "./ForgotPasswordPage.module.scss";
+import styles from "./ForgotPassword.module.scss";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
