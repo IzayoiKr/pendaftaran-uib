@@ -115,5 +115,43 @@ export const api = {
             apiClient.post<never, { message: string }>("/api/auth/logout"),
 
         profile: () => apiClient.get<never, User>("/api/profile"),
-    }
+
+        changePassword: (oldPassword: string, newPassword: string) =>
+            apiClient.post("/api/account/password", {
+                old_password: oldPassword,
+                new_password: newPassword,
+            }),
+
+        updateProfile: (data: { fullName: string; email: string; nik: string }) =>
+            apiClient.patch("/api/profile", {
+                full_name: data.fullName,
+                email: data.email,
+                nik: data.nik,
+            }),
+
+        forgotPassword: (email: string, nik: string) =>
+            apiClient.post("/api/auth/forgot-password", {
+                email: email,
+                nik: nik
+            }),
+
+        resetPassword: (data: { token: string; newPassword: string }) =>
+            apiClient.post("/api/auth/reset-password", {
+                token: data.token,
+                new_password: data.newPassword,
+            }),
+    },
+
+    // --- PRODI ROUTES ---
+    prodi: {
+        getRequests: () =>
+            apiClient.get<never, any[]>("/api/prodi/requests"),
+
+        requestPindah: (data: { prodiTujuan: string; waktuKuliahSebelumnya: string; waktuKuliahBaru: string; }) =>
+            apiClient.post("/api/prodi/requests", {
+                prodi_tujuan: data.prodiTujuan,
+                waktu_kuliah_sebelumnya: data.waktuKuliahSebelumnya,
+                waktu_kuliah_baru: data.waktuKuliahBaru
+            }),
+    },
 };

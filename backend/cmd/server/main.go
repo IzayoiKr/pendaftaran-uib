@@ -76,10 +76,16 @@ func main() {
 	r.Post("/api/auth/register", registerLimiter.RateLimitDevice(handlers.Register(provider.MySQL)))
 	r.Post("/api/auth/refresh", auth.RateLimitRefresh(refreshIPLimiter, refreshUserLimiter, handlers.Refresh(provider.MySQL, tokenStore)))
 
+	r.Post("/api/auth/forgot-password", handlers.ForgotPassword(provider.MySQL))
+    r.Post("/api/auth/reset-password", handlers.ResetPassword(provider.MySQL))
+
 	r.Group(func(r chi.Router) {
 		r.Use(auth.Middleware(tokenStore))
 		r.Get("/api/profile", profileLimiter.RateLimitUser(handlers.Profile(provider.MySQL)))
 		r.Post("/api/auth/logout", logoutLimiter.RateLimitUser(handlers.Logout(tokenStore)))
+
+		r.Patch("/api/profile", handlers.UpdateProfile(provider.MySQL))
+    	r.Post("/api/account/password", handlers.ChangePassword(provider.MySQL))
 	})
 
 	port := os.Getenv("SERVER_PORT")

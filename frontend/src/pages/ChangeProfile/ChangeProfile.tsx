@@ -88,8 +88,14 @@ export default function ChangeProfile() {
         e.preventDefault();
         setIsLoading(true);
         try {
-            await api.auth.updateProfile({ namaLengkap: form.namaLengkap }); // TODO: pastikan endpoint ini ada
-            toast.success("Profile berhasil diubah!");
+            await api.auth.updateProfile({
+                fullName: form.namaLengkap,
+                email: form.email,
+                nik: form.nik
+            });
+
+            toast.success("Profil berhasil diperbarui!");
+
             router.push("/account");
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");
@@ -97,7 +103,6 @@ export default function ChangeProfile() {
             setIsLoading(false);
         }
     };
-
     return (
         <main className={styles.page}>
             <div className={styles.container}>
