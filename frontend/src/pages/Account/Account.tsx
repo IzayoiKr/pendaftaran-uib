@@ -7,7 +7,8 @@ import { api } from "@/api";
 import useAuthStore from "@/store/useAuthStore";
 import type { User } from "@/types";
 import styles from "./Account.module.scss";
-import { RegisterIcon, EditIcon, LetterIcon, ReceiptIcon, ChangeIcon, EraserIcon, LockIcon, LogoutIcon, ProfileIcon} from "@/components/Icons";
+import { RegisterIcon, EditIcon, LetterIcon, ReceiptIcon, ChangeIcon, EraserIcon, LockIcon, LogoutIcon, ProfileIcon } from "@/components/Icons";
+import { downloadSuratHasil, downloadStaticPdf } from "@/utils/downloadPdf";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -58,9 +59,9 @@ function AccountInfo({ user }: { user: User }) {
 
 function StatusBadge({ status }: { status: BiodataStatus | PaymentStatus }) {
     const cls =
-        status === "Telah Lengkap" ? styles.statusComplete   :
-        status === "Belum Lengkap" ? styles.statusIncomplete  :
-        status === "Telah Lunas"   ? styles.statusPaid        :
+        status === "Telah Lengkap" ? styles.statusComplete  :
+        status === "Belum Lengkap" ? styles.statusIncomplete :
+        status === "Telah Lunas"   ? styles.statusPaid       :
         styles.statusUnpaid;
     return <span className={cls}>{status || "-"}</span>;
 }
@@ -73,15 +74,29 @@ function RegistrationActions({ reg, handlers }: {
 
     return (
         <div className={styles.actionGroup}>
-            <button className={`${styles.btn} ${styles.btnWarning}`} onClick={() => handlers.onCheckPendaftaran(reg)}><RegisterIcon/> Check Pendaftaran</button>
-            <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => handlers.onUbahBiodata(reg)}><EditIcon/> Ubah Biodata</button>
+            <button className={`${styles.btn} ${styles.btnWarning}`} onClick={() => handlers.onCheckPendaftaran(reg)}>
+                <RegisterIcon /> Check Pendaftaran
+            </button>
+            <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => handlers.onUbahBiodata(reg)}>
+                <EditIcon /> Ubah Biodata
+            </button>
             {isComplete && (
                 <>
-                    <button className={`${styles.btn} ${styles.btnSuccess}`} onClick={() => handlers.onDownloadSuratHasil(reg)}><LetterIcon /> Surat Hasil</button>
-                    <button className={`${styles.btn} ${styles.btnInfo}`}    onClick={() => handlers.onBuktiTransfer(reg)}> <ReceiptIcon/> Bukti Transfer</button>
-                    <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => handlers.onPerubahanProdi(reg)}><ChangeIcon/> Perubahan Prodi</button>
-                    <button className={`${styles.btn} ${styles.btnDanger}`}  onClick={() => handlers.onDownloadPengunduran(reg)}><EraserIcon/> Pengunduran Diri</button>
-                    <button className={`${styles.btn} ${styles.btnWarning}`} onClick={() => handlers.onPrasyaratOspek(reg)}><ProfileIcon/> Prasyarat Ospek</button>
+                    <button className={`${styles.btn} ${styles.btnSuccess}`} onClick={() => handlers.onDownloadSuratHasil(reg)}>
+                        <LetterIcon /> Surat Hasil
+                    </button>
+                    <button className={`${styles.btn} ${styles.btnInfo}`} onClick={() => handlers.onBuktiTransfer(reg)}>
+                        <ReceiptIcon /> Bukti Transfer
+                    </button>
+                    <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => handlers.onPerubahanProdi(reg)}>
+                        <ChangeIcon /> Perubahan Prodi
+                    </button>
+                    <button className={`${styles.btn} ${styles.btnDanger}`} onClick={() => handlers.onDownloadPengunduran(reg)}>
+                        <EraserIcon /> Pengunduran Diri
+                    </button>
+                    <button className={`${styles.btn} ${styles.btnWarning}`} onClick={() => handlers.onPrasyaratOspek(reg)}>
+                        <ProfileIcon /> Prasyarat Ospek
+                    </button>
                 </>
             )}
         </div>
@@ -110,7 +125,7 @@ function RegistrationTable({ registrations, handlers }: {
                             <td>{reg.periode     || "-"}</td>
                             <td>{reg.gelombang   || "-"}</td>
                             <td>{reg.jurusan     || "-"}</td>
-                            <td><StatusBadge status={reg.biodata} /></td>
+                            <td><StatusBadge status={reg.biodata}    /></td>
                             <td><StatusBadge status={reg.pembayaran} /></td>
                             <td>{reg.usm         || "-"}</td>
                             <td>{reg.passwordUSM || "-"}</td>
@@ -140,18 +155,16 @@ export default function Account() {
                         useAuthStore.getState().setUser(freshUser);
                     }
                 })
-                .catch(() => { /* TODO: handle error */ });
+                .catch(() => {});
         }
     }, [user]);
 
     useEffect(() => {
-        if (!isLoading && !user) {
-            router.push("/login");
-        }
+        if (!isLoading && !user) router.push("/login");
     }, [isLoading, user, router]);
 
     if (isLoading) return <div>Loading...</div>;
-    if (!user) return null;
+    if (!user)     return null;
 
     const handleLogout = async () => {
         setIsLogout(true);
@@ -161,29 +174,41 @@ export default function Account() {
             logout();
             toast.success("Logout berhasil!", { id: toastId });
             router.push("/login");
-        } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Logout gagal! Coba lagi...", { id: toastId });
+        } catch {
+            toast.error("Logout gagal!", { id: toastId });
         } finally {
             setIsLogout(false);
         }
     };
 
-    const downloadPdf = (filename: string) => {
-        const link = document.createElement("a");
-        link.href = `/files/${filename}`;
-        link.download = filename;
-        link.click();
-    };
-
-    // Semua route sesuai struktur folder src/app/account/
     const handlers: RegistrationHandlers = {
-        onCheckPendaftaran:    ()    => router.push("/"),
-        onUbahBiodata:         (reg) => router.push(`/biodata?nomorDaftar=${reg.nomorDaftar}`), // TODO: ganti route sesuai Aldo selesai baru bisa direct kesana
-        onDownloadSuratHasil:  (reg) => downloadPdf(`surat-hasil-${reg.nomorDaftar}.pdf`), // TUNGGU PAGE ALDO SELESAI
-        onBuktiTransfer:       (reg) => router.push(`/account/transfer-proof?nomorDaftar=${reg.nomorDaftar}`), // TUNGGU PAGE ALDO SELESAI
-        onPerubahanProdi:      (reg) => router.push(`/account/prodi?nomorDaftar=${reg.nomorDaftar}`),
-        onDownloadPengunduran: (reg) => downloadPdf(`pengunduran-diri-${reg.nomorDaftar}.pdf`), // TUNGGU PAGE ALDO SELESAI
-        onPrasyaratOspek:      (reg) => router.push(`/account/prasyarat-ospek?nomorDaftar=${reg.nomorDaftar}`),
+        onCheckPendaftaran: () => router.push("/"),
+
+        onUbahBiodata: (reg) =>
+            router.push(`/biodata?nomorDaftar=${reg.nomorDaftar}`),
+
+       
+        onDownloadSuratHasil: (reg) => {
+            downloadSuratHasil(reg.nomorDaftar).catch(err =>
+                toast.error(err instanceof Error ? err.message : "Gagal membuka surat hasil")
+            );
+        },
+
+        onBuktiTransfer: (reg) =>
+            router.push(`/account/transfer-proof?nomorDaftar=${reg.nomorDaftar}`),
+
+        onPerubahanProdi: (reg) =>
+            router.push(`/account/prodi?nomorDaftar=${reg.nomorDaftar}`),
+
+       
+        onDownloadPengunduran: () => {
+            downloadStaticPdf("pengunduran-diri", "pengunduran-diri.pdf").catch(err =>
+                toast.error(err instanceof Error ? err.message : "Gagal download surat pengunduran")
+            );
+        },
+
+        onPrasyaratOspek: (reg) =>
+            router.push(`/account/prasyarat-ospek?nomorDaftar=${reg.nomorDaftar}`),
     };
 
     return (
@@ -209,25 +234,32 @@ export default function Account() {
                 )}
 
                 <div className={styles.bottomActions}>
+                
                     <button
                         className={`${styles.btnLg} ${styles.btnLgWarning}`}
                         onClick={() => router.push("/account/change-password")}
+                        disabled={isLogout}
                     >
-                        <LockIcon/> UBAH PASSWORD
+                        <LockIcon /> UBAH PASSWORD
                     </button>
+
+                 
                     <button
-                        className={styles.btnLg}
+                        className={`${styles.btnLg} ${styles.btnLgGrey}`}
                         onClick={() => router.push("/account/change-profile")}
+                        disabled={isLogout}
                     >
-                        <ProfileIcon/> UBAH PROFILE
+                        <ProfileIcon /> UBAH PROFILE
                     </button>
+
+               
                     <button
                         className={`${styles.btnLg} ${styles.btnLgDanger}`}
                         onClick={handleLogout}
                         disabled={isLogout}
                         aria-busy={isLogout}
                     >
-                        <LogoutIcon/> LOGOUT
+                        <LogoutIcon /> LOGOUT
                     </button>
                 </div>
             </div>
