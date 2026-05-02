@@ -13,32 +13,47 @@ import (
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 	"time"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
-func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc {
+func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
 
-		var req models.ResetPasswordRequest
+		var req models.VerifyEmailRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("permintaan tidak valid"))
 			return
 		}
 
-		switch {
-		case req.Token == "":
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("link tidak valid"))
+		if req.Token == "" {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("link verifikasi tidak valid atau sudah kadaluwarsa"))
 			return
-		case req.NewPassword == "":
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password harus diisi"))
+		}
+
+		if req.TurnstileToken == "" {
+			al.Log(audit.Entry{
+				Event: audit.EventEmailVerificationCaptchaRequired,
+				IP: base.IP,
+				UserAgent: base.UserAgent,
+				RequestID: base.RequestID,
+			})
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("verifikasi CAPTCHA diperlukan"))
 			return
-		case len(req.NewPassword) < 8:
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password minimal 8 karakter"))
+		}
+
+		ok, err := auth.VerifyTurnstile(req.TurnstileToken, utils.RealIP(r))
+		if err != nil {
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
-		case len(req.NewPassword) > 72:
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password terlalu panjang"))
+		}
+		if !ok {
+			al.Log(audit.Entry{
+				Event: audit.EventEmailVerificationCaptchaFailure,
+				IP: base.IP,
+				UserAgent: base.UserAgent,
+				RequestID: base.RequestID,
+			})
+			utils.WriteJSON(w, http.StatusForbidden, utils.ErrJSON("verifikasi CAPTCHA gagal, coba lagi"))
 			return
 		}
 
@@ -51,20 +66,19 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 			expiredAt time.Time
 			isUsed bool
 		)
-		err := db.QueryRowContext(r.Context(),
-			"SELECT id, user_id, expired_at, is_used FROM reset_password WHERE token_hash = ?",
+		err = db.QueryRowContext(r.Context(),
+			"SELECT id, user_id, expired_at, is_used FROM email_verification WHERE token_hash = ?",
 			tokenHash,
 		).Scan(&recordID, &userID, &expiredAt, &isUsed)
 
 		if errors.Is(err, sql.ErrNoRows) {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("link tidak valid atau sudah kadaluwarsa"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("link verifikasi tidak valid atau sudah kadaluwarsa"))
 			return
 		}
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
-
 		if isUsed {
 			utils.WriteJSON(w, http.StatusBadRequest, map[string]any{
 				"error": "link verifikasi tidak valid atau sudah kadaluwarsa",
@@ -73,16 +87,17 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 			return
 		}
 		if time.Now().After(expiredAt) {
+			al.Log(audit.Entry{
+				Event: audit.EventEmailVerificationExpired,
+				UserID: userID,
+				IP: base.IP,
+				UserAgent: base.UserAgent,
+				RequestID: base.RequestID,
+			})
 			utils.WriteJSON(w, http.StatusBadRequest, map[string]any{
 				"error": "link verifikasi tidak valid atau sudah kadaluwarsa",
 				"expired": true,
 			})
-			return
-		}
-
-		newHash, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
-		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
@@ -95,41 +110,38 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 		defer func() {
 			if !committed {
 				if rbErr := tx.Rollback(); rbErr != nil {
-					slog.Error("reset_password: rollback", "error", rbErr)
+					slog.Error("verify_email: rollback", "error", rbErr)
 				}
 			}
 		}()
 
-		if _, err = tx.ExecContext(r.Context(),
-			"UPDATE user SET password_hash = ? WHERE id = ?",
-			string(newHash), userID,
+		if _, err := tx.ExecContext(r.Context(),
+			"UPDATE email_verification SET is_used = 1 WHERE id = ?",
+			recordID,
 		); err != nil {
-			slog.Error("reset_password: update password:", "user_id", userID, "error", err)
+			slog.Error("verify_email: mark token used", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
-		if _, err = tx.ExecContext(r.Context(),
-			"UPDATE reset_password SET is_used = 1 WHERE id = ?",
-			recordID,
+		if _, err := tx.ExecContext(r.Context(),
+			"UPDATE user SET email_verified = 1, email_verified_at = NOW() WHERE id = ?",
+			userID,
 		); err != nil {
-			slog.Error("reset_password: mark token used", "record_id", recordID, "error", err)
+			slog.Error("verify_email: mark user verified", "user_id", userID, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
 		if err = tx.Commit(); err != nil {
-			slog.Error("reset_password: commit", "error", err)
+			slog.Error("verify_email: commit", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
 		}
 		committed = true
 
-		if err := ts.RevokeAllUserSessions(r.Context(), userID); err != nil {
-			slog.Error("reset_passsword: RevokeAllUserSessions", "user_id", userID, "error", err)
-		}
-
 		al.Log(audit.Entry{
-			Event: audit.EventPasswordResetSuccess,
+			Event: audit.EventEmailVerified,
 			UserID: userID,
 			IP: base.IP,
 			UserAgent: base.UserAgent,
@@ -137,7 +149,7 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 		})
 
 		utils.WriteJSON(w, http.StatusOK, map[string]string{
-			"message": "password berhasil direset, silahkan login kembali",
+			"message": "Email berhasil diverifikasi! Silahkan login.",
 		})
 	}
 }

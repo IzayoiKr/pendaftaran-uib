@@ -4,14 +4,15 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"io"
+	"log/slog"
 	"net/http"
 	"net/mail"
-	"net/url"
-	"os"
 	"strings"
+	"time"
 
+	"pendaftaran-uib/backend/internal/audit"
+	"pendaftaran-uib/backend/internal/auth"
+	"pendaftaran-uib/backend/internal/email"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 
@@ -20,66 +21,24 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type registerRequest struct {
-	FullName string `json:"full_name"`
-	NIK string `json:"nik"`
-	Email string `json:"email"`
-	Password string `json:"password"`
-	TurnstileToken string `json:"cf_turnstile_token"`
-}
-
-type turnstileResponse struct {
-	Success bool `json:"success"`
-	ErrorCodes []string `json:"error-codes"`
-}
-
-func verifyTurnstile(token, remoteIP string) (bool, error) {
-	secret := os.Getenv("TURNSTILE_SECRET")
-	if secret == "" {
-		return false, fmt.Errorf("TURNSTILE_SECRET not set")
-	}
-
-	form := url.Values{}
-	form.Set("secret", secret)
-	form.Set("response", token)
-	if remoteIP != "" {
-		form.Set("remoteip", remoteIP)
-	}
-
-	resp, err := http.Post(
-		"https://challenges.cloudflare.com/turnstile/v0/siteverify",
-		"application/x-www-form-urlencoded",
-		strings.NewReader(form.Encode()),
-	)
-	if err != nil {
-		return false, fmt.Errorf("turnstile request failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return false, fmt.Errorf("reading turnstile response: %w", err)
-	}
-
-	var result turnstileResponse
-	if err := json.Unmarshal(body, &result); err != nil {
-		return false, fmt.Errorf("parsing turnstile response: %w", err)
-	}
-
-	return result.Success, nil
-}
-
-func Register(db *sql.DB) http.HandlerFunc {
+func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req registerRequest
+		base := audit.EntryFromRequest(r)
+
+		var req models.RegisterRequest
 		if err:= json.NewDecoder(r.Body).Decode(&req); err != nil {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("permintaan tidak valid"))
 			return
 		}
 
+		req.FullName = strings.TrimSpace(req.FullName)
+
 		switch {
-		case strings.TrimSpace(req.FullName) == "":
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("name lengkap wajib diisi"))
+		case req.FullName == "":
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("nama lengkap wajib diisi"))
+			return
+		case len(req.FullName) > 255:
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("nama terlalu panjang"))
 			return
 		case len(req.NIK) != 16:
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("NIK harus 16 digit"))
@@ -93,7 +52,17 @@ func Register(db *sql.DB) http.HandlerFunc {
 		case len(req.Password) < 8:
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password minimal 8 karakter"))
 			return
+		case len(req.Password) > 72:
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password maksimal 72 karakter"))
+			return
 		case req.TurnstileToken == "":
+			al.Log(audit.Entry{
+				Event: audit.EventRegisterCaptchaRequired,
+				Email: req.Email,
+				IP: base.IP,
+				UserAgent: base.UserAgent,
+				RequestID: base.RequestID,
+			})
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("verifikasi CAPTCHA diperlukan"))
 			return
 		}
@@ -103,12 +72,19 @@ func Register(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		ok, err := verifyTurnstile(req.TurnstileToken, utils.RealIP(r))
+		ok, err := auth.VerifyTurnstile(req.TurnstileToken, utils.RealIP(r))
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 		if !ok {
+			al.Log(audit.Entry{
+				Event: audit.EventRegisterCaptchaFailure,
+				Email: req.Email,
+				IP: base.IP,
+				UserAgent: base.UserAgent,
+				RequestID: base.RequestID,
+			})
 			utils.WriteJSON(w, http.StatusForbidden, utils.ErrJSON("verifikasi CAPTCHA gagal, coba lagi"))
 			return
 		}
@@ -122,27 +98,68 @@ func Register(db *sql.DB) http.HandlerFunc {
 		id := uuid.NewString()
 
 		_, err = db.ExecContext(r.Context(),
-			`INSERT INTO users (id, full_name, nik, email, password_hash)
-			 VALUES (?, ?, ?, ?, ?)`,
+			"INSERT INTO user (id, full_name, nik, email, password_hash) VALUES (?, ?, ?, ?, ?)",
 		 id, strings.TrimSpace(req.FullName), req.NIK, req.Email, string(hash),
 		)
 		if err != nil {
+			slog.Error("this is error", "error", err)
 			var mysqlErr *mysql.MySQLError
 			if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
-				utils.WriteJSON(w, http.StatusConflict, utils.ErrJSON("email sudah terdaftar"))
+				al.Log(audit.Entry{
+					Event: audit.EventRegisterFailure,
+					Email: req.Email,
+					IP: base.IP,
+					UserAgent: base.UserAgent,
+					RequestID: base.RequestID,
+					Meta: map[string]any{"reason": "email_already_exists"},
+				})
+				utils.WriteJSON(w, http.StatusOK, map[string]string{
+					"message": "Registrasi berhasil! Silahkan cek email anda untuk verifikasi",
+				})
 				return
 			}
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
-		user := models.User{
-			ID: id,
-			FullName: strings.TrimSpace(req.FullName),
-			NIK: req.NIK,
+		al.Log(audit.Entry{
+			Event: audit.EventRegisterSuccess,
+			UserID: id,
 			Email: req.Email,
+			IP: base.IP,
+			UserAgent: base.UserAgent,
+			RequestID: base.RequestID,
+		})
+
+		rawToken, tokenHash, err := generateVerificationToken()
+		if err != nil {
+			slog.Error("register: generate verification token", "user_id", id, "error", err)
+			utils.WriteJSON(w, http.StatusCreated, map[string]string{
+				"message": "Registrasi berhasil! Silahkan cek email Anda untuk verifikasi",
+			})
+			return
 		}
 
-		utils.WriteJSON(w, http.StatusCreated, user.ToDTO())
+		_, err = db.ExecContext(r.Context(),
+			"INSERT INTO email_verification (user_id, token_hash, expired_at) VALUES (?, ?, ?)",
+			id, tokenHash, time.Now().Add(verifyTokenTTL),
+		)
+		if err != nil {
+			slog.Error("register: store verification token", "user_id", id, "error", err)
+			utils.WriteJSON(w, http.StatusCreated, map[string]string{
+				"message": "Registrasi berhasil! Silahkan cek email Anda untuk verifikasi",
+			})
+			return
+		}
+
+		go func() {
+			if err := mailer.SendVerificationEmail(req.Email, req.FullName, rawToken); err != nil {
+				slog.Error("register: send verification email", "user_id", id, "error", err)
+			}
+		}()
+
+		utils.WriteJSON(w, http.StatusCreated, map[string]string{
+			"message": "Registrasi berhasil! Silahkan cek email Anda untuk verifikasi",
+		})
 	}
 }

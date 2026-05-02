@@ -20,7 +20,7 @@ func Profile(db *sql.DB) http.HandlerFunc {
 
 		var user models.User
 		err := db.QueryRowContext(r.Context(),
-			"SELECT full_name, nik, email FROM users WHERE id = ?",
+			"SELECT full_name, nik, email FROM user WHERE id = ?",
 			claims.UserID,
 		).Scan(&user.FullName, &user.NIK, &user.Email)
 

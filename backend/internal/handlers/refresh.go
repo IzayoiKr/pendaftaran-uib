@@ -5,9 +5,9 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
-	"os"
 	"time"
 
+	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
@@ -15,8 +15,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func Refresh(db *sql.DB, ts *auth.TokenStore) http.HandlerFunc {
+func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		base := audit.EntryFromRequest(r)
+
 		cookie, err := r.Cookie("refresh_token")
 		if err != nil {
 			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("no refresh token"))
@@ -43,39 +45,52 @@ func Refresh(db *sql.DB, ts *auth.TokenStore) http.HandlerFunc {
 			return
 		}
 
-		sessionValid, err := ts.IsSessionValid(r.Context(), sessionID)
-		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
-			return
-		}
-		if !sessionValid {
-			clearRefreshCookie(w)
-			slog.Error("SECURITY: refresh attempt on invalid/revoked session",
-				"session_id", sessionID,
-				"user_id", claims.UserID)
-			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("sesi tidak valid, silahkan login kembali"))
-			return
-		}
-
 		revoked, err := ts.IsRevoked(r.Context(), claims.ID)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 		if revoked {
-			if err := ts.RevokeSession(r.Context(), sessionID); err != nil {
-				slog.Error("refresh: RevokeSession after revokedJTI",
-					"session_id", sessionID,
-					"error", err)
-			}
 			clearRefreshCookie(w)
+			al.Log(audit.Entry{
+				Event: audit.EventRefreshFailure,
+				UserID: claims.UserID,
+				SessionID: claims.SessionID,
+				IP: base.IP,
+				UserAgent: base.UserAgent,
+				RequestID: base.RequestID,
+				Meta: map[string]any{"reason": "jti_revoked", "jti": claims.ID},
+			})
 			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("token has been revoked"))
+			return
+		}
+
+		consumed, err := ts.ConsumeSession(r.Context(), sessionID)
+		if err != nil {
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+		if !consumed {
+			clearRefreshCookie(w)
+			al.Log(audit.Entry{
+				Event: audit.EventRefreshReuseDetected,
+				UserID: claims.UserID,
+				SessionID: claims.SessionID,
+				IP: base.IP,
+				UserAgent: base.UserAgent,
+				RequestID: base.RequestID,
+				Meta: map[string]any{"jti": claims.ID},
+			})
+			slog.Warn("SECURITY: refresh on missing/expired session - possible token reuse",
+				"session_id", sessionID,
+				"user_id", claims.UserID)
+			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("sesi tidak valid, silahkan login kembali"))
 			return
 		}
 
 		var user models.User
 		err = db.QueryRowContext(r.Context(),
-			`SELECT id, full_name, nik, email FROM users WHERE id = ?`,
+			`SELECT id, full_name, nik, email FROM user WHERE id = ?`,
 			claims.UserID,
 		).Scan(&user.ID, &user.FullName, &user.NIK, &user.Email)
 
@@ -96,22 +111,16 @@ func Refresh(db *sql.DB, ts *auth.TokenStore) http.HandlerFunc {
 			return
 		}
 
-		newAccessToken, err := auth.GenerateAccessToken(user.ID, user.Email, newSessionID)
+		newAccessToken, err := auth.GenerateAccessToken(user.ID, newSessionID, user.Email)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
-		newRefreshToken, err := auth.GenerateRefreshToken(user.ID, user.Email, newSessionID)
+		newRefreshToken, err := auth.GenerateRefreshToken(user.ID, newSessionID, user.Email)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
-		}
-
-		if err := ts.RevokeSession(r.Context(), sessionID); err != nil {
-			slog.Error("refresh: RevokeSession old session",
-				"session_id", sessionID,
-				"error", err)
 		}
 
 		if err := ts.Revoke(r.Context(), claims); err != nil {
@@ -122,36 +131,19 @@ func Refresh(db *sql.DB, ts *auth.TokenStore) http.HandlerFunc {
 
 		setRefreshCookie(w, newRefreshToken)
 
+		al.Log(audit.Entry{
+			Event: audit.EventRefreshSuccess,
+			UserID: user.ID,
+			SessionID: newSessionID,
+			IP: base.IP,
+			UserAgent: base.UserAgent,
+			RequestID: base.RequestID,
+			Meta: map[string]any{"old_session_id": sessionID},
+		})
+
 		utils.WriteJSON(w, http.StatusOK, accessTokenResponse{
 			AccessToken: newAccessToken,
-			User:        user.ToDTO(),
+			User: user.ToDTO(),
 		})
 	}
-}
-
-
-func setRefreshCookie(w http.ResponseWriter, refreshToken string) {
-	secure := os.Getenv("APP_ENV") == "production"
-	http.SetCookie(w, &http.Cookie{
-		Name: "refresh_token",
-		Value: refreshToken,
-		Path: "/api/auth",
-		HttpOnly: true,
-		Secure: secure,
-		SameSite: http.SameSiteStrictMode,
-		MaxAge: 12 * 60 * 60,
-	})
-}
-
-func clearRefreshCookie(w http.ResponseWriter) {
-	secure := os.Getenv("APP_ENV") == "production"
-	http.SetCookie(w, &http.Cookie{
-		Name:     "refresh_token",
-		Value:    "",
-		Path:     "/api/auth",
-		HttpOnly: true,
-		Secure: secure,
-		SameSite: http.SameSiteStrictMode,
-		MaxAge:   -1,
-	})
 }

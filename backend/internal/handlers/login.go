@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
+	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
@@ -21,17 +23,6 @@ import (
 const captchaThreshold = 3
 
 const failedAttemptWindow = 15 * time.Minute
-
-type loginRequest struct {
-	Email string `json:"email"`
-	Password string `json:"password"`
-	TurnstileToken string `json:"cf_turnstile_token,omitempty"`
-}
-
-type loginErrorResponse struct {
-	Error string `json:"error"`
-	RequireCaptcha bool `json:"require_captcha,omitempty"`
-}
 
 type accessTokenResponse struct {
 	AccessToken string `json:"access_token"`
@@ -48,11 +39,13 @@ type attemptEntry struct {
 	expiresAt time.Time
 }
 
-func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter) http.HandlerFunc {
+func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *audit.Logger) http.HandlerFunc {
 	tracker := newFailedAttempts()
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req loginRequest
+		base := audit.EntryFromRequest(r)
+
+		var req models.LoginRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("permintaan tidak valid"))
 			return
@@ -62,9 +55,18 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter) http
 			return
 		}
 
+		req.Email = strings.ToLower(req.Email)
+
 		if allowed, retryAfter := emailLimiter.Allow(req.Email); !allowed {
+			al.Log(audit.Entry{
+				Event: audit.EventLoginBlocked,
+				Email: req.Email,
+				IP: base.IP,
+				UserAgent: base.UserAgent,
+				RequestID: base.RequestID,
+				Meta: map[string]any{"retry_after_seconds": int(retryAfter.Seconds())},
+			})
 			w.Header().Set("Retry-After", retryAfterString(retryAfter))
-			w.Header().Set("X-Auth-Error", "credentials")
 			utils.WriteJSON(w, http.StatusTooManyRequests, utils.ErrJSON(
 				fmt.Sprintf("terlalu banyak percobaan, coba lagi dalam %d detik",
 					int(retryAfter.Seconds())),
@@ -75,22 +77,36 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter) http
 		captchaRequired := tracker.count(req.Email) >= captchaThreshold
 		if captchaRequired {
 			if req.TurnstileToken == "" {
+				al.Log(audit.Entry{
+					Event: audit.EventLoginCaptchaRequired,
+					Email: req.Email,
+					IP: base.IP,
+					UserAgent: base.UserAgent,
+					RequestID: base.RequestID,
+				})
 				w.Header().Set("X-Auth-Error", "credentials")
-				utils.WriteJSON(w, http.StatusUnauthorized, loginErrorResponse{
+				utils.WriteJSON(w, http.StatusUnauthorized, models.LoginErrorResponse{
 					Error: "verifikasi CAPTCHA diperlukan",
 					RequireCaptcha: true,
 				})
 				return
 			}
 
-			ok, err := verifyTurnstile(req.TurnstileToken, utils.RealIP(r))
+			ok, err := auth.VerifyTurnstile(req.TurnstileToken, utils.RealIP(r))
 			if err != nil {
 				utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 				return
 			}
 			if !ok {
+				al.Log(audit.Entry{
+					Event: audit.EventLoginCaptchaFailure,
+					Email: req.Email,
+					IP: base.IP,
+					UserAgent: base.UserAgent,
+					RequestID: base.RequestID,
+				})
 				w.Header().Set("X-Auth-Error", "credentials")
-				utils.WriteJSON(w, http.StatusForbidden, loginErrorResponse{
+				utils.WriteJSON(w, http.StatusForbidden, models.LoginErrorResponse{
 					Error: "verifikasi CAPTCHA gagal, coba lagi",
 					RequireCaptcha: true,
 				})
@@ -100,18 +116,24 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter) http
 
 		var user models.User
 		err := db.QueryRowContext(r.Context(),
-			`SELECT id, full_name, nik, email, password_hash
-			 FROM users WHERE email = ?`,
+			"SELECT id, full_name, nik, email, password_hash, email_verified FROM user WHERE email = ?",
 			req.Email,
-		).Scan(&user.ID, &user.FullName, &user.NIK, &user.Email, &user.PasswordHash)
+		).Scan(&user.ID, &user.FullName, &user.NIK, &user.Email, &user.PasswordHash, &user.EmailVerified)
 
 		if errors.Is(err, sql.ErrNoRows) {
 			failCount := tracker.increment(req.Email)
-			needsCaptcha := failCount >= captchaThreshold
+			al.Log(audit.Entry{
+				Event: audit.EventLoginFailure,
+				Email: req.Email,
+				IP: base.IP,
+				UserAgent: base.UserAgent,
+				RequestID: base.RequestID,
+				Meta: map[string]any{"reason": "wrong_password", "fail_count": failCount},
+			})
 			w.Header().Set("X-Auth-Error", "credentials")
-			utils.WriteJSON(w, http.StatusUnauthorized, loginErrorResponse{
+			utils.WriteJSON(w, http.StatusUnauthorized, models.LoginErrorResponse{
 				Error: "email atau password salah",
-				RequireCaptcha: needsCaptcha,
+				RequireCaptcha: failCount >= captchaThreshold,
 			})
 			return
 		}
@@ -124,16 +146,33 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter) http
 			[]byte(user.PasswordHash), []byte(req.Password),
 		); err != nil {
 			failCount := tracker.increment(req.Email)
-			needsCaptcha := failCount >= captchaThreshold
+			al.Log(audit.Entry{
+				Event: audit.EventLoginFailure,
+				UserID: user.ID,
+				Email: req.Email,
+				IP: base.IP,
+				UserAgent: base.UserAgent,
+				RequestID: base.RequestID,
+				Meta: map[string]any{"reason": "wrong_password", "fail_count": failCount},
+			})
 			w.Header().Set("X-Auth-Error", "credentials")
-			utils.WriteJSON(w, http.StatusUnauthorized, loginErrorResponse{
+			utils.WriteJSON(w, http.StatusUnauthorized, models.LoginErrorResponse{
 				Error: "email atau password salah",
-				RequireCaptcha: needsCaptcha,
+				RequireCaptcha: failCount >= captchaThreshold,
 			})
 			return
 		}
 
 		tracker.reset(req.Email)
+
+		if !user.EmailVerified {
+			utils.WriteJSON(w, http.StatusForbidden, map[string]any{
+				"error": "email belum diverifikasi, silahkan cek inbox Anda",
+				"require_verify": true,
+				"email": user.Email,
+			})
+			return
+		}
 
 		sessionID := uuid.NewString()
 
@@ -153,6 +192,16 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter) http
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
+
+		al.Log(audit.Entry{
+			Event: audit.EventLoginSuccess,
+			UserID: user.ID,
+			Email: user.Email,
+			SessionID: sessionID,
+			IP: base.IP,
+			UserAgent: base.UserAgent,
+			RequestID: base.RequestID,
+		})
 
 		setRefreshCookie(w, refreshToken)
 
