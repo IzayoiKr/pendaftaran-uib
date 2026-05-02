@@ -1,7 +1,6 @@
 'use client';
 
-
-import Account from '@/pages/Account/Account';
+import Account from '@/pages/Account';
 
 export default function AccountPage() {
     return <Account />;
