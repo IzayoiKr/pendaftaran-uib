@@ -67,7 +67,7 @@ function NavMenu({ isOpen, activeId, pathname, onLinkClick, isAuthenticated }: N
 
                         const handleClick = (e: React.MouseEvent) => {
                             onLinkClick();
-                            if (link.hashId && window.location.pathname === '/') {
+                            if (link.hashId && pathname === '/') {
                                 e.preventDefault();
                                 scrollToId(link.hashId);
                             }
@@ -94,7 +94,7 @@ function NavMenu({ isOpen, activeId, pathname, onLinkClick, isAuthenticated }: N
 export default function Header() {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isScrolled, setIsScrolled] = useState<boolean>(false);
-    const pathname = usePathname();
+    const pathname = usePathname() ?? '';
 
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
@@ -109,8 +109,6 @@ export default function Header() {
         window.addEventListener('resize', update, { passive: true });
         return () => window.removeEventListener('resize', update);
     }, [])
-
-    useEffect(() => { setIsOpen(false) }, [pathname]);
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 50);

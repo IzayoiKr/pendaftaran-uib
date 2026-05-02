@@ -118,8 +118,6 @@ export default function ProgramStudi() {
                                         degree={program.degree}
                                         description={program.description}
                                         image={program.image}
-                                        imageWebp={program.imageWebp}
-                                        imageAvif={program.imageAvif}
                                         link={program.link}
                                     />
                                 </div>

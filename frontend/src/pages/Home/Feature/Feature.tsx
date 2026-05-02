@@ -1,5 +1,5 @@
 import { features } from '@/constants/data';
-import { featureIconMap } from '@/components/Icons';
+import { featureIconMap } from '@/components/Icons/Icons';
 import styles from './Feature.module.scss';
 
 function FeatureCard() {

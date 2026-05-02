@@ -41,7 +41,7 @@ $social-bg: #334f6c;
       transition: color 0.3s ease;
 
       &:hover {
-        color: color.adjust($widget-link-color, $lightness: -10%);
+        color: global.$primary-color;
       }
     }
   }
@@ -58,7 +58,7 @@ $social-bg: #334f6c;
       transition: color 0.3s ease;
 
       &:hover {
-        color: global.$white;
+        color: global.$primary-color;
       }
     }
   }

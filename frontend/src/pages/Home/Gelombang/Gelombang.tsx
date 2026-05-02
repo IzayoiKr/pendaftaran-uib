@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Event } from '@/types';
 import { events } from '@/constants/data';
-import { gelombangIconMap } from '@/components/Icons';
+import { gelombangIconMap } from '@/components/Icons/Icons';
 import styles from './Gelombang.module.scss';
 
 interface EventCardProps {

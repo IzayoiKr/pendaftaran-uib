@@ -1,8 +1,10 @@
-import Hero from "@/pages/Home/Hero/Hero";
-import ProgramStudi from "@/pages/Home/ProgramStudi/ProgramStudi";
-import Gelombang from "@/pages/Home/Gelombang/Gelombang";
-import Feature from "@/pages/Home/Feature/Feature";
-import Guides from "@/pages/Home/Guides/Guides";
+import dynamic from "next/dynamic";
+import Hero from "../pages/Home/Hero";
+
+const ProgramStudi = dynamic(() => import('@/pages/Home/ProgramStudi'));
+const Gelombang = dynamic(() => import('@/pages/Home/Gelombang'));
+const Guides = dynamic(() => import('@/pages/Home/Guides'));
+const Feature = dynamic(() => import('@/pages/Home/Feature'));
 
 export default function HomePage() {
     return (

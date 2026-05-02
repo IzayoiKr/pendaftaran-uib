@@ -6,8 +6,8 @@ import '@/styles/global.scss';
 import '@/styles/sonner.scss';
 import SessionProvider from "@/providers/SessionProvider";
 import ScrollToHash from "@/components/ScrollToHash";
-import Header from "@/components/Header/Header";
-import Footer from "@/components/Footer/Footer";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
     title: 'Admisi | Universitas Internasional Batam',

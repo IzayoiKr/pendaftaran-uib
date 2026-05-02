@@ -5,7 +5,7 @@ import styles from './Footer.module.scss';
 import { footerNavLinks } from "@/constants/navigation";
 import { contactInfo, externalLinks } from "@/constants/contact";
 import scrollToId from "@/components/ScrollToId";
-import { socialIconMap } from "@/components/Icons";
+import { socialIconMap } from "@/components/Icons/Icons";
 
 function FooterMenu() {
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, to: string) => {
