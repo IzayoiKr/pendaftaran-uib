@@ -1,0 +1,63 @@
+@use '@/styles/config.scss' as global;
+@use '@/styles/form.scss';
+
+.container {
+    @include global.container;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    svg {
+      width: calc(var(--space-2xl) * 1.5);
+      height: calc(var(--space-2xl) * 1.5);
+    }
+}
+
+.heading {
+    font-size: var(--step-2);
+    font-weight: 700;
+    color: global.$tertiary-color;
+    margin: 0;
+}
+
+.subheading {
+    font-size: var(--step--1);
+    color: global.$text-color;
+}
+
+.resendForm {
+  @include global.container-form;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2xs);
+    margin-top: var(--space-xs);
+
+    label {
+        font-size: var(--step--1);
+        color: global.$text-color;
+        align-self: flex-start;
+    }
+
+    input {
+        @include form.input-template;
+    }
+}
+
+.btn {
+    @include form.submit-button;
+    text-decoration: none;
+}
+
+.sentMsg {
+    font-size: var(--step--1);
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.backLink {
+    @include form.submit-button;
+    text-decoration: none;
+    margin-top: var(--space-xs);
+}

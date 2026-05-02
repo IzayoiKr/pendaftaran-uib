@@ -1,20 +1,18 @@
 'use client';
 
-import { useState, useRef, forwardRef, useImperativeHandle } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { Turnstile } from "@marsidev/react-turnstile";
-import type { TurnstileInstance } from "@marsidev/react-turnstile";
 import type { AccessTokenResponse, Form } from "@/types";
 import { login as loginFields } from "@/constants/data";
 import { loginSchema } from "@/validation/schema";
+import TurnstileWidget from "../../components/TurnstileWidget";
+import type { TurnstileHandle } from "../../components/TurnstileWidget";
 import { api, ApiError } from "@/api";
 import useAuthStore from "@/store/useAuthStore";
-import { RightArrowIcon } from "@/components/Icons";
+import { RightArrowIcon } from "@/components/Icons/Icons";
 import styles from "./Login.module.scss";
-
-const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY as string;
 
 interface LoginFormProps {
     onLogin: (
@@ -22,6 +20,7 @@ interface LoginFormProps {
         password: string,
         turnstileToken?: string,
     ) => Promise<AccessTokenResponse>;
+    router: ReturnType<typeof useRouter>;
 }
 
 interface LoginActionProps {
@@ -29,15 +28,7 @@ interface LoginActionProps {
     requireCaptcha: boolean;
 }
 
-interface TurnstileHandle {
-    reset: () => void;
-}
-
-interface LoginTurnstileProps {
-    onTokenChange: (token: string | null) => void;
-}
-
-function LoginPlaceholder({
+function LoginInput({
     name, type, placeholder, autoComplete, minLength, value, onChange,
 }: Form) {
     return (
@@ -54,33 +45,6 @@ function LoginPlaceholder({
         />
     );
 }
-
-const LoginTurnstile = forwardRef<TurnstileHandle, LoginTurnstileProps>(
-    ({ onTokenChange }, ref) => {
-        const turnstileRef = useRef<TurnstileInstance>(null);
-
-        useImperativeHandle(ref, () => ({
-            reset: () => turnstileRef.current?.reset(),
-        }));
-
-        return (
-            <div className={styles.turnstile}>
-                <Turnstile
-                    ref={turnstileRef}
-                    siteKey={SITE_KEY}
-                    onSuccess={(token) => onTokenChange(token)}
-                    onExpire={() => onTokenChange(null)}
-                    onError={() => {
-                        onTokenChange(null);
-                        toast.error("Verifikasi CAPTCHA gagal, coba muat ulang halaman");
-                    }}
-                    options={{ theme: "light", language: "id" }}
-                />
-            </div>
-        );
-    },
-);
-LoginTurnstile.displayName = "LoginTurnstile";
 
 function LoginAction({ isLoading, requireCaptcha }: LoginActionProps) {
     return (
@@ -108,11 +72,10 @@ function LoginAction({ isLoading, requireCaptcha }: LoginActionProps) {
     );
 }
 
-function LoginForm({ onLogin }: LoginFormProps) {
+function LoginForm({ onLogin, router }: LoginFormProps) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-
     const [requireCaptcha, setRequireCaptcha] = useState(false);
     const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
     const turnstileRef = useRef<TurnstileHandle>(null);
@@ -138,6 +101,21 @@ function LoginForm({ onLogin }: LoginFormProps) {
             await onLogin(email, password, turnstileToken ?? undefined);
             toast.success("Login berhasil!", { id: toastId });
         } catch (err) {
+            const needsCaptchaReset = (err instanceof ApiError && err.requireCaptcha) || requireCaptcha;
+
+            if (err instanceof ApiError && err.requireVerify) {
+                const params = new URLSearchParams({
+                    email: err.email ?? email,
+                    from: 'login',
+                });
+                toast.warning(
+                    "Email belum diverifikasi, mohon verifikasi email terlebih dahulu",
+                    { id: toastId }
+                );
+                router.push(`/check-inbox?${params.toString()}`);
+                return;
+            }
+
             if (err instanceof ApiError && err.requireCaptcha) {
                 setRequireCaptcha(true);
                 toast.warning(
@@ -151,7 +129,7 @@ function LoginForm({ onLogin }: LoginFormProps) {
                 );
             }
 
-            if (requireCaptcha) {
+            if (needsCaptchaReset) {
                 turnstileRef.current?.reset();
                 setTurnstileToken(null);
             }
@@ -165,7 +143,7 @@ function LoginForm({ onLogin }: LoginFormProps) {
             {loginFields.map((props) => {
                 const isEmail = props.name === "email";
                 return (
-                    <LoginPlaceholder
+                    <LoginInput
                         key={props.name}
                         {...props}
                         value={isEmail ? email : password}
@@ -176,7 +154,7 @@ function LoginForm({ onLogin }: LoginFormProps) {
                 );
             })}
 
-            <Link href="/forgot" className={styles.forgotLink}>
+            <Link href="/forgot-password" className={styles.forgotLink}>
                 Lupa Password?
             </Link>
 
@@ -184,9 +162,10 @@ function LoginForm({ onLogin }: LoginFormProps) {
                 style={{ display: requireCaptcha ? "block" : "none" }}
                 aria-hidden={!requireCaptcha}
             >
-                <LoginTurnstile
+                <TurnstileWidget
                     ref={turnstileRef}
                     onTokenChange={setTurnstileToken}
+                    className={styles.turnstile}
                 />
             </div>
 
@@ -201,6 +180,7 @@ export default function Login() {
     const loginStore = useAuthStore((state) => state.login);
 
     const url = searchParams?.get("from") || "/";
+    const safeUrl = url.startsWith('/') && !url.startsWith('//') ? url : '/';
 
     const handleLogin = async (
         email: string,
@@ -209,7 +189,7 @@ export default function Login() {
     ): Promise<AccessTokenResponse> => {
         const res = await api.auth.login(email, password, turnstileToken);
         loginStore(res.user, res.access_token);
-        router.push(url);
+        router.push(safeUrl);
         return res;
     };
 
@@ -217,7 +197,10 @@ export default function Login() {
         <main id="login" className={styles.login}>
             <div className={styles.container}>
                 <h1>LOGIN</h1>
-                <LoginForm onLogin={handleLogin} />
+                <LoginForm
+                    onLogin={handleLogin}
+                    router={router}
+                />
             </div>
         </main>
     );

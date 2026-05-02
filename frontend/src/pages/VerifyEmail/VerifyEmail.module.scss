@@ -1,0 +1,49 @@
+@use '@/styles/config.scss' as global;
+@use '@/styles/form.scss';
+
+.verifyEmail {
+  margin-top: calc(var(--space-2xl) + var(--space-l));
+  margin-bottom: var(--space-xl);
+}
+
+.container {
+  @include global.container;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  svg {
+    width: calc(var(--space-2xl) * 1.2);
+    height: calc(var(--space-2xl) * 1.2);
+    margin-bottom: var(--space-m);
+  }
+}
+
+.heading {
+  font-size: var(--step-2);
+  font-weight: 700;
+  color: global.$secondary-color;
+  margin-bottom: var(--space-xs);
+}
+
+.body {
+  font-size: var(--step--1);
+  color: global.$text-color;
+  line-height: 1.6;
+}
+
+.turnstile {
+  margin-bottom: var(--space-s)
+}
+
+.btn {
+  @include form.submit-button;
+  text-decoration: none;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+
+  &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+  }
+}

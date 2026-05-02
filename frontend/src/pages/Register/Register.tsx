@@ -1,30 +1,20 @@
 'use client';
 
-import { useState, useRef, forwardRef, useImperativeHandle } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Turnstile } from "@marsidev/react-turnstile";
-import type { TurnstileInstance } from "@marsidev/react-turnstile";
+import TurnstileWidget from "../../components/TurnstileWidget";
+import type { TurnstileHandle } from "../../components/TurnstileWidget";
 import type { Form } from "@/types";
 import { register } from "@/constants/data";
 import { registerSchema } from "@/validation/schema";
 import { api } from "@/api";
-import { RightArrowIcon } from "@/components/Icons";
+import { RightArrowIcon } from "@/components/Icons/Icons";
 import styles from "./Register.module.scss";
-
-const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY as string;
-
-interface RegisterTurnstileProps {
-    onTokenChange: (token: string | null) => void;
-}
 
 interface RegisterActionProps {
     isLoading: boolean;
-}
-
-interface TurnstileHandle {
-    reset: () => void;
 }
 
 function RegisterField({ label, type, name, value, autoComplete, minLength, maxLength, onChange }: Form) {
@@ -45,36 +35,6 @@ function RegisterField({ label, type, name, value, autoComplete, minLength, maxL
         </>
     );
 }
-
-const RegisterTurnstile = forwardRef<TurnstileHandle, RegisterTurnstileProps>(
-    ({ onTokenChange }, ref) => {
-        const turnstileRef = useRef<TurnstileInstance>(null);
-
-        useImperativeHandle(ref, () => ({
-            reset: () => {
-                turnstileRef.current?.reset();
-            }
-        }))
-
-        return (
-            <div className={styles.turnstile}>
-                <Turnstile
-                    ref={turnstileRef}
-                    siteKey={SITE_KEY}
-                    onSuccess={(token) => onTokenChange(token)}
-                    onExpire={() => onTokenChange(null)}
-                    onError={() => {
-                        onTokenChange(null);
-                        toast.error("Verifikasi CAPTCHA gagal, coba muat ulang halaman");
-                    }}
-                    options={{ theme: "light", language: "id" }}
-                />
-            </div>
-        )
-    }
-);
-
-RegisterTurnstile.displayName = "RegisterTurnstile";
 
 function RegisterAction({ isLoading }: RegisterActionProps) {
     return (
@@ -136,8 +96,8 @@ export default function Register() {
                 password,
                 cf_turnstile_token: turnstileToken
             });
-            toast.success("Registrasi berhasil! Silahkan login kembali", { id: toastId });
-            router.push("/login");
+            toast.success("Registrasi berhasil! Silahkan cek email Anda untuk verifikasi", { id: toastId });
+            router.push(`/check-inbox?email=${encodeURIComponent(formData.email)}&from=register`)
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Registrasi gagal! Coba lagi...", { id: toastId });
             turnstileRef.current?.reset();
@@ -161,9 +121,10 @@ export default function Register() {
                             onChange={(e) => handleChange(props.name, e.target.value)}
                         />
                     ))}
-                    <RegisterTurnstile
+                    <TurnstileWidget
                         ref={turnstileRef}
                         onTokenChange={setTurnstileToken}
+                        className={styles.turnstile}
                     />
                     <RegisterAction isLoading={isLoading} />
                 </form>

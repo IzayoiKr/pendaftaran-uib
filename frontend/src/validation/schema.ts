@@ -24,7 +24,8 @@ export const registerSchema = z.object({
         .email("Format email tidak valid"),
     password: z
         .string()
-        .min(8, "Password minimal 8 karakter"),
+        .min(8, "Password minimal 8 karakter")
+        .max(72, "Password maksimal 72 karakter"),
     retypePassword: z
         .string()
         .min(8, "Konfirmasi password wajib diisi")
@@ -33,5 +34,51 @@ export const registerSchema = z.object({
     path: ["retypePassword"]
 });
 
+export const forgotPasswordSchema = z.object({
+    email: z
+        .email("Format email tidak valid")
+        .min(1, "Email wajib diisi"),
+    nik: z
+        .string()
+        .min(16, "NIK harus 16 digit")
+        .regex(/^\d+$/, "NIK harus berupa angka"),
+});
+
+
+export const changePasswordSchema = z.object({
+    oldPassword: z
+        .string()
+        .min(1, "Password lama wajib diisi"),
+    newPassword: z
+        .string()
+        .min(8, "Password baru minimal 8 karakter")
+        .max(72, "Password baru maksimal 72 karakter"),
+    confirmPassword: z
+        .string()
+        .min(1, "Konfirmasi password wajib diisi"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Password baru dan konfirmasi tidak cocok",
+    path: ["confirmPassword"],
+}).refine((data) => data.oldPassword !== data.newPassword, {
+    message: "Password baru harus berbeda dari password lama",
+    path: ["newPassword"],
+});
+
+export const resetPasswordSchema = z.object({
+    newPassword: z
+        .string()
+        .min(8, "Password minimal 8 karakter")
+        .max(72, "Password maksimal 72 karakter"),
+    confirmPassword: z
+        .string()
+        .min(1, "Konfirmasi password wajib diisi"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Password dan konfirmasi tidak cocok",
+    path: ["confirmPassword"],
+});
+
 export type LoginValidation = z.infer<typeof loginSchema>;
 export type RegisterValidation = z.infer<typeof registerSchema>;
+export type ForgotPasswordValidation = z.infer<typeof forgotPasswordSchema>;
+export type ChangePasswordValidation = z.infer<typeof changePasswordSchema>;
+export type ResetPasswordValidation = z.infer<typeof resetPasswordSchema>;

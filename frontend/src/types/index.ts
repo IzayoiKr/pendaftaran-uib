@@ -94,6 +94,7 @@ export interface User {
     full_name: string;
     nik: string;
     email: string;
+    email_verified: boolean;
 }
 
 export interface AuthState {
