@@ -1,4 +1,5 @@
 .env
+!.env.example
 node_modules/
 .vscode/
 package-lock.json
@@ -21,3 +22,4 @@ frontend/.env.*.local
 
 .DS_Store
 Thumbs.db
+.codex

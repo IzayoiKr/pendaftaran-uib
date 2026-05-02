@@ -88,11 +88,34 @@ services:
     ports:
       - "8082:8081"
 
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mailpit-pendaftaran-uib-db
+    restart: unless-stopped
+    environment:
+      MP_UI_BIND_ADDR: ${MP_UI_BIND_ADDR}
+      MP_SMTP_BIND_ADDR: ${MP_SMTP_BIND_ADDR}
+      MP_MAX_MESSAGES: ${MP_MAX_MESSAGES}
+      MP_SMPT_AUTH_ACCEPT_ANY: ${MP_SMPT_AUTH_ACCEPT_ANY}
+      MP_SMPT_AUTH_ALLOW_INSECURE: ${MP_SMPT_AUTH_ALLOW_INSECURE}
+    ports:
+      - ${MP_WEB_PORTS}
+      - ${MP_SMTP_PORTS}
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:6969"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   migrate:
+    profiles:
+      - "tools"
     build:
       context: ./backend
       target: development
     container_name: migrate-pendaftaran-uib-dev
+    volumes:
+      - ./backend/migrations/:/app/migrations
     depends_on:
       mysql:
         condition: service_healthy
@@ -102,10 +125,36 @@ services:
       DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
       DB_NAME: ${MYSQL_DATABASE}
-    command: >-
-      migrate -path /app/migrations -database
-      "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(mysql:${MYSQL_PORT})/${MYSQL_DATABASE}"
-      up
+    entrypoint:
+      [
+        "migrate",
+        "-path",
+        "/app/migrations",
+        "-database",
+        "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(mysql:${MYSQL_PORT})/${MYSQL_DATABASE}",
+      ]
+
+  mongo-reset:
+    image: mongo:7
+    container_name: mongo-reset-pendaftaran-uib-dev
+    profiles: ["tools"]
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      - MONGO_URI=${MONGO_URI}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        mongosh "$$MONGO_URI" <<'EOF'
+        db.getCollectionNames().forEach(function(name) {
+          if (!name.startsWith("system.")) {
+            print("Dropping collection: " + name);
+            db.getCollection(name).drop();
+          }
+        });
+        print("Successfully down all mongo collections.");
+        EOF
 
   backend:
     build:
@@ -133,10 +182,20 @@ services:
       MONGO_CONNECT_TIMEOUT: ${MONGO_CONNECT_TIMEOUT}
       MONGO_PING_TIMEOUT: ${MONGO_PING_TIMEOUT}
 
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM: ${SMTP_FROM}
+      SMTP_DISABLE_TLS: ${SMTP_DISABLE_TLS}
+
       JWT_SECRET: ${JWT_SECRET}
+      JWT_ISSUER: ${JWT_ISSUER}
       CORS_ORIGIN: ${CORS_ORIGIN}
       TURNSTILE_SECRET: ${TURNSTILE_SECRET}
+      TURNSTILE_EXPECTED_HOSTNAME: ${TURNSTILE_EXPECTED_HOSTNAME}
       APP_ENV: ${APP_ENV}
+      APP_URL: ${APP_URL}
       APP_HEALTH_URL: ${APP_HEALTH_URL}
       SERVER_PORT: ${SERVER_PORT}
     ports:
@@ -150,7 +209,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 5s
+      start_period: 30s
 
   frontend:
     build:
