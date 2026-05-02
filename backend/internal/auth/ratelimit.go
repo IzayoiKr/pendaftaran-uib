@@ -14,11 +14,11 @@ import (
 )
 
 type tokenBucket struct {
-	tokens float64
-	capacity float64
+	tokens     float64
+	capacity   float64
 	refillRate float64
 	lastRefill time.Time
-	mu sync.Mutex
+	mu         sync.Mutex
 }
 
 func (tb *tokenBucket) init(capacity, refillRate float64) {
@@ -34,7 +34,8 @@ func (tb *tokenBucket) allow() (bool, time.Duration) {
 
 	now := time.Now()
 	elapsed := now.Sub(tb.lastRefill).Seconds()
-	tb.tokens = math.Min(tb.capacity, tb.tokens + elapsed * tb.refillRate)
+
+	tb.tokens = math.Min(tb.capacity, tb.tokens+elapsed*tb.refillRate)
 	tb.lastRefill = now
 
 	if tb.tokens >= 1 {
@@ -47,20 +48,20 @@ func (tb *tokenBucket) allow() (bool, time.Duration) {
 }
 
 type RateLimiter struct {
-	buckets map[string]*tokenBucket
-	mu sync.RWMutex
-	pool sync.Pool
-	capacity float64
+	buckets    map[string]*tokenBucket
+	mu         sync.RWMutex
+	pool       sync.Pool
+	capacity   float64
 	refillRate float64
-	window time.Duration
+	window     time.Duration
 }
 
 func NewRateLimiter(max int, window time.Duration) *RateLimiter {
 	rl := &RateLimiter{
-		buckets: make(map[string]*tokenBucket),
-		capacity: float64(max),
+		buckets:    make(map[string]*tokenBucket),
+		capacity:   float64(max),
 		refillRate: float64(max) / window.Seconds(),
-		window: window,
+		window:     window,
 	}
 	rl.pool.New = func() any { return &tokenBucket{} }
 	go rl.periodicCleanup()
@@ -123,7 +124,6 @@ func (rl *RateLimiter) RateLimitUser(next http.Handler) http.HandlerFunc {
 			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("unauthorized"))
 			return
 		}
-
 		allowed, retryAfter := rl.Allow(claims.UserID)
 		if !allowed {
 			rateLimitResponse(w, retryAfter)
@@ -170,7 +170,9 @@ func deviceKey(r *http.Request) string {
 	return ip
 }
 
-var uuidPattern = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`)
+var uuidPattern = regexp.MustCompile(
+	`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`,
+)
 
 func isValidDeviceID(s string) bool {
 	return uuidPattern.MatchString(strings.ToLower(s))

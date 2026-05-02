@@ -33,7 +33,7 @@ func NewProvider(ctx context.Context) (*Provider, error) {
 	mongoClient, mongoDB, err := NewMongo(ctx, cfg.Mongo)
 	if err != nil {
 		if closeErr := mysql.Close(); closeErr != nil {
-			slog.Error("failed to close mysql after mongo error", "erorr", closeErr)
+			slog.Error("failed to close mysql after mongo error", "error", closeErr)
 		}
 		return nil, fmt.Errorf("init mongo: %w", err)
 	}

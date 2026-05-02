@@ -93,7 +93,26 @@ func (ts *TokenStore) StoreSession(ctx context.Context, sessionID, userID string
 }
 
 func (ts *TokenStore) IsSessionValid(ctx context.Context, sessionID string) (bool, error) {
-	err := ts.sessions.FindOne(ctx, bson.M{"session_id": sessionID}).Err()
+	filter := bson.M{
+		"session_id": sessionID,
+		"expires_at": bson.M{"$gt": time.Now()},
+	}
+	err := ts.sessions.FindOne(ctx, filter).Err()
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (ts *TokenStore) ConsumeSession(ctx context.Context, sessionID string) (bool, error) {
+	filter := bson.M{
+		"session_id": sessionID,
+		"expires_at": bson.M{"$gt": time.Now()},
+	}
+	err := ts.sessions.FindOneAndDelete(ctx, filter).Err()
 	if errors.Is(err, mongo.ErrNoDocuments) {
 		return false, nil
 	}
@@ -108,11 +127,10 @@ func (ts *TokenStore) RevokeSession(ctx context.Context, sessionID string) error
 	return err
 }
 
-// Uncomment this if want log out all users feature
-// func (ts *TokenStore) RevokeAllUserSessions(ctx context.Context, userID string) error {
-// 	_, err := ts.sessions.DeleteMany(ctx, bson.M{"user_id": userID})
-// 	return err
-// }
+func (ts *TokenStore) RevokeAllUserSessions(ctx context.Context, userID string) error {
+	_, err := ts.sessions.DeleteMany(ctx, bson.M{"user_id": userID})
+	return err
+}
 
 func (ts *TokenStore) Revoke(ctx context.Context, claims *Claims) error {
 	_, err := ts.revokedTokens.InsertOne(ctx, revokedToken{

@@ -8,6 +8,7 @@ type User struct {
 	NIK string
 	Email string
 	PasswordHash string
+	EmailVerified bool
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -25,19 +26,3 @@ func (u *User) ToDTO() UserDTO {
 		Email: u.Email,
 	}
 }
-
-type  ChangePasswordRequest struct {
-	OldPassword string `json:"old_password"`
-	NewPassword string `json:"new_password"`
-}
-
-type ForgotPasswordRequest struct {
-	Email string `json:"email"`
-	NIK   string `json:"nik"`
-}
-
-type ResetPasswordRequest struct {
-	Token       string `json:"token"`
-	NewPassword string `json:"new_password"`
-}
-

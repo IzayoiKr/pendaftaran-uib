@@ -15,8 +15,10 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/joho/godotenv"
 
+	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/db"
+	"pendaftaran-uib/backend/internal/email"
 	"pendaftaran-uib/backend/internal/handlers"
 )
 
@@ -53,6 +55,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	mailer, err := email.NewMailer()
+	if err != nil {
+		slog.Error("mailer init failed", "error", err)
+		os.Exit(1)
+	}
+
+	auditlogger := audit.NewLogger()
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
@@ -68,29 +78,87 @@ func main() {
 	refreshUserLimiter := auth.NewRateLimiter(30, 1*time.Minute)
 
 	profileLimiter := auth.NewRateLimiter(60, 1*time.Minute)
+	updateProfileLimiter := auth.NewRateLimiter(10, 1*time.Minute)
+
+	changePasswordLimiter := auth.NewRateLimiter(5, 15*time.Minute)
+
+	forgotPasswordLimiter := auth.NewRateLimiter(3, 60*time.Minute)
+	forgotPasswordEmailLimiter := auth.NewRateLimiter(5, 60*time.Minute)
+
+	resetPasswordLimiter := auth.NewRateLimiter(10, 60*time.Minute)
+
 	logoutLimiter := auth.NewRateLimiter(20, 60*time.Minute)
+
+	verifyEmailLimiter := auth.NewRateLimiter(5, 60*time.Minute)
+	resendVerifyLimiter := auth.NewRateLimiter(3, 60*time.Minute)
 
 	r.Get("/health", handlers.HealthCheck(provider))
 
-	r.Post("/api/auth/login", loginIPLimiter.RateLimit(handlers.Login(provider.MySQL, tokenStore, loginEmailLimiter)))
-	r.Post("/api/auth/register", registerLimiter.RateLimitDevice(handlers.Register(provider.MySQL)))
-	r.Post("/api/auth/refresh", auth.RateLimitRefresh(refreshIPLimiter, refreshUserLimiter, handlers.Refresh(provider.MySQL, tokenStore)))
-
-	r.Post("/api/auth/forgot-password", handlers.ForgotPassword(provider.MySQL))
-    r.Post("/api/auth/reset-password", handlers.ResetPassword(provider.MySQL))
+	r.Post("/api/auth/login",
+		loginIPLimiter.RateLimit(
+			handlers.Login(provider.MySQL, tokenStore, loginEmailLimiter, auditlogger),
+		),
+	)
+	r.Post("/api/auth/register",
+		registerLimiter.RateLimitDevice(
+			handlers.Register(provider.MySQL, mailer, auditlogger),
+		),
+	)
+	r.Post("/api/auth/refresh",
+		auth.RateLimitRefresh(
+			refreshIPLimiter,
+			refreshUserLimiter,
+			handlers.Refresh(provider.MySQL, tokenStore, auditlogger),
+		),
+	)
+	r.Post("/api/auth/forgot-password",
+		forgotPasswordLimiter.RateLimitDevice(
+			handlers.ForgotPassword(provider.MySQL, mailer, forgotPasswordEmailLimiter, auditlogger),
+		),
+	)
+	r.Post("/api/auth/reset-password",
+		resetPasswordLimiter.RateLimit(
+			handlers.ResetPassword(provider.MySQL, tokenStore, auditlogger),
+		),
+	)
+	r.Post("/api/auth/verify-email",
+		verifyEmailLimiter.RateLimitDevice(
+			handlers.VerifyEmail(provider.MySQL, auditlogger),
+		),
+	)
+	r.Post("/api/auth/resend-verification",
+		resendVerifyLimiter.RateLimitDevice(
+			handlers.ResendVerification(provider.MySQL, mailer, auditlogger),
+		),
+	)
 
 	r.Group(func(r chi.Router) {
 		r.Use(auth.Middleware(tokenStore))
-		r.Get("/api/profile", profileLimiter.RateLimitUser(handlers.Profile(provider.MySQL)))
-		r.Post("/api/auth/logout", logoutLimiter.RateLimitUser(handlers.Logout(tokenStore)))
-
-		r.Patch("/api/profile", handlers.UpdateProfile(provider.MySQL))
-    	r.Post("/api/account/password", handlers.ChangePassword(provider.MySQL))
+		r.Get("/api/profile",
+			profileLimiter.RateLimitUser(
+				handlers.Profile(provider.MySQL),
+			),
+		)
+		r.Post("/api/profile",
+			updateProfileLimiter.RateLimitUser(
+				handlers.UpdateProfile(provider.MySQL, auditlogger),
+			),
+		)
+		r.Post("/api/auth/logout",
+			logoutLimiter.RateLimitUser(
+				handlers.Logout(tokenStore, auditlogger),
+			),
+		)
+    	r.Post("/api/profile/password",
+			changePasswordLimiter.RateLimitUser(
+				handlers.ChangePassword(provider.MySQL, tokenStore, auditlogger),
+			),
+		)
 	})
 
 	port := os.Getenv("SERVER_PORT")
 	srv := &http.Server{
-		Addr: ":"+port,
+		Addr: ":" + port,
 		Handler: r,
 		ReadTimeout: 15 * time.Second,
 		WriteTimeout: 15 * time.Second,
@@ -101,7 +169,7 @@ func main() {
 	go func() {
 		slog.Info("server listening", "port", port)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			slog.Info("server error", "error", err)
+			slog.Error("server error", "error", err)
 			os.Exit(1)
 		}
 	}()
@@ -111,7 +179,10 @@ func main() {
 	<-quit
 	slog.Info("Shutting down server...")
 
-	if err := srv.Shutdown(ctx); err != nil {
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(shutdownCtx); err != nil {
 		slog.Error("Server forced to shutdown", "error", err)
 		os.Exit(1)
 	}

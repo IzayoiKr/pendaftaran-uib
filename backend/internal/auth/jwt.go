@@ -36,12 +36,24 @@ func GenerateRefreshToken(userID, sessionID, email string) (string, error) {
 }
 
 func ValidateToken(raw string) (*Claims, error) {
-	token, err := jwt.ParseWithClaims(raw, &Claims{}, func(t *jwt.Token) (any, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errors.New("unexpected signing method")
-		}
-		return getJWTSecret(), nil
-	})
+	issuer := os.Getenv("JWT_ISSUER")
+	if issuer == "" {
+		issuer = "pendaftaran-uib"
+	}
+
+	token, err := jwt.ParseWithClaims(
+		raw,
+		&Claims{},
+		func(t *jwt.Token) (any, error) {
+			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, errors.New("unexpected signing method")
+			}
+			return getJWTSecret(), nil
+		},
+		jwt.WithValidMethods([]string{"HS256"}),
+		jwt.WithIssuer(issuer),
+		jwt.WithExpirationRequired(),
+	)
 	if err != nil {
 		return nil, err
 	}

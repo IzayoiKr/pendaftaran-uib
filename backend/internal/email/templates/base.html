@@ -1,0 +1,25 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <style>{{.CSS}}</style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="title">
+            <h1>Universitas Internasional Batam</h1>
+        </div>
+        <div class="content">
+            {{template "content" .}}
+            <p class="fallback-url">
+                Atau salin link ini ke browser: {{.URL}}
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>
+{{end}}
