@@ -10,6 +10,7 @@ import SelectField from "@/pages/BatchRegistration/components/SelectField";
 
 /* ================= HOOKS ================= */
 import { useMaxBirthDate } from "@/pages/BatchRegistration/hooks/useMaxBirthDate";
+import { useFormErrorHandler } from "@/pages/BatchRegistration/hooks/useFormErrorHandler";
 
 /* ================= CONSTANTS ================= */
 import {
@@ -41,15 +42,18 @@ export default function StepParentS2({
   currentStep,
   flow,
 }: StepPropsS2) {
+  const methods = useForm<FormType>({
+    resolver: zodResolver(s2ParentSchema),
+    defaultValues: data,
+  });
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<FormType>({
-    resolver: zodResolver(s2ParentSchema),
-    defaultValues: data,
-  });
+  } = methods;
+
+  const { onError } = useFormErrorHandler({ setFocus: methods.setFocus });
 
   const maxDate = useMaxBirthDate();
 
@@ -58,7 +62,7 @@ export default function StepParentS2({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit, onError)}>
       <div className={styles.container}>
         <div className={styles.formWrapper}>
 

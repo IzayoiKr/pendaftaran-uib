@@ -8,6 +8,7 @@ import form from "@/pages/BatchRegistration/styles/Form.module.scss";
 import ProgressBar from "@/pages/BatchRegistration/components/ProgressBar";
 import FileInputField from "@/pages/BatchRegistration/components/FileInputField";
 import InputField from "@/pages/BatchRegistration/components/InputField";
+import { useFormErrorHandler } from "@/pages/BatchRegistration/hooks/useFormErrorHandler";
 
 import type { StepPropsS1 } from "@/validation/schemaform";
 
@@ -45,21 +46,24 @@ export default function Step2S1({
   isSubmitting,
 }: StepPropsS1) {
   /* ================= RHF ================= */
+  const methods = useForm<FormType>({
+    resolver: zodResolver(s1Step2Schema),   // ← tetap di sini
+    defaultValues: {
+      ...data,
+      jenisdaftar: data.jenisdaftar ?? "baru",  // ← tetap di sini
+    },
+  });
   const {
     register,
     control,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<FormType>({
-    resolver: zodResolver(s1Step2Schema),
-    defaultValues: {
-      ...data,
-      jenisdaftar: data.jenisdaftar ?? "baru",
-    },
-  });
+  } = methods;
 
   const jenisdaftar = watch("jenisdaftar");
+
+  const { onError } = useFormErrorHandler({ setFocus: methods.setFocus });
 
   const [
     pp,
@@ -166,7 +170,7 @@ export default function Step2S1({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit, onError)}>
       <div className={styles.container}>
         <div className={styles.formWrapper}>
 

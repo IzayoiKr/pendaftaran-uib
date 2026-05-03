@@ -13,6 +13,7 @@ import AutocompleteField from "@/components/AutocompleteField";
 /* ================= HOOKS ================= */
 import useUniversitySearch from "@/pages/BatchRegistration/hooks/useUniversitySearch";
 import { useMaxBirthDate } from "@/pages/BatchRegistration/hooks/useMaxBirthDate";
+import { useFormErrorHandler } from "@/pages/BatchRegistration/hooks/useFormErrorHandler";
 
 /* ================= CONSTANTS ================= */
 import {
@@ -33,8 +34,6 @@ import { s2Step1Schema } from "@/validation/schemaform";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
-import { toast } from "sonner";
-import type { FieldErrors } from "react-hook-form";
 
 /* ================= FORM TYPE ================= */
 type FormType = z.infer<typeof s2Step1Schema>;
@@ -56,21 +55,13 @@ export default function Step1S2({
     handleSubmit,
     setValue,
     formState: { errors },
-    setFocus,
   } = methods;
 
   const onSubmit = (values: FormType) => {
     onResult({ action: "next", data: values });
   };
 
-  const onError = (errors: FieldErrors<FormType>) => {
-    console.log("FORM ERROR:", errors);
-    toast.error("Form belum lengkap. Periksa kembali input Anda.");
-    const firstError = Object.keys(errors)[0];
-    if (firstError) {
-      setFocus(firstError as any);
-    }
-  };
+  const { onError } = useFormErrorHandler({ setFocus: methods.setFocus });
 
   const maxDate = useMaxBirthDate();
   const university = useUniversitySearch();

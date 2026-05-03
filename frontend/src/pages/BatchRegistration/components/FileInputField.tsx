@@ -11,12 +11,9 @@ import { get } from "react-hook-form";
 type Props<T extends FieldValues> = {
   label: string;
   name: Path<T>;
-
   files: Partial<Record<Path<T>, File>>;
   filesPreview: Partial<Record<Path<T>, string>>;
-  
-  errors: FieldErrors<T>
-
+  errors: FieldErrors<T>;
   maxSizeMB: number;
   control: Control<T>;
 };
@@ -47,6 +44,7 @@ export default function FileInputField<T extends FieldValues>({
               <input
                 type="file"
                 id={name}
+                data-field={name}
                 className={styles.customFileInput}
                 accept=".pdf,application/pdf"
                 ref={field.ref}
@@ -54,32 +52,26 @@ export default function FileInputField<T extends FieldValues>({
                   const file = e.target.files?.[0];
                   if (!file) return;
 
-                  // 🔴 VALIDASI SIZE
                   if (file.size > maxSizeMB * 1024 * 1024) {
                     toast.error(`File maksimal ${maxSizeMB}MB`);
                     e.target.value = "";
                     return;
                   }
 
-                  // 🔴 VALIDASI MIME
                   if (file.type !== "application/pdf") {
                     toast.error("File harus PDF");
                     e.target.value = "";
                     return;
                   }
 
-                  // 🔴 VALIDASI EXTENSION
                   if (!file.name.toLowerCase().endsWith(".pdf")) {
                     toast.error("File harus PDF (.pdf)");
                     e.target.value = "";
                     return;
                   }
 
-                  // ✅ MASUK KE RHF
                   field.onChange(file);
                   e.target.value = "";
-
-                  // ✅ SUCCESS TOAST
                   toast.success(`${file.name} berhasil dipilih`);
                 }}
               />
@@ -90,30 +82,30 @@ export default function FileInputField<T extends FieldValues>({
             {files[name]?.name ?? "Pilih File PDF"}
           </label>
         </div>
-
-        <p className={styles.uploadedDoc}>
-          Dokumen Terupload:
-          {files[name] ? (
-            <>
-              <span> {files[name].name}</span>
-              {" - "}
-              {filesPreview[name] && (
-                <a href={filesPreview[name]} download>
-                  Download
-                </a>
-              )}
-            </>
-          ) : (
-            " Belum ada file"
-          )}
-        </p>
-
-        {error && (
-          <p className={form.errorText}>
-            {String(error?.message)}
-          </p>
-        )}
       </div>
+
+      {error && (
+        <p className={form.errorText}>
+          {String(error?.message)}
+        </p>
+      )}
+
+      <p className={styles.uploadedDoc}>
+        Dokumen Terupload:
+        {files[name] ? (
+          <>
+            <span> {files[name].name}</span>
+            {" - "}
+            {filesPreview[name] && (
+              <a href={filesPreview[name]} download>
+                Download
+              </a>
+            )}
+          </>
+        ) : (
+          " Belum ada file"
+        )}
+      </p>
     </div>
   );
 }

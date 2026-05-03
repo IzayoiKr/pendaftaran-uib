@@ -34,8 +34,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
-import type { FieldErrors } from "react-hook-form";
 import { useEffect } from "react";
+import { useFormErrorHandler } from "@/pages/BatchRegistration/hooks/useFormErrorHandler";
 
 /* ================= FORM TYPE ================= */
 type FormType = z.infer<typeof s1Step1Schema>;
@@ -72,14 +72,7 @@ export default function Step1S1({
     onResult({ action: "next", data: values });
   };
 
-  const onError = (errors: FieldErrors<FormType>) => {
-    console.log("FORM ERROR:", errors);
-    toast.error("Form belum lengkap. Periksa kembali input Anda.");
-    const firstError = Object.keys(errors)[0];
-    if (firstError) {
-      methods.setFocus(firstError as any);
-    }
-  };
+  const { onError } = useFormErrorHandler({ setFocus: methods.setFocus });
 
   const jenisDaftar = useWatch<FormType>({
     control: methods.control,
@@ -88,6 +81,16 @@ export default function Step1S1({
 
   const isAlihjenjangOrTransfer =
     jenisDaftar === "alihjenjang" || jenisDaftar === "transfer";
+
+    useEffect(() => {
+      if (!isAlihjenjangOrTransfer) {
+
+        methods.setValue("ipk", undefined as any);
+        methods.setValue("universitas_asal", "");
+        methods.setValue("prodi_asal", "");
+        methods.setValue("jenjang_pendidikan", undefined as any);
+      }
+    }, [isAlihjenjangOrTransfer, methods]);
 
   const maxDate = useMaxBirthDate();
   const school = useSchoolSearch();

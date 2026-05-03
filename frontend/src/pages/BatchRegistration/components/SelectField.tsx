@@ -43,10 +43,12 @@ export default function SelectField<T extends FieldValues>({
       <div className={form.selectWrapper}>
         <select
           {...register(name)} // ✅ Zod handles validation
+          defaultValue="" 
           className={`${form.select} ${error ? form.inputError : ""}`}
+          data-field={name}
         >
           {placeholder && (
-            <option value="" disabled>
+            <option value="" disabled hidden>
               {placeholder}
             </option>
           )}
