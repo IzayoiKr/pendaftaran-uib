@@ -43,7 +43,7 @@ func NewMailer() (*Mailer, error) {
 		"APP_URL": "",
 	}
 
-	var missing[] string
+	var missing []string
 	for k := range required {
 		v := os.Getenv(k)
 		if v == "" {
@@ -125,7 +125,7 @@ func (m *Mailer) send(to, subject, htmlBody string) error {
 
 	dialer := gomail.NewDialer(m.host, m.port, m.user, m.pass)
 
-	if os.Getenv("SMPT_DISABLE_TLS") == "true" {
+	if os.Getenv("SMTP_DISABLE_TLS") == "true" {
 		dialer.SSL = false
 		dialer.TLSConfig = nil
 	}
