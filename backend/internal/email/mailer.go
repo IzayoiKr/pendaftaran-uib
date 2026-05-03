@@ -61,6 +61,9 @@ func NewMailer() (*Mailer, error) {
 		return nil, fmt.Errorf("SMTP_PORT must be an integer, got %q", required["SMTP_PORT"])
 	}
 
+	username := os.Getenv("SMTP_USERNAME")
+	password := os.Getenv("SMTP_PASSWORD")
+
 	cssBytes, err := templateFS.ReadFile("templates/styles.css")
 	if err != nil {
 		return nil, fmt.Errorf("reading email CSS: %w", err)
@@ -87,8 +90,8 @@ func NewMailer() (*Mailer, error) {
 	return &Mailer{
 		host: required["SMTP_HOST"],
 		port: port,
-		user: required["SMTP_USERNAME"],
-		pass: required["SMTP_PASSWORD"],
+		user: username,
+		pass: password,
 		from: required["SMTP_FROM"],
 		appURL: required["APP_URL"],
 		verifyTmpl: verifyTmpl,
