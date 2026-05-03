@@ -39,8 +39,6 @@ func NewMailer() (*Mailer, error) {
 	required := map[string]string{
 		"SMTP_HOST": "",
 		"SMTP_PORT": "",
-		"SMTP_USERNAME": "",
-		"SMTP_PASSWORD": "",
 		"SMTP_FROM": "",
 		"APP_URL": "",
 	}
