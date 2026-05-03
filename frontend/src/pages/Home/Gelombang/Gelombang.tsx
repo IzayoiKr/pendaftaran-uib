@@ -70,7 +70,7 @@ function EventCard({ event }: EventCardProps) {
                     </a>
                 ) : (
                     <Link
-                        href={`/register/${event.id}`}
+                        href={`/batch-registration/${event.id}`}
                         className={styles.registerBtn}
                     >
                         Daftar (Register)

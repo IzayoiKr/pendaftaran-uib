@@ -1,0 +1,127 @@
+@use '../../../styles/config.scss' as global;
+@use 'sass:map';
+
+/* ================= LAYOUT ================= */
+.container {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-2xl) 1rem;
+
+  @media (max-width: map.get(global.$breakpoints, md)) {
+    padding: 1.5rem 0;
+  }
+
+  @media (max-width: map.get(global.$breakpoints, sm)) {
+    padding: 1rem 0;
+  }
+}
+
+.formWrapper {
+  @include global.container-form; // ✅ ini saja cukup
+
+  @media (max-width: map.get(global.$breakpoints, md)) {
+    padding: 0 1rem;
+  }
+}
+
+/* ================= HEADER ================= */
+.header {
+  text-align: center;
+  margin-bottom: var(--space-l);
+}
+
+.title {
+  font-size: var(--step-2);
+  font-weight: 700;
+  color: #0b3c5d;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-top: 0.3rem;
+}
+
+/* ================= SECTION ================= */
+.section {
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #0b3c5d;
+  margin-bottom: 0.5rem;
+}
+
+/* ================= TABLE ================= */
+.table {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.row,
+.rowHeader {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.rowHeader {
+  font-weight: 600;
+  background: #f3f4f6;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.row strong {
+  text-align: right;
+}
+
+/* ================= STATUS ================= */
+.success {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.error {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* ================= WARNING ================= */
+.warning {
+  font-size: 0.9rem;
+  color: #dc2626;
+  margin-bottom: 0.75rem;
+}
+
+.prodiCard {
+  background: linear-gradient(135deg, #eef6ff, #ffffff);
+  border: 1px solid #dbeafe;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.prodiLabel {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.prodiName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #0b3c5d;
+}
