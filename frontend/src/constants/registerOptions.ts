@@ -137,20 +137,21 @@ export const S1_STEP2_PAYMENT_DOC = S1_STEP2_DOCS.find(
 
 /* ================= PAYMENT ================= */
 
-export const S1_STEP2_PAYMENT_INFO = {
-  bank: "OCBC NISP",
-  rekening: "094800007802",
-  nama: "Universitas Internasional Batam",
-  biaya: "Rp 250.000",
-  panduanUrl: "/panduanpenggunaanqris.pdf",
+export const S2_STEP2_PAYMENT_INFO = {
+  bank:       "OCBC Bank",
+  rekening:   "123456789",
+  nama:       "Universitas Internasional Batam",
+  panduanUrl: "/api/files/panduanpenggunaanqris", 
+  biaya:      "Rp 300.000",
 };
 
-export const S2_STEP2_PAYMENT_INFO = {
-  bank: "OCBC NISP",
-  rekening: "094800007802",
-  nama: "Universitas Internasional Batam",
-  biaya: "Rp 1.500.000",
-  panduanUrl: "/panduanpenggunaanqris.pdf",
+
+export const S1_STEP2_PAYMENT_INFO = {
+  bank:       "OCBC Bank",
+  rekening:   "123456789",
+  nama:       "Universitas Internasional Batam",
+  panduanUrl: "/api/files/panduanpenggunaanqris", 
+  biaya:      "Rp 200.000",
 };
 
 /* ================= STATUS ================= */

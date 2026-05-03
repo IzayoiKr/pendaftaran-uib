@@ -4,62 +4,64 @@ import { useRef, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/api";
+import { downloadStaticPdf } from "@/utils/downloadPdf";
 import styles from "./PrasyaratOspek.module.scss";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface UploadField {
-    name: string;
-    label: string;
-    contohUrl?: string;
+    name:         string;
+    label:        string;
     uploadedUrl?: string;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function FileUploadRow({ field, file, onChange }: {
-    field: UploadField;
-    file: File | null;
-    onChange: (name: string, file: File | null) => void;
+function FileUploadRow({ field, file, onChange, onDownloadContoh, isDownloading }: {
+    field:             UploadField;
+    file:              File | null;
+    onChange:          (name: string, file: File | null) => void;
+    onDownloadContoh?: () => void;
+    isDownloading?:    boolean;
 }) {
     const inputRef = useRef<HTMLInputElement>(null);
 
     return (
         <div className={styles.uploadGroup}>
             <div className={styles.fileInputWrapper}>
-                <span className={styles.fileLabel}>
-                    {file ? file.name : field.label}
-                </span>
-                <button
-                    type="button"
-                    className={styles.browseBtn}
-                    onClick={() => inputRef.current?.click()}
-                >
+                <span className={styles.fileLabel}>{file ? file.name : field.label}</span>
+                <button type="button" className={styles.browseBtn}
+                    onClick={() => inputRef.current?.click()}>
                     Browse
                 </button>
                 <input
-                    ref={inputRef}
-                    type="file"
-                    accept=".jpg,.jpeg,.png,.pdf"
+                    ref={inputRef} type="file" accept=".jpg,.jpeg,.png,.pdf"
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         onChange(field.name, e.target.files?.[0] ?? null)
                     }
                 />
             </div>
+
             <div className={styles.uploadLinks}>
-                {field.contohUrl && (
+                {/* Download contoh via protected Route Handler */}
+                {onDownloadContoh && (
                     <p>
                         Contoh {field.label} :{" "}
-                        <a href={field.contohUrl} target="_blank" rel="noopener noreferrer">
-                            Klik Untuk Download
-                        </a>
+                        <button
+                            type="button"
+                            className={styles.linkBtn}
+                            onClick={onDownloadContoh}
+                            disabled={isDownloading}
+                        >
+                            {isDownloading ? "Mengunduh..." : "Klik Untuk Download"}
+                        </button>
                     </p>
                 )}
                 {field.uploadedUrl && (
                     <p>
                         {field.label} Terupload :{" "}
                         <a href={field.uploadedUrl} target="_blank" rel="noopener noreferrer">
-                            Klik Untuk Download (Download)
+                            Klik Untuk Download
                         </a>
                     </p>
                 )}
@@ -71,25 +73,39 @@ function FileUploadRow({ field, file, onChange }: {
 // ─── Field config ─────────────────────────────────────────────────────────────
 
 const UPLOAD_FIELDS: UploadField[] = [
-    { name: "pasFoto", label: "Pas Photo Final (Untuk KTM)", contohUrl: "/files/contoh-pas-foto.jpg" },
-    { name: "ijazah", label: "Ijazah" },
+    { name: "pasFoto", label: "Pas Photo Final (Untuk KTM)" },
+    { name: "ijazah",  label: "Ijazah" },
 ];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function PrasyaratOspek() {
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(false);
+
+    const [isLoading, setIsLoading]                 = useState(false);
+    const [isDownloadingContoh, setIsDownloadingContoh] = useState(false);
     const [files, setFiles] = useState<Record<string, File | null>>(
         Object.fromEntries(UPLOAD_FIELDS.map(f => [f.name, null]))
     );
 
-    // TODO: ambil dari backend / props / context
-    const status = "Masih dalam pemeriksaan";
+    // TODO: fetch dari backend berdasarkan nomorDaftar di URL
+    const status             = "Menunggu Status";
     const catatanPemeriksaan = "";
 
     const handleFileChange = (name: string, file: File | null) =>
         setFiles(prev => ({ ...prev, [name]: file }));
+
+    // ── Download contoh pas photo via protected route ─────────────────────────
+    const handleDownloadContohPasPhoto = async () => {
+        setIsDownloadingContoh(true);
+        try {
+            await downloadStaticPdf("contoh_pasphoto", "contoh_pasphoto.pdf");
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Gagal download contoh pas photo");
+        } finally {
+            setIsDownloadingContoh(false);
+        }
+    };
 
     const handleUpload = async () => {
         setIsLoading(true);
@@ -98,7 +114,7 @@ export default function PrasyaratOspek() {
             UPLOAD_FIELDS.forEach(f => {
                 if (files[f.name]) formData.append(f.name, files[f.name] as File);
             });
-            await api.ospek.uploadPrasyarat(formData); // TODO: pastikan endpoint ini ada
+            await api.ospek.uploadPrasyarat(formData);
             toast.success("Upload berhasil!");
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");
@@ -129,6 +145,12 @@ export default function PrasyaratOspek() {
                         field={field}
                         file={files[field.name]}
                         onChange={handleFileChange}
+                        onDownloadContoh={
+                            field.name === "pasFoto" ? handleDownloadContohPasPhoto : undefined
+                        }
+                        isDownloading={
+                            field.name === "pasFoto" ? isDownloadingContoh : false
+                        }
                     />
                 ))}
 

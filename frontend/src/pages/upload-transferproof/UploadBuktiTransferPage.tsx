@@ -4,39 +4,32 @@ import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/api";
+import { downloadStaticPdf } from "@/utils/downloadPdf";
 import styles from "./UploadBuktiTransferPage.module.scss";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface BiodataPendaftaran {
-    nomorDaftar: string;
-    periode:     string;
-    gelombang:   string;
-    jurusan:     string;
-    namaLengkap: string;
-    alamatEmail: string;
-    nomorNIK:    string;
+    nomorDaftar: string; periode: string; gelombang: string;
+    jurusan: string; namaLengkap: string; alamatEmail: string; nomorNIK: string;
 }
 
 interface TambahBuktiTransferForm {
-    pemilikRekening: string;
-    bank:            string;
-    file:            File | null;
+    pemilikRekening: string; bank: string; file: File | null;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function BiodataSection({ data }: { data: BiodataPendaftaran }) {
     const rows: [string, string][] = [
-        ["Nomor Daftar (Registration Number)",                data.nomorDaftar],
-        ["Periode (Period)",                                   data.periode],
-        ["Gelombang (Group)",                                  data.gelombang],
-        ["Jurusan (Study Program)",                            data.jurusan],
-        ["Nama Lengkap (Full Name)",                           data.namaLengkap],
-        ["Alamat Email (Email)",                               data.alamatEmail],
-        ["Nomor NIK (National Identification Number)",         data.nomorNIK],
+        ["Nomor Daftar (Registration Number)",        data.nomorDaftar],
+        ["Periode (Period)",                           data.periode],
+        ["Gelombang (Group)",                          data.gelombang],
+        ["Jurusan (Study Program)",                    data.jurusan],
+        ["Nama Lengkap (Full Name)",                   data.namaLengkap],
+        ["Alamat Email (Email)",                       data.alamatEmail],
+        ["Nomor NIK (National Identification Number)", data.nomorNIK],
     ];
-
     return (
         <div className={styles.biodataInfo}>
             {rows.map(([label, value]) => (
@@ -49,50 +42,26 @@ function BiodataSection({ data }: { data: BiodataPendaftaran }) {
     );
 }
 
-function DownloadBanner({ href }: { href: string }) {
-    return (
-        <div className={styles.downloadBanner}>
-            <a href={href} className={styles.downloadBtn} target="_blank" rel="noopener noreferrer">
-                ⬇ Klik disini untuk Download Panduan Pembayaran dengan VA
-            </a>
-        </div>
-    );
-}
-
 function FormTextInput({ id, label, placeholder, value, autoComplete, onChange }: {
-    id:            string;
-    label:         string;
-    placeholder:   string;
-    value:         string;
-    autoComplete?: string;
-    onChange:      (e: ChangeEvent<HTMLInputElement>) => void;
+    id: string; label: string; placeholder: string; value: string;
+    autoComplete?: string; onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
     return (
         <div className={styles.formField}>
             <label htmlFor={id} className={styles.fieldLabel}>
                 {label}<span className={styles.requiredStar}> *</span>
             </label>
-            <input
-                id={id}
-                type="text"
-                placeholder={`${placeholder}*`}
-                value={value}
-                autoComplete={autoComplete}
-                onChange={onChange}
-                required
-            />
+            <input id={id} type="text" placeholder={`${placeholder}*`}
+                value={value} autoComplete={autoComplete} onChange={onChange} required />
         </div>
     );
 }
 
 function FileInputField({ id, label, file, onFileChange }: {
-    id:           string;
-    label:        string;
-    file:         File | null;
+    id: string; label: string; file: File | null;
     onFileChange: (file: File | null) => void;
 }) {
     const inputRef = useRef<HTMLInputElement>(null);
-
     return (
         <div className={styles.formField}>
             <label htmlFor={id} className={styles.fieldLabel}>
@@ -105,20 +74,10 @@ function FileInputField({ id, label, file, onFileChange }: {
                 >
                     {file ? file.name : "Bukti Transfer *"}
                 </span>
-                <button
-                    type="button"
-                    className={styles.browseBtn}
-                    onClick={() => inputRef.current?.click()}
-                >
-                    Browse
-                </button>
-                <input
-                    ref={inputRef}
-                    id={id}
-                    type="file"
-                    accept="image/*,application/pdf"
-                    onChange={(e) => onFileChange(e.target.files?.[0] ?? null)}
-                />
+                <button type="button" className={styles.browseBtn}
+                    onClick={() => inputRef.current?.click()}>Browse</button>
+                <input ref={inputRef} id={id} type="file" accept="image/*,application/pdf"
+                    onChange={(e) => onFileChange(e.target.files?.[0] ?? null)} />
             </div>
             <span className={styles.uploadedHint}>
                 Dokumen Terupload :{file && <strong> {file.name}</strong>}
@@ -134,39 +93,38 @@ function ActionRow({ isLoading, onCancel }: { isLoading: boolean; onCancel: () =
                 Batal
             </button>
             <button type="submit" className={styles.btn} disabled={isLoading} aria-busy={isLoading}>
-                {isLoading
-                    ? <><div className={styles.spinner} aria-hidden="true" /> Upload</>
-                    : "Upload"
-                }
+                {isLoading ? <><div className={styles.spinner} aria-hidden="true" /> Upload</> : "Upload"}
             </button>
         </div>
     );
 }
 
-// ─── Mock data — ganti dengan data dari backend / props / context ─────────────
+// ─── Mock data — TODO: fetch dari backend berdasarkan nomorDaftar di URL ──────
 
 const MOCK_BIODATA: BiodataPendaftaran = {
-    nomorDaftar: "-",
-    periode:     "-",
-    gelombang:   "-",
-    jurusan:     "-",
-    namaLengkap: "-",
-    alamatEmail: "-",
-    nomorNIK:    "-",
+    nomorDaftar: "-", periode: "-", gelombang: "-", jurusan: "-",
+    namaLengkap: "-", alamatEmail: "-", nomorNIK: "-",
 };
-
-const PANDUAN_URL = "https://pendaftaran.uib.ac.id/panduan/pembayaran-va"; // ganti ke URL asli
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function UploadBuktiTransferPage() {
     const router = useRouter();
-    const [form, setForm] = useState<TambahBuktiTransferForm>({
-        pemilikRekening: "",
-        bank:            "",
-        file:            null,
-    });
-    const [isLoading, setIsLoading] = useState(false);
+    const [form, setForm]                   = useState<TambahBuktiTransferForm>({ pemilikRekening: "", bank: "", file: null });
+    const [isLoading, setIsLoading]         = useState(false);
+    const [isDownloading, setIsDownloading] = useState(false);
+
+    // ── Download Panduan VA via protected route ───────────────────────────────
+    const handleDownloadVA = async () => {
+        setIsDownloading(true);
+        try {
+            await downloadStaticPdf("VA", "panduan-VA.pdf");
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : "Gagal download panduan VA");
+        } finally {
+            setIsDownloading(false);
+        }
+    };
 
     const handleTextChange =
         (field: keyof Pick<TambahBuktiTransferForm, "pemilikRekening" | "bank">) =>
@@ -182,7 +140,7 @@ export default function UploadBuktiTransferPage() {
             formData.append("pemilikRekening", form.pemilikRekening);
             formData.append("bank", form.bank);
             formData.append("file", form.file);
-            await api.transfer.uploadBukti(formData); // TODO: pastikan endpoint ini ada
+            await api.transfer.uploadBukti(formData);
             toast.success("Bukti transfer berhasil diupload!");
             router.back();
         } catch (err) {
@@ -201,7 +159,22 @@ export default function UploadBuktiTransferPage() {
                 <h3 className={styles.tableTitle}>
                     Daftar Bukti Transfer (List of Receipt Payment)
                 </h3>
-                <DownloadBanner href={PANDUAN_URL} />
+
+                {/* Download Panduan VA */}
+                <div className={styles.downloadBanner}>
+                    <button
+                        type="button"
+                        className={styles.downloadBtn}
+                        onClick={handleDownloadVA}
+                        disabled={isDownloading}
+                        aria-busy={isDownloading}
+                    >
+                        {isDownloading
+                            ? "⏳ Mengunduh..."
+                            : "⬇ Klik disini untuk Download Panduan Pembayaran dengan VA"
+                        }
+                    </button>
+                </div>
 
                 <form onSubmit={handleSubmit} noValidate>
                     <div className={styles.fieldGroup}>
@@ -214,11 +187,8 @@ export default function UploadBuktiTransferPage() {
                             onChange={handleTextChange("pemilikRekening")}
                         />
                         <FormTextInput
-                            id="bank"
-                            label="Bank"
-                            placeholder="Bank"
-                            value={form.bank}
-                            onChange={handleTextChange("bank")}
+                            id="bank" label="Bank" placeholder="Bank"
+                            value={form.bank} onChange={handleTextChange("bank")}
                         />
                         <FileInputField
                             id="buktiTransfer"
@@ -227,7 +197,6 @@ export default function UploadBuktiTransferPage() {
                             onFileChange={(file) => setForm(prev => ({ ...prev, file }))}
                         />
                     </div>
-
                     <ActionRow isLoading={isLoading} onCancel={() => router.back()} />
                 </form>
             </div>
