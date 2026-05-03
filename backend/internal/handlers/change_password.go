@@ -33,16 +33,16 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 
 		switch {
 		case req.OldPassword == "" || req.NewPassword == "":
-			utils.WriteJSON(w, http.StatusBadRequest, "password lama dan baru harus diisi")
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password lama dan baru harus diisi"))
 			return
 		case len(req.NewPassword) < 8:
-			utils.WriteJSON(w, http.StatusBadRequest, "password baru minimal 8 karakter")
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password baru minimal 8 karakter"))
 			return
 		case len(req.NewPassword) > 72:
-			utils.WriteJSON(w, http.StatusBadRequest, "password baru terlalu panjang")
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password baru terlalu panjang"))
 			return
 		case req.OldPassword == req.NewPassword:
-			utils.WriteJSON(w, http.StatusBadRequest, "password baru harus berbeda dengan password lama")
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password baru harus berbeda dengan password lama"))
 			return
 		}
 
@@ -80,6 +80,10 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 			slog.Error("change_password: exec", "user_id", claims.UserID, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
+		}
+
+		if err := ts.Revoke(r.Context(), claims); err != nil {
+			slog.Error("change_password: Revoke access token", "jti", claims.ID, "error", err)
 		}
 
 		if err := ts.RevokeAllUserSessions(r.Context(), claims.UserID); err != nil {

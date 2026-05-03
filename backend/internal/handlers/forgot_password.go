@@ -111,7 +111,7 @@ func ForgotPassword(db *sql.DB, mailer *email.Mailer, emailLimiter *auth.RateLim
 		}
 
 		_, _ = db.ExecContext(r.Context(),
-			"DELETE FROM email_verification WHERE expired_at < NOW()",
+			"DELETE FROM reset_password WHERE expired_at < NOW()",
 		)
 
 		tokenBytes := make([]byte, 32)
