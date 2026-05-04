@@ -62,8 +62,8 @@ html {
 }
 
 body {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
   font-family: config.$font-family;
   background-color: config.$background-color;
@@ -89,6 +89,10 @@ body {
   p {
     font-size: var(--step-0);
   }
+}
+
+main {
+  flex: 1 0 auto;
 }
 
 a {

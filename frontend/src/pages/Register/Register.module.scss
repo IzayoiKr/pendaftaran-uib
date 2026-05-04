@@ -3,12 +3,12 @@
 @use 'sass:color';
 
 .register {
-  @include form.form;
+  @include global.main-layout;
   align-items: flex-start;
 }
 
 .container {
-  @include global.container-form;
+  @include form.container-form;
   text-align: center;
 
   h1 {

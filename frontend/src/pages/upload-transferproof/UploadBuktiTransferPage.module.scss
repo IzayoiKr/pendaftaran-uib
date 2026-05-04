@@ -6,7 +6,7 @@ $color-danger:        #e74c3c;
 $color-danger-hover:  #c0392b;
 
 .page {
-  @include form.form;
+  @include global.main-layout;
   align-items: flex-start;
 }
 

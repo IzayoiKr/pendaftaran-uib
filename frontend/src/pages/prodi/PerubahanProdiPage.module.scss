@@ -9,7 +9,7 @@ $color-success-hover: #1e8449;
 $color-danger-text:   #e74c3c;
 
 .page {
-  @include form.form;
+  @include global.main-layout;
   align-items: flex-start;
 }
 

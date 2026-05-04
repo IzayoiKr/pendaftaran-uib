@@ -27,7 +27,7 @@
 }
 
 .resendForm {
-  @include global.container-form;
+  @include form.container-form;
     display: flex;
     flex-direction: column;
     align-items: center;

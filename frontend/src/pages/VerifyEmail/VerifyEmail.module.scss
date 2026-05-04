@@ -2,8 +2,7 @@
 @use '@/styles/form.scss';
 
 .verifyEmail {
-  margin-top: calc(var(--space-2xl) + var(--space-l));
-  margin-bottom: var(--space-xl);
+  @include global.main-layout;
 }
 
 .container {

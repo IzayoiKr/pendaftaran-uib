@@ -8,10 +8,27 @@ $primary:       #29b6f6;
 $primary-hover: #039be5;
 $placeholder:   #888;
 
-@mixin form {
-  display: flex;
-  justify-content: center;
-  margin: calc(var(--space-2xl) + var(--space-xl)) 0 var(--space-2xl);
+$form-cap: 700px;
+
+$container-form-max-widths: (
+  sm: 540px,
+  md: 640px,
+  lg: $form-cap,
+  xl: $form-cap,
+  xxl: $form-cap,
+  xxxl: $form-cap
+);
+
+@mixin container-form {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 15px;
+
+  @each $name, $container-width in $container-form-max-widths {
+    @media (min-width: map.get(global.$breakpoints, $name)) {
+      max-width: $container-width;
+    }
+  }
 }
 
 @mixin input-template {

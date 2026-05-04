@@ -3,8 +3,7 @@
 @use 'sass:color';
 
 .checkInbox {
-  margin-top: calc(var(--space-2xl) + var(--space-l));
-  margin-bottom: var(--space-xl)
+  @include global.main-layout;
 }
 
 .container {

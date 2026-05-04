@@ -3,12 +3,12 @@
 @use 'sass:map';
 
 .page {
-  @include form.form;
+  @include global.main-layout;
   align-items: center;
 }
 
 .container {
-  @include global.container-form;
+  @include form.container-form;
 
   h1 {
     font-size: var(--step-2);

@@ -12,8 +12,6 @@ $white: #fff;
 $error-color: #FF0033;
 $font-family: "Rubik Variable", "Poppins", sans-serif;
 
-$form-cap: 700px;
-
 $breakpoints: (
   sm: 576px,
   md: 768px,
@@ -32,14 +30,11 @@ $container-max-widths: (
   xxxl: 1520px
 );
 
-$container-form-max-widths: (
-  sm: 540px,
-  md: 640px,
-  lg: $form-cap,
-  xl: $form-cap,
-  xxl: $form-cap,
-  xxxl: $form-cap
-);
+@mixin main-layout {
+  display: flex;
+  justify-content: center;
+  margin: calc(var(--space-2xl) + var(--space-xl)) 0 var(--space-2xl);
+}
 
 @mixin container {
   width: 100%;
@@ -47,18 +42,6 @@ $container-form-max-widths: (
   padding: 0 15px;
 
   @each $name, $container-width in $container-max-widths {
-    @media (min-width: map.get($breakpoints, $name)) {
-      max-width: $container-width;
-    }
-  }
-}
-
-@mixin container-form {
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 15px;
-
-  @each $name, $container-width in $container-form-max-widths {
     @media (min-width: map.get($breakpoints, $name)) {
       max-width: $container-width;
     }
