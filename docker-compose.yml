@@ -201,6 +201,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/tmp
+      - /dev/null:/app/.env
     command: air -c .air.toml
     healthcheck:
       test: curl -f ${APP_HEALTH_URL} || exit 1
@@ -228,6 +229,7 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - /app/.next
+      - /dev/null:/app/.env
 
 volumes:
   mysql_data:
