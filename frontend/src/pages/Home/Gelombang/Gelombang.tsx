@@ -1,23 +1,22 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Event } from '@/types';
-import { events } from '@/constants/data';
 import { gelombangIconMap } from '@/components/Icons/Icons';
 import styles from './Gelombang.module.scss';
 
-interface EventCardProps {
-    event: Event
-}
+interface GelombangProps { events: Event[] }
+
+interface EventCardProps { event: Event }
 
 function EventCard({ event }: EventCardProps) {
     return (
         <div className={styles.card}>
             <Image
                 className={styles.cardImg}
-                src={event.image}
+                src={event.image_path}
                 alt={event.id}
-                width={555}
-                height={400}
+                fill
+                sizes='(max-width: 992px) 100vw, 50vw'
                 loading='lazy'
             />
             <div className={styles.details}>
@@ -26,10 +25,10 @@ function EventCard({ event }: EventCardProps) {
                     <i>Admission Test</i>
                 </h3>
                 <h4>
-                    {event.programType} <br />
-                    <i>{event.programTypeEn}</i>
+                    {event.program_type} <br />
+                    <i>{event.program_type_en}</i>
                 </h4>
-                <h5>{event.academicYear}</h5>
+                <h5>{event.academic_year}</h5>
 
                 <div className={styles.meta}>
                     <div className={styles.date}>
@@ -40,9 +39,9 @@ function EventCard({ event }: EventCardProps) {
                         <p>
                             {gelombangIconMap.Clock}
                             {' '}
-                            <time dateTime={event.startTime}>{event.startTime}</time>
+                            <time dateTime={event.start_time}>{event.start_time}</time>
                             {' - '}
-                            <time dateTime={event.endTime}>{event.endTime}</time>
+                            <time dateTime={event.end_time}>{event.end_time}</time>
                         </p>
                         <p>{gelombangIconMap.Pin} {event.location}</p>
                     </div>
@@ -50,38 +49,41 @@ function EventCard({ event }: EventCardProps) {
                 <p className={styles.batch}>
                     <span>Gelombang (<i>Batch</i>):</span>
                     <br />
-                    {event.batchName}
+                    {event.batch_name}
                 </p>
                 <p className={styles.regDate}>
                     <span>Tanggal Pendaftaran (<i>Registration date</i>):</span>
                     <br />
-                    <time dateTime={event.registrationStart}>{event.registrationStart}</time>
+                    <time dateTime={event.registration_start}>{event.registration_start_display}</time>
                     {' s.d. '}
-                    <time dateTime={event.registrationEnd}>{event.registrationEnd}</time>
+                    <time dateTime={event.registration_end}>{event.registration_end_display}</time>
                 </p>
-                {event.registerLink && event.registerLink.startsWith('http') ? (
-                    <a
-                        href={event.registerLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.registerBtn}
-                    >
-                        Daftar (Register)
-                    </a>
-                ) : (
-                    <Link
-                        href={`/batch-registration/${event.id}`}
-                        className={styles.registerBtn}
-                    >
-                        Daftar (Register)
-                    </Link>
-                )}
+                {  /* TODO: replace the registerLink later with backend token */}
+                {
+                    event.registerLink && event.registerLink.startsWith('http') ? (
+                        <a
+                            href={event.registerLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={styles.registerBtn}
+                        >
+                            Daftar (Register)
+                        </a>
+                    ) : (
+                        <Link
+                            href={`/batch-registration/${event.batch_key}`}
+                            className={styles.registerBtn}
+                        >
+                            Daftar (Register)
+                        </Link>
+                    )
+                }
             </div>
         </div>
     );
 };
 
-export default function Gelombang() {
+export default function Gelombang({ events }: GelombangProps) {
     return (
         <section className={styles.gelombang} id="gelombang">
             <div className={styles.container}>

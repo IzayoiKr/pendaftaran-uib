@@ -1,5 +1,3 @@
-import type { StaticImageData } from "next/image";
-
 export interface HeaderNavLinks {
     to: string;
     label: string;
@@ -37,31 +35,36 @@ export interface Hero {
     academicButtonDesc: string;
 }
 
+// Use snake case to match json type
 export interface Program {
     id: string;
     title: string;
     faculty: string;
     degree: 'S1' | 'S2';
     description: string;
-    image: StaticImageData;
+    image_path: string;
     link: string;
 }
 
+// Use snake case to match json type
 export interface Event {
     id: string;
-    image: StaticImageData;
-    programType: string;
-    programTypeEn: string;
-    academicYear: string;
+    batch_key: string;
+    batch_name: string;
+    program_type: string;
+    program_type_en: string;
+    academic_year: string;
+    image_path: string;
     day: string;
     month: string;
-    startTime: string;
-    endTime: string;
-    location: string;
-    batchName: string;
-    registrationStart: string;
-    registrationEnd: string;
-    registerLink: string;
+    start_time: string;
+    end_time: string;
+    location: 'Batam' | 'Online' | 'Tanjung Pinang';
+    registration_start: string;
+    registration_start_display: string;
+    registration_end: string;
+    registration_end_display: string;
+    register_link: string;
 }
 
 export interface Feature {
@@ -113,7 +116,7 @@ export interface BlogPost {
     id: number;
     title: string;
     description: string;
-    image: StaticImageData;
+    image: string;
     author: string;
     date: string;
     category: string;

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/api';
-import { CrossmarkIcon } from '../Icons/AnimatedIcons';
+import { CrossmarkIcon } from '@/components/Icons/AnimatedIcons';
 import styles from './ExpiredLink.module.scss';
 
 interface ExpiredLinkProps {

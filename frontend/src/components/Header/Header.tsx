@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import styles from './Header.module.scss';
 import { headerNavLinks, spyIds } from '@/constants/navigation';
-import { images } from '@/constants/image';
 import useScrollSpy from '@/hooks/useScrollSpy';
 import scrollToId from '@/components/ScrollToId';
 import useAuthStore from '@/store/useAuthStore';
@@ -28,7 +27,7 @@ function UIBLogo() {
     return (
         <Link href="/" className={styles.logoUIB}>
             <Image
-                src={images.logo}
+                src='/images/logo.png'
                 alt='Universitas Internasional Batam Logo'
                 width={197}
                 height={47}
@@ -109,6 +108,9 @@ export default function Header() {
         window.addEventListener('resize', update, { passive: true });
         return () => window.removeEventListener('resize', update);
     }, [])
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    useEffect(() => { setIsOpen(false) }, [pathname]);
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 50);

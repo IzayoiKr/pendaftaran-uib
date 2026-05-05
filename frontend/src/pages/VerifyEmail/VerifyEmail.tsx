@@ -8,7 +8,7 @@ import { api, ApiError } from '@/api';
 import TurnstileWidget from '@/components/TurnstileWidget';
 import type { TurnstileHandle } from '@/components/TurnstileWidget';
 import ExpiredLink from '@/components/ExpiredLink';
-import { CheckmarkIcon, BouncingBallsIcon } from '../../components/Icons/AnimatedIcons';
+import { CheckmarkIcon, BouncingBallsIcon } from '@/components/Icons/AnimatedIcons';
 import styles from './VerifyEmail.module.scss';
 
 type State = 'pending' | 'loading' | 'success' | 'expired';

@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import styles from './Hero.module.scss';
 import { heroes } from '@/constants/data';
-import { images } from '@/constants/image';
 import scrollToId from '@/components/ScrollToId';
 
 interface handleClickProps {
@@ -22,9 +21,12 @@ const handleClick = ({ e, hashId }: handleClickProps) => {
 function HeroPicture() {
     return (
         <Image
-            src={images.heroBg}
+            src='/images/hero-bg.jpg'
+            width={1920}
+            height={1000}
             alt='A group of international students gathering'
             priority
+            fetchPriority='high'
         />
     )
 }

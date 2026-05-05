@@ -1,19 +1,20 @@
 'use client';
 
-import { useCallback, useEffect, useState, useRef, memo } from 'react';
+import { useCallback, useEffect, useMemo, useState, memo } from 'react';
 import Image from 'next/image';
-import type { StaticImageData } from 'next/image';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
-import { programs } from '@/constants/data';
+import type { Program } from '@/types';
 import styles from './ProgramStudi.module.scss';
+
+interface ProgramStudiProps { programs: Program[] }
 
 interface ProgramCardProps {
     title: string;
     faculty: string;
     degree: 'S1' | 'S2';
     description: string;
-    image: StaticImageData;
+    image: string;
     link: string
 }
 
@@ -26,6 +27,7 @@ const ProgramCard = memo(function ProgramCard({ title, faculty, degree, descript
                     alt={title}
                     width={1080}
                     height={849}
+                    sizes="(max-width: 768px) 100vw, (max-width: 992px) 50vw, (max-width: 1400px) 33vw, 25vw"
                     loading='lazy'
                 />
             </div>
@@ -53,12 +55,15 @@ function DotButton({ active, onClick }: { active: boolean; onClick: () => void }
     );
 }
 
-export default function ProgramStudi() {
-    const autoplay = useRef(Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true }));
+export default function ProgramStudi({ programs }: ProgramStudiProps) {
+    const autoplay = useMemo(
+        () => Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true }),
+        []
+    );
 
     const [emblaRef, emblaApi] = useEmblaCarousel(
         { loop: true, align: 'start', slidesToScroll: 1 },
-        [autoplay.current]
+        [autoplay]
     );
 
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -74,8 +79,10 @@ export default function ProgramStudi() {
         setSelectedIndex(emblaApi.selectedScrollSnap());
     }, [emblaApi]);
 
+
     useEffect(() => {
         if (!emblaApi) return;
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         onInit();
         onSelect();
         emblaApi.on('reInit', onInit);
@@ -117,7 +124,7 @@ export default function ProgramStudi() {
                                         faculty={program.faculty}
                                         degree={program.degree}
                                         description={program.description}
-                                        image={program.image}
+                                        image={program.image_path}
                                         link={program.link}
                                     />
                                 </div>

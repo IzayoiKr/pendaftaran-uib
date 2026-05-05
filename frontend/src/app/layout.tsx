@@ -12,7 +12,7 @@ import Footer from "@/components/Footer";
 export const metadata: Metadata = {
     title: 'Admisi | Universitas Internasional Batam',
     description: 'Pendaftaran Mahasiswa Baru Universitas Internasional Batam — informasi jadwal, program studi, beasiswa, dan panduan pendaftaran.',
-    icons: "/uib.svg"
+    icons: "/favicon/uib.svg",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
