@@ -94,6 +94,9 @@ func main() {
 
 	r.Get("/health", handlers.HealthCheck(provider))
 
+	r.Get("/api/program_studi", handlers.ProgramStudi(provider.MySQL))
+	r.Get("/api/gelombang", handlers.Gelombang(provider.MySQL))
+
 	r.Post("/api/auth/login",
 		loginIPLimiter.RateLimit(
 			handlers.Login(provider.MySQL, tokenStore, loginEmailLimiter, auditlogger),
