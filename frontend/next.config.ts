@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
     sassOptions: {
         loadPaths: ['node_modules']
     },
+    images: {
+        formats: ['image/avif', 'image/webp'],
+    },
     async rewrites() {
         return [
             {
