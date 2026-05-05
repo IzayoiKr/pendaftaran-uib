@@ -2,13 +2,10 @@ package handlers
 
 import (
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
-	"sync"
 	"time"
 
 	"pendaftaran-uib/backend/internal/audit"
@@ -22,40 +19,28 @@ import (
 
 const captchaThreshold = 3
 
-const failedAttemptWindow = 15 * time.Minute
-
 type accessTokenResponse struct {
 	AccessToken string `json:"access_token"`
 	User models.UserDTO `json:"user"`
 }
 
-type failedAttempts struct {
-	mu sync.Mutex
-	entries map[string]*attemptEntry
-}
-
-type attemptEntry struct {
-	count int
-	expiresAt time.Time
-}
-
 func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *audit.Logger) http.HandlerFunc {
-	tracker := newFailedAttempts()
+	tracker := auth.NewFailedAttempts()
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
 
 		var req models.LoginRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("permintaan tidak valid"))
-			return
-		}
-		if req.Email == "" || req.Password == "" {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("email dan password wajib diisi"))
+		if err := utils.DecodeJSON(r, &req); err != nil {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
 
-		req.Email = strings.ToLower(req.Email)
+		req.Sanitize()
+		if err := req.Validate(); err != nil {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
+			return
+		}
 
 		if allowed, retryAfter := emailLimiter.Allow(req.Email); !allowed {
 			al.Log(audit.Entry{
@@ -66,7 +51,7 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 				RequestID: base.RequestID,
 				Meta: map[string]any{"retry_after_seconds": int(retryAfter.Seconds())},
 			})
-			w.Header().Set("Retry-After", retryAfterString(retryAfter))
+			w.Header().Set("Retry-After", strconv.Itoa(int(retryAfter.Seconds())))
 			utils.WriteJSON(w, http.StatusTooManyRequests, utils.ErrJSON(
 				fmt.Sprintf("terlalu banyak percobaan, coba lagi dalam %d detik",
 					int(retryAfter.Seconds())),
@@ -74,7 +59,7 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 			return
 		}
 
-		captchaRequired := tracker.count(req.Email) >= captchaThreshold
+		captchaRequired := tracker.Count(req.Email) >= captchaThreshold
 		if captchaRequired {
 			if req.TurnstileToken == "" {
 				al.Log(audit.Entry{
@@ -121,7 +106,7 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 		).Scan(&user.ID, &user.FullName, &user.NIK, &user.Email, &user.PasswordHash, &user.EmailVerified)
 
 		if errors.Is(err, sql.ErrNoRows) {
-			failCount := tracker.increment(req.Email)
+			failCount := tracker.Increment(req.Email)
 			al.Log(audit.Entry{
 				Event: audit.EventLoginFailure,
 				Email: req.Email,
@@ -145,7 +130,7 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 		if err := bcrypt.CompareHashAndPassword(
 			[]byte(user.PasswordHash), []byte(req.Password),
 		); err != nil {
-			failCount := tracker.increment(req.Email)
+			failCount := tracker.Increment(req.Email)
 			al.Log(audit.Entry{
 				Event: audit.EventLoginFailure,
 				UserID: user.ID,
@@ -163,7 +148,7 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 			return
 		}
 
-		tracker.reset(req.Email)
+		tracker.Reset(req.Email)
 
 		if !user.EmailVerified {
 			utils.WriteJSON(w, http.StatusForbidden, map[string]any{
@@ -210,62 +195,4 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 			User: user.ToDTO(),
 		})
 	}
-}
-
-func newFailedAttempts() *failedAttempts {
-	fa := &failedAttempts{entries: make(map[string]*attemptEntry)}
-	go fa.periodicCleanup()
-	return fa
-}
-
-func (fa *failedAttempts) increment(key string) int {
-	fa.mu.Lock()
-	defer fa.mu.Unlock()
-
-	now := time.Now()
-	entry, exists := fa.entries[key]
-	if !exists || entry.expiresAt.Before(now) {
-		fa.entries[key] = &attemptEntry{count: 1, expiresAt: now.Add(failedAttemptWindow)}
-		return 1
-	}
-
-	entry.count++
-	return entry.count
-}
-
-func (fa *failedAttempts) count(key string) int {
-	fa.mu.Lock()
-	defer fa.mu.Unlock()
-
-	entry, exists := fa.entries[key]
-	if !exists || entry.expiresAt.Before(time.Now()) {
-		return 0
-	}
-
-	return entry.count
-}
-
-func (fa *failedAttempts) reset(key string) {
-	fa.mu.Lock()
-	defer fa.mu.Unlock()
-	delete(fa.entries, key)
-}
-
-func (fa *failedAttempts) periodicCleanup() {
-	ticker := time.NewTicker(failedAttemptWindow)
-	defer ticker.Stop()
-	for range ticker.C {
-		fa.mu.Lock()
-		now := time.Now()
-		for k, v := range fa.entries {
-			if v.expiresAt.Before(now) {
-				delete(fa.entries, k)
-			}
-		}
-		fa.mu.Unlock()
-	}
-}
-
-func retryAfterString(d time.Duration) string {
-	return strconv.Itoa(int(d.Seconds()))
 }

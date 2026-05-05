@@ -42,6 +42,7 @@ func LoadConfig() (*Config, error) {
 		return v
 	}
 
+	mysqlPortStr := req("DB_PORT")
 	cfg := &Config{
 		MySQL: MySQLConfig{
 			Host: req("DB_HOST"),
@@ -59,23 +60,26 @@ func LoadConfig() (*Config, error) {
 		return nil, fmt.Errorf("missing required environment variables: %v", missing)
 	}
 
-	portStr := os.Getenv("DB_PORT")
-	if portStr == "" {
-		return nil, fmt.Errorf("missing required environment variable: DB_PORT")
-	}
-	port, err := strconv.Atoi(portStr)
+	port, err := strconv.Atoi(mysqlPortStr)
 	if err != nil {
-		return nil, fmt.Errorf("DB_PORT must be a valid integer, got %q: %w", portStr, err)
+		return nil, fmt.Errorf("DB_PORT must be a valid integer, got %q: %w", mysqlPortStr, err)
 	}
 	cfg.MySQL.Port = port
 
-	cfg.MySQL.MaxOpenConns = getEnvAsInt("DB_MAX_OPEN_CONNS", 100)
-	cfg.MySQL.MaxIdleConns = getEnvAsInt("DB_MAX_IDLE_CONNS", 25)
-	cfg.MySQL.MaxLifetime = time.Duration(getEnvAsInt("DB_MAX_LIFETIME_MIN", 30) * int(time.Minute))
-	cfg.MySQL.MaxIdleTime = time.Duration(getEnvAsInt("DB_MAX_IDLE_LIFETIME_MIN", 5) * int(time.Minute))
+	cfg.MySQL.MaxOpenConns = envInt("DB_MAX_OPEN_CONNS", 100)
+	cfg.MySQL.MaxIdleConns = envInt("DB_MAX_IDLE_CONNS", 25)
+	cfg.MySQL.MaxLifetime = time.Duration(envInt("DB_MAX_LIFETIME_MIN", 30)) * time.Minute
+	cfg.MySQL.MaxIdleTime = time.Duration(envInt("DB_MAX_IDLE_LIFETIME_MIN", 5)) * time.Minute
 
-	cfg.Mongo.ConnectTimeout = time.Duration(getEnvAsInt("MONGO_CONNECT_TIMEOUT", 15) * int(time.Second))
-	cfg.Mongo.PingTimeout = time.Duration(getEnvAsInt("MONGO_PING_TIMEOUT", 5) * int(time.Second))
+	cfg.Mongo.ConnectTimeout = time.Duration(envInt("MONGO_CONNECT_TIMEOUT", 15)) * time.Second
+	cfg.Mongo.PingTimeout = time.Duration(envInt("MONGO_PING_TIMEOUT", 5)) * time.Second
 
 	return cfg, nil
+}
+
+func envInt(name string, defaultVal int) int {
+	if v, err := strconv.Atoi(os.Getenv(name)); err == nil {
+		return v
+	}
+	return defaultVal
 }

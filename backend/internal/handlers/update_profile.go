@@ -2,11 +2,9 @@ package handlers
 
 import (
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
-	"strings"
 
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
@@ -24,34 +22,29 @@ func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			return
 		}
 
-		var req models.UserDTO
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("permintaan tidak valid"))
+		var req models.UpdateProfileRequest
+		if err := utils.DecodeJSON(r, &req); err != nil {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
 
-		req.FullName = strings.TrimSpace(req.FullName)
-		if req.FullName == "" {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("nama tidak boleh kosong"))
-			return
-		}
-		if len(req.FullName) > 255 {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("nama terlalu panjang"))
+		req.Sanitize()
+		if err := req.Validate(); err != nil {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
 
-		_, err := db.ExecContext(r.Context(),
+		if _, err := db.ExecContext(r.Context(),
 			"UPDATE user SET full_name = ? WHERE id = ?",
 			req.FullName, claims.UserID,
-		)
-		if err != nil {
+		); err != nil {
 			slog.Error("update_profile: exec", "user_id", claims.UserID, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
 		var newFullname models.UpdateProfileRequest
-		err = db.QueryRowContext(r.Context(),
+		err := db.QueryRowContext(r.Context(),
 			"SELECT full_name FROM user WHERE id = ?",
 			claims.UserID,
 		).Scan(&newFullname.FullName)

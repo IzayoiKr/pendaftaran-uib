@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 )
 
@@ -17,4 +18,11 @@ type APIError struct {
 
 func ErrJSON(msg string) APIError {
 	return APIError{Error: msg}
+}
+
+func DecodeJSON(r *http.Request, dst any) error {
+	if err := json.NewDecoder(r.Body).Decode(dst); err != nil {
+		return errors.New("permintaan tidak valid")
+	}
+	return nil
 }

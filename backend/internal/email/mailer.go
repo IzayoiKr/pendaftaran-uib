@@ -29,6 +29,7 @@ type Mailer struct {
 	pass string
 	from string
 	appURL string
+	disableTLS bool
 
 	verifyTmpl *template.Template
 	resetTmpl *template.Template
@@ -36,33 +37,29 @@ type Mailer struct {
 }
 
 func NewMailer() (*Mailer, error) {
-	required := map[string]string{
-		"SMTP_HOST": "",
-		"SMTP_PORT": "",
-		"SMTP_FROM": "",
-		"APP_URL": "",
+	var missing []string
+
+	req := func(key string) string {
+		v := os.Getenv(key)
+		if v == "" {
+			missing = append(missing, key)
+		}
+		return v
 	}
 
-	var missing []string
-	for k := range required {
-		v := os.Getenv(k)
-		if v == "" {
-			missing = append(missing, k)
-			continue
-		}
-		required[k] = v
-	}
+	smtpHost := req("SMTP_HOST")
+	smtpPort := req("SMTP_PORT")
+	smtpFrom := req("SMTP_FROM")
+	appURL := req("APP_URL")
+
 	if len(missing) > 0 {
 		return nil, fmt.Errorf("missing required email env vars: %v", missing)
 	}
 
-	port, err := strconv.Atoi(required["SMTP_PORT"])
+	port, err := strconv.Atoi(smtpPort)
 	if err != nil {
-		return nil, fmt.Errorf("SMTP_PORT must be an integer, got %q", required["SMTP_PORT"])
+		return nil, fmt.Errorf("SMTP_PORT must be an integer, got %q", smtpPort)
 	}
-
-	username := os.Getenv("SMTP_USERNAME")
-	password := os.Getenv("SMTP_PASSWORD")
 
 	cssBytes, err := templateFS.ReadFile("templates/styles.css")
 	if err != nil {
@@ -88,12 +85,13 @@ func NewMailer() (*Mailer, error) {
 	}
 
 	return &Mailer{
-		host: required["SMTP_HOST"],
+		host: smtpHost,
 		port: port,
-		user: username,
-		pass: password,
-		from: required["SMTP_FROM"],
-		appURL: required["APP_URL"],
+		user: os.Getenv("SMTP_USERNAME"),
+		pass: os.Getenv("SMTP_PASSWORD"),
+		from: smtpFrom,
+		appURL: appURL,
+		disableTLS: os.Getenv("SMTP_DISABLE_TLS") == "true",
 		verifyTmpl: verifyTmpl,
 		resetTmpl: resetTmpl,
 		css: template.CSS(cssBytes),
@@ -128,7 +126,7 @@ func (m *Mailer) send(to, subject, htmlBody string) error {
 
 	dialer := gomail.NewDialer(m.host, m.port, m.user, m.pass)
 
-	if os.Getenv("SMTP_DISABLE_TLS") == "true" {
+	if m.disableTLS {
 		dialer.SSL = false
 		dialer.TLSConfig = nil
 	}

@@ -2,11 +2,11 @@ package handlers
 
 import (
 	"crypto/rand"
-	"crypto/sha256"
 	"encoding/hex"
 	"net/http"
 	"os"
 	"pendaftaran-uib/backend/internal/auth"
+	"pendaftaran-uib/backend/internal/utils"
 	"time"
 )
 
@@ -19,33 +19,34 @@ func generateVerificationToken() (rawToken, tokenHash string, err error) {
 		return "", "", err
 	}
 	rawToken = hex.EncodeToString(b)
-	h := sha256.Sum256([]byte(rawToken))
-	tokenHash = hex.EncodeToString(h[:])
+	tokenHash = utils.HashToken(rawToken)
 	return rawToken, tokenHash, nil
 }
 
 func setRefreshCookie(w http.ResponseWriter, refreshToken string) {
-	secure := os.Getenv("APP_ENV") == "production"
 	http.SetCookie(w, &http.Cookie{
 		Name: "refresh_token",
 		Value: refreshToken,
 		Path: "/api/auth",
 		HttpOnly: true,
-		Secure: secure,
+		Secure: isProduction(),
 		SameSite: http.SameSiteStrictMode,
 		MaxAge: int(auth.RefreshTokenTTL.Seconds()),
 	})
 }
 
 func clearRefreshCookie(w http.ResponseWriter) {
-	secure := os.Getenv("APP_ENV") == "production"
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    "",
 		Path:     "/api/auth",
 		HttpOnly: true,
-		Secure: secure,
+		Secure: isProduction(),
 		SameSite: http.SameSiteStrictMode,
 		MaxAge:   -1,
 	})
+}
+
+func isProduction() bool {
+	return os.Getenv("APP_ENV") == "production"
 }

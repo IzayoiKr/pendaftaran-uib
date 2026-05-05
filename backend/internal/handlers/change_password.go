@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -26,23 +25,13 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 		}
 
 		var req models.ChangePasswordRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("permintaan tidak valid"))
+		if err := utils.DecodeJSON(r, &req); err != nil {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
 
-		switch {
-		case req.OldPassword == "" || req.NewPassword == "":
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password lama dan baru harus diisi"))
-			return
-		case len(req.NewPassword) < 8:
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password baru minimal 8 karakter"))
-			return
-		case len(req.NewPassword) > 72:
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password baru terlalu panjang"))
-			return
-		case req.OldPassword == req.NewPassword:
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password baru harus berbeda dengan password lama"))
+		if err := req.Validate(); err != nil {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
 
@@ -72,22 +61,21 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 			return
 		}
 
-		_, err = db.ExecContext(r.Context(),
+		if _, err = db.ExecContext(r.Context(),
 			"UPDATE user SET password_hash = ? WHERE id = ?",
 			string(newHash), claims.UserID,
-		)
-		if err != nil {
+		); err != nil {
 			slog.Error("change_password: exec", "user_id", claims.UserID, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
 		if err := ts.Revoke(r.Context(), claims); err != nil {
-			slog.Error("change_password: Revoke access token", "jti", claims.ID, "error", err)
+			slog.Error("change_password: revoke access token", "jti", claims.ID, "error", err)
 		}
 
 		if err := ts.RevokeAllUserSessions(r.Context(), claims.UserID); err != nil {
-			slog.Error("change_password: RevokeAllUserSessions",
+			slog.Error("change_password: revoke all sessions",
 				"user_id", claims.UserID,
 				"error", err,
 			)

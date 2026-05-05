@@ -1,10 +1,7 @@
 package handlers
 
 import (
-	"crypto/sha256"
 	"database/sql"
-	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -22,28 +19,17 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 		base := audit.EntryFromRequest(r)
 
 		var req models.ResetPasswordRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("permintaan tidak valid"))
+		if err := utils.DecodeJSON(r, &req); err != nil {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
 
-		switch {
-		case req.Token == "":
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("link tidak valid"))
-			return
-		case req.NewPassword == "":
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password harus diisi"))
-			return
-		case len(req.NewPassword) < 8:
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password minimal 8 karakter"))
-			return
-		case len(req.NewPassword) > 72:
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password terlalu panjang"))
+		if err := req.Validate(); err != nil {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
 
-		h := sha256.Sum256([]byte(req.Token))
-		tokenHash := hex.EncodeToString(h[:])
+		tokenHash := utils.HashToken(req.Token)
 
 		var (
 			recordID int64
@@ -65,14 +51,24 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 			return
 		}
 
-		if isUsed {
-			utils.WriteJSON(w, http.StatusBadRequest, map[string]any{
-				"error": "link verifikasi tidak valid atau sudah kadaluwarsa",
-				"expired": true,
-			})
-			return
-		}
-		if time.Now().After(expiredAt) {
+		if isUsed || time.Now().After(expiredAt) {
+			if isUsed {
+				al.Log(audit.Entry{
+					Event: audit.EventPasswordResetUsed,
+					UserID: userID,
+					IP: base.IP,
+					UserAgent: base.UserAgent,
+					RequestID: base.RequestID,
+				})
+			} else {
+				al.Log(audit.Entry{
+					Event: audit.EventPasswordResetExpired,
+					UserID: userID,
+					IP: base.IP,
+					UserAgent: base.UserAgent,
+					RequestID: base.RequestID,
+				})
+			}
 			utils.WriteJSON(w, http.StatusBadRequest, map[string]any{
 				"error": "link verifikasi tidak valid atau sudah kadaluwarsa",
 				"expired": true,
@@ -125,7 +121,7 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 		committed = true
 
 		if err := ts.RevokeAllUserSessions(r.Context(), userID); err != nil {
-			slog.Error("reset_passsword: RevokeAllUserSessions", "user_id", userID, "error", err)
+			slog.Error("reset_passsword: revoke all sessions", "user_id", userID, "error", err)
 		}
 
 		al.Log(audit.Entry{

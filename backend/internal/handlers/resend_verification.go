@@ -2,16 +2,13 @@ package handlers
 
 import (
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
-	"net/mail"
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/email"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
-	"strings"
 	"time"
 )
 
@@ -22,20 +19,14 @@ func ResendVerification(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http
 		const vagueMsg = "link verifikasi telah dikirim"
 
 		var req models.ResendVerifyEmailRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("permintaan tidak valid"))
+		if err := utils.DecodeJSON(r, &req); err != nil {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
 
-		req.Email = strings.ToLower(req.Email)
-
-		if req.Email == "" {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("email wajib diisi"))
-			return
-		}
-
-		if _, err := mail.ParseAddress(req.Email); err != nil {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("format email tidak valid"))
+		req.Sanitize()
+		if err := req.Validate(); err != nil {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
 

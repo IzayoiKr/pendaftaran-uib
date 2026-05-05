@@ -2,6 +2,11 @@ package audit
 
 import (
 	"log/slog"
+	"net/http"
+
+	"github.com/go-chi/chi/v5/middleware"
+
+	"pendaftaran-uib/backend/internal/utils"
 )
 
 type Event string
@@ -18,12 +23,13 @@ const (
 	EventRegisterCaptchaRequired Event = "register.captcha_required"
 	EventRegisterCaptchaFailure Event = "register.captcha_failure"
 
-	EventEmailVerificationSent = "email.verification_sent"
-	EventEmailVerified = "email.verified"
-	EventEmailVerificationResent = "email.verification_resent"
-	EventEmailVerificationExpired = "email.verification_expired"
-	EventEmailVerificationCaptchaRequired = "email.captcha_required"
-	EventEmailVerificationCaptchaFailure = "email.captcha_failure"
+	EventEmailVerificationSent Event = "email.verification_sent"
+	EventEmailVerified Event = "email.verified"
+	EventEmailVerificationResent Event = "email.verification_resent"
+	EventEmailVerificationUsed Event = "email.verification_used"
+	EventEmailVerificationExpired Event = "email.verification_expired"
+	EventEmailVerificationCaptchaRequired Event = "email.captcha_required"
+	EventEmailVerificationCaptchaFailure Event = "email.captcha_failure"
 
 	EventLogoutSuccess Event = "logout.success"
 
@@ -34,12 +40,14 @@ const (
 	EventPasswordChanged Event = "password.changed"
 	EventProfileUpdated Event = "profile.updated"
 
-	EventPasswordForgotBlocked = "password_forgot.blocked"
-	EventPasswordForgotCaptchaRequired = "password_forgot.captcha_required"
-	EventPasswordForgotCaptchaFailure = "password_forgot.captcha_failure"
+	EventPasswordForgotBlocked Event = "password_forgot.blocked"
+	EventPasswordForgotCaptchaRequired Event = "password_forgot.captcha_required"
+	EventPasswordForgotCaptchaFailure Event = "password_forgot.captcha_failure"
 
 	EventPasswordResetRequested Event = "password_reset.requested"
 	EventPasswordResetSuccess Event = "password_reset.success"
+	EventPasswordResetUsed Event = "password_reset.used"
+	EventPasswordResetExpired Event = "password_reset.expired"
 )
 
 type Entry struct {
@@ -53,7 +61,7 @@ type Entry struct {
 	Meta map[string]any
 }
 
-type Logger struct {}
+type Logger struct{}
 
 func NewLogger() *Logger {
 	return &Logger{}
@@ -85,4 +93,12 @@ func (l *Logger) Log(e Entry) {
 	}
 
 	slog.Info("AUDIT", attrs...)
+}
+
+func EntryFromRequest(r *http.Request) Entry {
+	return Entry{
+		IP:        utils.RealIP(r),
+		UserAgent: r.Header.Get("User-Agent"),
+		RequestID: middleware.GetReqID(r.Context()),
+	}
 }

@@ -2,12 +2,9 @@ package handlers
 
 import (
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
-	"net/mail"
-	"strings"
 	"time"
 
 	"pendaftaran-uib/backend/internal/audit"
@@ -26,36 +23,18 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 		base := audit.EntryFromRequest(r)
 
 		var req models.RegisterRequest
-		if err:= json.NewDecoder(r.Body).Decode(&req); err != nil {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("permintaan tidak valid"))
+		if err := utils.DecodeJSON(r, &req); err != nil {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
 
-		req.FullName = strings.TrimSpace(req.FullName)
+		req.Sanitize()
+		if err := req.Validate(); err != nil {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
+			return
+		}
 
-		switch {
-		case req.FullName == "":
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("nama lengkap wajib diisi"))
-			return
-		case len(req.FullName) > 255:
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("nama terlalu panjang"))
-			return
-		case len(req.NIK) != 16:
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("NIK harus 16 digit"))
-			return
-		case !utils.IsAllDigits(req.NIK):
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("NIK harus berupa angka"))
-			return
-		case req.Email == "":
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("email wajib diisi"))
-			return
-		case len(req.Password) < 8:
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password minimal 8 karakter"))
-			return
-		case len(req.Password) > 72:
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password maksimal 72 karakter"))
-			return
-		case req.TurnstileToken == "":
+		if req.TurnstileToken == "" {
 			al.Log(audit.Entry{
 				Event: audit.EventRegisterCaptchaRequired,
 				Email: req.Email,
@@ -64,11 +43,6 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 				RequestID: base.RequestID,
 			})
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("verifikasi CAPTCHA diperlukan"))
-			return
-		}
-
-		if _, err := mail.ParseAddress(req.Email); err != nil {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("format email tidak valid"))
 			return
 		}
 
@@ -99,10 +73,9 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 
 		_, err = db.ExecContext(r.Context(),
 			"INSERT INTO user (id, full_name, nik, email, password_hash) VALUES (?, ?, ?, ?, ?)",
-		 id, strings.TrimSpace(req.FullName), req.NIK, req.Email, string(hash),
+		 id, req.FullName, req.NIK, req.Email, string(hash),
 		)
 		if err != nil {
-			slog.Error("this is error", "error", err)
 			var mysqlErr *mysql.MySQLError
 			if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
 				al.Log(audit.Entry{
@@ -113,11 +86,12 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 					RequestID: base.RequestID,
 					Meta: map[string]any{"reason": "email_already_exists"},
 				})
-				utils.WriteJSON(w, http.StatusOK, map[string]string{
+				utils.WriteJSON(w, http.StatusCreated, map[string]string{
 					"message": "Registrasi berhasil! Silahkan cek email anda untuk verifikasi",
 				})
 				return
 			}
+			slog.Error("register: insert user", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
@@ -140,11 +114,10 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 			return
 		}
 
-		_, err = db.ExecContext(r.Context(),
+		if _, err = db.ExecContext(r.Context(),
 			"INSERT INTO email_verification (user_id, token_hash, expired_at) VALUES (?, ?, ?)",
 			id, tokenHash, time.Now().Add(verifyTokenTTL),
-		)
-		if err != nil {
+		); err != nil {
 			slog.Error("register: store verification token", "user_id", id, "error", err)
 			utils.WriteJSON(w, http.StatusCreated, map[string]string{
 				"message": "Registrasi berhasil! Silahkan cek email Anda untuk verifikasi",

@@ -2,7 +2,7 @@ package auth
 
 import (
 	"errors"
-	"os"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -27,6 +27,23 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+var jwtCfg struct {
+	secret []byte
+	issuer string
+}
+
+func InitJWT(secret, issuer string) error {
+	if secret == "" {
+		return fmt.Errorf("JWT_SECRET is required")
+	}
+	if issuer == "" {
+		return fmt.Errorf("JWT_ISSUER is required")
+	}
+	jwtCfg.secret = []byte(secret)
+	jwtCfg.issuer = issuer
+	return nil
+}
+
 func GenerateAccessToken(userID, sessionID, email string) (string, error) {
 	return generateToken(userID, sessionID, email, TokenTypeAccess, AccessTokenTTL)
 }
@@ -36,11 +53,6 @@ func GenerateRefreshToken(userID, sessionID, email string) (string, error) {
 }
 
 func ValidateToken(raw string) (*Claims, error) {
-	issuer := os.Getenv("JWT_ISSUER")
-	if issuer == "" {
-		issuer = "pendaftaran-uib"
-	}
-
 	token, err := jwt.ParseWithClaims(
 		raw,
 		&Claims{},
@@ -48,10 +60,10 @@ func ValidateToken(raw string) (*Claims, error) {
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, errors.New("unexpected signing method")
 			}
-			return getJWTSecret(), nil
+			return jwtCfg.secret, nil
 		},
 		jwt.WithValidMethods([]string{"HS256"}),
-		jwt.WithIssuer(issuer),
+		jwt.WithIssuer(jwtCfg.issuer),
 		jwt.WithExpirationRequired(),
 	)
 	if err != nil {
@@ -65,21 +77,7 @@ func ValidateToken(raw string) (*Claims, error) {
 	return claims, nil
 }
 
-func getJWTSecret() []byte {
-	secret := os.Getenv("JWT_SECRET")
-	if secret == "" {
-		panic("JWT_SECRET environment variable is required")
-	}
-	return []byte(secret)
-
-}
-
 func generateToken(userID, sessionID, email string, tokenType TokenType, ttl time.Duration) (string , error) {
-	issuer := os.Getenv("JWT_ISSUER")
-	if issuer == "" {
-		issuer = "pendaftaran-uib"
-	}
-
 	claims := Claims{
 		UserID: userID,
 		Email: email,
@@ -90,10 +88,10 @@ func generateToken(userID, sessionID, email string, tokenType TokenType, ttl tim
 			Subject: userID,
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(ttl)),
 			IssuedAt: jwt.NewNumericDate(time.Now()),
-			Issuer: issuer,
+			Issuer: jwtCfg.issuer,
 		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(getJWTSecret())
+	return token.SignedString(jwtCfg.secret)
 }

@@ -6,13 +6,11 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"slices"
-	"strings"
 	"syscall"
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/joho/godotenv"
 
 	"pendaftaran-uib/backend/internal/audit"
@@ -20,6 +18,7 @@ import (
 	"pendaftaran-uib/backend/internal/db"
 	"pendaftaran-uib/backend/internal/email"
 	"pendaftaran-uib/backend/internal/handlers"
+	"pendaftaran-uib/backend/internal/middleware"
 )
 
 func main() {
@@ -30,6 +29,11 @@ func main() {
 
 	if err := godotenv.Load(); err != nil {
 		slog.Error("error loading .env file", "error", err)
+		os.Exit(1)
+	}
+
+	if err := auth.InitJWT(os.Getenv("JWT_SECRET"), os.Getenv("JWT_ISSUER")); err != nil {
+		slog.Error("jwt config error", "error", err)
 		os.Exit(1)
 	}
 
@@ -61,101 +65,71 @@ func main() {
 		os.Exit(1)
 	}
 
-	auditlogger := audit.NewLogger()
+	auditLogger := audit.NewLogger()
 
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
-	r.Use(middleware.RequestID)
-	r.Use(corsMiddleware)
+	r.Use(chimiddleware.Logger)
+	r.Use(chimiddleware.Recoverer)
+	r.Use(chimiddleware.RequestID)
+	r.Use(middleware.CORS)
 
-	loginIPLimiter := auth.NewRateLimiter(30, 10*time.Minute)
-	loginEmailLimiter := auth.NewRateLimiter(5, 15*time.Minute)
-
-	registerLimiter := auth.NewRateLimiter(5, 60*time.Minute)
-
-	refreshIPLimiter := auth.NewRateLimiter(60, 1*time.Minute)
-	refreshUserLimiter := auth.NewRateLimiter(30, 1*time.Minute)
-
-	profileLimiter := auth.NewRateLimiter(60, 1*time.Minute)
-	updateProfileLimiter := auth.NewRateLimiter(10, 1*time.Minute)
-
-	changePasswordLimiter := auth.NewRateLimiter(5, 15*time.Minute)
-
-	forgotPasswordLimiter := auth.NewRateLimiter(3, 60*time.Minute)
-	forgotPasswordEmailLimiter := auth.NewRateLimiter(5, 60*time.Minute)
-
-	resetPasswordLimiter := auth.NewRateLimiter(10, 60*time.Minute)
-
-	logoutLimiter := auth.NewRateLimiter(20, 60*time.Minute)
-
-	verifyEmailLimiter := auth.NewRateLimiter(5, 60*time.Minute)
-	resendVerifyLimiter := auth.NewRateLimiter(3, 60*time.Minute)
+	rl := newRateLimiters()
 
 	r.Get("/health", handlers.HealthCheck(provider))
-
 	r.Get("/api/program_studi", handlers.ProgramStudi(provider.MySQL))
 	r.Get("/api/gelombang", handlers.Gelombang(provider.MySQL))
 
 	r.Post("/api/auth/login",
-		loginIPLimiter.RateLimit(
-			handlers.Login(provider.MySQL, tokenStore, loginEmailLimiter, auditlogger),
+		rl.loginIP.RateLimit(
+			handlers.Login(provider.MySQL, tokenStore, rl.loginEmail, auditLogger),
 		),
 	)
 	r.Post("/api/auth/register",
-		registerLimiter.RateLimitDevice(
-			handlers.Register(provider.MySQL, mailer, auditlogger),
+		rl.register.RateLimitDevice(
+			handlers.Register(provider.MySQL, mailer, auditLogger),
 		),
 	)
 	r.Post("/api/auth/refresh",
 		auth.RateLimitRefresh(
-			refreshIPLimiter,
-			refreshUserLimiter,
-			handlers.Refresh(provider.MySQL, tokenStore, auditlogger),
+			rl.refreshIP, rl.refreshUser,
+			handlers.Refresh(provider.MySQL, tokenStore, auditLogger),
 		),
 	)
 	r.Post("/api/auth/forgot-password",
-		forgotPasswordLimiter.RateLimitDevice(
-			handlers.ForgotPassword(provider.MySQL, mailer, forgotPasswordEmailLimiter, auditlogger),
+		rl.forgotPasswordIP.RateLimitDevice(
+			handlers.ForgotPassword(provider.MySQL, mailer, rl.forgotPasswordEmail, auditLogger),
 		),
 	)
 	r.Post("/api/auth/reset-password",
-		resetPasswordLimiter.RateLimit(
-			handlers.ResetPassword(provider.MySQL, tokenStore, auditlogger),
+		rl.resetPassword.RateLimit(
+			handlers.ResetPassword(provider.MySQL, tokenStore, auditLogger),
 		),
 	)
 	r.Post("/api/auth/verify-email",
-		verifyEmailLimiter.RateLimitDevice(
-			handlers.VerifyEmail(provider.MySQL, auditlogger),
+		rl.verifyEmail.RateLimitDevice(
+			handlers.VerifyEmail(provider.MySQL, auditLogger),
 		),
 	)
 	r.Post("/api/auth/resend-verification",
-		resendVerifyLimiter.RateLimitDevice(
-			handlers.ResendVerification(provider.MySQL, mailer, auditlogger),
+		rl.resendVerify.RateLimitDevice(
+			handlers.ResendVerification(provider.MySQL, mailer, auditLogger),
 		),
 	)
 
 	r.Group(func(r chi.Router) {
 		r.Use(auth.Middleware(tokenStore))
+
 		r.Get("/api/profile",
-			profileLimiter.RateLimitUser(
-				handlers.Profile(provider.MySQL),
-			),
+			rl.profile.RateLimitUser(handlers.Profile(provider.MySQL)),
 		)
 		r.Post("/api/profile",
-			updateProfileLimiter.RateLimitUser(
-				handlers.UpdateProfile(provider.MySQL, auditlogger),
-			),
+			rl.updateProfile.RateLimitUser(handlers.UpdateProfile(provider.MySQL, auditLogger)),
 		)
 		r.Post("/api/auth/logout",
-			logoutLimiter.RateLimitUser(
-				handlers.Logout(tokenStore, auditlogger),
-			),
+			rl.logout.RateLimitUser(handlers.Logout(tokenStore, auditLogger)),
 		)
-    	r.Post("/api/profile/password",
-			changePasswordLimiter.RateLimitUser(
-				handlers.ChangePassword(provider.MySQL, tokenStore, auditlogger),
-			),
+		r.Post("/api/profile/password",
+			rl.changePassword.RateLimitUser(handlers.ChangePassword(provider.MySQL, tokenStore, auditLogger)),
 		)
 	})
 
@@ -191,30 +165,38 @@ func main() {
 	}
 }
 
-func corsMiddleware(next http.Handler) http.Handler {
-	origin := os.Getenv("CORS_ORIGIN")
-	var allowedOrigins []string
+type rateLimiters struct {
+	loginIP *auth.RateLimiter
+	loginEmail *auth.RateLimiter
+	register *auth.RateLimiter
+	refreshIP *auth.RateLimiter
+	refreshUser *auth.RateLimiter
+	profile *auth.RateLimiter
+	updateProfile *auth.RateLimiter
+	changePassword *auth.RateLimiter
+	forgotPasswordIP *auth.RateLimiter
+	forgotPasswordEmail *auth.RateLimiter
+	resetPassword *auth.RateLimiter
+	logout *auth.RateLimiter
+	verifyEmail *auth.RateLimiter
+	resendVerify *auth.RateLimiter
+}
 
-	if origin != "" {
-		for o := range strings.SplitSeq(origin, ",") {
-			allowedOrigins = append(allowedOrigins, strings.TrimSpace(o))
-		}
+func newRateLimiters() rateLimiters {
+	return rateLimiters{
+		loginIP: auth.NewRateLimiter(30, 10*time.Minute),
+		loginEmail: auth.NewRateLimiter(5, 15*time.Minute),
+		register: auth.NewRateLimiter(5, 60*time.Minute),
+		refreshIP: auth.NewRateLimiter(60, 1*time.Minute),
+		refreshUser: auth.NewRateLimiter(30, 1*time.Minute),
+		profile: auth.NewRateLimiter(60, 1*time.Minute),
+		updateProfile: auth.NewRateLimiter(10, 1*time.Minute),
+		changePassword: auth.NewRateLimiter(5, 15*time.Minute),
+		forgotPasswordIP: auth.NewRateLimiter(3, 60*time.Minute),
+		forgotPasswordEmail: auth.NewRateLimiter(5, 60*time.Minute),
+		resetPassword: auth.NewRateLimiter(10, 60*time.Minute),
+		logout: auth.NewRateLimiter(20, 60*time.Minute),
+		verifyEmail: auth.NewRateLimiter(5, 60*time.Minute),
+		resendVerify: auth.NewRateLimiter(3, 60*time.Minute),
 	}
-
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		origin := r.Header.Get("Origin")
-
-		if slices.Contains(allowedOrigins, origin) {
-			w.Header().Set("Access-Control-Allow-Origin", origin)
-			w.Header().Set("Access-Control-Allow-Credentials", "true")
-			w.Header().Set("Vary", "Origin")
-		}
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusNoContent)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
 }
