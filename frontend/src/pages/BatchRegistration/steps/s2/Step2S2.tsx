@@ -2,9 +2,6 @@
 
 import { useRef, useMemo, useEffect } from "react";
 
-import styles from "@/pages/BatchRegistration/styles/Step2.module.scss";
-import form from "@/pages/BatchRegistration/styles/Form.module.scss";
-
 import ProgressBar from "@/pages/BatchRegistration/components/ProgressBar";
 import FileInputField from "@/pages/BatchRegistration/components/FileInputField";
 import InputField from "@/pages/BatchRegistration/components/InputField";
@@ -20,18 +17,10 @@ import { z } from "zod";
 import {
   S2_STEP2_PERSONAL_DOCS,
   S2_STEP2_STUDY_DOCS,
+  S2_STEP2_DOCS,
   S2_STEP2_PAYMENT_DOC,
   S2_STEP2_PAYMENT_INFO,
 } from "@/constants/registerOptions";
-
-// ─── STATUS DISPLAY ───────────────────────────────────────
-// DISPLAY ONLY — tidak ada kaitan dengan form validation / RHF
-import RegistrationStatusSection, {
-  buildS2StatusItems,
-  DEFAULT_S2_STATUS,
-  type S2StatusData,
-} from "../../components/RegistrationStatusSection";
-// ─────────────────────────────────────────────────────────
 
 type FormType = z.infer<typeof s2Step2Schema>;
 
@@ -44,7 +33,10 @@ export default function Step2S2({
   currentStep,
   flow,
   isSubmitting,
-}: StepPropsS2) {
+  filesWereLost,
+}: StepPropsS2 & {
+  filesWereLost?: boolean;
+}) {
   /* ================= RHF ================= */
   const methods = useForm<FormType>({
     resolver: zodResolver(s2Step2Schema),
@@ -128,19 +120,6 @@ export default function Step2S2({
     };
   }, []);
 
-  /* ================= STATUS DATA ================= */
-  // TODO: Ganti DEFAULT_S2_STATUS dengan data dari API:
-  //   const [statusData, setStatusData] = useState<S2StatusData>(DEFAULT_S2_STATUS);
-  //   useEffect(() => {
-  //     fetch(`/api/registration-status?key=${data.registrationKey}`)
-  //       .then(r => r.json())
-  //       .then(setStatusData);
-  //   }, [data.registrationKey]);
-  //
-  // Sementara ini gunakan default (semua "Masih dalam pemeriksaan").
-  const statusData: S2StatusData = DEFAULT_S2_STATUS;
-  const statusItems = buildS2StatusItems(statusData);
-
   /* ================= SUBMIT ================= */
   const onSubmit = (values: FormType) => {
     onResult({ action: "submit", data: values });
@@ -148,16 +127,16 @@ export default function Step2S2({
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onError)}>
-      <div className={styles.container}>
-        <div className={styles.formWrapper}>
+      <div className="formContainer">
+        <div className="formWrapper">
 
           {/* ================= HEADER ================= */}
-          <div className={styles.header}>
-            <h1 className={styles.mainTitle}>
+          <div className="formHeader">
+            <h1 className="titleMain">
               FORM PENDAFTARAN CALON MAHASISWA PROGRAM STRATA DUA
             </h1>
 
-            <p className={styles.subTitle}>
+            <p className="titleSub">
               (Postgraduate Student Registration Form)
             </p>
 
@@ -165,16 +144,26 @@ export default function Step2S2({
               currentStep={currentStep}
               goToStep={goToStep}
               steps={flow}
+              isSubmitting={isSubmitting}
             />
           </div>
 
-          <p className={styles.requiredNote}>
+          <p className="requiredNote">
             * Wajib di Isi (Required)
           </p>
 
+          {filesWereLost && (
+            <div className="warningBanner">
+              ⚠️ Dokumen yang sebelumnya dipilih
+              tidak tersimpan setelah refresh
+              halaman. Harap upload ulang file
+              sebelum submit.
+            </div>
+          )}
+
           {/* ================= DOKUMEN PRIBADI ================= */}
-          <div className={styles.documentsSection}>
-            <h3 className={styles.sectionHeading}>
+          <div className="documentsSection">
+            <h3 className="sectionHeading">
               Dokumen Pribadi (Personal Documents)
             </h3>
 
@@ -193,8 +182,8 @@ export default function Step2S2({
           </div>
 
           {/* ================= DOKUMEN STUDI ================= */}
-          <div className={styles.documentsSection}>
-            <h3 className={styles.sectionHeading}>
+          <div className="documentsSection">
+            <h3 className="sectionHeading">
               Dokumen Studi (Study Documents)
             </h3>
 
@@ -213,13 +202,13 @@ export default function Step2S2({
           </div>
 
           {/* ================= PEMBAYARAN ================= */}
-          <div className={styles.paymentSection}>
-            <h3 className={styles.sectionHeading}>
+          <div className="paymentSection">
+            <h3 className="sectionHeading">
               Biaya Formulir Pendaftaran (Registration Form Fee)
             </h3>
 
-            <div className={styles.infoBox}>
-              <div className={styles.paymentInfo}>
+            <div className="infoBox">
+              <div className="paymentInfo">
                 <p><strong>Nama Bank :</strong> {S2_STEP2_PAYMENT_INFO.bank}</p>
                 <p><strong>No Rekening :</strong> {S2_STEP2_PAYMENT_INFO.rekening}</p>
                 <p><strong>Nama Pemilik :</strong> {S2_STEP2_PAYMENT_INFO.nama}</p>
@@ -271,23 +260,38 @@ export default function Step2S2({
             control={control}
           />
 
-          {/* ================= STATUS DOKUMEN & PEMBAYARAN ================= */}
-          {/*
-            DISPLAY ONLY — informasi dari sistem/admin.
-            Tidak ada register(), tidak ada Zod, tidak ikut submit.
-            Wire ke API: ganti statusData di atas dengan hasil fetch.
-          */}
-          <RegistrationStatusSection
-            title="Status Dokumen (Document Status)"
-            items={statusItems}
-          />
+          {/* ================= DOCUMENT STATUS (REAL-TIME) ================= */}
+          <div className="section">
+            <h3 className="titleSection">Status Dokumen</h3>
+
+            <div className="table">
+              <div className="tableRowHeader">
+                <span>Dokumen</span>
+                <span>Status</span>
+              </div>
+
+              {S2_STEP2_DOCS.map((doc) => (
+                <div key={doc.name} className="tableRow">
+                  <span>{doc.label}</span>
+                <strong
+                  className={`status ${fileValues[doc.name as keyof FormType] ? "statusSuccess" : "statusError"}`}
+                >
+                  {fileValues[doc.name as keyof FormType] ? "✔ Sudah Upload" : "❌ Belum"}
+                </strong>
+                </div>
+              ))}
+            </div>
+          </div>
 
           {/* ================= BUTTON ================= */}
-          <div className={form.buttonGroup}>
+          <div className="buttonGroup">
             <button
               type="button"
-              onClick={() => onResult({ action: "prev" })}
-              className={`${form.btn} ${form.btnDanger}`}
+              onClick={() =>
+                onResult({ action: "prev" })
+              }
+              disabled={isSubmitting}
+              className="btn btnDanger"
             >
               Kembali (Back)
             </button>
@@ -295,9 +299,12 @@ export default function Step2S2({
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`${form.btn} ${form.btnPrimary}`}
+              aria-busy={isSubmitting}
+              className="btn btnPrimary"
             >
-              {isSubmitting ? "Uploading..." : "Upload (Submit)"}
+              {isSubmitting
+                ? "Uploading..."
+                : "Upload (Submit)"}
             </button>
           </div>
 

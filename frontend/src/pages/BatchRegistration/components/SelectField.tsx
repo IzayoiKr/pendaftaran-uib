@@ -11,8 +11,6 @@ import { get } from "react-hook-form";
 
 import type { SelectOption } from "@/constants/registerOptions";
 
-import form from "@/pages/BatchRegistration/styles/Form.module.scss";
-
 type Props<T extends FieldValues> = {
   label: string;
   name: Path<T>;
@@ -20,7 +18,7 @@ type Props<T extends FieldValues> = {
   errors: FieldErrors<T>;
   options: SelectOption[];
   placeholder?: string;
-  required?: boolean; // UI only
+  required?: boolean;
 };
 
 export default function SelectField<T extends FieldValues>({
@@ -35,16 +33,16 @@ export default function SelectField<T extends FieldValues>({
   const error = get(errors, name);
 
   return (
-    <div className={form.formGroup}>
-      <label className={form.label}>
+    <div className="formGroup">
+      <label className="label">
         {label} {required && "*"}
       </label>
 
-      <div className={form.selectWrapper}>
+      <div className="selectWrapper">
         <select
-          {...register(name)} // ✅ Zod handles validation
-          defaultValue="" 
-          className={`${form.select} ${error ? form.inputError : ""}`}
+          {...register(name)}
+          defaultValue=""
+          className={`select ${error ? "inputError" : ""}`}
           data-field={name}
         >
           {placeholder && (
@@ -62,7 +60,7 @@ export default function SelectField<T extends FieldValues>({
       </div>
 
       {error?.message && (
-        <p className={form.errorText}>
+        <p className="errorText">
           {String(error.message)}
         </p>
       )}

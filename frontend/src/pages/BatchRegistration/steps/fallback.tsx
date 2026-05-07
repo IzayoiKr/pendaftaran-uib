@@ -1,3 +1,3 @@
 export default function Fallback() {
-  return <div>Step tidak ditemukan</div>;
+  return <div>Step Pages tidak ditemukan</div>;
 }

@@ -409,12 +409,20 @@ export type FormDataS2 =
   z.infer<typeof s2ParentSchema> &
   z.infer<typeof s2Step2Schema>;
 
-export type ProgramType = "Program Sarjana" | "Program Diploma";
+export const programTypeSchema = z.enum([
+  "Program Sarjana",
+  "Program Magister",
+]);
+
+export type ProgramType =
+  z.infer<typeof programTypeSchema>;
 
 export type EventType = {
+  id: string;
   programType: ProgramType;
   batchName?: string;
 };
+
 
 export type StepResultS1 =
   | { action: "next";   data: Partial<FormDataS1> }
@@ -440,6 +448,32 @@ export type StepItem = {
   label: string;
   sub: string;
 };
+
+export interface BaseStepProps {
+  data:
+    | Partial<FormDataS1>
+    | Partial<FormDataS2>;
+
+  onResult: (
+    result:
+      | StepResultS1
+      | StepResultS2
+  ) => void;
+
+  goToStep: (n: number) => void;
+
+  currentStep: number;
+
+  totalStep: number;
+
+  flow: StepItem[];
+
+  isSubmitting: boolean;
+
+  filesWereLost?: boolean;
+
+  isEditMode?: boolean;
+}
 
 export type StepPropsS1 = {
   data: Partial<FormDataS1>;

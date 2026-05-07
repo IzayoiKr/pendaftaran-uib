@@ -1,5 +1,5 @@
 @use '@/styles/config.scss' as global;
-@use '@/styles/form.scss';
+@use '@/styles/';
 
 .verifyEmail {
   @include global.main-layout;

@@ -1,23 +1,23 @@
 "use client";
 
-import styles from "@/pages/BatchRegistration/styles/StepDone.module.scss";
+import { useRouter } from "next/navigation";
+
 import ProgressBar from "@/pages/BatchRegistration/components/ProgressBar";
 
 import {
-  S2_STEP2_DOCS,
   getProdiName,
 } from "@/constants/registerOptions";
 
-import type { FormDataS2, StepItem } from "@/validation/schemaform";
+import RegistrationStatusSection, {
+  buildS2StatusItems,
+  DEFAULT_S2_STATUS,
+} from "@/pages/BatchRegistration/components/RegistrationStatusSection";
 
-type DocKey = keyof FormDataS2;
+import type {
+  StepPropsS2,
+} from "@/validation/schemaform";
 
-type Props = {
-  data: Partial<FormDataS2>;
-  currentStep: number;
-  flow: StepItem[];
-  goToStep: (n: number) => void;
-};
+type Props = StepPropsS2;
 
 export default function StepDoneS2({
   data,
@@ -25,15 +25,35 @@ export default function StepDoneS2({
   flow,
   goToStep,
 }: Props) {
+  const router = useRouter();
+
+  /* ================= STATUS ================= */
+
+  // sementara masih pakai default status
+  // nanti bisa diganti fetch API
+  const statusData =
+    DEFAULT_S2_STATUS;
+
+  const statusItems =
+    buildS2StatusItems(
+      statusData
+    );
+
+  /* ================= RENDER ================= */
+
   return (
-    <div className={styles.container}>
-      <div className={styles.formWrapper}>
+    <div className="formContainer">
+      <div className="formWrapper">
 
         {/* ================= HEADER ================= */}
-        <div className={styles.header}>
-          <h1 className={styles.title}>
+        <div className="formHeader">
+          <h1 className="titleMain">
             KONFIRMASI PENDAFTARAN
           </h1>
+
+          <p className="titleSub">
+            (Registration Confirmation)
+          </p>
 
           <ProgressBar
             currentStep={currentStep}
@@ -42,73 +62,104 @@ export default function StepDoneS2({
           />
         </div>
 
-        {/* ================= SUCCESS MESSAGE ================= */}
-        <div className={styles.section}>
-          <p className={styles.subtitle}>
-            🎉 Pendaftaran Anda telah berhasil dikirim!
-          </p>
-        </div>
-
         {/* ================= SUMMARY ================= */}
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Ringkasan Data</h3>
+        <div className="section">
+          <h3 className="titleSection">
+            Ringkasan Data
+          </h3>
 
-          <div className={styles.table}>
-            <div className={styles.rowHeader}>
+          <div className="table">
+
+            <div className="tableRowHeader">
               <span>Field</span>
               <span>Data</span>
             </div>
 
-            <div className={styles.row}>
+            <div className="tableRow">
               <span>Nama</span>
-              <strong>{data.nama || "-"}</strong>
-            </div>
-            <div className={styles.row}>
-              <span>Email</span>
-              <strong>{data.email || "-"}</strong>
-            </div>
-            <div className={styles.row}>
-              <span>No HP</span>
-              <strong>{data.nohp || "-"}</strong>
-            </div>
-            <div className={styles.row}>
-              <span>Program</span>
+
               <strong>
-                {data.prodipil ? getProdiName(data.prodipil) : "-"}
+                {data.nama || "-"}
               </strong>
             </div>
-            <div className={styles.row}>
+
+            <div className="tableRow">
+              <span>Email</span>
+
+              <strong>
+                {data.email || "-"}
+              </strong>
+            </div>
+
+            <div className="tableRow">
+              <span>No HP</span>
+
+              <strong>
+                {data.nohp || "-"}
+              </strong>
+            </div>
+
+            <div className="tableRow">
+              <span>Program</span>
+
+              <strong>
+                {data.prodipil
+                  ? getProdiName(
+                      data.prodipil
+                    )
+                  : "-"}
+              </strong>
+            </div>
+
+            <div className="tableRow">
               <span>Nama Ayah</span>
-              <strong>{data.nama_ayah || "-"}</strong>
+
+              <strong>
+                {data.nama_ayah ||
+                  "-"}
+              </strong>
             </div>
-            <div className={styles.row}>
+
+            <div className="tableRow">
               <span>Nama Ibu</span>
-              <strong>{data.nama_ibu || "-"}</strong>
+
+              <strong>
+                {data.nama_ibu ||
+                  "-"}
+              </strong>
             </div>
+
           </div>
         </div>
 
-        {/* ================= DOCUMENT ================= */}
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Dokumen</h3>
+        {/* ================= STATUS ================= */}
+        <div className="section">
+          <RegistrationStatusSection
+            title="Status Dokumen (Document Status)"
+            items={statusItems}
+          />
+        </div>
 
-          <div className={styles.table}>
-            <div className={styles.rowHeader}>
-              <span>Dokumen</span>
-              <span>Status</span>
-            </div>
-
-            {S2_STEP2_DOCS.map((doc) => (
-              <div key={doc.name} className={styles.row}>
-                <span>{doc.label}</span>
-                <strong>
-                  {Boolean(data[doc.name as DocKey])
-                    ? "✔ Sudah Upload"
-                    : "❌ Belum"}
-                </strong>
-              </div>
-            ))}
-          </div>
+        {/* ================= DONE BUTTON ================= */}
+        <div
+          className="buttonGroup"
+          style={{
+            justifyContent:
+              "center",
+            marginTop: "2rem",
+          }}
+        >
+          <button
+            type="button"
+            className="btn btnPrimary"
+            onClick={() =>
+              router.push(
+                "/account"
+              )
+            }
+          >
+            Selesai — Kembali ke Akun
+          </button>
         </div>
 
       </div>

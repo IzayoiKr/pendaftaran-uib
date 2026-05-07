@@ -1,26 +1,23 @@
 "use client";
 
-import styles from "@/pages/BatchRegistration/styles/StepDone.module.scss";
+import { useRouter } from "next/navigation";
+
 import ProgressBar from "@/pages/BatchRegistration/components/ProgressBar";
 
 import {
-  S1_STEP2_DOCS,
   getProdiName,
 } from "@/constants/registerOptions";
 
-import type { FormDataS1, StepItem } from "@/validation/schemaform";
+import RegistrationStatusSection, {
+  buildS1StatusItems,
+  DEFAULT_S1_STATUS,
+} from "@/pages/BatchRegistration/components/RegistrationStatusSection";
 
-type DocKey = keyof FormDataS1;
+import type {
+  StepPropsS1,
+} from "@/validation/schemaform";
 
-type Props = {
-  data: Partial<FormDataS1>;
-  currentStep: number;
-  flow: StepItem[];
-  goToStep: (n: number) => void;
-};
-
-const isTransfer = (jenis?: string) =>
-  jenis === "alihjenjang" || jenis === "transfer";
+type Props = StepPropsS1;
 
 export default function StepDoneS1({
   data,
@@ -28,21 +25,30 @@ export default function StepDoneS1({
   flow,
   goToStep,
 }: Props) {
-  const docs = S1_STEP2_DOCS.filter((doc) =>
-    doc.section === "study" ? isTransfer(data.jenisdaftar) : true
-  );
+  const router = useRouter();
+
+  /* ================= STATUS ================= */
+
+  // sementara masih pakai default dummy status
+  // nanti bisa diganti fetch API
+  const statusData = DEFAULT_S1_STATUS;
+
+  const statusItems =
+    buildS1StatusItems(statusData);
+
+  /* ================= RENDER ================= */
 
   return (
-    <div className={styles.container}>
-      <div className={styles.formWrapper}>
+    <div className="formContainer">
+      <div className="formWrapper">
 
         {/* ================= HEADER ================= */}
-        <div className={styles.header}>
-          <h1 className={styles.title}>
+        <div className="formHeader">
+          <h1 className="titleMain">
             KONFIRMASI DATA PENDAFTARAN
           </h1>
 
-          <p className={styles.subtitle}>
+          <p className="titleSub">
             (Registration Data Confirmation)
           </p>
 
@@ -53,44 +59,48 @@ export default function StepDoneS1({
           />
         </div>
 
-        {/* ================= SUCCESS MESSAGE ================= */}
-        <div className={styles.section}>
-          <p className={styles.subtitle}>
-            🎉 Pendaftaran Anda telah berhasil dikirim!
-          </p>
-        </div>
-
         {/* ================= SUMMARY ================= */}
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>Program Studi</h3>
+        <div className="section">
+          <h3 className="titleSection">
+            Program Studi
+          </h3>
 
-          <div className={styles.prodiCard}>
-            <div className={styles.prodiLabel}>Pilihan Anda</div>
-            <div className={styles.prodiName}>
+          <div className="prodiCard">
+            <div className="prodiLabel">
+              Pilihan Anda
+            </div>
+
+            <div className="prodiName">
               {getProdiName(data.prodipil) || "-"}
             </div>
           </div>
         </div>
 
-        {/* ================= DOCUMENT ================= */}
-        <div className={styles.table}>
-          {/* HEADER */}
-          <div className={styles.rowHeader}>
-            <span>Dokumen</span>
-            <span>Status</span>
-          </div>
+        {/* ================= STATUS ================= */}
+        <div className="section">
+          <RegistrationStatusSection
+            title="Status Dokumen (Document Status)"
+            items={statusItems}
+          />
+        </div>
 
-          {/* ROWS */}
-          {docs.map((doc) => (
-            <div key={doc.name} className={styles.row}>
-              <span>{doc.label}</span>
-              <strong>
-                {data[doc.name as DocKey]
-                  ? "✔ Sudah Upload"
-                  : "❌ Belum"}
-              </strong>
-            </div>
-          ))}
+        {/* ================= DONE BUTTON ================= */}
+        <div
+          className="buttonGroup"
+          style={{
+            justifyContent: "center",
+            marginTop: "2rem",
+          }}
+        >
+          <button
+            type="button"
+            className="btn btnPrimary"
+            onClick={() =>
+              router.push("/account")
+            }
+          >
+            Selesai — Kembali ke Akun
+          </button>
         </div>
 
       </div>

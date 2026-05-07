@@ -9,8 +9,6 @@ import type {
 
 import { get } from "react-hook-form";
 
-import form from "@/pages/BatchRegistration/styles/Form.module.scss";
-
 type Props<T extends FieldValues> = {
   label: string;
   name: Path<T>;
@@ -18,7 +16,7 @@ type Props<T extends FieldValues> = {
   errors: FieldErrors<T>;
   type?: string;
   placeholder?: string;
-  required?: boolean; // UI only
+  required?: boolean;
   maxLength?: number;
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
 };
@@ -37,8 +35,8 @@ export default function InputField<T extends FieldValues>({
   const error = get(errors, name);
 
   return (
-    <div className={form.formGroup}>
-      <label className={form.label}>
+    <div className="formGroup">
+      <label className="label">
         {label} {required && "*"}
       </label>
 
@@ -48,11 +46,11 @@ export default function InputField<T extends FieldValues>({
         placeholder={placeholder}
         maxLength={maxLength}
         inputMode={inputMode}
-        className={`${form.input} ${error ? form.inputError : ""}`}
+        className={`input ${error ? "inputError" : ""}`}
       />
 
       {error?.message && (
-        <p className={form.errorText}>
+        <p className="errorText">
           {String(error.message)}
         </p>
       )}

@@ -1,9 +1,5 @@
 "use client";
 
-/* ================= UI STYLES ================= */
-import styles from "@/pages/BatchRegistration/styles/Step1.module.scss";
-import form from "@/pages/BatchRegistration/styles/Form.module.scss";
-
 /* ================= COMPONENTS ================= */
 import ProgressBar from "@/pages/BatchRegistration/components/ProgressBar";
 import SelectField from "@/pages/BatchRegistration/components/SelectField";
@@ -41,6 +37,7 @@ export default function StepParentS2({
   goToStep,
   currentStep,
   flow,
+  isSubmitting,
 }: StepPropsS2) {
   const methods = useForm<FormType>({
     resolver: zodResolver(s2ParentSchema),
@@ -63,15 +60,15 @@ export default function StepParentS2({
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onError)}>
-      <div className={styles.container}>
-        <div className={styles.formWrapper}>
+      <div className="formContainer">
+        <div className="formWrapper">
 
           {/* HEADER */}
-          <div className={styles.header}>
-            <h1 className={styles.mainTitle}>
+          <div className="formHeader">
+            <h1 className="titleMain">
               FORM PENDAFTARAN CALON MAHASISWA PROGRAM STRATA DUA
             </h1>
-            <p className={styles.subTitle}>
+            <p className="titleSub">
               (Postgraduate Student Registration Form)
             </p>
 
@@ -79,23 +76,24 @@ export default function StepParentS2({
               currentStep={currentStep}
               goToStep={goToStep}
               steps={flow}
+              isSubmitting={isSubmitting}
             />
           </div>
 
           {/* ================= PARENT LOOP ================= */}
           {PARENT_SECTIONS.map((section) => (
             <div key={section.type}>
-              <h2 className={styles.sectionTitle}>{section.title}</h2>
+              <h2 className="titleSection">{section.title}</h2>
 
               {/* NIK — kept inline: digit sanitize */}
-              <div className={form.formGroup}>
-                <label className={form.label}>
+              <div className="formGroup">
+                <label className="label">
                   {section.labels.nik}
                 </label>
 
                 <input
                   {...register(section.fields.nik)}
-                  className={`${form.input} ${errors[section.fields.nik] ? form.inputError : ""}`}
+                  className={`input ${errors[section.fields.nik] ? "inputError" : ""}`}
                   inputMode="numeric"
                   maxLength={16}
                   placeholder="Contoh: 1234567890123456"
@@ -112,21 +110,21 @@ export default function StepParentS2({
                 />
 
                 {errors[section.fields.nik] && (
-                  <p className={form.errorText}>
+                  <p className="errorText">
                     {errors[section.fields.nik]?.message}
                   </p>
                 )}
               </div>
 
               {/* NAMA — kept inline: whitespace sanitize */}
-              <div className={form.formGroup}>
-                <label className={form.label}>
+              <div className="formGroup">
+                <label className="label">
                   {section.labels.nama}
                 </label>
 
                 <input
                   {...register(section.fields.nama)}
-                  className={`${form.input} ${errors[section.fields.nama] ? form.inputError : ""}`}
+                  className={`input ${errors[section.fields.nama] ? "inputError" : ""}`}
                   placeholder={`Masukkan nama lengkap ${section.type}`}
                   autoComplete="name"
                   onChange={(e) => {
@@ -142,15 +140,15 @@ export default function StepParentS2({
                 />
 
                 {errors[section.fields.nama] && (
-                  <p className={form.errorText}>
+                  <p className="errorText">
                     {errors[section.fields.nama]?.message}
                   </p>
                 )}
               </div>
 
               {/* TGL — kept inline: type="date" with max */}
-              <div className={form.formGroup}>
-                <label className={form.label}>
+              <div className="formGroup">
+                <label className="label">
                   {section.labels.tgl}
                 </label>
 
@@ -158,29 +156,29 @@ export default function StepParentS2({
                   type="date"
                   max={maxDate}
                   {...register(section.fields.tgl)}
-                  className={`${form.input} ${errors[section.fields.tgl] ? form.inputError : ""}`}
+                  className={`input ${errors[section.fields.tgl] ? "inputError" : ""}`}
                 />
 
-                <small className={form.helperText}>
+                <small className="helperText">
                   Format: YYYY-MM-DD (contoh: 1980-12-31)
                 </small>
 
                 {errors[section.fields.tgl] && (
-                  <p className={form.errorText}>
+                  <p className="errorText">
                     {errors[section.fields.tgl]?.message}
                   </p>
                 )}
               </div>
 
               {/* TELP — kept inline: digit sanitize */}
-              <div className={form.formGroup}>
-                <label className={form.label}>
+              <div className="formGroup">
+                <label className="label">
                   {section.labels.telp}
                 </label>
 
                 <input
                   {...register(section.fields.telp)}
-                  className={`${form.input} ${errors[section.fields.telp] ? form.inputError : ""}`}
+                  className={`input ${errors[section.fields.telp] ? "inputError" : ""}`}
                   type="text"
                   inputMode="numeric"
                   maxLength={15}
@@ -198,12 +196,12 @@ export default function StepParentS2({
                   }}
                 />
 
-                <small className={form.helperText}>
+                <small className="helperText">
                   Gunakan nomor aktif (maks. 15 digit, tanpa spasi atau simbol)
                 </small>
 
                 {errors[section.fields.telp] && (
-                  <p className={form.errorText}>
+                  <p className="errorText">
                     {errors[section.fields.telp]?.message}
                   </p>
                 )}
@@ -245,17 +243,17 @@ export default function StepParentS2({
           ))}
 
           {/* ================= EXTRA ================= */}
-          <h3 className={styles.sectionTitle}>
+          <h3 className="titleSection">
             Alamat Orang Tua (Parents' Home Address)
           </h3>
 
           {EXTRA_FIELDS.map((f) => (
-            <div key={f.name} className={form.formGroup}>
-              <label className={form.label}>{f.label}</label>
+            <div key={f.name} className="formGroup">
+              <label className="label">{f.label}</label>
 
               <input
                 {...register(f.name)}
-                className={`${form.input} ${errors[f.name] ? form.inputError : ""}`}
+                className={`input ${errors[f.name] ? "inputError" : ""}`}
                 placeholder={f.placeholder}
                 onChange={(e) => {
                   const value = e.target.value.trimStart();
@@ -267,12 +265,12 @@ export default function StepParentS2({
                 }}
               />
 
-              <small className={form.helperText}>
+              <small className="helperText">
                 Masukkan alamat lengkap sesuai domisili orang tua
               </small>
 
               {errors[f.name] && (
-                <p className={form.errorText}>
+                <p className="errorText">
                   {errors[f.name]?.message}
                 </p>
               )}
@@ -280,20 +278,27 @@ export default function StepParentS2({
           ))}
 
           {/* ================= BUTTON ================= */}
-          <div className={form.buttonGroup}>
+          <div className="buttonGroup">
             <button
               type="button"
-              className={`${form.btn} ${form.btnDanger}`}
-              onClick={() => onResult({ action: "prev" })}
+              className="btn btnDanger"
+              onClick={() =>
+                onResult({ action: "prev" })
+              }
+              disabled={isSubmitting}
             >
               Kembali (Back)
             </button>
 
             <button
               type="submit"
-              className={`${form.btn} ${form.btnPrimary}`}
+              className="btn btnPrimary"
+              disabled={isSubmitting}
+              aria-busy={isSubmitting}
             >
-              Selanjutnya (Next)
+              {isSubmitting
+                ? "Memproses..."
+                : "Selanjutnya (Next)"}
             </button>
           </div>
 

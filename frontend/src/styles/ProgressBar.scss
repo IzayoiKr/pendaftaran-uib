@@ -1,7 +1,7 @@
-@use '../../../styles/config.scss' as global;
+@use '@/styles/config.scss' as global;
 
 /* ================= WRAPPER ================= */
-.wrapper {
+.pb-wrapper {
   position: relative;
   margin: 2rem 0 0.5rem 0;
 
@@ -14,18 +14,16 @@
 }
 
 /* ================= STEPS ================= */
-.steps {
+.pb-steps {
   display: flex;
   justify-content: space-between;
   position: relative;
 
-  /* 🔥 ini kunci biar garis gak tembus */
   --offset: calc(100% / (var(--step-count) * 2));
 }
 
 /* ================= LINE GRAY ================= */
-.steps::before {
-  content: "";
+.pb-line-background {
   position: absolute;
   top: calc(var(--circle-size) / 2);
   left: var(--offset);
@@ -37,12 +35,11 @@
 }
 
 /* ================= LINE PROGRESS ================= */
-.steps::after {
-  content: "";
+.pb-line-progress {
   position: absolute;
   top: calc(var(--circle-size) / 2);
   left: var(--offset);
-  right: var(--offset); /* 🔥 tambahin ini */
+  right: var(--offset);
   width: var(--progress);
   height: 2px;
   background: var(--active-color);
@@ -52,7 +49,7 @@
 }
 
 /* ================= STEP ================= */
-.stepWrapper {
+.pb-step-wrapper {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -61,14 +58,14 @@
   position: relative;
   z-index: 2;
 
-  &.disabled {
+  &.pb-disabled {
     cursor: not-allowed;
     opacity: 0.5;
   }
 }
 
 /* ================= CIRCLE ================= */
-.circle {
+.pb-circle {
   width: var(--circle-size);
   height: var(--circle-size);
   border-radius: 50%;
@@ -82,34 +79,39 @@
   color: #6b7280;
   transition: all 0.25s ease;
   z-index: 2;
+
+  /* ACTIVE */
+  &.pb-active {
+    border-color: var(--active-color);
+    color: var(--active-color);
+  }
+
+  /* DONE */
+  &.pb-done {
+    background: var(--active-color);
+    color: white;
+    border-color: var(--active-color);
+  }
 }
 
-/* ACTIVE */
-.active {
-  border-color: var(--active-color);
-  color: var(--active-color);
-}
-
-/* DONE */
-.done {
-  background: var(--active-color);
-  color: white;
-  border-color: var(--active-color);
+/* ================= CHECKMARK ================= */
+.pb-checkmark {
+  line-height: 1;
 }
 
 /* ================= LABEL ================= */
-.label {
+.pb-label {
   margin-top: 0.6rem;
   text-align: center;
 }
 
-.main {
+.pb-label-main {
   font-size: var(--step--1);
   font-weight: 600;
   color: var(--text-color);
 }
 
-.sub {
+.pb-label-sub {
   font-size: var(--step--2);
   color: #9ca3af;
 }

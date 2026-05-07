@@ -1,69 +1,111 @@
-import styles from "@/pages/BatchRegistration/styles/ProgressBar.module.scss";
 import type { StepItem } from "@/validation/schemaform";
 
 type Props = {
   currentStep: number;
   steps: StepItem[];
   goToStep: (n: number) => void;
+  isSubmitting?: boolean;
 };
 
 export default function ProgressBar({
   currentStep,
   steps,
   goToStep,
+  isSubmitting = false,
 }: Props) {
   const totalSteps = steps.length;
 
   const progressPercent =
-    totalSteps > 1 ? ((currentStep - 1) / (totalSteps - 1)) * 100 : 0;
+    totalSteps > 1
+      ? ((currentStep - 1) /
+          (totalSteps - 1)) *
+        100
+      : 0;
 
   const adjustedProgress = `calc(${progressPercent}% * (1 - (2 / ${totalSteps})))`;
 
   return (
     <div
-      className={styles.wrapper}
+      className="pb-wrapper"
       style={
         {
           "--step-count": totalSteps,
-          "--progress": adjustedProgress,
+          "--progress":
+            adjustedProgress,
         } as React.CSSProperties
       }
     >
-      <div className={styles.steps}>
-        <div className={styles.lineBackground} />
-        <div className={styles.lineProgress} />
+      <div className="pb-steps">
+        <div className="pb-line-background" />
+        <div className="pb-line-progress" />
 
         {steps.map((step, index) => {
-          const stepNumber = index + 1;
-          const isActive = stepNumber === currentStep;
-          const isDone = stepNumber < currentStep;
-          const isFuture = stepNumber > currentStep;
+          const stepNumber =
+            index + 1;
+
+          const isActive =
+            stepNumber === currentStep;
+
+          const isDone =
+            stepNumber < currentStep;
+
+          const isFuture =
+            stepNumber > currentStep;
+
+          const isDisabled =
+            isFuture ||
+            isSubmitting;
 
           return (
             <div
-              key={step.key} // ✅ FIXED
-              className={`${styles.stepWrapper} ${
-                isFuture ? styles.disabled : ""
-              }`}
-              onClick={() => !isFuture && goToStep(stepNumber)}
+              key={step.key}
+              className={[
+                "pb-step-wrapper",
+                isDisabled
+                  ? "pb-disabled"
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              onClick={() => {
+                if (isDisabled) return;
+
+                goToStep(stepNumber);
+              }}
+              aria-disabled={
+                isDisabled
+              }
             >
               <div
-                className={`
-                  ${styles.circle}
-                  ${isActive ? styles.active : ""}
-                  ${isDone ? styles.done : ""}
-                `}
+                className={[
+                  "pb-circle",
+                  isActive
+                    ? "pb-active"
+                    : "",
+                  isDone
+                    ? "pb-done"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
               >
                 {isDone ? (
-                  <span className={styles.checkmark}>✓</span>
+                  <span className="pb-checkmark">
+                    ✓
+                  </span>
                 ) : (
                   stepNumber
                 )}
               </div>
 
-              <div className={styles.label}>
-                <div className={styles.main}>{step.label}</div>
-                <div className={styles.sub}>({step.sub})</div>
+              <div className="pb-label">
+                <div className="pb-label-main">
+                  {step.label}
+                </div>
+
+                <div className="pb-label-sub">
+                  ({step.sub})
+                </div>
               </div>
             </div>
           );

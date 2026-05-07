@@ -1,7 +1,5 @@
 "use client";
 
-import form from "@/pages/BatchRegistration/styles/Form.module.scss";
-import styles from "@/pages/BatchRegistration/styles/Step2.module.scss";
 import type { Control, FieldValues, Path } from "react-hook-form";
 import { Controller } from "react-hook-form";
 import { toast } from "sonner";
@@ -30,13 +28,13 @@ export default function FileInputField<T extends FieldValues>({
   const error = get(errors, name) as FieldError | undefined;
 
   return (
-    <div className={form.formGroup}>
-      <label className={form.label}>
+    <div className="formGroup">
+      <label className="label">
         {label} * (PDF, maks. {maxSizeMB}MB)
       </label>
 
-      <div className={styles.fileBox}>
-        <div className={styles.fileInputWrapper}>
+      <div className="fileBox">
+        <div className="fileInputWrapper">
           <Controller
             name={name}
             control={control}
@@ -45,7 +43,7 @@ export default function FileInputField<T extends FieldValues>({
                 type="file"
                 id={name}
                 data-field={name}
-                className={styles.customFileInput}
+                className="customFileInput"
                 accept=".pdf,application/pdf"
                 ref={field.ref}
                 onChange={(e) => {
@@ -78,19 +76,22 @@ export default function FileInputField<T extends FieldValues>({
             )}
           />
 
-          <label htmlFor={name} className={styles.customFileLabel}>
+          <label
+            htmlFor={name}
+            className={`customFileLabel${files[name] ? " selected" : ""}`}
+          >
             {files[name]?.name ?? "Pilih File PDF"}
           </label>
         </div>
       </div>
 
       {error && (
-        <p className={form.errorText}>
+        <p className="errorText">
           {String(error?.message)}
         </p>
       )}
 
-      <p className={styles.uploadedDoc}>
+      <p className="uploadedDoc">
         Dokumen Terupload:
         {files[name] ? (
           <>

@@ -135,11 +135,11 @@ func main() {
 
 	port := os.Getenv("SERVER_PORT")
 	srv := &http.Server{
-		Addr: ":" + port,
-		Handler: r,
-		ReadTimeout: 15 * time.Second,
-		WriteTimeout: 15 * time.Second,
-		IdleTimeout: 60 * time.Second,
+		Addr:           ":" + port,
+		Handler:        r,
+		ReadTimeout:    15 * time.Second,
+		WriteTimeout:   15 * time.Second,
+		IdleTimeout:    60 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
 
@@ -166,37 +166,37 @@ func main() {
 }
 
 type rateLimiters struct {
-	loginIP *auth.RateLimiter
-	loginEmail *auth.RateLimiter
-	register *auth.RateLimiter
-	refreshIP *auth.RateLimiter
-	refreshUser *auth.RateLimiter
-	profile *auth.RateLimiter
-	updateProfile *auth.RateLimiter
-	changePassword *auth.RateLimiter
-	forgotPasswordIP *auth.RateLimiter
+	loginIP             *auth.RateLimiter
+	loginEmail          *auth.RateLimiter
+	register            *auth.RateLimiter
+	refreshIP           *auth.RateLimiter
+	refreshUser         *auth.RateLimiter
+	profile             *auth.RateLimiter
+	updateProfile       *auth.RateLimiter
+	changePassword      *auth.RateLimiter
+	forgotPasswordIP    *auth.RateLimiter
 	forgotPasswordEmail *auth.RateLimiter
-	resetPassword *auth.RateLimiter
-	logout *auth.RateLimiter
-	verifyEmail *auth.RateLimiter
-	resendVerify *auth.RateLimiter
+	resetPassword       *auth.RateLimiter
+	logout              *auth.RateLimiter
+	verifyEmail         *auth.RateLimiter
+	resendVerify        *auth.RateLimiter
 }
 
 func newRateLimiters() rateLimiters {
 	return rateLimiters{
-		loginIP: auth.NewRateLimiter(30, 10*time.Minute),
-		loginEmail: auth.NewRateLimiter(5, 15*time.Minute),
-		register: auth.NewRateLimiter(5, 60*time.Minute),
-		refreshIP: auth.NewRateLimiter(60, 1*time.Minute),
-		refreshUser: auth.NewRateLimiter(30, 1*time.Minute),
-		profile: auth.NewRateLimiter(60, 1*time.Minute),
-		updateProfile: auth.NewRateLimiter(10, 1*time.Minute),
-		changePassword: auth.NewRateLimiter(5, 15*time.Minute),
-		forgotPasswordIP: auth.NewRateLimiter(3, 60*time.Minute),
+		loginIP:             auth.NewRateLimiter(30, 10*time.Minute),
+		loginEmail:          auth.NewRateLimiter(5, 15*time.Minute),
+		register:            auth.NewRateLimiter(5, 60*time.Minute),
+		refreshIP:           auth.NewRateLimiter(60, 1*time.Minute),
+		refreshUser:         auth.NewRateLimiter(30, 1*time.Minute),
+		profile:             auth.NewRateLimiter(60, 1*time.Minute),
+		updateProfile:       auth.NewRateLimiter(10, 1*time.Minute),
+		changePassword:      auth.NewRateLimiter(5, 15*time.Minute),
+		forgotPasswordIP:    auth.NewRateLimiter(3, 60*time.Minute),
 		forgotPasswordEmail: auth.NewRateLimiter(5, 60*time.Minute),
-		resetPassword: auth.NewRateLimiter(10, 60*time.Minute),
-		logout: auth.NewRateLimiter(20, 60*time.Minute),
-		verifyEmail: auth.NewRateLimiter(5, 60*time.Minute),
-		resendVerify: auth.NewRateLimiter(3, 60*time.Minute),
+		resetPassword:       auth.NewRateLimiter(10, 60*time.Minute),
+		logout:              auth.NewRateLimiter(20, 60*time.Minute),
+		verifyEmail:         auth.NewRateLimiter(5, 60*time.Minute),
+		resendVerify:        auth.NewRateLimiter(3, 60*time.Minute),
 	}
 }

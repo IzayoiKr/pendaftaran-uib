@@ -6,11 +6,9 @@
  * Komponen ini tidak menyentuh react-hook-form, tidak ada register(),
  * tidak ada Zod schema, dan tidak ikut kirim ke API saat submit.
  *
- * Gunakan di Step2S1 dan Step2S2 — setelah section Pembayaran,
- * sebelum tombol submit.
+ * Gunakan di StepDoneS1 dan StepDoneS2 — setelah section prodiCard / summary,
+ * sebelum tabel dokumen (yang sudah dipindah ke Step2).
  */
-
-import styles from "@/pages/BatchRegistration/styles/Step2.module.scss";
 
 /* =========================================================
    TYPES
@@ -33,6 +31,21 @@ type Props = {
 };
 
 /* =========================================================
+   STATUS COLOR HELPER
+========================================================= */
+
+function getStatusClass(value: string): string {
+  const v = value.toLowerCase();
+  if (v.includes("rejected") || v.includes("ditolak") || v.includes("tidak lengkap")) {
+    return "statusRejected";
+  }
+  if (v.includes("approved") || v.includes("disetujui") || v.includes("lengkap")) {
+    return "statusApproved";
+  }
+  return "statusPending";
+}
+
+/* =========================================================
    COMPONENT
 ========================================================= */
 
@@ -41,10 +54,10 @@ export default function RegistrationStatusSection({
   items,
 }: Props) {
   return (
-    <div className={styles.statusSection}>
-      <h3 className={styles.sectionHeading}>{title}</h3>
+    <div className="statusSection">
+      <h3 className="sectionHeading">{title}</h3>
 
-      <div className={styles.infoBox}>
+      <div className="infoBox">
         {items.map((item, index) => {
           const displayValue =
             item.value && item.value.trim() !== ""
@@ -52,9 +65,11 @@ export default function RegistrationStatusSection({
               : (item.fallback ?? "-");
 
           return (
-            <div key={index} className={styles.statusItem}>
+            <div key={index} className="statusItem">
               <strong>{item.label} :</strong>
-              <span className={styles.statusValue}>{displayValue}</span>
+              <span className={`statusValue ${getStatusClass(displayValue)}`}>
+                {displayValue}
+              </span>
             </div>
           );
         })}
@@ -65,7 +80,7 @@ export default function RegistrationStatusSection({
 
 /* =========================================================
    HELPERS — S1 & S2 item builders
-   Gunakan ini di Step2S1 / Step2S2 untuk membuat array items
+   Gunakan ini di StepDoneS1 / StepDoneS2 untuk membuat array items
    dari data status yang sudah di-fetch dari API.
 ========================================================= */
 
@@ -84,7 +99,7 @@ export type S2StatusData = {
   paymentNotes: string;   // catatan keuangan, bisa kosong
 };
 
-/** Bangun items untuk Step2S1 dari data API */
+/** Bangun items untuk StepDoneS1 dari data API */
 export function buildS1StatusItems(data: S1StatusData): StatusDisplayItem[] {
   return [
     {
@@ -115,7 +130,7 @@ export function buildS1StatusItems(data: S1StatusData): StatusDisplayItem[] {
   ];
 }
 
-/** Bangun items untuk Step2S2 dari data API */
+/** Bangun items untuk StepDoneS2 dari data API */
 export function buildS2StatusItems(data: S2StatusData): StatusDisplayItem[] {
   return [
     {

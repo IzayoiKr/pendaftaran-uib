@@ -1,9 +1,5 @@
 "use client";
 
-/* ================= STYLES ================= */
-import styles from "@/pages/BatchRegistration/styles/Step1.module.scss";
-import form from "@/pages/BatchRegistration/styles/Form.module.scss";
-
 /* ================= COMPONENTS ================= */
 import ProgressBar from "@/pages/BatchRegistration/components/ProgressBar";
 import InputField from "@/pages/BatchRegistration/components/InputField";
@@ -46,6 +42,7 @@ export default function Step1S1({
   goToStep,
   currentStep,
   flow,
+  isSubmitting,
 }: StepPropsS1) {
   const methods = useForm<FormType>({
     resolver: zodResolver(s1Step1Schema),
@@ -82,15 +79,14 @@ export default function Step1S1({
   const isAlihjenjangOrTransfer =
     jenisDaftar === "alihjenjang" || jenisDaftar === "transfer";
 
-    useEffect(() => {
-      if (!isAlihjenjangOrTransfer) {
-
-        methods.setValue("ipk", undefined as any);
-        methods.setValue("universitas_asal", "");
-        methods.setValue("prodi_asal", "");
-        methods.setValue("jenjang_pendidikan", undefined as any);
-      }
-    }, [isAlihjenjangOrTransfer, methods]);
+  useEffect(() => {
+    if (!isAlihjenjangOrTransfer) {
+      methods.setValue("ipk", undefined as any);
+      methods.setValue("universitas_asal", "");
+      methods.setValue("prodi_asal", "");
+      methods.setValue("jenjang_pendidikan", undefined as any);
+    }
+  }, [isAlihjenjangOrTransfer, methods]);
 
   const maxDate = useMaxBirthDate();
   const school = useSchoolSearch();
@@ -99,15 +95,15 @@ export default function Step1S1({
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit, onError)}>
-        <div className={styles.container}>
-          <div className={styles.formWrapper}>
+        <div className="formContainer">
+          <div className="formWrapper">
 
             {/* ================= HEADER ================= */}
-            <div className={styles.header}>
-              <h1 className={styles.mainTitle}>
+            <div className="formHeader">
+              <h1 className="titleMain">
                 FORM PENDAFTARAN CALON MAHASISWA PROGRAM STRATA SATU
               </h1>
-              <p className={styles.subTitle}>
+              <p className="titleSub">
                 (Undergraduate Student Registration Form)
               </p>
 
@@ -115,29 +111,30 @@ export default function Step1S1({
                 currentStep={currentStep}
                 goToStep={goToStep}
                 steps={flow}
+                isSubmitting={isSubmitting}
               />
             </div>
 
             {/* ================= TITLE ================= */}
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.pageTitle}>
+            <div className="sectionHeader">
+              <h2 className="titleMain">
                 BIODATA PRIBADI (Personal Data)
               </h2>
 
-              <p className={styles.requiredNote}>
+              <p className="requiredNote">
                 * Wajib di Isi (Required)
               </p>
             </div>
 
             {/* NIK — kept inline: digit sanitize + setValue */}
-            <div className={form.formGroup}>
-              <label className={form.label}>
+            <div className="formGroup">
+              <label className="label">
                 NIK (National Identification Number) * (16 digit)
               </label>
 
               <input
                 {...register("nik")}
-                className={`${form.input} ${errors.nik ? form.inputError : ""}`}
+                className={`input ${errors.nik ? "inputError" : ""}`}
                 inputMode="numeric"
                 maxLength={16}
                 placeholder="Contoh: 1234567890123456"
@@ -151,7 +148,7 @@ export default function Step1S1({
               />
 
               {errors.nik && (
-                <p className={form.errorText}>{errors.nik.message}</p>
+                <p className="errorText">{errors.nik.message}</p>
               )}
             </div>
 
@@ -199,8 +196,8 @@ export default function Step1S1({
             />
 
             {/* TEMPAT & TANGGAL LAHIR */}
-            <div className={form.row}>
-              <div className={form.col}>
+            <div className="formRow">
+              <div className="formCol">
                 <InputField<FormType>
                   label="Tempat Lahir (Place of Birth)"
                   name="tempatlahir"
@@ -211,21 +208,21 @@ export default function Step1S1({
                 />
               </div>
 
-              <div className={form.col}>
-                <div className={form.formGroup}>
-                  <label className={form.label}>
+              <div className="formCol">
+                <div className="formGroup">
+                  <label className="label">
                     Tanggal Lahir (Date of Birth) *
                   </label>
 
                   <input
                     {...register("tanggallahir")}
-                    className={`${form.input} ${errors.tanggallahir ? form.inputError : ""}`}
+                    className={`input ${errors.tanggallahir ? "inputError" : ""}`}
                     type="date"
                     max={maxDate}
                   />
 
                   {errors.tanggallahir && (
-                    <p className={form.errorText}>
+                    <p className="errorText">
                       {errors.tanggallahir.message}
                     </p>
                   )}
@@ -234,14 +231,14 @@ export default function Step1S1({
             </div>
 
             {/* NO HP — kept inline: digit sanitize */}
-            <div className={form.formGroup}>
-              <label className={form.label}>
+            <div className="formGroup">
+              <label className="label">
                 No. Hp (First Phone Number) *
               </label>
 
               <input
                 {...register("nohp")}
-                className={`${form.input} ${errors.nohp ? form.inputError : ""}`}
+                className={`input ${errors.nohp ? "inputError" : ""}`}
                 type="text"
                 inputMode="numeric"
                 placeholder="Contoh: 08123456789"
@@ -255,19 +252,19 @@ export default function Step1S1({
               />
 
               {errors.nohp && (
-                <p className={form.errorText}>{errors.nohp.message}</p>
+                <p className="errorText">{errors.nohp.message}</p>
               )}
             </div>
 
             {/* NO WA — kept inline: digit sanitize */}
-            <div className={form.formGroup}>
-              <label className={form.label}>
+            <div className="formGroup">
+              <label className="label">
                 No. WA (WhatsApp Number) *
               </label>
 
               <input
                 {...register("nohp2")}
-                className={`${form.input} ${errors.nohp2 ? form.inputError : ""}`}
+                className={`input ${errors.nohp2 ? "inputError" : ""}`}
                 type="text"
                 inputMode="numeric"
                 placeholder="Contoh: 08123456789"
@@ -281,7 +278,7 @@ export default function Step1S1({
               />
 
               {errors.nohp2 && (
-                <p className={form.errorText}>{errors.nohp2.message}</p>
+                <p className="errorText">{errors.nohp2.message}</p>
               )}
             </div>
 
@@ -295,13 +292,13 @@ export default function Step1S1({
               placeholder="Pilih Jenis Pendaftaran (Select Registration Type) *"
               required
             />
-            <p style={{ color: "red", fontSize: 12 }}>
-  DEBUG jenis: "{String(jenisDaftar)}"
-</p>
+            {/* <p style={{ color: "red", fontSize: 12 }}>
+              DEBUG jenis: "{String(jenisDaftar)}"
+            </p> */}
 
             {/* DATA PENDIDIKAN SEBELUMNYA — hanya muncul jika Alih Jenjang atau Transfer */}
             {isAlihjenjangOrTransfer && (
-              <div className={form.extraBox}>
+              <div className="extraBox">
                 <h3>Data Pendidikan Sebelumnya (Previous Education Data)</h3>
 
                 {/* UNIVERSITAS ASAL */}
@@ -316,7 +313,17 @@ export default function Step1S1({
                   setValue={setValue}
                   error={errors.universitas_asal?.message}
                   placeholder="Ketik nama universitas (min. 2 huruf)..."
-                  styles={form}
+                  styles={{
+                    formGroup: "formGroup",
+                    label: "label",
+                    input: "input",
+                    inputError: "inputError",
+                    errorText: "errorText",
+                    dropdown: "dropdown",
+                    option: "option",
+                    optionDisabled: "optionDisabled",
+                    notFound: "notFound",
+                  }}
                 />
 
                 {/* ASAL PROGRAM STUDI */}
@@ -330,14 +337,14 @@ export default function Step1S1({
                 />
 
                 {/* IPK — kept inline: valueAsNumber */}
-                <div className={form.formGroup}>
-                  <label className={form.label}>
+                <div className="formGroup">
+                  <label className="label">
                     IPK (GPA) * (0.00 - 4.00)
                   </label>
 
                   <input
                     {...register("ipk", { valueAsNumber: true })}
-                    className={`${form.input} ${errors.ipk ? form.inputError : ""}`}
+                    className={`input ${errors.ipk ? "inputError" : ""}`}
                     type="number"
                     step="0.01"
                     min={0}
@@ -346,7 +353,7 @@ export default function Step1S1({
                   />
 
                   {errors.ipk && (
-                    <p className={form.errorText}>{errors.ipk.message}</p>
+                    <p className="errorText">{errors.ipk.message}</p>
                   )}
                 </div>
 
@@ -364,7 +371,7 @@ export default function Step1S1({
             )}
 
             {/* ===== INFORMASI PERKULIAHAN ===== */}
-            <h3 className={styles.sectionTitle}>
+            <h3 className="titleSection">
               Informasi Perkuliahan (Study Program)
             </h3>
 
@@ -411,7 +418,7 @@ export default function Step1S1({
             />
 
             {/* ===== INFORMASI SEKOLAH ===== */}
-            <h3 className={styles.sectionTitle}>
+            <h3 className="titleSection">
               Informasi Sekolah (High School Information)
             </h3>
 
@@ -427,13 +434,23 @@ export default function Step1S1({
               setValue={setValue}
               error={errors.asal_sekolah?.message}
               placeholder="Ketik nama sekolah..."
-              styles={form}
+              styles={{
+                formGroup: "formGroup",
+                label: "label",
+                input: "input",
+                inputError: "inputError",
+                errorText: "errorText",
+                dropdown: "dropdown",
+                option: "option",
+                optionDisabled: "optionDisabled",
+                notFound: "notFound",
+              }}
             />
 
             {/* CHECKBOX — hanya muncul saat "baru" */}
             {jenisDaftar === "baru" && (
-              <div className={form.extraBox}>
-                <label className={form.checkbox}>
+              <div className="extraBox">
+                <label className="checkbox">
                   <input
                     type="checkbox"
                     {...register("konfirmasi")}
@@ -443,7 +460,7 @@ export default function Step1S1({
                 </label>
 
                 {errors.konfirmasi && (
-                  <p className={form.errorText}>
+                  <p className="errorText">
                     {errors.konfirmasi.message}
                   </p>
                 )}
@@ -451,20 +468,27 @@ export default function Step1S1({
             )}
 
             {/* BUTTON */}
-            <div className={form.buttonGroup}>
+            <div className="buttonGroup">
               <button
                 type="button"
-                className={`${form.btn} ${form.btnDanger}`}
-                onClick={() => onResult({ action: "prev" })}
+                className="btn btnDanger"
+                onClick={() =>
+                  onResult({ action: "prev" })
+                }
+                disabled={isSubmitting}
               >
                 Batal
               </button>
 
               <button
                 type="submit"
-                className={`${form.btn} ${form.btnPrimary}`}
+                className="btn btnPrimary"
+                disabled={isSubmitting}
+                aria-busy={isSubmitting}
               >
-                Selanjutnya
+                {isSubmitting
+                  ? "Memproses..."
+                  : "Selanjutnya"}
               </button>
             </div>
 

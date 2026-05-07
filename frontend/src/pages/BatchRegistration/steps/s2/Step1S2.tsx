@@ -1,9 +1,5 @@
 "use client";
 
-/* ================= UI STYLES ================= */
-import styles from "@/pages/BatchRegistration/styles/Step1.module.scss";
-import form from "@/pages/BatchRegistration/styles/Form.module.scss";
-
 /* ================= COMPONENTS ================= */
 import ProgressBar from "@/pages/BatchRegistration/components/ProgressBar";
 import InputField from "@/pages/BatchRegistration/components/InputField";
@@ -44,6 +40,7 @@ export default function Step1S2({
   goToStep,
   currentStep,
   flow,
+  isSubmitting,
 }: StepPropsS2) {
   const methods = useForm<FormType>({
     resolver: zodResolver(s2Step1Schema),
@@ -69,15 +66,15 @@ export default function Step1S2({
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit, onError)}>
-        <div className={styles.container}>
-          <div className={styles.formWrapper}>
+        <div className="formContainer">
+          <div className="formWrapper">
 
             {/* ================= HEADER ================= */}
-            <div className={styles.header}>
-              <h1 className={styles.mainTitle}>
+            <div className="formHeader">
+              <h1 className="titleMain">
                 FORM PENDAFTARAN CALON MAHASISWA PROGRAM STRATA DUA
               </h1>
-              <p className={styles.subTitle}>
+              <p className="titleSub">
                 (Postgraduate Student Registration Form)
               </p>
 
@@ -85,29 +82,30 @@ export default function Step1S2({
                 currentStep={currentStep}
                 goToStep={goToStep}
                 steps={flow}
+                isSubmitting={isSubmitting}
               />
             </div>
 
             {/* ================= BIODATA PRIBADI ================= */}
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.pageTitle}>
+            <div className="sectionHeader">
+              <h2 className="titleMain">
                 BIODATA PRIBADI (Personal Data)
               </h2>
 
-              <p className={styles.requiredNote}>
+              <p className="requiredNote">
                 * Wajib di Isi (Required)
               </p>
             </div>
 
             {/* 1. NIK — kept inline: digit sanitize */}
-            <div className={form.formGroup}>
-              <label className={form.label}>
+            <div className="formGroup">
+              <label className="label">
                 NIK (National Identification Number) * (16 digit)
               </label>
 
               <input
                 {...register("nik")}
-                className={`${form.input} ${errors.nik ? form.inputError : ""}`}
+                className={`input ${errors.nik ? "inputError" : ""}`}
                 inputMode="numeric"
                 maxLength={16}
                 placeholder="Contoh: 1234567890123456"
@@ -121,7 +119,7 @@ export default function Step1S2({
               />
 
               {errors.nik && (
-                <p className={form.errorText}>{errors.nik.message}</p>
+                <p className="errorText">{errors.nik.message}</p>
               )}
             </div>
 
@@ -158,8 +156,8 @@ export default function Step1S2({
             />
 
             {/* 5. TEMPAT & TANGGAL LAHIR */}
-            <div className={form.row}>
-              <div className={form.col}>
+            <div className="formRow">
+              <div className="formCol">
                 <InputField<FormType>
                   label="Tempat Lahir (Place of Birth)"
                   name="tempatlahir"
@@ -170,19 +168,19 @@ export default function Step1S2({
                 />
               </div>
 
-              <div className={form.col}>
-                <div className={form.formGroup}>
-                  <label className={form.label}>
+              <div className="formCol">
+                <div className="formGroup">
+                  <label className="label">
                     Tanggal Lahir (Date of Birth)
                   </label>
                   <input
                     {...register("tanggallahir")}
                     type="date"
-                    className={`${form.input} ${errors.tanggallahir ? form.inputError : ""}`}
+                    className={`input ${errors.tanggallahir ? "inputError" : ""}`}
                     max={maxDate}
                   />
                   {errors.tanggallahir && (
-                    <p className={form.errorText}>
+                    <p className="errorText">
                       {errors.tanggallahir.message}
                     </p>
                   )}
@@ -211,14 +209,14 @@ export default function Step1S2({
             />
 
             {/* 8. NO HP — kept inline: digit sanitize */}
-            <div className={form.formGroup}>
-              <label className={form.label}>
+            <div className="formGroup">
+              <label className="label">
                 No. Telepon (Phone Number)
               </label>
 
               <input
                 {...register("nohp")}
-                className={`${form.input} ${errors.nohp ? form.inputError : ""}`}
+                className={`input ${errors.nohp ? "inputError" : ""}`}
                 type="text"
                 inputMode="numeric"
                 placeholder="Contoh: 08123456789"
@@ -232,7 +230,7 @@ export default function Step1S2({
               />
 
               {errors.nohp && (
-                <p className={form.errorText}>{errors.nohp.message}</p>
+                <p className="errorText">{errors.nohp.message}</p>
               )}
             </div>
 
@@ -277,7 +275,7 @@ export default function Step1S2({
             />
 
             {/* ================= TEMPAT TINGGAL ================= */}
-            <h3 className={styles.sectionTitle}>
+            <h3 className="titleSection">
               Tempat Tinggal (Residence)
             </h3>
 
@@ -292,8 +290,8 @@ export default function Step1S2({
             />
 
             {/* 14. NAMA DUSUN & KODE POS */}
-            <div className={form.row}>
-              <div className={form.col}>
+            <div className="formRow">
+              <div className="formCol">
                 <InputField<FormType>
                   label="Nama Dusun (Hamlet Name)"
                   name="namadusun"
@@ -303,7 +301,7 @@ export default function Step1S2({
                 />
               </div>
 
-              <div className={form.col}>
+              <div className="formCol">
                 <InputField<FormType>
                   label="Kode Pos (Postal Code)"
                   name="kodepost"
@@ -317,8 +315,8 @@ export default function Step1S2({
             </div>
 
             {/* 15. NO RT & NO RW */}
-            <div className={form.row}>
-              <div className={form.col}>
+            <div className="formRow">
+              <div className="formCol">
                 <InputField<FormType>
                   label="No RT"
                   name="nort"
@@ -328,7 +326,7 @@ export default function Step1S2({
                 />
               </div>
 
-              <div className={form.col}>
+              <div className="formCol">
                 <InputField<FormType>
                   label="No RW"
                   name="norw"
@@ -340,8 +338,8 @@ export default function Step1S2({
             </div>
 
             {/* 16. KELURAHAN & KECAMATAN */}
-            <div className={form.row}>
-              <div className={form.col}>
+            <div className="formRow">
+              <div className="formCol">
                 <InputField<FormType>
                   label="Kelurahan (Sub District)"
                   name="kelurahan"
@@ -352,7 +350,7 @@ export default function Step1S2({
                 />
               </div>
 
-              <div className={form.col}>
+              <div className="formCol">
                 <InputField<FormType>
                   label="Kecamatan (District)"
                   name="kecamatan"
@@ -365,7 +363,7 @@ export default function Step1S2({
             </div>
 
             {/* ================= INFORMASI ASAL UNIVERSITAS ================= */}
-            <h3 className={styles.sectionTitle}>
+            <h3 className="titleSection">
               Informasi Asal Universitas (Previous University Information)
             </h3>
 
@@ -381,7 +379,17 @@ export default function Step1S2({
               setValue={setValue}
               error={errors.universitas?.message}
               placeholder="Ketik nama universitas (min. 2 huruf)..."
-              styles={form}
+              styles={{
+                formGroup: "formGroup",
+                label: "label",
+                input: "input",
+                inputError: "inputError",
+                errorText: "errorText",
+                dropdown: "dropdown",
+                option: "option",
+                optionDisabled: "optionDisabled",
+                notFound: "notFound",
+              }}
             />
 
             {/* 18. JURUSAN */}
@@ -395,8 +403,8 @@ export default function Step1S2({
             />
 
             {/* 19. IPK — kept inline: valueAsNumber */}
-            <div className={form.formGroup}>
-              <label className={form.label}>
+            <div className="formGroup">
+              <label className="label">
                 IPK (GPA) * (0.00 - 4.00)
               </label>
               <input
@@ -405,11 +413,11 @@ export default function Step1S2({
                 step="0.01"
                 min={0}
                 max={4}
-                className={`${form.input} ${errors.ipk ? form.inputError : ""}`}
+                className={`input ${errors.ipk ? "inputError" : ""}`}
                 placeholder="Contoh: 3.45"
               />
               {errors.ipk && (
-                <p className={form.errorText}>{errors.ipk.message}</p>
+                <p className="errorText">{errors.ipk.message}</p>
               )}
             </div>
 
@@ -424,7 +432,7 @@ export default function Step1S2({
             />
 
             {/* ================= INFORMASI PEKERJAAN ================= */}
-            <h3 className={styles.sectionTitle}>
+            <h3 className="titleSection">
               Informasi Pekerjaan (Employment Information)
             </h3>
 
@@ -476,7 +484,7 @@ export default function Step1S2({
             />
 
             {/* ================= INFORMASI PERKULIAHAN ================= */}
-            <h3 className={styles.sectionTitle}>
+            <h3 className="titleSection">
               Informasi Perkuliahan (Post-graduate Program)
             </h3>
 
@@ -492,20 +500,27 @@ export default function Step1S2({
             />
 
             {/* ================= BUTTON ================= */}
-            <div className={form.buttonGroup}>
+            <div className="buttonGroup">
               <button
                 type="button"
-                className={`${form.btn} ${form.btnDanger}`}
-                onClick={() => onResult({ action: "prev" })}
+                className="btn btnDanger"
+                onClick={() =>
+                  onResult({ action: "prev" })
+                }
+                disabled={isSubmitting}
               >
                 Batal (Cancel)
               </button>
 
               <button
                 type="submit"
-                className={`${form.btn} ${form.btnPrimary}`}
+                className="btn btnPrimary"
+                disabled={isSubmitting}
+                aria-busy={isSubmitting}
               >
-                Selanjutnya (Next)
+                {isSubmitting
+                  ? "Memproses..."
+                  : "Selanjutnya (Next)"}
               </button>
             </div>
 
