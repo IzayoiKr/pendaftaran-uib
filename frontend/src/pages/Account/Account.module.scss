@@ -176,11 +176,43 @@ $header-height: var(--space-2xl);
 
 // ─── Large bottom buttons (reuse form submit-button mixin) ────────────────────
 
+$color-black:       #1a1a1a;
+$color-black-hover: #000000;
+$color-grey:        #6b7280;
+$color-grey-hover:  #4b5563;
+
 .btnLg {
   @include form.submit-button;
 
-  &.btnWarning { background: $color-warning; border-color: $color-warning; &:hover { background: $color-warning-hover; border-color: $color-warning-hover; color: global.$white; } }
-  &.btnDanger  { background: $color-danger;  border-color: $color-danger;  &:hover { background: $color-danger-hover;  border-color: $color-danger-hover;  color: global.$white; } }
+  
+  &.btnLgWarning {
+    background: $color-black;
+    border-color: $color-black;
+    color: global.$white;
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    &:hover  { background: global.$white; border-color: $color-black; color: $color-black;  }
+    &:active { background: global.$white; border-color: $color-black; color: $color-black;  }
+  }
+
+  
+  &.btnLgGrey {
+    background: $color-grey;
+    border-color: $color-grey;
+    color: global.$white;
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    &:hover  { background: global.$white; border-color: $color-grey; color: $color-grey;   }
+    &:active { background: global.$white; border-color: $color-grey; color: $color-grey;   }
+  }
+
+  
+  &.btnLgDanger {
+    background: $color-danger;
+    border-color: $color-danger;
+    color: global.$white;
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    &:hover  { background: global.$white; border-color: $color-danger; color: $color-danger; }
+    &:active { background: global.$white; border-color: $color-danger; color: $color-danger; }
+  }
 }
 
 // ─── Responsive ───────────────────────────────────────────────────────────────
