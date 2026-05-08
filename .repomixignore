@@ -1,0 +1,12 @@
+**/*.jpg
+**/*.jpeg
+**/*.png
+**/*.svg
+**/*.pdf
+**/*.ico
+**/*.webp
+**/*.gif
+**/*.xml
+
+**/.git/**
+README.md

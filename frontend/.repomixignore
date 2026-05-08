@@ -1,0 +1,25 @@
+# Repomix Ignore Patterns for Frontend Optimization
+
+# 1. Icon Components (Mostly SVG paths, minimal logic)
+src/components/Icons/Icons.tsx
+src/components/Icons/AnimatedIcons.tsx
+
+# 2. Public/Private Asset Directories
+public/images/**
+public/favicon/**
+private/**
+
+# 3. Build Artifacts and Cache
+**/node_modules/**
+**/.next/**
+tsconfig.tsbuildinfo
+.turbo/**
+
+# 4. Lock Files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 5. Miscellaneous
+**/.DS_Store
+README.md
