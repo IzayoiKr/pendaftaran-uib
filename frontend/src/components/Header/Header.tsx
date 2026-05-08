@@ -2,12 +2,12 @@
 
 import { useEffect, useState, useRef, memo } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import styles from './Header.module.scss';
-import { headerNavLinks, spyIds } from '@/constants/navigation';
+import { headerNavLinks, spyIds } from './data';
 import useScrollSpy from '@/hooks/useScrollSpy';
-import scrollToId from '@/components/ScrollToId';
+import scrollToId from '@/utils/ScrollToId';
 import useAuthStore from '@/store/useAuthStore';
 
 interface HamburgerButtonProps {
@@ -19,7 +19,7 @@ interface NavMenuProps {
     isOpen?: boolean;
     activeId: string;
     pathname: string;
-    onLinkClick: () => void;
+    onLinkClick: (e: React.MouseEvent, to: string, hashId?: string) => void;
     isAuthenticated: boolean;
 }
 
@@ -64,20 +64,12 @@ function NavMenu({ isOpen, activeId, pathname, onLinkClick, isAuthenticated }: N
 
                         const isActive = link.hashId ? activeId === link.hashId : pathname === displayTo;
 
-                        const handleClick = (e: React.MouseEvent) => {
-                            onLinkClick();
-                            if (link.hashId && pathname === '/') {
-                                e.preventDefault();
-                                scrollToId(link.hashId);
-                            }
-                        }
-
                         return (
                             <li className={styles.navItem} key={link.to}>
                                 <Link
                                     className={`${styles.navLink} ${isActive ? styles.active : ''}`}
                                     href={displayTo}
-                                    onClick={handleClick}
+                                    onClick={(e) => onLinkClick(e, displayTo, link.hashId)}
                                 >
                                     {displayLabel}
                                 </Link>
@@ -93,6 +85,7 @@ function NavMenu({ isOpen, activeId, pathname, onLinkClick, isAuthenticated }: N
 export default function Header() {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isScrolled, setIsScrolled] = useState<boolean>(false);
+    const router = useRouter();
     const pathname = usePathname() ?? '';
 
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -120,6 +113,20 @@ export default function Header() {
 
     const activeId = useScrollSpy({ ids: spyIds, offset: headerHeight });
 
+    const handleLinkClick = (e: React.MouseEvent, to: string, hashId?: string) => {
+        e.preventDefault();
+        setIsOpen(false);
+
+        if (pathname === '/' && hashId) {
+            scrollToId(hashId);
+        } else {
+            router.push(to);
+            if (hashId) {
+                setTimeout(() => scrollToId(hashId), 150);
+            }
+        }
+    };
+
     return (
         <header className={`${styles.header} ${isScrolled ? styles.fixed : ''}`} ref={headerRef}>
             <div className={styles.container}>
@@ -129,7 +136,7 @@ export default function Header() {
                     isOpen={isOpen}
                     activeId={activeId}
                     pathname={pathname}
-                    onLinkClick={() => setIsOpen(false)}
+                    onLinkClick={handleLinkClick}
                     isAuthenticated={isAuthenticated}
                 />
             </div>

@@ -1,16 +1,18 @@
 'use client';
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import styles from './Footer.module.scss';
-import { footerNavLinks } from "@/constants/navigation";
-import { contactInfo, externalLinks } from "@/constants/contact";
-import scrollToId from "@/components/ScrollToId";
+import { footerNavLinks, contactInfo, externalLinks } from "./data";
+import scrollToId from "@/utils/ScrollToId";
 import { socialIconMap } from "@/components/Icons/Icons";
 
 function FooterMenu() {
+    const pathname = usePathname();
+
     const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, to: string) => {
         const hashMatch = to.match(/^\/#(.+)/);
-        if (hashMatch && window.location.pathname === '/') {
+        if (hashMatch && pathname === '/') {
             e.preventDefault();
             scrollToId(hashMatch[1]);
         }

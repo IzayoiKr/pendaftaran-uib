@@ -2,12 +2,11 @@ import z from "zod";
 
 export const loginSchema = z.object({
     email: z
-        .string()
-        .min(1, "Email wajib diisi")
-        .email("Format email tidak valid"),
+        .email("Format email tidak valid")
+        .min(1, "Email wajib diisi"),
     password: z
         .string()
-        .min(8, "Password minimal 8 karakter")
+        .min(1, "Password wajib diisi")
 });
 
 export const registerSchema = z.object({
@@ -16,16 +15,15 @@ export const registerSchema = z.object({
         .min(1, "Nama lengkap wajib diisi"),
     nik: z
         .string()
-        .min(16, "NIK harus 16 digit")
+        .length(16, "NIK harus 16 digit")
         .regex(/^\d+$/, "NIK harus berupa angka"),
     email: z
-        .string()
-        .min(1, "Email wajib diisi")
-        .email("Format email tidak valid"),
+        .email("Format email tidak valid")
+        .min(1, "Email wajib diisi"),
     password: z
         .string()
         .min(8, "Password minimal 8 karakter")
-        .max(72, "Password maksimal 72 karakter"),
+        .max(72, "Password terlalu panjang"),
     retypePassword: z
         .string()
         .min(8, "Konfirmasi password wajib diisi")
@@ -40,7 +38,7 @@ export const forgotPasswordSchema = z.object({
         .min(1, "Email wajib diisi"),
     nik: z
         .string()
-        .min(16, "NIK harus 16 digit")
+        .length(16, "NIK harus 16 digit")
         .regex(/^\d+$/, "NIK harus berupa angka"),
 });
 

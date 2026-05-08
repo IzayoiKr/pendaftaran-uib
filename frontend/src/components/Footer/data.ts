@@ -1,4 +1,12 @@
-import type { ContactInfo, ExternalLinks } from "@/types";
+import type { FooterNavLinks, ContactInfo, ExternalLinks } from "@/types/ui"
+
+export const footerNavLinks: FooterNavLinks[] = [
+    { to: "/#home", label: "Beranda" },
+    { to: "/#gelombang", label: "Gelombang" },
+    { to: "/info-umum", label: "Info Umum" },
+    { to: "https://www.uib.ac.id/category/pengumuman/", label: "Pengumuman" },
+    { to: "/login", label: "Daftar/Login" },
+]
 
 export const contactInfo: ContactInfo = {
     university: "Universitas Internasional Batam",

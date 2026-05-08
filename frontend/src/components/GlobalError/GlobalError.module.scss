@@ -1,0 +1,59 @@
+@use '@/styles/config.scss' as global;
+@use 'sass:color';
+
+.container {
+  @include global.container;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &.globalError {
+    width: 100vh;
+    height: 100vh;
+  }
+
+  &.error{
+    margin: calc(var(--space-2xl) * 2) auto var(--space-2xl);
+  }
+
+  h1 {
+    font-size: var(--step-4);
+    color: global.$tertiary-color;
+    margin-bottom: var(--space-xs);
+  }
+
+  p {
+    font-size: var(--step-0);
+    color: global.$tertiary-color;
+    margin-bottom: var(--space-m);
+  }
+
+  button {
+    font-size: var(--step-0);
+    font-weight: 600;
+    padding: var(--space-2xs) var(--space-s);
+    background: global.$tertiary-color;
+    color: global.$white;
+    border-radius: 24px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+
+    margin-bottom: var(--space-l);
+
+    &:hover {
+      background: global.$link-color;
+    }
+  }
+
+  a {
+    font-size: var(--step--1);
+    color: blue;
+    text-decoration: underline;
+
+    &:hover {
+      color: color.adjust(global.$link-color, $lightness: -25%);
+    }
+  }
+}

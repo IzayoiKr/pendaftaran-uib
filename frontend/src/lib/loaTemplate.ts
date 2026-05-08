@@ -1,26 +1,23 @@
-// src/lib/loaTemplate.ts
-// Generator HTML Surat Hasil / LoA UIB — serve sebagai HTML murni
-
-
-import { hitungTotalBiaya, formatRupiah, type JenisBeasiswa, type KelasKuliah, DEFAULT_KELAS } from "@/constants/biaya";
+import { hitungTotalBiaya, formatRupiah, DEFAULT_KELAS } from "@/constants/biaya";
+import type { JenisBeasiswa, KelasKuliah } from "@/constants/biaya";
 
 export interface LoaData {
-    nomorSurat:      string;
-    nomorDaftar:     string;
-    namaLengkap:     string;
-    namaSekolah:     string;
-    gelombang:       string;
-    tahunAkademik:   string;
-    tempatUjian:     string;
-    tanggalUjian:    string;
-    prodi:           string;
-    kelasKuliah:     KelasKuliah;
-    namaBeasiswa:    JenisBeasiswa;
-    namaBank:        string;
-    noRekening:      string;
-    atasNama:        string;
+    nomorSurat: string;
+    nomorDaftar: string;
+    namaLengkap: string;
+    namaSekolah: string;
+    gelombang: string;
+    tahunAkademik: string;
+    tempatUjian: string;
+    tanggalUjian: string;
+    prodi: string;
+    kelasKuliah: KelasKuliah;
+    namaBeasiswa: JenisBeasiswa;
+    namaBank: string;
+    noRekening: string;
+    atasNama: string;
     tanggalDeadline: string;
-    tanggalSurat:    string;
+    tanggalSurat: string;
     cicilanDeadline: string;
 }
 
@@ -31,7 +28,7 @@ export function generateLoaHtml(data: LoaData): string {
     const cicilanMinimal = formatRupiah(Math.min(calc.totalBayar, 3_000_000));
 
     const row = (label: string, nilai: string, bold = false) =>
-        `<tr><td style="padding:5px 10px;${bold?"font-weight:700;":""}">${label}</td><td style="padding:5px 10px;text-align:right;${bold?"font-weight:700;":""}">${nilai}</td></tr>`;
+        `<tr><td style="padding:5px 10px;${bold ? "font-weight:700;" : ""}">${label}</td><td style="padding:5px 10px;text-align:right;${bold ? "font-weight:700;" : ""}">${nilai}</td></tr>`;
 
     const sec = (label: string) =>
         `<tr><td colspan="2" style="padding:5px 10px;font-weight:700;background:#e8e8e8;font-size:10pt;">${label}</td></tr>`;
@@ -115,10 +112,10 @@ Program Studi <strong>${data.prodi}</strong>, <strong>${kelas}</strong>, mohon c
     ${biaya.bppPraktikum > 0 ? row("&nbsp;&nbsp;3) BPP Praktikum", formatRupiah(biaya.bppPraktikum)) : ""}
     ${row("SUBTOTAL (A + B)", formatRupiah(calc.totalSebelumPotongan), true)}
     ${sec(`C. BEASISWA: ${data.namaBeasiswa} — ${potongan.label}`)}
-    ${calc.potonganBppPokok > 0     ? row(`&nbsp;&nbsp;Potongan BPP Pokok (${potongan.potonganBppPokok}%)`,     formatRupiah(calc.potonganBppPokok)) : ""}
-    ${calc.potonganBppSks > 0       ? row(`&nbsp;&nbsp;Potongan BPP SKS (${potongan.potonganBppSks}%)`,         formatRupiah(calc.potonganBppSks)) : ""}
+    ${calc.potonganBppPokok > 0 ? row(`&nbsp;&nbsp;Potongan BPP Pokok (${potongan.potonganBppPokok}%)`, formatRupiah(calc.potonganBppPokok)) : ""}
+    ${calc.potonganBppSks > 0 ? row(`&nbsp;&nbsp;Potongan BPP SKS (${potongan.potonganBppSks}%)`, formatRupiah(calc.potonganBppSks)) : ""}
     ${calc.potonganBppPraktikum > 0 ? row(`&nbsp;&nbsp;Potongan BPP Praktikum (${potongan.potonganBppPraktikum}%)`, formatRupiah(calc.potonganBppPraktikum)) : ""}
-    ${calc.potonganSpp > 0          ? row(`&nbsp;&nbsp;Potongan SPP (${potongan.potonganSpp}%)`,                 formatRupiah(calc.potonganSpp)) : ""}
+    ${calc.potonganSpp > 0 ? row(`&nbsp;&nbsp;Potongan SPP (${potongan.potonganSpp}%)`, formatRupiah(calc.potonganSpp)) : ""}
   </tbody>
   <tfoot>
     <tr class="tr"><td>TOTAL POTONGAN BEASISWA</td><td style="text-align:right">${formatRupiah(calc.totalPotongan)}</td></tr>

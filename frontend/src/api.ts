@@ -1,6 +1,6 @@
 import axios from 'axios';
 import type { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import type { User, AccessTokenResponse } from '@/types';
+import type { User, AccessTokenResponse } from '@/types/api';
 import useAuthStore from '@/store/useAuthStore';
 
 export class ApiError extends Error {
@@ -29,15 +29,12 @@ function getDeviceId(): string {
     if (typeof window === 'undefined') return '';
     let id = localStorage.getItem('device_id');
     if (!id) {
-        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-            id = crypto.randomUUID();
-        } else {
-            id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                const r = Math.random() * 16 | 0;
-                const v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
+        id = typeof crypto?.randomUUID === 'function'
+            ? crypto.randomUUID()
+            : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+                const r = (Math.random() * 16) | 0;
+                return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
             });
-        }
         localStorage.setItem('device_id', id);
     }
     return id;
@@ -177,13 +174,11 @@ export const api = {
             }),
 
         resendVerification: (email: string) =>
-            apiClient.post<never, { message: string }>('/api/auth/resend-verification', {
-                email: email,
-            }),
+            apiClient.post<never, { message: string }>('/api/auth/resend-verification', { email }),
     },
 
     profile: {
-        profile: () =>
+        get: () =>
             apiClient.get<never, User>('/api/profile'),
 
         changePassword: (oldPassword: string, newPassword: string) =>
@@ -192,7 +187,7 @@ export const api = {
                 new_password: newPassword,
             }),
 
-        updateProfile: (data: { fullName: string }) =>
+        update: (data: { fullName: string }) =>
             apiClient.post<never, { message: string }>("/api/profile", {
                 full_name: data.fullName,
             }),

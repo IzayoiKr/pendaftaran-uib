@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { User, AuthState, AccessTokenResponse } from "@/types";
+import type { User, AuthState, AccessTokenResponse } from "@/types/api";
 
 interface AuthActions {
     login: (user: User, accessToken: string) => void;
