@@ -103,10 +103,6 @@ func ForgotPassword(db *sql.DB, mailer *email.Mailer, emailLimiter *auth.RateLim
 			return
 		}
 
-		_, _ = db.ExecContext(r.Context(),
-			"DELETE FROM reset_password WHERE expired_at < NOW()",
-		)
-
 		rawToken, tokenHash, err := generateVerificationToken()
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))

@@ -49,10 +49,6 @@ func ResendVerification(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http
 			return
 		}
 
-		_, _ = db.ExecContext(r.Context(),
-			"DELETE FROM email_verification WHERE expired_at < NOW()",
-		)
-
 		rawToken, tokenHash, err := generateVerificationToken()
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))

@@ -53,6 +53,9 @@ func main() {
 	slog.Info("Connected to MySQL")
 	slog.Info("Connected to MongoDB")
 
+	db.NewCleaner(provider.MySQL).Start()
+	slog.Info("Starting hourly cleanup of expired tokens...")
+
 	tokenStore, err := auth.NewTokenStore(provider.Mongo)
 	if err != nil {
 		slog.Error("token store init failed", "error", err)
