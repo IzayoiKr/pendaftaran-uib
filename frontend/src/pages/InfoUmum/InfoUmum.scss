@@ -13,7 +13,7 @@ $shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 .info-umum-section {
   width: 100%;
   min-height: 100vh;
-  background-color: $light-gray;
+  margin: var(--space-2xl) 0;
 }
 
 .blog_area {

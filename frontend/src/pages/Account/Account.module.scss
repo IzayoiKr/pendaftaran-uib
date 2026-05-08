@@ -158,7 +158,6 @@ $header-height: var(--space-2xl);
   border-radius: 0.25em;
   padding: 0.4em var(--space-s);
   font-size: var(--step--2);
-  font-family: global.$font-family;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
@@ -184,7 +183,7 @@ $color-grey-hover:  #4b5563;
 .btnLg {
   @include form.submit-button;
 
-  
+
   &.btnLgWarning {
     background: $color-black;
     border-color: $color-black;
@@ -194,7 +193,7 @@ $color-grey-hover:  #4b5563;
     &:active { background: global.$white; border-color: $color-black; color: $color-black;  }
   }
 
-  
+
   &.btnLgGrey {
     background: $color-grey;
     border-color: $color-grey;
@@ -204,7 +203,7 @@ $color-grey-hover:  #4b5563;
     &:active { background: global.$white; border-color: $color-grey; color: $color-grey;   }
   }
 
-  
+
   &.btnLgDanger {
     background: $color-danger;
     border-color: $color-danger;

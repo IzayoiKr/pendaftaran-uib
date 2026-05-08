@@ -1,20 +1,52 @@
 import Script from "next/script";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import '@fontsource-variable/rubik';
 import '@fontsource/poppins';
 import '@/styles/global.scss';
-import '@/styles/_form.scss';
 import '@/styles/sonner.scss';
-import '@/styles/ProgressBar.scss';
+import 'react-loading-skeleton/dist/skeleton.css';
 import SessionProvider from "@/providers/SessionProvider";
-import ScrollToHash from "@/components/ScrollToHash";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import Header from "@/components/Header/Header";
+import BreadcrumbsJsonLd from "@/components/Breadcrumbs";
+import Footer from "@/components/Footer/Footer";
 
 export const metadata: Metadata = {
-    title: 'Admisi | Universitas Internasional Batam',
+    title: {
+        template: "%s | Universitas Internasional Batam",
+        default: "Admisi | Universitas Internasional Batam",
+    },
     description: 'Pendaftaran Mahasiswa Baru Universitas Internasional Batam — informasi jadwal, program studi, beasiswa, dan panduan pendaftaran.',
-    icons: "/favicon/uib.svg",
+    icons: {
+        icon: "/favicon/uib-76.svg",
+        apple: "/favicon/uib-180.png",
+    },
+    manifest: '/manifest.json',
+    metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL as string),
+    alternates: {
+        canonical: './',
+    },
+    openGraph: {
+        title: {
+            template: '%s | Universitas Internasional Batam',
+            default: 'Admisi | Universitas Internasional Batam',
+        },
+        description: 'Pendaftaran Mahasiswa Baru Universitas Internasional Batam — informasi jadwal, program studi, beasiswa, dan panduan pendaftaran.',
+        siteName: 'Pendaftaran Universitas Internasional Batam',
+        locale: 'id_ID',
+        type: 'website',
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: {
+            template: '%s | Universitas Internasional Batam',
+            default: 'Admisi | Universitas Internasional Batam',
+        },
+        description: 'Pendaftaran Mahasiswa Baru Universitas Internasional Batam — informasi jadwal, program studi, beasiswa, dan panduan pendaftaran.',
+    }
+};
+
+export const viewport: Viewport = {
+    themeColor: "#002347",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -25,12 +57,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     <Script
                         src="//unpkg.com/react-scan/dist/auto.global.js"
                         crossOrigin="anonymous"
-                        strategy="beforeInteractive"
+                        strategy="afterInteractive"
                     />
                 )}
                 <SessionProvider>
                     <Header />
-                    <ScrollToHash />
+                    <BreadcrumbsJsonLd />
                     {children}
                     <Footer />
                 </SessionProvider>

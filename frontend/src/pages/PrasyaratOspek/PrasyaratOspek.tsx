@@ -3,26 +3,26 @@
 import { useRef, useState, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { api } from "@/api";
+// import { api } from "@/api";
 import { downloadStaticPdf } from "@/utils/downloadPdf";
 import styles from "./PrasyaratOspek.module.scss";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface UploadField {
-    name:         string;
-    label:        string;
+    name: string;
+    label: string;
     uploadedUrl?: string;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function FileUploadRow({ field, file, onChange, onDownloadContoh, isDownloading }: {
-    field:             UploadField;
-    file:              File | null;
-    onChange:          (name: string, file: File | null) => void;
+    field: UploadField;
+    file: File | null;
+    onChange: (name: string, file: File | null) => void;
     onDownloadContoh?: () => void;
-    isDownloading?:    boolean;
+    isDownloading?: boolean;
 }) {
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -74,7 +74,7 @@ function FileUploadRow({ field, file, onChange, onDownloadContoh, isDownloading 
 
 const UPLOAD_FIELDS: UploadField[] = [
     { name: "pasFoto", label: "Pas Photo Final (Untuk KTM)" },
-    { name: "ijazah",  label: "Ijazah" },
+    { name: "ijazah", label: "Ijazah" },
 ];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -82,14 +82,14 @@ const UPLOAD_FIELDS: UploadField[] = [
 export default function PrasyaratOspek() {
     const router = useRouter();
 
-    const [isLoading, setIsLoading]                 = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [isDownloadingContoh, setIsDownloadingContoh] = useState(false);
     const [files, setFiles] = useState<Record<string, File | null>>(
         Object.fromEntries(UPLOAD_FIELDS.map(f => [f.name, null]))
     );
 
     // TODO: fetch dari backend berdasarkan nomorDaftar di URL
-    const status             = "Menunggu Status";
+    const status = "Menunggu Status";
     const catatanPemeriksaan = "";
 
     const handleFileChange = (name: string, file: File | null) =>
@@ -114,7 +114,7 @@ export default function PrasyaratOspek() {
             UPLOAD_FIELDS.forEach(f => {
                 if (files[f.name]) formData.append(f.name, files[f.name] as File);
             });
-            await api.ospek.uploadPrasyarat(formData);
+            // await api.ospek.uploadPrasyarat(formData);
             toast.success("Upload berhasil!");
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");

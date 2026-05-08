@@ -1,0 +1,46 @@
+@use '@/styles/skeleton.scss';
+
+.titleSkeleton {
+  @extend .skeleton;
+  width: 180px;
+  height: var(--step-3);
+}
+
+.labelSkeleton {
+  @extend .skeleton;
+  width: 100%;
+  height: var(--step--1);
+}
+
+.valueSkeleton {
+  @extend .skeleton;
+  width: 14rem;
+  height: var(--step--1);
+}
+
+.sectionSkeleton {
+  @extend .skeleton;
+  width: 140px;
+  height: var(--step-1);
+}
+
+.emptyTextSkeleton {
+  @extend .skeleton;
+  width: 60%;
+  height: var(--step--1);
+  margin: 0 auto var(--space-m);
+}
+
+.emptyButtonSkeleton {
+  @extend .skeleton;
+  width: 220px;
+  height: 40px;
+  border-radius: 0.25em;
+}
+
+.actionSkeleton {
+  @extend .skeleton;
+  width: 140px;
+  height: 48px;
+  border-radius: 999px;
+}

@@ -1,4 +1,4 @@
-import { guides } from '@/constants/data';
+import { guides } from './data';
 import styles from './Guides.module.scss'
 
 interface GuideVideoProps {

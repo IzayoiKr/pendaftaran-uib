@@ -1,8 +1,7 @@
 @use '@/styles/config.scss' as global;
 @use '@/styles/formConfig.scss' as form;
-@use 'sass:map';
 
-.page {
+.updateProfile {
   @include global.main-layout;
   align-items: center;
 }
@@ -41,14 +40,3 @@
     @include form.submit-button;
   }
 }
-
-.spinner {
-  width: 0.875em; height: 0.875em;
-  border: 0.125em solid rgba(global.$white, 0.4);
-  border-top-color: global.$white;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  flex-shrink: 0;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }

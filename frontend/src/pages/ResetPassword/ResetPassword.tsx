@@ -4,9 +4,11 @@ import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import type { Form } from "@/types/ui";
+import { resetPassword } from "./data";
 import { api, ApiError } from "@/api";
 import { resetPasswordSchema } from "@/validation/schema";
-import ExpiredLink from "@/components/ExpiredLink";
+import ExpiredLink from "@/components/ExpiredLink/ExpiredLink";
 import { RightArrowIcon } from "@/components/Icons/Icons";
 import styles from "./ResetPassword.module.scss";
 
@@ -15,27 +17,17 @@ interface ResetForm {
     confirmPassword: string;
 }
 
-const FIELDS: { name: keyof ResetForm; placeholder: string }[] = [
-    { name: "newPassword", placeholder: "Password Baru (New Password) *" },
-    { name: "confirmPassword", placeholder: "Konfirmasi Password Baru (Confirm New Password) *" },
-];
-
-function PasswordInput({ name, placeholder, value, onChange }: {
-    name: keyof ResetForm;
-    placeholder: string;
-    value: string;
-    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
-}) {
+function PasswordInput({ type, name, placeholder, autoComplete, minLength, value, onChange }: Form) {
     return (
         <input
-            type="password"
+            type={type}
             id={name}
             name={name}
             placeholder={placeholder}
+            autoComplete={autoComplete}
+            minLength={minLength}
             value={value}
-            autoComplete="new-password"
             onChange={onChange}
-            minLength={8}
             required
         />
     );
@@ -104,12 +96,11 @@ function ResetPasswordForm() {
         <>
             <h1>Reset Password</h1>
             <form onSubmit={handleSubmit} noValidate>
-                {FIELDS.map(f => (
+                {resetPassword.map((props) => (
                     <PasswordInput
-                        key={f.name}
-                        name={f.name}
-                        placeholder={f.placeholder}
-                        value={form[f.name]}
+                        key={props.name}
+                        {...props}
+                        value={form[props.name as keyof typeof form]}
                         onChange={handleChange}
                     />
                 ))}

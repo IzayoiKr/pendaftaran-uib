@@ -1,13 +1,14 @@
+'use client';
+
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import type { StaticImageData } from "next/image";
 import "./BlogItem.scss";
 
 interface BlogItemProps {
     id: number;
     title: string;
     description: string;
-    image: StaticImageData;
+    image: string;
     author: string;
     date: string;
     category: string;
@@ -58,6 +59,8 @@ export default function BlogItem({
                                 src={image}
                                 alt={title}
                                 className="blog_post_image"
+                                width={555}
+                                height={280}
                             />
                         )}
                         <div className="blog_details">

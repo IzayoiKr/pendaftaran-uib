@@ -1,6 +1,6 @@
-import { blogPosts } from "../../constants/data";
-import "./InfoUmumContent.scss";
 import BlogItem from "./BlogItem";
+import { blogPosts } from "./data";
+import "./InfoUmum.scss";
 
 export default function InfoUmum() {
     return (

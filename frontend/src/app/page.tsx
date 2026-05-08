@@ -1,9 +1,16 @@
-import Hero from "@/pages/Home/Hero";
-import ProgramStudi from "@/pages/Home/ProgramStudi";
-import Gelombang from "@/pages/Home/Gelombang";
-import Guides from "@/pages/Home/Guides";
-import Feature from "@/pages/Home/Feature";
-import type { Program, Event } from "@/types";
+import type { Metadata } from 'next';
+import Hero from '@/pages/Home/Hero/Hero';
+import ProgramStudi from '@/pages/Home/ProgramStudi/ProgramStudi';
+import ProgramStudiSkeleton from '@/pages/Home/ProgramStudi/ProgramStudi.skeleton';
+import Gelombang from '@/pages/Home/Gelombang/Gelombang';
+import GelombangSkeleton from '@/pages/Home/Gelombang/Gelombang.skeleton';
+import Guides from '@/pages/Home/Guides/Guides';
+import type { Program, Event } from "@/types/api";
+import { Suspense } from 'react';
+
+export const metadata: Metadata = {
+    title: "Beranda",
+};
 
 export const revalidate = 3600;
 
@@ -27,19 +34,27 @@ async function fetchGelombang(): Promise<Event[]> {
     }
 }
 
-export default async function HomePage() {
-    const [programs, events] = await Promise.all([
-        fetchProgramStudi(),
-        fetchGelombang(),
-    ]);
+async function ProgramStudiSection() {
+    const programs = await fetchProgramStudi();
+    return <ProgramStudi programs={programs} />;
+}
 
+async function GelombangSection() {
+    const event = await fetchGelombang();
+    return <Gelombang events={event} />;
+}
+
+export default async function HomePage() {
     return (
         <main>
             <Hero />
-            <ProgramStudi programs={programs} />
-            <Gelombang events={events} />
+            <Suspense fallback={<ProgramStudiSkeleton />}>
+                <ProgramStudiSection />
+            </Suspense>
+            <Suspense fallback={<GelombangSkeleton />}>
+                <GelombangSection />
+            </Suspense>
             <Guides />
-            <Feature />
         </main>
     );
 }

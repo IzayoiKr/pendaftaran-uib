@@ -3,11 +3,14 @@
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { api } from "@/api";
+import type { Form } from "@/types/ui";
+import { forgotPassword } from "./data";
 import { forgotPasswordSchema } from "@/validation/schema";
 import TurnstileWidget from "@/components/TurnstileWidget";
 import type { TurnstileHandle } from "@/components/TurnstileWidget";
 import { RightArrowIcon } from "@/components/Icons/Icons";
 import styles from "./ForgotPassword.module.scss";
+import Link from "next/link";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -18,14 +21,7 @@ interface ForgotForm {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function ForgotInput({ name, type, placeholder, autoComplete, value, onChange }: {
-    name: keyof ForgotForm;
-    type: "email" | "text";
-    placeholder: string;
-    autoComplete: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}) {
+function ForgotInput({ name, type, placeholder, autoComplete, maxLength, value, onChange }: Form) {
     return (
         <input
             id={name}
@@ -33,6 +29,7 @@ function ForgotInput({ name, type, placeholder, autoComplete, value, onChange }:
             type={type}
             placeholder={placeholder}
             autoComplete={autoComplete}
+            maxLength={maxLength}
             value={value}
             onChange={onChange}
             required
@@ -103,22 +100,17 @@ export default function ForgotPassword() {
                 <h1>Lupa Password</h1>
                 <p className={styles.required}>* Wajib di Isi (Required)</p>
                 <form onSubmit={handleSubmit} noValidate>
-                    <ForgotInput
-                        name="email"
-                        type="email"
-                        placeholder="Email saat daftar (Registration Email) *"
-                        autoComplete="email"
-                        value={form.email}
-                        onChange={handleChange}
-                    />
-                    <ForgotInput
-                        name="nik"
-                        type="text"
-                        placeholder="NIK saat daftar (Registration National Identification Number) *"
-                        autoComplete="off"
-                        value={form.nik}
-                        onChange={handleChange}
-                    />
+                    {forgotPassword.map((props) => (
+                        <ForgotInput
+                            key={props.name}
+                            {...props}
+                            value={form[props.name as keyof typeof form]}
+                            onChange={handleChange}
+                        />
+                    ))}
+                    <Link href="/login" className={styles.loginlink}>
+                        Back to Login
+                    </Link>
                     <TurnstileWidget
                         ref={turnstileRef}
                         onTokenChange={setTurnstileToken}

@@ -1,8 +1,11 @@
-'use client';
- 
-import BuktiTransferPage from "@/pages/TransferProof/BuktiTransferPage";
- 
+import type { Metadata } from "next";
+import TransferProof from "@/pages/TransferProof/TransferProof";
+
+export const metadata: Metadata = {
+    title: "Bukti Transfer",
+    description: "Daftar bukti transfer pembayaran pendaftaran.",
+};
+
 export default function TransferProofPage() {
-    return <BuktiTransferPage />;
+    return <TransferProof />;
 }
- 

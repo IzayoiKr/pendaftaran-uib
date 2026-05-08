@@ -1,0 +1,118 @@
+@use '@/styles/config.scss' as global;
+@use '@/styles/formConfig.scss' as form;
+@use 'sass:map';
+
+$color-danger:        #e74c3c;
+$color-danger-hover:  #c0392b;
+
+.page {
+  @include global.main-layout;
+  align-items: flex-start;
+}
+
+.container {
+  @include global.container;
+  padding-bottom: var(--space-2xl);
+
+  .sectionTitle {
+    font-size: var(--step-2);
+    font-weight: 700;
+    color: global.$secondary-color;
+    margin-bottom: var(--space-s);
+  }
+
+  .biodataInfo {
+    margin-bottom: var(--space-l);
+
+    .infoRow {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-s);
+      margin-bottom: var(--space-2xs);
+      font-size: var(--step--1);
+
+      .infoLabel { font-weight: 600; color: global.$primary-color; min-width: 8rem; flex-shrink: 0; }
+      .infoValue { color: global.$text-color2; }
+    }
+  }
+
+  .formTitle {
+    font-size: var(--step-1);
+    font-weight: 700;
+    color: global.$secondary-color;
+    margin-bottom: var(--space-s);
+    padding-bottom: var(--space-2xs);
+    border-bottom: 1px solid #ddd;
+  }
+
+  .formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-m);
+    margin-bottom: var(--space-l);
+
+    @media (max-width: map.get(global.$breakpoints, sm)) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .formField {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+
+    .fieldLabel {
+      font-size: var(--step--1);
+      font-weight: 600;
+      color: global.$text-color2;
+
+      .requiredStar { color: $color-danger; }
+    }
+
+    select {
+      @include form.input-template;
+      height: 3em;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right var(--space-s) center;
+      padding-right: calc(var(--space-s) + 1.5em);
+
+      &:disabled {
+        background-color: #f0f0f0;
+        color: global.$text-color;
+        cursor: default;
+        opacity: 1;
+      }
+    }
+  }
+
+  .bottomActions {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-s);
+    flex-wrap: wrap;
+  }
+}
+
+.btn        { @include form.submit-button; }
+.btnDanger  { @include form.submit-button; background: $color-danger;  border-color: $color-danger;  &:hover { background: $color-danger-hover;  color: global.$white; border-color: $color-danger-hover; } }
+
+.spinner {
+  width: 0.875em; height: 0.875em;
+  border: 0.125em solid rgba(global.$white, 0.4);
+  border-top-color: global.$white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: map.get(global.$breakpoints, sm)) {
+  .container {
+    .infoRow { flex-direction: column; gap: 0; }
+    .bottomActions { flex-direction: column; align-items: stretch; }
+  }
+}

@@ -1,6 +1,8 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
-import type { Event } from '@/types';
+import type { Event } from '@/types/api';
 import { gelombangIconMap } from '@/components/Icons/Icons';
 import styles from './Gelombang.module.scss';
 
@@ -60,9 +62,9 @@ function EventCard({ event }: EventCardProps) {
                 </p>
                 {  /* TODO: replace the registerLink later with backend token */}
                 {
-                    event.registerLink && event.registerLink.startsWith('http') ? (
+                    event.register_link && event.register_link.startsWith('http') ? (
                         <a
-                            href={event.registerLink}
+                            href={event.register_link}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={styles.registerBtn}
@@ -85,7 +87,7 @@ function EventCard({ event }: EventCardProps) {
 
 export default function Gelombang({ events }: GelombangProps) {
     return (
-        <section className={styles.gelombang} id="gelombang">
+        <section className={styles.gelombang} id='gelombang'>
             <div className={styles.container}>
                 <div className={styles.title}>
                     <h2>Gelombang Pendaftaran</h2>

@@ -57,10 +57,7 @@ function ProfileInput({ name, placeholder, type, autoComplete, value, editable, 
 function SubmitAction({ isLoading }: { isLoading: boolean }) {
     return (
         <button type="submit" className={styles.submitBtn} disabled={isLoading} aria-busy={isLoading}>
-            {isLoading
-                ? <><div className={styles.spinner} aria-hidden="true" /> Menyimpan...</>
-                : <>Ubah Profile <RightArrowIcon /></>
-            }
+            Ubah Profile <RightArrowIcon />
         </button>
     );
 }
@@ -88,7 +85,7 @@ export default function UpdateProfile() {
         e.preventDefault();
         setIsLoading(true);
         try {
-            await api.profile.updateProfile({
+            await api.profile.update({
                 fullName: form.namaLengkap,
             });
 
@@ -102,7 +99,7 @@ export default function UpdateProfile() {
         }
     };
     return (
-        <main className={styles.page}>
+        <main className={styles.updateProfile}>
             <div className={styles.container}>
                 <h1>Ubah Profile Akun (Change Account Profile)</h1>
                 <p className={styles.required}>* Wajib di Isi (Required)</p>

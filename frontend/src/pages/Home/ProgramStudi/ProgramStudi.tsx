@@ -1,10 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, memo } from 'react';
+import { useCallback, useEffect, useRef, useState, memo } from 'react';
 import Image from 'next/image';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
-import type { Program } from '@/types';
+import type { Program } from '@/types/api';
 import styles from './ProgramStudi.module.scss';
 
 interface ProgramStudiProps { programs: Program[] }
@@ -56,14 +56,14 @@ function DotButton({ active, onClick }: { active: boolean; onClick: () => void }
 }
 
 export default function ProgramStudi({ programs }: ProgramStudiProps) {
-    const autoplay = useMemo(
-        () => Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true }),
-        []
+    const autoplay = useRef(
+        Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true })
     );
 
     const [emblaRef, emblaApi] = useEmblaCarousel(
         { loop: true, align: 'start', slidesToScroll: 1 },
-        [autoplay]
+        // eslint-disable-next-line react-hooks/refs
+        [autoplay.current]
     );
 
     const [selectedIndex, setSelectedIndex] = useState(0);

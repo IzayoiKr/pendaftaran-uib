@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { api, ApiError } from '@/api';
 import TurnstileWidget from '@/components/TurnstileWidget';
 import type { TurnstileHandle } from '@/components/TurnstileWidget';
-import ExpiredLink from '@/components/ExpiredLink';
+import ExpiredLink from '@/components/ExpiredLink/ExpiredLink';
 import { CheckmarkIcon, BouncingBallsIcon } from '@/components/Icons/AnimatedIcons';
 import styles from './VerifyEmail.module.scss';
 

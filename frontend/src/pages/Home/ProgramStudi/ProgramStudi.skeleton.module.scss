@@ -1,0 +1,42 @@
+.sectionTitle {
+  width: 10rem;
+  height: var(--step-3);
+  margin: 0 auto var(--space-2xs);
+}
+
+.sectionSubtitle {
+  width: 16rem;
+  height: var(--step-0);
+  margin: 0 auto var(--space-l);
+}
+
+.cardImage {
+  width: 100%;
+  aspect-ratio: 1080 / 849;
+  height: auto;
+}
+
+.badge {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  position: absolute;
+  top: -2rem;
+  right: 1rem;
+}
+
+.tag {
+  width: 6rem;
+  height: 1.5rem;
+}
+
+.cardTitle {
+  width: 80%;
+  height: var(--step-1);
+  margin: var(--space-xs) 0;
+}
+
+.cardText {
+  width: 100%;
+  height: var(--step--1);
+}

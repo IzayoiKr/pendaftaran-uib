@@ -3,8 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from './Hero.module.scss';
-import { heroes } from '@/constants/data';
-import scrollToId from '@/components/ScrollToId';
+import scrollToId from '@/utils/ScrollToId';
 
 interface handleClickProps {
     e: React.MouseEvent<HTMLAnchorElement>,
@@ -34,8 +33,8 @@ function HeroPicture() {
 function Content() {
     return (
         <div className={styles.content}>
-            <h1>{heroes.title}</h1>
-            <p>{heroes.description}</p>
+            <h1>WELCOME TO UNIVERSITAS INTERNASIONAL BATAM</h1>
+            <p>University with international quality standard that produces graduates, science, technology and arts that can meet global dynamic changes.</p>
         </div>
     )
 }
@@ -48,14 +47,14 @@ function HeroButtons() {
                 className={styles.btnPrimary}
                 onClick={(e) => handleClick({ e: e, hashId: "gelombang" })}
             >
-                {heroes.registrationButtonDesc}
+                PENDAFTARAN (REGISTRATION)
             </Link>
             <Link
                 href="#program"
                 className={styles.btnSecondary}
                 onClick={(e) => handleClick({ e: e, hashId: "program" })}
             >
-                {heroes.academicButtonDesc}
+                AKADEMIK (ACADEMIC)
             </Link>
         </div>
     )
