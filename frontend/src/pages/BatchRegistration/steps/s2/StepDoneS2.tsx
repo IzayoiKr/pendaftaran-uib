@@ -3,10 +3,7 @@
 import { useRouter } from "next/navigation";
 
 import ProgressBar from "@/pages/BatchRegistration/components/ProgressBar";
-
-import {
-  getProdiName,
-} from "@/constants/registerOptions";
+import useProgramStudiOptions from "@/pages/BatchRegistration/hooks/useProgramStudiOptions";
 
 import RegistrationStatusSection, {
   buildS2StatusItems,
@@ -26,6 +23,12 @@ export default function StepDoneS2({
   goToStep,
 }: Props) {
   const router = useRouter();
+  const { options: prodiOptions } = useProgramStudiOptions("S2");
+
+  const getProdiLabel = (id?: string) => {
+    if (!id) return "-";
+    return prodiOptions.find((o) => o.value === id)?.label || "Loading...";
+  };
 
   /* ================= STATUS ================= */
 
@@ -103,11 +106,7 @@ export default function StepDoneS2({
               <span>Program</span>
 
               <strong>
-                {data.prodipil
-                  ? getProdiName(
-                      data.prodipil
-                    )
-                  : "-"}
+                {getProdiLabel(data.prodipil)}
               </strong>
             </div>
 

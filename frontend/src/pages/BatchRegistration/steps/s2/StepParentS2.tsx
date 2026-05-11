@@ -229,16 +229,6 @@ export default function StepParentS2({
                   />
                 );
               })}
-
-              {/* ================= STATUS ================= */}
-              <SelectField<FormType>
-                label={`${section.labels.stat}`}
-                name={section.fields.stat as keyof FormType}
-                register={register}
-                errors={errors}
-                options={STATUS_ORANG_TUA_OPTIONS}
-                placeholder={`Pilih status ${section.type}`}
-              />
             </div>
           ))}
 

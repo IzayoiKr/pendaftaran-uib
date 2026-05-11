@@ -76,11 +76,25 @@ func main() {
 	r.Use(chimiddleware.RequestID)
 	r.Use(middleware.CORS)
 
+	fileServer := http.FileServer(http.Dir("./uploads"))
+	r.Handle("/uploads/*", http.StripPrefix("/uploads/", fileServer))
+
 	rl := newRateLimiters()
 
+	// Public Routes
 	r.Get("/health", handlers.HealthCheck(provider))
 	r.Get("/api/program_studi", handlers.ProgramStudi(provider.MySQL))
-	r.Get("/api/gelombang", handlers.Gelombang(provider.MySQL))
+
+	r.Get("/api/gelombang",
+		rl.gelombang.RateLimit(
+			handlers.GetGelombangList(provider.MySQL),
+		),
+	)
+	r.Get("/api/gelombang/{registrationKey}",
+		rl.gelombang.RateLimit(
+			handlers.GetGelombangByKey(provider.MySQL),
+		),
+	)
 
 	r.Post("/api/auth/login",
 		rl.loginIP.RateLimit(
@@ -94,7 +108,8 @@ func main() {
 	)
 	r.Post("/api/auth/refresh",
 		auth.RateLimitRefresh(
-			rl.refreshIP, rl.refreshUser,
+			rl.refreshIP,
+			rl.refreshUser,
 			handlers.Refresh(provider.MySQL, tokenStore, auditLogger),
 		),
 	)
@@ -119,20 +134,59 @@ func main() {
 		),
 	)
 
+	// Protected Routes
 	r.Group(func(r chi.Router) {
 		r.Use(auth.Middleware(tokenStore))
-
 		r.Get("/api/profile",
-			rl.profile.RateLimitUser(handlers.Profile(provider.MySQL)),
+			rl.profile.RateLimitUser(
+				handlers.Profile(provider.MySQL),
+			),
 		)
 		r.Post("/api/profile",
-			rl.updateProfile.RateLimitUser(handlers.UpdateProfile(provider.MySQL, auditLogger)),
+			rl.updateProfile.RateLimitUser(
+				handlers.UpdateProfile(provider.MySQL, auditLogger),
+			),
 		)
 		r.Post("/api/auth/logout",
-			rl.logout.RateLimitUser(handlers.Logout(tokenStore, auditLogger)),
+			rl.logout.RateLimitUser(
+				handlers.Logout(tokenStore, auditLogger),
+			),
 		)
 		r.Post("/api/profile/password",
-			rl.changePassword.RateLimitUser(handlers.ChangePassword(provider.MySQL, tokenStore, auditLogger)),
+			rl.changePassword.RateLimitUser(
+				handlers.ChangePassword(provider.MySQL, tokenStore, auditLogger),
+			),
+		)
+
+		r.Post("/api/registration",
+			rl.studentRegister.RateLimitUser(
+				handlers.RegisterStudent(provider.MySQL, auditLogger),
+			),
+		)
+		r.Get("/api/registration/{id}",
+			rl.profile.RateLimitUser(
+				handlers.GetRegistrationDetails(provider.MySQL),
+			),
+		)
+		r.Post("/api/registration/{id}",
+			rl.studentRegister.RateLimitUser(
+				handlers.UpdateRegistration(provider.MySQL),
+			),
+		)
+		r.Post("/api/registration/{id}/transfer",
+			rl.studentRegister.RateLimitUser(
+				handlers.UploadTransferProof(provider.MySQL),
+			),
+		)
+		r.Get("/api/registration-status",
+			rl.profile.RateLimitUser(
+				handlers.GetRegistrationStatus(provider.MySQL),
+			),
+		)
+		r.Get("/api/registration/latest",
+			rl.profile.RateLimitUser(
+				handlers.GetLatestRegistration(provider.MySQL),
+			),
 		)
 	})
 
@@ -183,6 +237,8 @@ type rateLimiters struct {
 	logout              *auth.RateLimiter
 	verifyEmail         *auth.RateLimiter
 	resendVerify        *auth.RateLimiter
+	gelombang           *auth.RateLimiter
+	studentRegister     *auth.RateLimiter
 }
 
 func newRateLimiters() rateLimiters {
@@ -201,5 +257,7 @@ func newRateLimiters() rateLimiters {
 		logout:              auth.NewRateLimiter(20, 60*time.Minute),
 		verifyEmail:         auth.NewRateLimiter(5, 60*time.Minute),
 		resendVerify:        auth.NewRateLimiter(3, 60*time.Minute),
+		gelombang:           auth.NewRateLimiter(120, 1*time.Minute),
+		studentRegister:     auth.NewRateLimiter(10, 60*time.Minute),
 	}
 }

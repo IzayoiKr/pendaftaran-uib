@@ -26,3 +26,19 @@ func (u *User) ToDTO() UserDTO {
 		Email: u.Email,
 	}
 }
+
+type RegistrationDTO struct {
+	NomorDaftar string `json:"nomorDaftar"`
+	Periode     int    `json:"periode"`
+	Gelombang   string `json:"gelombang"`
+	Jurusan     string `json:"jurusan"`
+	Biodata     string `json:"biodata"`
+	Pembayaran  string `json:"pembayaran"`
+}
+
+type ProfileResponse struct {
+	FullName      string            `json:"full_name"`
+	NIK           string            `json:"nik"`
+	Email         string            `json:"email"`
+	Registrations []RegistrationDTO `json:"registrations"`
+}

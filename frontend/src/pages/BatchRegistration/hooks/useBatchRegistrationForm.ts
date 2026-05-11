@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import { toast } from "sonner";
+import { api } from "@/api";
 
 import type {
   EventType,
@@ -281,17 +282,7 @@ export default function useBatchRegistrationForm({
 
     setIsLoadingExisting(true);
 
-    fetch(`/api/registration/${nomorDaftar}`)
-      .then(async (res) => {
-
-        if (!res.ok) {
-          throw new Error(
-            "Gagal fetch data"
-          );
-        }
-
-        return res.json();
-      })
+    api.profile.getRegistration(nomorDaftar)
       .then((existingData) => {
 
         setFormData((prev) => ({
@@ -389,7 +380,7 @@ export default function useBatchRegistrationForm({
     return fd;
   };
 
-  const parseApiError = async (
+    const parseApiError = async (
     res: Response,
     fallback: string
   ) => {
@@ -467,14 +458,7 @@ export default function useBatchRegistrationForm({
         | Partial<FormDataS1>
         | Partial<FormDataS2>
     ) => {
-
-      return requestWithTimeout(
-        "/api/register",
-        {
-          method: "POST",
-          body: buildFormData(incoming),
-        }
-      );
+      return api.profile.registerStudent(buildFormData(incoming));
     },
     []
   );
@@ -487,14 +471,7 @@ export default function useBatchRegistrationForm({
         | Partial<FormDataS1>
         | Partial<FormDataS2>
     ) => {
-
-      return requestWithTimeout(
-        `/api/registration/${nomorDaftar}`,
-        {
-          method: "PATCH",
-          body: buildFormData(incoming),
-        }
-      );
+      return api.profile.updateRegistration(nomorDaftar, buildFormData(incoming));
     },
     []
   );

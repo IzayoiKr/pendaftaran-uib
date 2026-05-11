@@ -4,48 +4,10 @@ import type {
   StatusState
 } from "@/validation/schemaform";
 
-/* ================= PRODI ================= */
-
-export const PRODI_MAP: Record<string, string> = {
-  "42": "Akuntansi (Accounting)",
-  "12": "Arsitektur (Architecture)",
-  "71": "Biologi (Biology)",
-  "72": "Gizi (Nutrition)",
-  "51": "Ilmu Hukum (Law Science)",
-  "81": "Kedokteran (Medicine)",
-  "41": "Manajemen (Management)",
-  "46": "Pariwisata (Tourism)",
-  "61": "Pendidikan Bahasa Inggris",
-  "82": "Profesi Kedokteran (Medicine)",
-  "31": "Sistem Informasi (Information System)",
-  "11": "Teknik Sipil (Civil Engineering)",
-  "32": "Teknologi Informasi (Information Technology)",
-
-  "52": "Magister Hukum (Master of Law)",
-  "44": "Magister Manajemen (Master of Management)",
-};
-
 export type SelectOption = {
   value: string;
   label: string;
 };
-
-const mapToOptions = (codes: string[]): SelectOption[] =>
-  codes.map((code) => ({
-    value: code,
-    label: PRODI_MAP[code],
-  }));
-
-export const PRODI_S1_OPTIONS = mapToOptions([
-  "42", "12", "71", "72", "51", "81", "41",
-  "46", "61", "82", "31", "11", "32",
-]);
-
-export const PRODI_S2_OPTIONS = mapToOptions(["52", "44"]);
-
-export function getProdiName(code?: string): string {
-  return code ? PRODI_MAP[code] || code : "";
-}
 
 /* ================= OPTIONS ================= */
 
