@@ -10,10 +10,10 @@ import AutocompleteField from "@/components/AutocompleteField";
 import useUniversitySearch from "@/pages/BatchRegistration/hooks/useUniversitySearch";
 import { useMaxBirthDate } from "@/pages/BatchRegistration/hooks/useMaxBirthDate";
 import { useFormErrorHandler } from "@/pages/BatchRegistration/hooks/useFormErrorHandler";
+import useProgramStudiOptions from "@/pages/BatchRegistration/hooks/useProgramStudiOptions";
 
 /* ================= CONSTANTS ================= */
 import {
-  PRODI_S2_OPTIONS,
   JENIS_KELAMIN_OPTIONS,
   KEWARGANEGARAAN_OPTIONS,
   AGAMA_OPTIONS,
@@ -62,6 +62,7 @@ export default function Step1S2({
 
   const maxDate = useMaxBirthDate();
   const university = useUniversitySearch();
+  const { options: prodiOptions } = useProgramStudiOptions("S2");
 
   return (
     <FormProvider {...methods}>
@@ -494,7 +495,7 @@ export default function Step1S2({
               name="prodipil"
               register={register}
               errors={errors}
-              options={PRODI_S2_OPTIONS}
+              options={prodiOptions}
               placeholder="Pilih Program Studi (Select Study Program) *"
               required
             />

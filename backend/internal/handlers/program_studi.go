@@ -10,12 +10,23 @@ import (
 
 func ProgramStudi(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		rows, err := db.QueryContext(r.Context(), `
+		degree := r.URL.Query().Get("degree")
+
+		query := `
 			SELECT id, title, faculty, degree, description, image_path, link
 			FROM program_studi
 			WHERE is_active = 1
-			ORDER BY sort_order ASC
-		`)
+		`
+		args := []interface{}{}
+
+		if degree != "" {
+			query += " AND degree = ?"
+			args = append(args, degree)
+		}
+
+		query += " ORDER BY sort_order ASC"
+
+		rows, err := db.QueryContext(r.Context(), query, args...)
 		if err != nil {
 			slog.Error("program_studi: query error", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))

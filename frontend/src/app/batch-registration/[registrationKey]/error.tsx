@@ -14,13 +14,6 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
     }, [error])
 
     return (
-        <html>
-            <head>
-                <title>Terjadi Kesalahan | Universitas Internasional Batam</title>
-            </head>
-            <body>
-                <GlobalError reset={reset} type="error" />
-            </body>
-        </html>
+        <GlobalError reset={reset} type="error" />
     )
 }

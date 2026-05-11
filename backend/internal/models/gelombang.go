@@ -18,4 +18,5 @@ type GelombangDTO struct {
 	RegistrationStartDisplay string `json:"registration_start_display"`
 	RegistrationEnd string `json:"registration_end"`
 	RegistrationEndDisplay string `json:"registration_end_display"`
+	USMPassword string `json:"usm_password"`
 }

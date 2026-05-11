@@ -1,3 +1,5 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
 DELETE FROM program_studi WHERE id IN (
     '550e8400-e29b-41d4-a716-446655440001',
     '550e8400-e29b-41d4-a716-446655440002',
@@ -11,9 +13,12 @@ DELETE FROM program_studi WHERE id IN (
     '550e8400-e29b-41d4-a716-446655440010',
     '550e8400-e29b-41d4-a716-446655440011'
 );
+
 DELETE FROM gelombang WHERE id IN (
     'b1a0c7e2-0f1a-4d3b-9a1c-8e2b3c4d5e01',
     'b1a0c7e2-0f1a-4d3b-9a1c-8e2b3c4d5e02',
     'b1a0c7e2-0f1a-4d3b-9a1c-8e2b3c4d5e03',
     'b1a0c7e2-0f1a-4d3b-9a1c-8e2b3c4d5e04'
 );
+
+SET FOREIGN_KEY_CHECKS = 1;

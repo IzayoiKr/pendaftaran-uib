@@ -1,9 +1,9 @@
 'use client';
 
-import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRef, useState, useEffect, type ChangeEvent, type FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-// import { api } from "@/api";
+import { api } from "@/api";
 import { downloadStaticPdf } from "@/utils/downloadPdf";
 import styles from "./UploadTransferProof.module.scss";
 
@@ -22,12 +22,12 @@ interface TambahBuktiTransferForm {
 
 function BiodataSection({ data }: { data: BiodataPendaftaran }) {
     const rows: [string, string][] = [
-        ["Nomor Daftar (Registration Number)", data.nomorDaftar],
-        ["Periode (Period)", data.periode],
-        ["Gelombang (Group)", data.gelombang],
-        ["Jurusan (Study Program)", data.jurusan],
-        ["Nama Lengkap (Full Name)", data.namaLengkap],
-        ["Alamat Email (Email)", data.alamatEmail],
+        ["Nomor Daftar (Registration Number)",        data.nomorDaftar],
+        ["Periode (Period)",                           data.periode],
+        ["Gelombang (Group)",                          data.gelombang],
+        ["Jurusan (Study Program)",                    data.jurusan],
+        ["Nama Lengkap (Full Name)",                   data.namaLengkap],
+        ["Alamat Email (Email)",                       data.alamatEmail],
         ["Nomor NIK (National Identification Number)", data.nomorNIK],
     ];
     return (
@@ -35,7 +35,7 @@ function BiodataSection({ data }: { data: BiodataPendaftaran }) {
             {rows.map(([label, value]) => (
                 <div key={label} className={styles.infoRow}>
                     <span className={styles.infoLabel}>{label}</span>
-                    <span className={styles.infoValue}>: {value}</span>
+                    <span className={styles.infoValue}>: {value || "-"}</span>
                 </div>
             ))}
         </div>
@@ -99,26 +99,62 @@ function ActionRow({ isLoading, onCancel }: { isLoading: boolean; onCancel: () =
     );
 }
 
-// ─── Mock data — TODO: fetch dari backend berdasarkan nomorDaftar di URL ──────
-
-const MOCK_BIODATA: BiodataPendaftaran = {
-    nomorDaftar: "-", periode: "-", gelombang: "-", jurusan: "-",
-    namaLengkap: "-", alamatEmail: "-", nomorNIK: "-",
-};
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function UploadTransferProof() {
+export default function UploadBuktiTransferPage() {
     const router = useRouter();
-    const [form, setForm] = useState<TambahBuktiTransferForm>({ pemilikRekening: "", bank: "", file: null });
-    const [isLoading, setIsLoading] = useState(false);
+    const searchParams = useSearchParams();
+    const nomorDaftar = searchParams.get("nomorDaftar");
+
+    const [form, setForm]                   = useState<TambahBuktiTransferForm>({ pemilikRekening: "", bank: "", file: null });
+    const [isLoading, setIsLoading]         = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [isFetchingData, setIsFetchingData] = useState(false);
+
+    const [biodata, setBiodata] = useState<BiodataPendaftaran>({
+        nomorDaftar: nomorDaftar || "",
+        periode: "",
+        gelombang: "",
+        jurusan: "",
+        namaLengkap: "",
+        alamatEmail: "",
+        nomorNIK: "",
+    });
+
+    useEffect(() => {
+        if (!nomorDaftar) return;
+
+        const fetchData = async () => {
+            setIsFetchingData(true);
+            try {
+                const data = await api.profile.getRegistration(nomorDaftar);
+                if (data) {
+                    setBiodata({
+                        nomorDaftar: nomorDaftar,
+                        periode: new Date(data.created_at || Date.now()).getFullYear().toString(),
+                        gelombang: data.batchName || "-",
+                        jurusan: data.type === "S1" ? (data.prodi_pil_name || data.prodi_pil || "-") : (data.jurusan || "-"),
+                        namaLengkap: data.nama || "-",
+                        alamatEmail: data.email || "-",
+                        nomorNIK: data.nik || "-",
+                    });
+                }
+            } catch (err) {
+                console.error("Failed to fetch registration details", err);
+                toast.error("Gagal mengambil data pendaftaran.");
+            } finally {
+                setIsFetchingData(false);
+            }
+        };
+
+        fetchData();
+    }, [nomorDaftar]);
 
     // ── Download Panduan VA via protected route ───────────────────────────────
     const handleDownloadVA = async () => {
         setIsDownloading(true);
         try {
-            await downloadStaticPdf("VA", "panduan-VA.pdf");
+            await downloadStaticPdf("VA", "VA.pdf");
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Gagal download panduan VA");
         } finally {
@@ -128,19 +164,26 @@ export default function UploadTransferProof() {
 
     const handleTextChange =
         (field: keyof Pick<TambahBuktiTransferForm, "pemilikRekening" | "bank">) =>
-            (e: ChangeEvent<HTMLInputElement>) =>
-                setForm(prev => ({ ...prev, [field]: e.target.value }));
+        (e: ChangeEvent<HTMLInputElement>) =>
+            setForm(prev => ({ ...prev, [field]: e.target.value }));
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!form.file) return;
+        if (!nomorDaftar) {
+            toast.error("Nomor daftar tidak ditemukan.");
+            return;
+        }
+        if (!form.file) {
+            toast.error("Pilih file bukti transfer terlebih dahulu.");
+            return;
+        }
         setIsLoading(true);
         try {
             const formData = new FormData();
             formData.append("pemilikRekening", form.pemilikRekening);
             formData.append("bank", form.bank);
             formData.append("file", form.file);
-            // await api.transfer.uploadBukti(formData);
+            await api.transfer.uploadBukti(nomorDaftar, formData);
             toast.success("Bukti transfer berhasil diupload!");
             router.back();
         } catch (err) {
@@ -154,7 +197,7 @@ export default function UploadTransferProof() {
         <main className={styles.page}>
             <div className={styles.container}>
                 <h2 className={styles.sectionTitle}>Biodata Pendaftaran</h2>
-                <BiodataSection data={MOCK_BIODATA} />
+                {isFetchingData ? <p>Loading biodata...</p> : <BiodataSection data={biodata} />}
 
                 <h3 className={styles.tableTitle}>
                     Daftar Bukti Transfer (List of Receipt Payment)

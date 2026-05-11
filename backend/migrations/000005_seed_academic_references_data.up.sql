@@ -55,7 +55,7 @@ INSERT INTO gelombang (
     batch_name, batch_type, program_type, program_type_en,
     degree, academic_year, image_path,
     event_date, start_time, end_time, location,
-    registration_start, registration_end
+    registration_start, registration_end, usm_password
 ) VALUES
 
 ('b1a0c7e2-0f1a-4d3b-9a1c-8e2b3c4d5e01',
@@ -63,25 +63,25 @@ INSERT INTO gelombang (
  'Gelombang 06', 'Reguler', 'Program Sarjana', 'Undergraduate Program',
  'S1', 'T.A 2026/2027', '/images/event/GP.jpg',
  '2026-05-09', '09:00:00', '16:00:00', 'Online',
- '2026-04-13', '2026-05-08'),
+ '2026-04-13', '2026-05-08', 'S1G6OL'),
 
 ('b1a0c7e2-0f1a-4d3b-9a1c-8e2b3c4d5e02',
  'magister-gelombang-1',
  'Gelombang 01', 'Reguler', 'Program Magister', 'Master Program',
  'S2', 'T.A 2026/2027', '/images/event/magister.png',
  '2026-05-23', '09:00:00', '17:00:00', 'Online',
- '2026-03-01', '2026-05-22'),
+ '2026-03-01', '2026-05-22', 'M2G1OL'),
 
 ('b1a0c7e2-0f1a-4d3b-9a1c-8e2b3c4d5e03',
  'sarjana-kedokteran-beasiswa-gelombang-2',
  'Gelombang 2 Beasiswa-S1 Kedokteran', 'Beasiswa', 'Program Sarjana', 'Undergraduate Program',
  'S1', 'T.A 2026/2027', '/images/event/GP.jpg',
  '2026-06-20', '09:00:00', '13:00:00', 'Batam',
- '2026-02-09', '2026-06-13'),
+ '2026-02-09', '2026-06-13', 'K2B2BM'),
 
 ('b1a0c7e2-0f1a-4d3b-9a1c-8e2b3c4d5e04',
  'sarjana-beasiswa-gelombang-3',
  'Beasiswa III', 'Beasiswa', 'Program Sarjana', 'Undergraduate Program',
  'S1', 'T.A 2026/2027', '/images/event/beasiswa-baru.png',
  '2026-06-13', '09:00:00', '16:00:00', 'Online',
- '2025-12-08', '2026-06-12');
+ '2025-12-08', '2026-06-12', 'B3OL26');

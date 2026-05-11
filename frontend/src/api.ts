@@ -42,7 +42,6 @@ function getDeviceId(): string {
 
 const apiClient: AxiosInstance = axios.create({
     withCredentials: true,
-    headers: { 'Content-Type': 'application/json' },
 });
 
 let refreshPromise: Promise<string> | null = null;
@@ -178,8 +177,23 @@ export const api = {
     },
 
     profile: {
-        get: () =>
+        profile: () =>
             apiClient.get<never, User>('/api/profile'),
+
+        getRegistrationStatus: () =>
+            apiClient.get<never, { is_registered: boolean; registrations: any[] }>('/api/registration-status'),
+
+        getRegistration: (id: string) =>
+            apiClient.get<never, any>(`/api/registration/${id}`),
+
+        registerStudent: (data: FormData) =>
+            apiClient.post<never, { message: string }>('/api/registration', data),
+
+        updateRegistration: (id: string, data: FormData) =>
+            apiClient.post<never, { message: string }>(`/api/registration/${id}`, data),
+
+        getLatestRegistration: () =>
+            apiClient.get<never, any>('/api/registration/latest'),
 
         changePassword: (oldPassword: string, newPassword: string) =>
             apiClient.post<never, { message: string }>("/api/profile/password", {
@@ -193,7 +207,19 @@ export const api = {
             }),
     },
 
-    /* prodi: {
+    prodi: {
+        getProgramStudi: (degree?: string) =>
+            apiClient.get<never, any[]>("/api/program_studi", {
+                params: { degree },
+            }),
+    },
+
+    transfer: {
+        uploadBukti: (registrationId: string, data: FormData) =>
+            apiClient.post<never, { message: string }>(`/api/registration/${registrationId}/transfer`, data),
+    },
+
+    /* prodi_request: {
         getRequests: () =>
             apiClient.get<never, any[]>("/api/prodi/requests"),
 
