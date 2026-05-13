@@ -61,9 +61,9 @@ function StatusBadge({ status }: { status: string }) {
     const s = (status || "").toLowerCase();
     const isComplete = (s.includes("lengkap") || s.includes("complete") || s.includes("lunas") || s.includes("paid") || s.includes("approved") || s.includes("verified") || s.includes("lulus")) && !s.includes("belum");
     const isIncomplete = s.includes("belum") || s.includes("tidak") || s.includes("incomplete") || s.includes("pemeriksaan") || s.includes("pending") || s.includes("rejected");
-    
+
     const cls = isComplete ? styles.statusComplete : (isIncomplete ? styles.statusIncomplete : "");
-    
+
     return <span className={cls}>{status || "-"}</span>;
 }
 
@@ -71,46 +71,53 @@ function RegistrationActions({ reg, handlers }: {
     reg: Registration; handlers: RegistrationHandlers;
 }) {
     const res = (reg.usmResult || "").toLowerCase();
-    
-    const isLulus = res.includes("lulus");
-    const isGagal = res.includes("gagal");
+
+    const isLulus      = res.includes("lulus");
+    const isGagal      = res.includes("gagal");
     const isUsmDecided = isLulus || isGagal;
 
     return (
         <div className={styles.actionGroup}>
             {!isUsmDecided && (
                 <>
+                   
                     <button className={`${styles.btn} ${styles.btnWarning}`}
                         onClick={() => handlers.onCheckPendaftaran(reg)}>
                         <RegisterIcon /> Check Pendaftaran
                     </button>
-                    <button className={`${styles.btn} ${styles.btnPrimary}`}
+                   
+                    <button className={`${styles.btn} ${styles.btnAqua}`}
                         onClick={() => handlers.onUbahBiodata(reg)}>
                         <EditIcon /> Ubah Biodata
                     </button>
                 </>
             )}
             {isUsmDecided && (
-                <button className={`${styles.btn} ${styles.btnSuccess}`}
+               
+                <button className={`${styles.btn} ${styles.btnWarning}`}
                     onClick={() => handlers.onDownloadSuratHasil(reg)}>
                     <LetterIcon /> Surat Hasil
                 </button>
             )}
             {isLulus && (
                 <>
-                    <button className={`${styles.btn} ${styles.btnInfo}`}
+                   
+                    <button className={`${styles.btn} ${styles.btnAqua}`}
                         onClick={() => handlers.onBuktiTransfer(reg)}>
                         <ReceiptIcon /> Bukti Transfer
                     </button>
+                  
                     <button className={`${styles.btn} ${styles.btnPrimary}`}
                         onClick={() => handlers.onPerubahanProdi(reg)}>
                         <ChangeIcon /> Perubahan Prodi
                     </button>
+                 
                     <button className={`${styles.btn} ${styles.btnDanger}`}
                         onClick={() => handlers.onDownloadPengunduran(reg)}>
                         <EraserIcon /> Pengunduran Diri
                     </button>
-                    <button className={`${styles.btn} ${styles.btnWarning}`}
+                   
+                    <button className={`${styles.btn} ${styles.btnAqua}`}
                         onClick={() => handlers.onPrasyaratOspek(reg)}>
                         <ProfileIcon /> Prasyarat Ospek
                     </button>
@@ -172,7 +179,7 @@ export default function Account() {
                     }
                 })
                 .catch(() => {});
-            
+
             // Fetch registration status
             setIsFetchingReg(true);
             api.profile.getRegistrationStatus()
@@ -228,7 +235,6 @@ export default function Account() {
         onUbahBiodata: (reg) =>
             router.push(`/account/ubah-biodata?nomorDaftar=${reg.nomorDaftar}`),
 
-        // Buka Surat Hasil sebagai HTML di tab baru → user Ctrl+P → Save as PDF
         onDownloadSuratHasil: (reg) => {
             downloadSuratHasil(reg.nomorDaftar);
         },
@@ -239,7 +245,6 @@ export default function Account() {
         onPerubahanProdi: (reg) =>
             router.push(`/account/prodi?nomorDaftar=${reg.nomorDaftar}`),
 
-        // Download surat pengunduran diri (file statis dari folder private/)
         onDownloadPengunduran: () => {
             downloadStaticPdf("pengunduran", "pengunduran.pdf").catch(err =>
                 toast.error(err instanceof Error ? err.message : "Gagal download surat pengunduran")

@@ -12,6 +12,8 @@ $color-success:       #27ae60;
 $color-success-hover: #1e8449;
 $color-info:          #8e44ad;
 $color-info-hover:    #6c3483;
+$color-aqua:          #00bcd4;  // aqua — ubah biodata, bukti transfer, prasyarat ospek
+$color-aqua-hover:    #0097a7;
 
 $header-height: var(--space-2xl);
 
@@ -172,8 +174,9 @@ $header-height: var(--space-2xl);
 .btnDanger  { background: $color-danger;  color: global.$white; &:hover { background: $color-danger-hover;  } }
 .btnSuccess { background: $color-success; color: global.$white; &:hover { background: $color-success-hover; } }
 .btnInfo    { background: $color-info;    color: global.$white; &:hover { background: $color-info-hover;    } }
+.btnAqua    { background: $color-aqua;    color: global.$white; &:hover { background: $color-aqua-hover;    } }
 
-// ─── Large bottom buttons (reuse form submit-button mixin) ────────────────────
+// ─── Large bottom buttons ─────────────────────────────────────────────────────
 
 $color-black:       #1a1a1a;
 $color-black-hover: #000000;
@@ -182,7 +185,6 @@ $color-grey-hover:  #4b5563;
 
 .btnLg {
   @include form.submit-button;
-
 
   &.btnLgWarning {
     background: $color-black;
@@ -193,7 +195,6 @@ $color-grey-hover:  #4b5563;
     &:active { background: global.$white; border-color: $color-black; color: $color-black;  }
   }
 
-
   &.btnLgGrey {
     background: $color-grey;
     border-color: $color-grey;
@@ -202,7 +203,6 @@ $color-grey-hover:  #4b5563;
     &:hover  { background: global.$white; border-color: $color-grey; color: $color-grey;   }
     &:active { background: global.$white; border-color: $color-grey; color: $color-grey;   }
   }
-
 
   &.btnLgDanger {
     background: $color-danger;
