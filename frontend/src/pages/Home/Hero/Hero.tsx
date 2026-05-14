@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import styles from './Hero.module.scss';
 import scrollToId from '@/utils/ScrollToId';
@@ -8,13 +9,6 @@ import scrollToId from '@/utils/ScrollToId';
 interface handleClickProps {
     e: React.MouseEvent<HTMLAnchorElement>,
     hashId: string
-}
-
-const handleClick = ({ e, hashId }: handleClickProps) => {
-    if (hashId && window.location.pathname === '/') {
-        e.preventDefault();
-        scrollToId(hashId)
-    }
 }
 
 function HeroPicture() {
@@ -40,6 +34,15 @@ function Content() {
 }
 
 function HeroButtons() {
+    const pathname = usePathname();
+
+    const handleClick = ({ e, hashId }: handleClickProps) => {
+        if (hashId && pathname === '/') {
+            e.preventDefault();
+            scrollToId(hashId)
+        }
+    }
+
     return (
         <div className={styles.heroButtons}>
             <Link

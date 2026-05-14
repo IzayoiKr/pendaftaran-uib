@@ -5,36 +5,37 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/api";
 import useAuthStore from "@/store/useAuthStore";
-import type { User } from "@/types";
+import type { User } from "@/types/api";
 import styles from "./Account.module.scss";
 import { RegisterIcon, EditIcon, LetterIcon, ReceiptIcon, ChangeIcon, EraserIcon, LockIcon, LogoutIcon, ProfileIcon } from "@/components/Icons/Icons";
 import { downloadSuratHasil, downloadStaticPdf } from "@/utils/downloadPdf";
+import AccountSkeleton from "./Account.skeleton";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type BiodataStatus = "Belum Lengkap" | "Telah Lengkap";
-type PaymentStatus = "Belum Lunas"   | "Telah Lunas";
+type PaymentStatus = "Belum Lunas" | "Telah Lunas";
 
 interface Registration {
     nomorDaftar: string;
-    periode:     number;
-    gelombang:   string;
-    jurusan:     string;
-    biodata:     string;
-    pembayaran:  string;
-    usm:         string;
+    periode: number;
+    gelombang: string;
+    jurusan: string;
+    biodata: string;
+    pembayaran: string;
+    usm: string;
     passwordUSM: string;
-    usmResult:   string;
+    usmResult: string;
 }
 
 interface RegistrationHandlers {
-    onCheckPendaftaran:    (reg: Registration) => void;
-    onUbahBiodata:         (reg: Registration) => void;
-    onDownloadSuratHasil:  (reg: Registration) => void;
-    onBuktiTransfer:       (reg: Registration) => void;
-    onPerubahanProdi:      (reg: Registration) => void;
+    onCheckPendaftaran: (reg: Registration) => void;
+    onUbahBiodata: (reg: Registration) => void;
+    onDownloadSuratHasil: (reg: Registration) => void;
+    onBuktiTransfer: (reg: Registration) => void;
+    onPerubahanProdi: (reg: Registration) => void;
     onDownloadPengunduran: (reg: Registration) => void;
-    onPrasyaratOspek:      (reg: Registration) => void;
+    onPrasyaratOspek: (reg: Registration) => void;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -42,8 +43,8 @@ interface RegistrationHandlers {
 function AccountInfo({ user }: { user: User }) {
     const rows: [string, string][] = [
         ["Nama Lengkap", user.full_name || "-"],
-        ["Alamat Email", user.email     || "-"],
-        ["Nomor NIK",    user.nik       || "-"],
+        ["Alamat Email", user.email || "-"],
+        ["Nomor NIK", user.nik || "-"],
     ];
     return (
         <div className={styles.accountInfo}>
@@ -72,20 +73,20 @@ function RegistrationActions({ reg, handlers }: {
 }) {
     const res = (reg.usmResult || "").toLowerCase();
 
-    const isLulus      = res.includes("lulus");
-    const isGagal      = res.includes("gagal");
+    const isLulus = res.includes("lulus");
+    const isGagal = res.includes("gagal");
     const isUsmDecided = isLulus || isGagal;
 
     return (
         <div className={styles.actionGroup}>
             {!isUsmDecided && (
                 <>
-                   
+
                     <button className={`${styles.btn} ${styles.btnWarning}`}
                         onClick={() => handlers.onCheckPendaftaran(reg)}>
                         <RegisterIcon /> Check Pendaftaran
                     </button>
-                   
+
                     <button className={`${styles.btn} ${styles.btnAqua}`}
                         onClick={() => handlers.onUbahBiodata(reg)}>
                         <EditIcon /> Ubah Biodata
@@ -93,7 +94,7 @@ function RegistrationActions({ reg, handlers }: {
                 </>
             )}
             {isUsmDecided && (
-               
+
                 <button className={`${styles.btn} ${styles.btnWarning}`}
                     onClick={() => handlers.onDownloadSuratHasil(reg)}>
                     <LetterIcon /> Surat Hasil
@@ -101,22 +102,22 @@ function RegistrationActions({ reg, handlers }: {
             )}
             {isLulus && (
                 <>
-                   
+
                     <button className={`${styles.btn} ${styles.btnAqua}`}
                         onClick={() => handlers.onBuktiTransfer(reg)}>
                         <ReceiptIcon /> Bukti Transfer
                     </button>
-                  
+
                     <button className={`${styles.btn} ${styles.btnPrimary}`}
                         onClick={() => handlers.onPerubahanProdi(reg)}>
                         <ChangeIcon /> Perubahan Prodi
                     </button>
-                 
+
                     <button className={`${styles.btn} ${styles.btnDanger}`}
                         onClick={() => handlers.onDownloadPengunduran(reg)}>
                         <EraserIcon /> Pengunduran Diri
                     </button>
-                   
+
                     <button className={`${styles.btn} ${styles.btnAqua}`}
                         onClick={() => handlers.onPrasyaratOspek(reg)}>
                         <ProfileIcon /> Prasyarat Ospek
@@ -143,12 +144,12 @@ function RegistrationTable({ registrations, handlers }: {
                     {registrations.map(reg => (
                         <tr key={reg.nomorDaftar}>
                             <td>{reg.nomorDaftar || "-"}</td>
-                            <td>{reg.periode     || "-"}</td>
-                            <td>{reg.gelombang   || "-"}</td>
-                            <td>{reg.jurusan     || "-"}</td>
-                            <td><StatusBadge status={reg.biodata}    /></td>
+                            <td>{reg.periode || "-"}</td>
+                            <td>{reg.gelombang || "-"}</td>
+                            <td>{reg.jurusan || "-"}</td>
+                            <td><StatusBadge status={reg.biodata} /></td>
                             <td><StatusBadge status={reg.pembayaran} /></td>
-                            <td>{reg.usm         || "-"}</td>
+                            <td>{reg.usm || "-"}</td>
                             <td>{reg.passwordUSM || "-"}</td>
                             <td><RegistrationActions reg={reg} handlers={handlers} /></td>
                         </tr>
@@ -170,49 +171,37 @@ export default function Account() {
 
     // ── Fetch profile terbaru ──────────────────────────────────────────────────
     useEffect(() => {
-        if (user) {
-            api.profile.profile()
-                .then(freshUser => {
-                    const current = useAuthStore.getState().user;
-                    if (JSON.stringify(current) !== JSON.stringify(freshUser)) {
-                        useAuthStore.getState().setUser(freshUser);
-                    }
-                })
-                .catch(() => {});
+        if (!user) return;
+        api.profile.get()
+            .then(freshUser => {
+                const current = useAuthStore.getState().user;
+                if (JSON.stringify(current) !== JSON.stringify(freshUser)) {
+                    useAuthStore.getState().setUser(freshUser);
+                }
+            }).catch(() => { });
 
-            // Fetch registration status
-            setIsFetchingReg(true);
-            api.profile.getRegistrationStatus()
-                .then(res => {
-                    const mapped: Registration[] = (res.registrations || []).map(r => ({
-                        nomorDaftar: r.registration_number,
-                        periode:     r.period,
-                        gelombang:   r.batch,
-                        jurusan:     r.major,
-                        biodata:     r.biodata_status as BiodataStatus,
-                        pembayaran:  r.payment_status as PaymentStatus,
-                        usm:         r.usm,
-                        passwordUSM: r.usm_password,
-                        usmResult:   r.usm_result,
-                    }));
-                    setRegistrations(mapped);
-                })
-                .catch(err => {
-                    console.error("Failed to fetch registration status", err);
-                })
-                .finally(() => setIsFetchingReg(false));
-        }
+        // Fetch registration status
+        setIsFetchingReg(true);
+        api.profile.getRegistrationStatus()
+            .then(res => {
+                const mapped: Registration[] = (res.registrations || []).map(r => ({
+                    nomorDaftar: r.registration_number,
+                    periode: r.period,
+                    gelombang: r.batch,
+                    jurusan: r.major,
+                    biodata: r.biodata_status as BiodataStatus,
+                    pembayaran: r.payment_status as PaymentStatus,
+                    usm: r.usm,
+                    passwordUSM: r.usm_password,
+                    usmResult: r.usm_result,
+                }));
+                setRegistrations(mapped);
+            })
+            .catch(err => {
+                console.error("Failed to fetch registration status", err);
+            })
+            .finally(() => setIsFetchingReg(false));
     }, [user]);
-
-    // ── Auth guard ────────────────────────────────────────────────────────────
-    useEffect(() => {
-        if (!isLoading && !user) {
-            router.push(`/login?from=${encodeURIComponent(window.location.pathname)}`);
-        }
-    }, [isLoading, user, router]);
-
-    if (isLoading) return <div>Loading...</div>;
-    if (!user)     return null;
 
     const handleLogout = async () => {
         setIsLogout(true);
@@ -255,8 +244,11 @@ export default function Account() {
             router.push(`/account/prasyarat-ospek?nomorDaftar=${reg.nomorDaftar}`),
     };
 
+    if (isLoading) return <AccountSkeleton />;
+    if (!user) return null;
+
     return (
-        <div className={styles.pageContent}>
+        <main className={styles.pageContent}>
             <div className={styles.accountBox}>
                 <h2 className={styles.accountTitle}>Akun Saya</h2>
                 <AccountInfo user={user} />
@@ -302,6 +294,6 @@ export default function Account() {
                     </button>
                 </div>
             </div>
-        </div>
+        </main>
     );
 }

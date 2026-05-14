@@ -6,9 +6,11 @@ import '@/styles/global.scss';
 import '@/styles/sonner.scss';
 import 'react-loading-skeleton/dist/skeleton.css';
 import SessionProvider from "@/providers/SessionProvider";
+import { ScrollSpyProvider } from "@/providers/ScrollSpyProvider";
 import Header from "@/components/Header/Header";
 import BreadcrumbsJsonLd from "@/components/Breadcrumbs";
 import Footer from "@/components/Footer/Footer";
+// import { headers } from "next/headers";
 
 export const metadata: Metadata = {
     title: {
@@ -49,7 +51,9 @@ export const viewport: Viewport = {
     themeColor: "#002347",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+    // const nonce = (await headers()).get('x-nonce') ?? '';
+
     return (
         <html lang="id">
             <body>
@@ -61,10 +65,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     />
                 )}
                 <SessionProvider>
-                    <Header />
-                    <BreadcrumbsJsonLd />
-                    {children}
-                    <Footer />
+                    <ScrollSpyProvider>
+                        <Header />
+                        <BreadcrumbsJsonLd />
+                        {children}
+                        <Footer />
+                    </ScrollSpyProvider>
                 </SessionProvider>
             </body>
         </html>

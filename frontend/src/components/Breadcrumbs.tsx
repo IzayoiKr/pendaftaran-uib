@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from "next/navigation";
-import { BREADCRUMB_LABELS } from "@/constants/breadcrumps";
+import { BREADCRUMB_LABELS } from "@/constants/breadcrumbs";
 
 export default function BreadcrumbsJsonLd() {
     const pathname = usePathname() ?? "";

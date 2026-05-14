@@ -3,9 +3,11 @@
 # 1. Icon Components (Mostly SVG paths, minimal logic)
 src/components/Icons/Icons.tsx
 src/components/Icons/AnimatedIcons.tsx
+src/components/Icons/AnimatedIcons.module.scss
 
 # 2. Public/Private Asset Directories
 public/images/**
+public/docs/**
 public/favicon/**
 private/**
 
@@ -22,4 +24,4 @@ pnpm-lock.yaml
 
 # 5. Miscellaneous
 **/.DS_Store
-README.md
+*.md

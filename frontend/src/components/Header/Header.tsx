@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import styles from './Header.module.scss';
 import { headerNavLinks, spyIds } from './data';
+import { useScrollSpyContext } from '@/providers/ScrollSpyProvider';
 import useScrollSpy from '@/hooks/useScrollSpy';
 import scrollToId from '@/utils/ScrollToId';
 import useAuthStore from '@/store/useAuthStore';
@@ -85,6 +86,7 @@ function NavMenu({ isOpen, activeId, pathname, onLinkClick, isAuthenticated }: N
 export default function Header() {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [isScrolled, setIsScrolled] = useState<boolean>(false);
+    const { ready } = useScrollSpyContext();
     const router = useRouter();
     const pathname = usePathname() ?? '';
 
@@ -111,7 +113,7 @@ export default function Header() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [])
 
-    const activeId = useScrollSpy({ ids: spyIds, offset: headerHeight });
+    const activeId = useScrollSpy({ ids: spyIds, offset: headerHeight, ready });
 
     const handleLinkClick = (e: React.MouseEvent, to: string, hashId?: string) => {
         e.preventDefault();

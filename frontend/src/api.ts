@@ -29,12 +29,7 @@ function getDeviceId(): string {
     if (typeof window === 'undefined') return '';
     let id = localStorage.getItem('device_id');
     if (!id) {
-        id = typeof crypto?.randomUUID === 'function'
-            ? crypto.randomUUID()
-            : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-                const r = (Math.random() * 16) | 0;
-                return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
-            });
+        id = crypto.randomUUID()
         localStorage.setItem('device_id', id);
     }
     return id;
@@ -42,6 +37,10 @@ function getDeviceId(): string {
 
 const apiClient: AxiosInstance = axios.create({
     withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+    },
 });
 
 let refreshPromise: Promise<string> | null = null;
@@ -177,8 +176,13 @@ export const api = {
     },
 
     profile: {
-        profile: () =>
+        get: () =>
             apiClient.get<never, User>('/api/profile'),
+
+        update: (data: { fullName: string }) =>
+            apiClient.post<never, { message: string }>("/api/profile", {
+                full_name: data.fullName,
+            }),
 
         getRegistrationStatus: () =>
             apiClient.get<never, { is_registered: boolean; registrations: any[] }>('/api/registration-status'),
@@ -200,11 +204,6 @@ export const api = {
                 old_password: oldPassword,
                 new_password: newPassword,
             }),
-
-        update: (data: { fullName: string }) =>
-            apiClient.post<never, { message: string }>("/api/profile", {
-                full_name: data.fullName,
-            }),
     },
 
     prodi: {
@@ -218,16 +217,4 @@ export const api = {
         uploadBukti: (registrationId: string, data: FormData) =>
             apiClient.post<never, { message: string }>(`/api/registration/${registrationId}/transfer`, data),
     },
-
-    /* prodi_request: {
-        getRequests: () =>
-            apiClient.get<never, any[]>("/api/prodi/requests"),
-
-        requestPindah: (data: { prodiTujuan: string; waktuKuliahSebelumnya: string; waktuKuliahBaru: string; }) =>
-            apiClient.post("/api/prodi/requests", {
-                prodi_tujuan: data.prodiTujuan,
-                waktu_kuliah_sebelumnya: data.waktuKuliahSebelumnya,
-                waktu_kuliah_baru: data.waktuKuliahBaru
-            }),
-    }, */
 };

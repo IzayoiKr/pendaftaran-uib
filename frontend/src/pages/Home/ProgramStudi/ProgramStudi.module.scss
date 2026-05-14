@@ -54,14 +54,15 @@ $dot-size: var(--step--2);
 }
 
 .slide {
+  display: flex;
   flex: 0 0 25%;
   min-width: 0;
   padding-inline: calc(var(--space-s) / 2);
 
   $card-quantity: (
-  xxl: 33%,
-  lg: 50%,
-  md: 100%
+    xxl: 33%,
+    lg: 50%,
+    md: 100%
   );
 
   @each $bp, $width in $card-quantity {
@@ -72,10 +73,20 @@ $dot-size: var(--step--2);
 }
 
 .card {
-  transition: box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: global.$card-bg;
+  border: 1px solid rgba(0, 35, 71, 0.06);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: box-shadow 0.4s ease, transform 0.4s ease;
 
   &:hover {
-    box-shadow: 0px 10px 30px rgba(0, 35, 71, 0.1);
+    box-shadow:
+      0 2px 8px rgba(0, 35, 71, 0.03),
+      0 8px 24px rgba(0, 35, 71, 0.05);
+    transform: translateY(-2px);
 
     .courseHead img {
       transform: scale(1.2);
@@ -111,10 +122,32 @@ $dot-size: var(--step--2);
 }
 
 .courseContent {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   padding: var(--space-m) var(--space-s);
   background: global.$card-bg;
   position: relative;
   transition: background 0.3s ease;
+
+  h3 {
+    font-weight: 500;
+    margin-bottom: var(--space-xs);
+
+    a {
+      color: global.$tertiary-color;
+      transition: color 0.3s ease;
+    }
+  }
+
+  p {
+    font-size: var(--step--1);
+    color: global.$text-color;
+    text-align: left;
+    line-height: 1.6;
+    text-wrap: pretty;
+    overflow: hidden;
+  }
 }
 
 .badge {
@@ -141,35 +174,13 @@ $dot-size: var(--step--2);
   background: global.$tertiary-color;
   text-transform: uppercase;
   margin-bottom: var(--space-xs);
-}
-
-.courseContent {
-  h3 {
-  font-weight: 500;
-  margin-bottom: var(--space-xs);
-
-    a {
-      color: global.$tertiary-color;
-      transition: color 0.3s ease;
-    }
-  }
-
-  p {
-    font-size: var(--step--1);
-    color: global.$text-color;
-    text-align: justify;
-    text-justify: inter-word;
-    hyphens: auto;
-    text-wrap: pretty;
-    line-height: 1.7;
-  }
+  width: fit-content;
 }
 
 .navBtn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-
   width: $navBtn-size;
   height: $navBtn-size;
   border-radius: 50%;
@@ -202,7 +213,7 @@ $dot-size: var(--step--2);
   gap: var(--space-xs);
   margin-top: var(--space-l);
 
-  @media(max-width: map.get(global.$breakpoints, sm)) {
+  @media (max-width: map.get(global.$breakpoints, sm)) {
     display: none;
     margin: 0;
     gap: 0;

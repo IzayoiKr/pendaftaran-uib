@@ -1,16 +1,6 @@
 @use '@/styles/config.scss' as global;
 @use 'sass:map';
 
-$card-width: (
-  420px: 70%,
-  576px: 60%,
-  768px: 48%,
-  992px: 70%,
-  1200px: 60%,
-  1400px: 55%,
-  1600px: 50%
-);
-
 .gelombang {
   background: global.$tertiary-color;
   color: global.$white;
@@ -22,142 +12,188 @@ $card-width: (
 }
 
 .title {
-  color: global.$white;
   text-align: center;
   margin-bottom: var(--space-xl);
 
   h2 {
-    line-height: var(--step-3);
     font-weight: 600;
+    line-height: 1.2;
+    color: global.$white;
   }
 
   .subTitle {
+    color: global.$primary-color;
     margin-bottom: var(--space-s);
+    font-weight: 500;
   }
 
   p {
-    line-height: 1.2;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
   }
 }
 
 .stack {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  justify-items: center;
-  gap: var(--space-m);
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-l);
+}
 
-  @media (max-width: map.get(global.$breakpoints, lg)) {
+@media (max-width: map.get(global.$breakpoints, lg)) {
+  .stack {
     grid-template-columns: 1fr;
   }
+}
 
-  .card {
-    display: flex;
-    justify-content: flex-end;
-    position: relative;
-    width: 100%;
-    overflow: hidden;
+.card {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 
-    .cardImg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s ease;
+  &:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
 
-      &:hover {
-        transform: scale(1.1);
-      }
+    .image {
+      transform: scale(1.05);
     }
+  }
+}
 
-    .details {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      width: 100%;
-      background: rgba(0, 35, 71, 0.7);
-      color: global.$white;
-      padding: var(--space-2xs);
-      z-index: 101;
+.media {
+  position: relative;
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.2);
+}
 
-      @each $breakpoints, $width in $card-width {
-        @media (min-width: $breakpoints) {
-          width: $width;
-        }
-      }
+.image {
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.5s ease;
+}
 
-      h3, h4, h5 {
-        color: global.$primary-color;
-        text-transform: uppercase;
-        font-size: var(--step-0);
-        font-weight: 700;
-        line-height: 1.4;
-        margin-bottom: var(--space-2xs);
-      }
+.body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: var(--space-m);
+  gap: calc(var(--space-2xs) / 2);
+}
 
-      h4 {
-        font-size: var(--step--1);
-        line-height: 1.35;
-      }
+.batch {
+  font-size: var(--step-1);
+  font-weight: 700;
+  color: global.$primary-color;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
 
-      h5 {
-        font-size: var(--step--1);
-        margin-bottom: 0;
-      }
-    }
+.program {
+  font-size: var(--step-0);
+  font-weight: 500;
+  color: global.$white;
+  line-height: 1.4;
 
-    .meta {
-      display: flex;
-      align-items: center;
-      margin-bottom: var(--space-2xs);
+  i {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 400;
+  }
+}
 
-      .date {
-        color: global.$white;
-        border-right: 2px solid global.$white;
-        padding-right: var(--space-2xs);
-        margin-right: var(--space-2xs);
-        font-size: var(--step--1);
+.year {
+  font-size: var(--step--1);
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-2xs);
+}
 
-        span {
-          display: block;
-          color: global.$primary-color;
-          font-size: var(--step-1);
-          font-weight: 500;
-          line-height: 1;
-        }
-      }
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: var(--space-xs) 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-      .timeLocation p {
-        font-size: var(--step--1);
-        color: global.$white;
-        margin-bottom: 0;
-        line-height: 1.6;
-      }
-    }
+.calendar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 3rem;
+  padding-right: var(--space-xs);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-    .batch, .regDate {
-      font-size: var(--step--1);
-      color: global.$white;
+.calendarDay {
+  font-size: var(--step-1);
+  font-weight: 700;
+  color: global.$primary-color;
+  line-height: 1;
+}
 
-      span {
-        color: global.$primary-color;
-      }
-    }
+.calendarMonth {
+  font-size: var(--step--2);
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.1em;
+}
 
-    .registerBtn {
-      background: global.$primary-color;
-      color: global.$tertiary-color;
-      padding: var(--space-xs) var(--space-l);
-      font-size: var(--step--2);
-      font-weight: 500;
-      margin-top: var(--space-2xs);
-      text-transform: uppercase;
-      transition: all 0.3s ease;
+.info {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--step--1);
+  color: rgba(255, 255, 255, 0.85);
+}
 
-      &:hover {
-        background: global.$tertiary-color;
-        color: global.$primary-color;
-      }
-    }
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--step--1);
+  line-height: 1.5;
+}
+
+.registration {
+  font-size: var(--step--1);
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+  margin: var(--space-2xs) 0;
+}
+
+.registrationLabel {
+  color: global.$primary-color;
+  font-weight: 500;
+}
+
+.registerBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: auto;
+  padding: var(--space-xs) var(--space-m);
+  background: global.$primary-color;
+  color: global.$tertiary-color;
+  font-size: var(--step--1);
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 6px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    background: global.$white;
+    color: global.$tertiary-color;
   }
 }

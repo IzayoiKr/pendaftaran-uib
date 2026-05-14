@@ -62,7 +62,6 @@ function FooterMap() {
                 src={externalLinks.mapEmbedUrl}
                 width="100%"
                 height="200"
-                style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
                 title="Lokasi Universitas Internasional Batam"

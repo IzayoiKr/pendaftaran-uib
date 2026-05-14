@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 
 interface UseScrollSpyProps {
-    ids: string[],
-    offset?: number
+    ids: string[];
+    offset?: number;
+    ready?: number;
 }
 
-export default function useScrollSpy({ ids, offset = 80 }: UseScrollSpyProps) {
+export default function useScrollSpy({ ids, offset = 80, ready = 0 }: UseScrollSpyProps) {
     const [activeId, setActiveId] = useState<string>('');
 
     const idsRef = useRef(ids);
@@ -16,11 +17,8 @@ export default function useScrollSpy({ ids, offset = 80 }: UseScrollSpyProps) {
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        intersecting.add(entry.target.id);
-                    } else {
-                        intersecting.delete(entry.target.id);
-                    }
+                    if (entry.isIntersecting) intersecting.add(entry.target.id);
+                    else intersecting.delete(entry.target.id);
                 })
 
                 if (intersecting.size === 0) {
@@ -47,7 +45,7 @@ export default function useScrollSpy({ ids, offset = 80 }: UseScrollSpyProps) {
         })
 
         return () => observer.disconnect();
-    }, [offset])
+    }, [offset, ready])
 
     return activeId;
 }

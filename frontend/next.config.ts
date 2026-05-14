@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 
+const isProduction = process.env.NODE_ENV === 'production';
 const backendUrl = process.env.BACKEND_URL ?? 'http://localhost:9999'
 
 const nextConfig: NextConfig = {
@@ -11,6 +12,26 @@ const nextConfig: NextConfig = {
     images: {
         formats: ['image/avif', 'image/webp'],
     },
+    async headers() {
+        return [
+            {
+                source: '/(.*)',
+                headers: [
+                    {
+                        key: 'Permissions-Policy',
+                        value: [
+                            'camera=()',
+                            'microphone=()',
+                            'geolocation=()',
+                            'payment=()',
+                            'usb=()',
+                            'interest-cohort=()',
+                        ].join(', ')
+                    }
+                ]
+            }
+        ];
+    },
     async rewrites() {
         return [
             {
@@ -19,7 +40,7 @@ const nextConfig: NextConfig = {
             }
         ];
     },
-    output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined
+    output: isProduction ? 'standalone' : undefined
 };
 
 export default nextConfig;
