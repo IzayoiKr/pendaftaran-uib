@@ -1,42 +1,174 @@
 @use '@/styles/config.scss' as global;
 @use '@/styles/formConfig.scss' as form;
+@use 'sass:map';
 
 .updateProfile {
-  @include global.main-layout;
-  align-items: center;
+  @include form.container-form;
+  margin: calc(var(--space-2xl) + var(--space-xl)) auto var(--space-2xl);
 }
 
 .container {
-  @include form.container-form;
+  border-radius: 1rem;
+  box-shadow:
+    0 8px 32px rgba(0, 35, 71, 0.10),
+    0 1px 3px rgba(0, 35, 71, 0.06);
+  overflow: hidden;
+}
 
-  h1 {
-    font-size: var(--step-2);
-    font-weight: 700;
-    color: global.$secondary-color;
-    text-align: center;
-    letter-spacing: 0.06em;
-    margin-bottom: var(--space-2xs);
+.profileHeader {
+  background: linear-gradient(135deg, global.$tertiary-color 0%, #5f6f92 100%);
+  padding: var(--space-l) 0;
+  text-align: center;
+  color: global.$white;
+  position: relative;
+}
+
+.avatar {
+  width: calc(var(--step-4) * 1.8);
+  height: calc(var(--step-4) * 1.8);
+  border-radius: 50%;
+  background: global.$primary-color;
+  color: global.$tertiary-color;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--step-2);
+  font-weight: 700;
+  margin: 0 auto var(--space-s);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  user-select: none;
+}
+
+.title {
+  font-size: var(--step-1);
+  font-weight: 600;
+  color: global.$white;
+  margin: 0;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+}
+
+.subTitle {
+  display: block;
+  font-size: var(--step--1);
+  font-weight: 400;
+  opacity: 0.75;
+  font-style: italic;
+  letter-spacing: 0;
+}
+
+.formBody {
+  margin: var(--space-m);
+}
+
+.infoSection {
+  padding-bottom: var(--space-s);
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.editSection {
+  padding-top: var(--space-m);
+}
+
+.sectionTitle {
+  font-size: var(--step--1);
+  font-weight: 700;
+  color: global.$text-color2;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-xs);
+  display: block;
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  padding: var(--space-s) 0;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.15s ease;
+  border-radius: 0.5rem;
+
+  &:hover {
+    background: #f8fafc;
   }
 
-  .required {
-    font-size: var(--step--2);
-    color: global.$text-color;
-    text-align: center;
-    margin-bottom: var(--space-m);
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.infoContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.infoLabel {
+  font-size: var(--step--2);
+  color: global.$text-color;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.infoValue {
+  font-size: var(--step--1);
+  color: global.$text-color2;
+  font-weight: 600;
+  word-break: break-word;
+  letter-spacing: 0.01em;
+}
+
+.fieldLabel {
+  display: block;
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: global.$text-color2;
+  margin-bottom: var(--space-xs);
+}
+
+.input {
+  @include form.input-template;
+}
+
+.submitBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-s);
+  margin-top: var(--space-m);
+
+  font-size: var(--step--1);
+  font-family: global.$font-family;
+  font-weight: 600;
+  color: global.$tertiary-color;
+
+  background: global.$primary-color;
+  border: 2px solid global.$primary-color;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: #e6b22d;
+    border-color: #e6b22d;
+    box-shadow: 0 8px 20px rgba(253, 198, 50, 0.25);
   }
 
-  input {
-    @include form.input-template;
-
-    &:read-only {
-      background: #f0f0f0;
-      color: global.$text-color;
-      cursor: default;
-      &:focus { background: #f0f0f0; border-color: #d0d5dd; }
-    }
+  &:active:not(:disabled) {
+    box-shadow: 0 2px 8px rgba(253, 198, 50, 0.2);
   }
 
-  .submitBtn {
-    @include form.submit-button;
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  svg {
+    width: var(--step-0);
+    height: var(--step-0);
   }
 }

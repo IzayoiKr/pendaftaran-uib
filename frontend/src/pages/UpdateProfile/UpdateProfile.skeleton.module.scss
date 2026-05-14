@@ -1,0 +1,65 @@
+@use '@/styles/skeleton.scss' as *;
+@use '@/styles/config.scss' as global;
+
+.avatarSkeleton {
+  @extend .skeleton;
+  width: calc(var(--step-4) * 1.8);
+  height: calc(var(--step-4) * 1.8);
+  border-radius: 50%;
+  margin: 0 auto var(--space-s);
+}
+
+.titleSkeleton {
+  @extend .skeleton;
+  width: 13.75rem;
+  height: var(--step-1);
+  margin: 0 auto;
+}
+
+.subTitleSkeleton {
+  @extend .skeleton;
+  width: 11.25rem;
+  height: var(--step--1);
+  margin: var(--space-2xs) auto 0;
+}
+
+.sectionTitleSkeleton {
+  @extend .skeleton;
+  width: 7.5rem;
+  height: var(--step--1);
+  margin-bottom: var(--space-xs);
+}
+
+.infoLabelSkeleton {
+  @extend .skeleton;
+  width: 5rem;
+  height: var(--step--2);
+}
+
+.infoValueSkeleton {
+  @extend .skeleton;
+  width: 200%;
+  height: var(--step--1);
+}
+
+.fieldLabelSkeleton {
+  @extend .skeleton;
+  width: 6.25rem;
+  height: var(--step--1);
+  margin-bottom: var(--space-xs);
+}
+
+.inputSkeleton {
+  @extend .skeleton;
+  width: 100%;
+  height: 3rem;
+  border-radius: 0.5rem;
+}
+
+.submitBtnSkeleton {
+  @extend .skeleton;
+  width: 100%;
+  height: 3rem;
+  border-radius: 0.75rem;
+  margin-top: var(--space-m);
+}

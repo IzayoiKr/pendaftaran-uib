@@ -42,6 +42,11 @@ export const forgotPasswordSchema = z.object({
         .regex(/^\d+$/, "NIK harus berupa angka"),
 });
 
+export const updateProfileSchema = z.object({
+    fullName: z
+        .string()
+        .min(1, "Nama lengkap wajib diisi")
+})
 
 export const changePasswordSchema = z.object({
     oldPassword: z
@@ -78,5 +83,6 @@ export const resetPasswordSchema = z.object({
 export type LoginValidation = z.infer<typeof loginSchema>;
 export type RegisterValidation = z.infer<typeof registerSchema>;
 export type ForgotPasswordValidation = z.infer<typeof forgotPasswordSchema>;
+export type UpdateProfileValidation = z.infer<typeof updateProfileSchema>;
 export type ChangePasswordValidation = z.infer<typeof changePasswordSchema>;
 export type ResetPasswordValidation = z.infer<typeof resetPasswordSchema>;

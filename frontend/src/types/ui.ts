@@ -42,7 +42,9 @@ export interface Form {
     label?: string;
     type: "text" | "email" | "password";
     placeholder?: string;
-    autoComplete: string;
+    autoComplete?: string;
+    required?: boolean;
+    readOnly?: boolean;
     minLength?: number;
     maxLength?: number;
     value?: string;

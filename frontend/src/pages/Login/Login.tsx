@@ -159,16 +159,15 @@ function LoginForm({ onLogin, router }: LoginFormProps) {
                 Lupa Password?
             </Link>
 
-            <div
-                style={{ display: requireCaptcha ? "block" : "none" }}
-                aria-hidden={!requireCaptcha}
-            >
-                <TurnstileWidget
-                    ref={turnstileRef}
-                    onTokenChange={setTurnstileToken}
-                    className={styles.turnstile}
-                />
-            </div>
+            {requireCaptcha && (
+                <div aria-hidden={!requireCaptcha}>
+                    <TurnstileWidget
+                        ref={turnstileRef}
+                        onTokenChange={setTurnstileToken}
+                        className={styles.turnstile}
+                    />
+                </div>
+            )}
 
             <LoginAction isLoading={isLoading} requireCaptcha={requireCaptcha} />
         </form>

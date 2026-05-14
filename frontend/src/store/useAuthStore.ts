@@ -48,6 +48,7 @@ const useAuthStore = create<AuthStore>((set) => ({
     accessToken: null,
     isAuthenticated: false,
     isLoading: true,
+    isLoggingOut: false,
 
     login: (user, accessToken) => set({
         user,
@@ -60,7 +61,8 @@ const useAuthStore = create<AuthStore>((set) => ({
         user: null,
         accessToken: null,
         isAuthenticated: false,
-        isLoading: false
+        isLoading: false,
+        isLoggingOut: true,
     }),
 
     setAccessToken: (token) => set({ accessToken: token }),

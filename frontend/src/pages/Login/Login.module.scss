@@ -24,6 +24,10 @@
     @include form.input-template;
   }
 
+  .requireCaptcha {
+    display: block;
+  }
+
   .turnstile {
     display: flex;
     margin-top: var(--space-xs);
