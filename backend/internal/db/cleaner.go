@@ -33,7 +33,7 @@ func (c *Cleaner) sweep() {
 	tables := []string{"reset_password", "email_verification"}
 	for _, table := range tables {
 		result, err := c.db.ExecContext(context.Background(),
-			"DELETE FROM "+table+" WHERE expired_at NOW()",
+			"DELETE FROM "+table+" WHERE expired_at < NOW()",
 		)
 		if err != nil {
 			slog.Error("db cleaner: sweep failed", "table", table, "error", err)

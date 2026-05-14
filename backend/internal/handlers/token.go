@@ -6,9 +6,15 @@ import (
 	"net/http"
 	"os"
 	"pendaftaran-uib/backend/internal/auth"
+	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 	"time"
 )
+
+type accessTokenResponse struct {
+	AccessToken string `json:"access_token"`
+	User models.UserDTO `json:"user"`
+}
 
 const verifyTokenTTL = 24 * time.Hour
 const resetTokenTTL = 15 * time.Minute

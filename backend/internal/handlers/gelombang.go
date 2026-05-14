@@ -19,7 +19,7 @@ func Gelombang(db *sql.DB) http.HandlerFunc {
 		degree, academic_year, image_path, event_date,
 		start_time, end_time, location, registration_start, registration_end
 			FROM gelombang
-			WHERE registration_end >= CURRENT_DATE()
+			WHERE registration_start <= CURRENT_DATE() AND registration_end >= CURRENT_DATE()
 			ORDER BY registration_start DESC
 		`)
 		if err != nil {
@@ -54,6 +54,8 @@ func Gelombang(db *sql.DB) http.HandlerFunc {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
+
+		w.Header().Set("Cache-Control", "public, max-age=3600, stale-while-revalidate=60")
 		utils.WriteJSON(w, http.StatusOK, gelombang)
 	}
 }

@@ -75,6 +75,8 @@ func main() {
 	r.Use(chimiddleware.Recoverer)
 	r.Use(chimiddleware.RequestID)
 	r.Use(middleware.CORS)
+	r.Use(middleware.SecFetch)
+	r.Use(middleware.SecurityHeaders)
 
 	fileServer := http.FileServer(http.Dir("./uploads"))
 	r.Handle("/uploads/*", http.StripPrefix("/uploads/", fileServer))

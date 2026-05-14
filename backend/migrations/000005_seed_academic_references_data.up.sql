@@ -84,4 +84,11 @@ INSERT INTO gelombang (
  'Beasiswa III', 'Beasiswa', 'Program Sarjana', 'Undergraduate Program',
  'S1', 'T.A 2026/2027', '/images/event/beasiswa-baru.png',
  '2026-06-13', '09:00:00', '16:00:00', 'Online',
- '2025-12-08', '2026-06-12', 'B3OL26');
+ '2025-12-08', '2026-06-12', 'B3OL26'),
+
+('b1a0c7e2-0f1a-4d3b-9a1c-8e2b3c4d5e05',
+ 'sarjana-gelombang-7',
+ 'Gelombang 07', 'Reguler', 'Program Sarjana', 'Undergraduate Program',
+ 'S1', 'T.A 2026/2027', '/images/event/GP.jpg',
+ '2026-06-27', '09:00:00', '16:00:00', 'Online',
+ '2026-05-11', '2026-06-26', 'F67BLO');

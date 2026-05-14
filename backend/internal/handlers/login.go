@@ -19,11 +19,6 @@ import (
 
 const captchaThreshold = 3
 
-type accessTokenResponse struct {
-	AccessToken string `json:"access_token"`
-	User models.UserDTO `json:"user"`
-}
-
 func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *audit.Logger) http.HandlerFunc {
 	tracker := auth.NewFailedAttempts()
 

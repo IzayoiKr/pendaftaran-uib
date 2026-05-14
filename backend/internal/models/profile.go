@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"strings"
+	"unicode/utf8"
 )
 
 type UpdateProfileRequest struct {
@@ -14,10 +15,10 @@ func (r *UpdateProfileRequest) Sanitize() {
 }
 
 func (r *UpdateProfileRequest) Validate() error {
-	switch {
-	case r.FullName == "":
+	if r.FullName == "" {
 		return errors.New("nama wajib diisi")
-	case len(r.FullName) > 255:
+	}
+	if utf8.RuneCountInString(r.FullName) > 255 {
 		return errors.New("nama terlalu panjang")
 	}
 	return nil

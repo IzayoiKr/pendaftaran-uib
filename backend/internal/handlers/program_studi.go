@@ -50,6 +50,8 @@ func ProgramStudi(db *sql.DB) http.HandlerFunc {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
+
+		w.Header().Set("Cache-Control", "public, max-age=3600, stale-while-revalidate=60")
 		utils.WriteJSON(w, http.StatusOK, programs)
 	}
 }

@@ -34,26 +34,31 @@ func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			return
 		}
 
-		if _, err := db.ExecContext(r.Context(),
-			"UPDATE user SET full_name = ? WHERE id = ?",
-			req.FullName, claims.UserID,
-		); err != nil {
-			slog.Error("update_profile: exec", "user_id", claims.UserID, "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
-			return
-		}
-
-		var newFullname models.UpdateProfileRequest
+		var oldFullname string
 		err := db.QueryRowContext(r.Context(),
 			"SELECT full_name FROM user WHERE id = ?",
 			claims.UserID,
-		).Scan(&newFullname.FullName)
+		).Scan(&oldFullname)
 
 		if errors.Is(err, sql.ErrNoRows) {
 			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON("user tidak ditemukan"))
 			return
 		}
 		if err != nil {
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+
+		if oldFullname == req.FullName {
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("nama baru harus berbeda dari nama lama!"))
+			return
+		}
+
+		if _, err := db.ExecContext(r.Context(),
+			"UPDATE user SET full_name = ? WHERE id = ?",
+			req.FullName, claims.UserID,
+		); err != nil {
+			slog.Error("update_profile: exec", "user_id", claims.UserID, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
@@ -66,6 +71,6 @@ func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			RequestID: base.RequestID,
 		})
 
-		utils.WriteJSON(w, http.StatusOK, &newFullname)
+		utils.WriteJSON(w, http.StatusOK, &req.FullName)
 	}
 }
