@@ -1,0 +1,163 @@
+// ─── Design tokens (matching original UIB panduan theme) ─────────────────────
+$accent:      #1a3fa8;
+$accent-lt:   #e8edf8;
+$text-hi:     #111218;
+$text-md:     #3d3f4f;
+$text-lo:     #8a8c9a;
+$border:      #e4e2db;
+$surface:     #ffffff;
+$radius-card: 16px;
+
+// ─── Per-step gradient icon colours (from App.tsx) ───────────────────────────
+$gradients: (
+  blue:   (start: #3b82f6, end: #2563eb),
+  purple: (start: #a855f7, end: #9333ea),
+  green:  (start: #22c55e, end: #16a34a),
+  orange: (start: #f97316, end: #ea580c),
+  teal:   (start: #14b8a6, end: #0d9488),
+  pink:   (start: #ec4899, end: #db2777),
+  indigo: (start: #6366f1, end: #4f46e5),
+);
+
+// ─── Card ────────────────────────────────────────────────────────────────────
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius-card;
+  padding: 1.5rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+
+  &:hover {
+    border-color: rgba($accent, 0.45);
+    box-shadow: 0 10px 32px rgba($accent, 0.12);
+    transform: translateY(-3px);
+
+    .cardFooter { opacity: 1; }
+    .iconBox     { transform: scale(1.08); }
+    .titleId     { color: $accent; }
+    .pdfBadge    { color: $accent; }
+  }
+}
+
+// ─── Top row ─────────────────────────────────────────────────────────────────
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.iconBox {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  svg {
+    width: 26px;
+    height: 26px;
+    color: #fff;
+  }
+}
+
+// ─── Generate icon gradient per step ─────────────────────────────────────────
+@each $key, $colors in $gradients {
+  .#{$key} .iconBox {
+    background: linear-gradient(135deg, map-get($colors, start), map-get($colors, end));
+  }
+}
+
+// ─── PDF badge ───────────────────────────────────────────────────────────────
+.pdfBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: $text-lo;
+  transition: color 0.2s;
+}
+
+.extIcon {
+  width: 14px;
+  height: 14px;
+}
+
+// ─── Body ────────────────────────────────────────────────────────────────────
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+}
+
+.stepRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.stepNum {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: $text-hi;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.titleId {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: $text-hi;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  transition: color 0.2s;
+}
+
+.titleEn {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: $text-lo;
+  letter-spacing: 0.01em;
+  margin-top: 0.1rem;
+}
+
+.desc {
+  font-size: 0.875rem;
+  color: $text-md;
+  line-height: 1.6;
+  margin-top: 0.35rem;
+}
+
+// ─── Hover-reveal footer ──────────────────────────────────────────────────────
+.cardFooter {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid $border;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $accent;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.arrowIcon {
+  width: 14px;
+  height: 14px;
+}

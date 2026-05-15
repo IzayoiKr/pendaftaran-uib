@@ -1,0 +1,74 @@
+// ─── Design tokens ────────────────────────────────────────────────────────────
+$accent:    #1a3fa8;
+$accent-lt: #e8edf8;
+$text-hi:   #111218;
+$text-md:   #3d3f4f;
+$text-lo:   #8a8c9a;
+$border:    #e4e2db;
+
+// ─── Section wrapper ──────────────────────────────────────────────────────────
+.section {
+  width: 100%;
+  padding-top: clamp(2.5rem, 5vw, 3.5rem);
+  padding-bottom: clamp(4rem, 8vw, 7rem);
+}
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+.hero {
+  padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 5vw, 4rem) clamp(1.5rem, 3vw, 2.5rem);
+  text-align: center;
+}
+
+.heading {
+  margin: 0;
+
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+
+  color: $text-hi;
+}
+
+.sub {
+  margin-top: 0.6rem;
+
+  font-size: 0.875rem;
+  line-height: 1.5;
+
+  color: $text-lo;
+}
+
+// ─── Grid ────────────────────────────────────────────────────────────────────
+.grid {
+  padding: 0 clamp(1.5rem, 5vw, 4rem);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+
+  > [role="listitem"] {
+    display: flex;
+    flex-direction: column;
+
+    > * { flex: 1; }
+  }
+}
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    padding: 0 1.25rem;
+  }
+}

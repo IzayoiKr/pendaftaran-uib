@@ -1,0 +1,869 @@
+// ─────────────────────────────────────────────
+// UIB TOKENS
+// ─────────────────────────────────────────────
+
+$brand: #003087;
+$brand-mid: #1a3fa8;
+$brand-hover: #1432a0;
+
+$brand-light: #eef3ff;
+
+$accent: #c8a84b;
+
+$text-hi: #1a2340;
+$text-md: #5f6f92;
+$text-lo: #94a3b8;
+
+$surface: #ffffff;
+$bg: #f6f8fc;
+
+$border: #e3e8f2;
+
+// ─────────────────────────────────────────────
+// PAGE
+// ─────────────────────────────────────────────
+
+.page {
+  min-height: 100vh;
+
+  padding:
+    6rem 1.5rem
+    5rem;
+
+  background: $bg;
+}
+
+// ─────────────────────────────────────────────
+// TOPBAR
+// ─────────────────────────────────────────────
+
+.topbar {
+  max-width: 920px;
+
+  margin:
+    0 auto
+    2.5rem;
+}
+
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  gap: .55rem;
+
+  margin-bottom: 1rem;
+
+  font-size: .82rem;
+
+  color: $text-lo;
+
+  a {
+    color: inherit;
+
+    text-decoration: none;
+
+    transition: color .15s;
+
+    &:hover {
+      color: $brand-mid;
+    }
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+
+  width: fit-content;
+
+  padding:
+    .42rem
+    .85rem;
+
+  margin-bottom: 1rem;
+
+  border-radius: 999px;
+
+  background: $brand-light;
+
+  border:
+    1px solid
+    rgba(26,63,168,.12);
+
+  color: $brand-mid;
+
+  font-size: .74rem;
+  font-weight: 700;
+
+  letter-spacing: .03em;
+
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+
+  font-family:
+    "Playfair Display",
+    Georgia,
+    serif;
+
+  font-size:
+    clamp(
+      2rem,
+      4vw,
+      3rem
+    );
+
+  line-height: 1.1;
+
+  letter-spacing: -.03em;
+
+  color: $text-hi;
+}
+
+.excerpt {
+  max-width: 760px;
+
+  margin:
+    1rem 0
+    1.8rem;
+
+  color: $text-md;
+
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+// ─────────────────────────────────────────────
+// TOC
+// ─────────────────────────────────────────────
+
+.tocInline {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: .7rem;
+}
+
+.tocPill {
+  display: inline-flex;
+  align-items: center;
+
+  padding:
+    .7rem
+    1rem;
+
+  border-radius: 999px;
+
+  background: $surface;
+
+  border:
+    1px solid $border;
+
+  color: $text-md;
+
+  text-decoration: none;
+
+  font-size: .82rem;
+  font-weight: 600;
+
+  transition:
+    background .15s,
+    border-color .15s,
+    transform .15s;
+
+  &:hover {
+    background: $brand-light;
+
+    border-color:
+      rgba(26,63,168,.18);
+
+    color: $brand-mid;
+
+    transform:
+      translateY(-1px);
+  }
+}
+
+// ─────────────────────────────────────────────
+// ARTICLE
+// ─────────────────────────────────────────────
+
+.article {
+  max-width: 920px;
+
+  margin: 0 auto;
+}
+
+.contentCard {
+  padding:
+    clamp(1.5rem, 4vw, 3rem);
+
+  border-radius: 24px;
+
+  background: $surface;
+
+  border:
+    1px solid $border;
+
+  box-shadow:
+    0 8px 40px
+    rgba(26,63,168,.06);
+
+  color: $text-hi;
+
+  font-size: .98rem;
+
+  line-height: 1.9;
+}
+
+// ─────────────────────────────────────────────
+// TYPOGRAPHY
+// ─────────────────────────────────────────────
+
+.contentCard section {
+  margin-bottom: 2.5rem;
+}
+
+.contentCard h2,
+.contentCard h3,
+.contentCard h4 {
+  color: $brand-mid;
+
+  line-height: 1.2;
+
+  letter-spacing: -.02em;
+
+  margin:
+    2.25rem 0
+    .9rem;
+}
+
+.contentCard > section:first-child > h2:first-child {
+  margin-top: 0;
+}
+
+.contentCard h2 {
+  font-family:
+    "Playfair Display",
+    Georgia,
+    serif;
+
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+
+.contentCard h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.contentCard h4 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.contentCard p {
+  margin:
+    0 0
+    1rem;
+
+  color: $text-hi;
+}
+
+.contentCard ul,
+.contentCard ol {
+  margin:
+    0 0
+    1rem;
+
+  padding-left: 1.5rem;
+}
+
+.contentCard li {
+  margin-bottom: .45rem;
+
+  color: $text-hi;
+}
+
+.contentCard strong {
+  color: $text-hi;
+}
+
+.contentCard a {
+  color: $brand-mid;
+
+  text-decoration: underline;
+
+  &:hover {
+    color: $brand-hover;
+  }
+}
+
+.contentCard hr {
+  border: none;
+
+  border-top:
+    1px dashed
+    $border;
+
+  margin:
+    2rem 0;
+}
+
+// ─────────────────────────────────────────────
+// TABLE
+// ─────────────────────────────────────────────
+
+.tableWrap {
+  width: 100%;
+
+  overflow-x: auto;
+
+  margin:
+    1.5rem 0
+    2rem;
+}
+
+.tableWrap table {
+  width: 100%;
+  min-width: 680px;
+
+  border-collapse: collapse;
+
+  border:
+    1px solid $border;
+
+  border-radius: 14px;
+
+  overflow: hidden;
+
+  background: $surface;
+}
+
+.tableWrap thead tr {
+  background: $brand-mid;
+}
+
+.tableWrap th {
+  padding:
+    .85rem
+    1rem;
+
+  text-align: left;
+
+  color: #fff;
+
+  font-size: .82rem;
+  font-weight: 700;
+
+  letter-spacing: .02em;
+}
+
+.tableWrap td {
+  padding:
+    .85rem
+    1rem;
+
+  border-top:
+    1px solid $border;
+
+  vertical-align: top;
+
+  color: $text-hi;
+
+  font-size: .92rem;
+  line-height: 1.7;
+}
+
+.tableWrap tbody tr:nth-child(even) {
+  background:
+    rgba(26,63,168,.025);
+}
+
+.tableWrap tbody tr:hover {
+  background:
+    rgba(26,63,168,.05);
+}
+
+// ─────────────────────────────────────────────
+// CALLOUT
+// ─────────────────────────────────────────────
+
+.callout {
+  margin: 1.5rem 0;
+
+  padding:
+    1rem
+    1.25rem;
+
+  border-radius: 14px;
+
+  background:
+    rgba(26,63,168,.05);
+
+  border:
+    1px solid
+    rgba(26,63,168,.12);
+
+  color: $text-hi;
+}
+
+// ─────────────────────────────────────────────
+// LANGUAGE DIVIDER
+// ─────────────────────────────────────────────
+
+.langDivider {
+  display: flex;
+  justify-content: center;
+
+  margin:
+    4rem 0
+    2rem;
+}
+
+.langLabel {
+  padding:
+    .5rem
+    1rem;
+
+  border-radius: 999px;
+
+  background: $surface;
+
+  border:
+    1px solid $border;
+
+  color: $text-md;
+
+  font-size: .78rem;
+  font-weight: 700;
+
+  letter-spacing: .03em;
+
+  text-transform: uppercase;
+}
+
+// ─────────────────────────────────────────────
+// VIDEO
+// ─────────────────────────────────────────────
+
+.videoWrapper {
+  position: relative;
+
+  width: 100%;
+
+  aspect-ratio: 16 / 9;
+
+  overflow: hidden;
+
+  margin: 1.5rem 0;
+
+  border-radius: 18px;
+}
+
+.videoWrapper iframe {
+  width: 100%;
+  height: 100%;
+
+  border: 0;
+}
+
+// ─────────────────────────────────────────────
+// IMAGE
+// ─────────────────────────────────────────────
+
+.imageWrapper {
+  overflow: hidden;
+
+  margin: 1.5rem 0;
+
+  border-radius: 18px;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+
+  object-fit: cover;
+}
+
+.source {
+  margin-top: .75rem;
+
+  color: $text-md;
+
+  font-size: .82rem;
+}
+
+// ─────────────────────────────────────────────
+// GALLERY
+// ─────────────────────────────────────────────
+
+.galleryGrid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(280px, 1fr)
+    );
+
+  gap: 1.25rem;
+
+  margin-top: 1.5rem;
+}
+
+.galleryCard {
+  overflow: hidden;
+
+  border-radius: 20px;
+
+  background: $surface;
+
+  border:
+    1px solid $border;
+
+  box-shadow:
+    0 6px 20px
+    rgba(26,63,168,.05);
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease;
+
+  &:hover {
+    transform:
+      translateY(-3px);
+
+    border-color:
+      rgba(26,63,168,.14);
+
+    box-shadow:
+      0 14px 34px
+      rgba(26,63,168,.10);
+  }
+}
+
+.galleryImageWrap {
+  position: relative;
+
+  width: 100%;
+
+  aspect-ratio: 16 / 10;
+
+  overflow: hidden;
+
+  background:
+    rgba(26,63,168,.05);
+}
+
+.galleryImage {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition:
+    transform .35s ease;
+}
+
+.galleryCard:hover .galleryImage {
+  transform: scale(1.04);
+}
+
+.galleryBody {
+  padding:
+    1rem
+    1.1rem
+    1.15rem;
+}
+
+.galleryBody h4 {
+  margin:
+    0 0
+    .5rem;
+
+  color: $text-hi;
+
+  font-size: 1rem;
+  font-weight: 700;
+
+  line-height: 1.35;
+}
+
+.galleryBody p {
+  margin: 0;
+
+  color: $text-md;
+
+  font-size: .9rem;
+  line-height: 1.7;
+}
+
+// ─────────────────────────────────────────────
+// RELATED
+// ─────────────────────────────────────────────
+
+.related {
+  margin:
+    4rem auto 0;
+
+  max-width: 920px;
+}
+
+.relatedHeading {
+  margin-bottom: 1.5rem;
+
+  color: $text-hi;
+
+  font-family:
+    "Playfair Display",
+    Georgia,
+    serif;
+
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.relatedGrid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(260px, 1fr)
+    );
+
+  gap: 1.2rem;
+}
+
+.relatedCard {
+  overflow: hidden;
+
+  border:
+    1px solid $border;
+
+  border-radius: 18px;
+
+  background: $surface;
+
+  text-decoration: none;
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease;
+
+  &:hover {
+    transform:
+      translateY(-3px);
+
+    border-color:
+      rgba(26,63,168,.16);
+
+    box-shadow:
+      0 10px 30px
+      rgba(26,63,168,.08);
+  }
+}
+
+.relatedImageWrap {
+  width: 100%;
+
+  aspect-ratio: 16 / 9;
+
+  overflow: hidden;
+
+  background:
+    rgba(26,63,168,.06);
+}
+
+.relatedImage {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition:
+    transform .35s ease,
+    opacity .35s ease;
+}
+
+.relatedCard:hover .relatedImage {
+  transform: scale(1.05);
+}
+
+.relatedContent {
+  display: flex;
+  flex-direction: column;
+
+  gap: .65rem;
+
+  padding:
+    1rem
+    1.05rem
+    1.1rem;
+}
+
+.relatedTitle {
+  margin: 0;
+
+  overflow: hidden;
+
+  color: $text-hi;
+
+  font-size: .92rem;
+  font-weight: 700;
+
+  line-height: 1.5;
+
+  display: -webkit-box;
+
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+}
+
+.relatedCta {
+  color: $brand-mid;
+
+  font-size: .78rem;
+  font-weight: 700;
+
+  letter-spacing: .02em;
+}
+
+.relatedFooter {
+  display: flex;
+  justify-content: center;
+
+  margin-top: 2.5rem;
+}
+
+.backToInfoBtn {
+  display: inline-flex;
+  align-items: center;
+
+  gap: .5rem;
+
+  padding:
+    .8rem
+    1rem;
+
+  border-radius: 999px;
+
+  background: $surface;
+
+  border:
+    1px solid $border;
+
+  color: $brand-mid;
+
+  text-decoration: none;
+
+  font-size: .84rem;
+  font-weight: 700;
+
+  transition:
+    background .15s,
+    transform .15s;
+
+  &:hover {
+    background: $brand-light;
+
+    transform:
+      translateY(-1px);
+  }
+}
+
+// ─────────────────────────────────────────────
+// FOOTER
+// ─────────────────────────────────────────────
+
+.relatedFooter {
+  display: flex;
+  justify-content: center;
+
+  margin-top: 2.5rem;
+}
+
+.backToInfoBtn {
+  display: inline-flex;
+  align-items: center;
+
+  gap: .5rem;
+
+  padding:
+    .8rem
+    1rem;
+
+  border-radius: 999px;
+
+  background: $surface;
+
+  border:
+    1px solid $border;
+
+  color: $brand-mid;
+
+  text-decoration: none;
+
+  font-size: .84rem;
+  font-weight: 700;
+
+  transition:
+    background .15s,
+    transform .15s;
+
+  &:hover {
+    background: $brand-light;
+
+    transform:
+      translateY(-1px);
+  }
+}
+
+// ─────────────────────────────────────────────
+// MOBILE
+// ─────────────────────────────────────────────
+
+@media (max-width: 768px) {
+  .page {
+    padding:
+      5.5rem 1rem
+      4rem;
+  }
+
+  .contentCard {
+    padding:
+      1.35rem
+      1.1rem;
+  }
+
+  .title {
+    font-size: 2.1rem;
+  }
+
+  .excerpt {
+    font-size: .95rem;
+  }
+
+  .tocInline {
+    gap: .55rem;
+  }
+
+  .tocPill {
+    padding:
+      .6rem
+      .85rem;
+
+    font-size: .76rem;
+  }
+
+  .tableWrap table {
+    min-width: 620px;
+  }
+}

@@ -8,7 +8,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import SessionProvider from "@/providers/SessionProvider";
 import { ScrollSpyProvider } from "@/providers/ScrollSpyProvider";
 import Header from "@/components/Header/Header";
-import BreadcrumbsJsonLd from "@/components/Breadcrumbs";
+import BreadcrumbsJsonLd from "@/components/Breadcrumb/Breadcrumbs";
 import Footer from "@/components/Footer/Footer";
 // import { headers } from "next/headers";
 
