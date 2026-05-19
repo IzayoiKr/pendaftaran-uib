@@ -1,5 +1,10 @@
 import styles from './AnimatedIcons.module.scss';
 
+/*
+ Original SVG animation concept by iAmEcko via CodePen.
+ Source: https://codepen.io/iAmEcko/pen/oQQXzr
+ Licensed under MIT (c) CodePen community authors.
+*/
 export function CheckmarkIcon() {
     return (
         <svg
@@ -31,6 +36,11 @@ export function CheckmarkIcon() {
     )
 }
 
+/*
+ Original SVG animation concept by iAmEcko via CodePen.
+ Source: https://codepen.io/iAmEcko/pen/oQQXzr
+ Licensed under MIT (c) CodePen community authors.
+*/
 export function CrossmarkIcon() {
     return (
         <svg
@@ -77,6 +87,11 @@ export function CrossmarkIcon() {
     )
 }
 
+/*
+    Preloader Animation provided by SVGBackgrounds.com
+    Source: https://www.svgbackgrounds.com/elements/animated-svg-preloaders/
+    License: Free with Attribution
+*/
 export function BouncingBallsIcon() {
     return (
         <svg
@@ -138,6 +153,74 @@ export function BouncingBallsIcon() {
                     keySplines=".5 0 .5 1;.5 0 .5 1"
                     repeatCount="indefinite"
                     begin="0"
+                />
+            </circle>
+        </svg>
+    );
+}
+
+/*
+    Preloader Animation provided by SVGBackgrounds.com
+    Source: https://www.svgbackgrounds.com/elements/animated-svg-preloaders/
+    License: Free with Attribution
+*/
+export function TubeSpinnerIcon() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 200 200"
+            className={styles.tubeSpinner}
+        >
+            <defs>
+                <radialGradient
+                    id="a3"
+                    cx=".66"
+                    fx=".66"
+                    cy=".3125"
+                    fy=".3125"
+                    gradientTransform="scale(1.5)"
+                >
+                    <stop offset="0" stopColor="#002347" />
+                    <stop offset=".3" stopColor="#002347" stopOpacity=".9" />
+                    <stop offset=".6" stopColor="#002347" stopOpacity=".6" />
+                    <stop offset=".8" stopColor="#002347" stopOpacity=".3" />
+                    <stop offset="1" stopColor="#002347" stopOpacity="0" />
+                </radialGradient>
+            </defs>
+
+            <circle
+                style={{ transformOrigin: 'center' }}
+                fill="none"
+                opacity=".2"
+                stroke="#002347"
+                strokeWidth="15"
+                strokeLinecap="round"
+                cx="100"
+                cy="100"
+                r="70"
+            />
+
+            <circle
+                style={{ transformOrigin: 'center' }}
+                fill="none"
+                stroke="url(#a3)"
+                strokeWidth="15"
+                strokeLinecap="round"
+                strokeDasharray="200 1000"
+                strokeDashoffset="0"
+                cx="100"
+                cy="100"
+                r="70"
+            >
+                <animateTransform
+                    type="rotate"
+                    attributeName="transform"
+                    calcMode="spline"
+                    dur="1.1"
+                    values="360;0"
+                    keyTimes="0;1"
+                    keySplines="0 0 1 1"
+                    repeatCount="indefinite"
                 />
             </circle>
         </svg>
