@@ -23,7 +23,7 @@ RUN apk add --no-cache ca-certificates mysql-client curl bash
 WORKDIR /app
 RUN adduser -D admin && chown -R admin:admin /app
 USER admin
-COPY --from=builder --chown=admin:admin /app/server .
+COPY --from=builder --chown=admin:admin /server .
 COPY --from=builder --chown=admin:admin /app/migrations ./migrations
 COPY --from=builder --chown=admin:admin /go/bin/migrate /usr/local/bin/migrate
 CMD ["./server"]

@@ -3,10 +3,10 @@ package auth
 import (
 	"errors"
 	"fmt"
+	"pendaftaran-uib/backend/internal/utils"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 )
 
 const AccessTokenTTL = 15 * time.Minute
@@ -84,7 +84,7 @@ func generateToken(userID, sessionID, email string, tokenType TokenType, ttl tim
 		SessionID: sessionID,
 		TokenType: tokenType,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ID: uuid.NewString(),
+			ID: utils.GenerateUUIDString(),
 			Subject: userID,
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(ttl)),
 			IssuedAt: jwt.NewNumericDate(time.Now()),

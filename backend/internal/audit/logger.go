@@ -37,8 +37,10 @@ const (
 	EventRefreshReuseDetected Event = "refresh.reuse_detected"
 	EventRefreshFailure Event = "refresh.failure"
 
-	EventPasswordChanged Event = "password.changed"
 	EventProfileUpdated Event = "profile.updated"
+	EventNIKRevealed Event = "profile.nik_revealed"
+
+	EventPasswordChanged Event = "password.changed"
 
 	EventPasswordForgotBlocked Event = "password_forgot.blocked"
 	EventPasswordForgotCaptchaRequired Event = "password_forgot.captcha_required"
