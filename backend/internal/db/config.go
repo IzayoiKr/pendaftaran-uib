@@ -18,6 +18,9 @@ type MySQLConfig struct {
 	User string
 	Password string
 	DBName string
+	TCPTimeout int
+	ReadTimeout int
+	WriteTimeout int
 	MaxOpenConns int
 	MaxIdleConns int
 	MaxLifetime time.Duration
@@ -66,6 +69,9 @@ func LoadConfig() (*Config, error) {
 	}
 	cfg.MySQL.Port = port
 
+	cfg.MySQL.TCPTimeout = envInt("DB_TCP_TIMEOUT", 5)
+	cfg.MySQL.ReadTimeout = envInt("DB_READ_TIMEOUT", 30)
+	cfg.MySQL.WriteTimeout = envInt("DB_WRITE_TIMEOUT", 30)
 	cfg.MySQL.MaxOpenConns = envInt("DB_MAX_OPEN_CONNS", 100)
 	cfg.MySQL.MaxIdleConns = envInt("DB_MAX_IDLE_CONNS", 25)
 	cfg.MySQL.MaxLifetime = time.Duration(envInt("DB_MAX_LIFETIME_MIN", 30)) * time.Minute

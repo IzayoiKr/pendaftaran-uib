@@ -1,0 +1,11 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "plugins": [
+            {
+                "name": "tsec",
+                "reportTsecDiagnosticsOnly": true
+            }
+        ]
+    }
+}

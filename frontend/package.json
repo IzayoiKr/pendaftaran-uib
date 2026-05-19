@@ -7,7 +7,8 @@
         "build": "next build",
         "start": "next start --port 8989",
         "lint": "eslint",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "tsec-security": "tsec -p tsconfig.tsec.json --noEmit"
     },
     "dependencies": {
         "@fontsource-variable/rubik": "^5.2.8",
@@ -36,9 +37,11 @@
         "eslint": "^9.39.4",
         "eslint-config-next": "^16.2.4",
         "sass": "^1.99.0",
+        "tsec": "^0.2.9",
         "typescript": "^6.0.3"
     },
     "overrides": {
-        "postcss": "^8.5.12"
+        "postcss": "^8.5.12",
+        "protobufjs": "^7.5.8"
     }
 }

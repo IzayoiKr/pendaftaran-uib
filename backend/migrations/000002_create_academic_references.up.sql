@@ -1,5 +1,6 @@
 CREATE TABLE program_studi (
-    id CHAR(36) NOT NULL PRIMARY KEY,
+    id BINARY(16) NOT NULL PRIMARY KEY,
+    program_key VARCHAR(50) NOT NULL UNIQUE,
     title VARCHAR(50) NOT NULL,
     faculty VARCHAR(20) NOT NULL,
     degree ENUM('S1', 'S2') NOT NULL,
@@ -13,7 +14,7 @@ CREATE TABLE program_studi (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE gelombang (
-    id CHAR(36) NOT NULL PRIMARY KEY,
+    id BINARY(16) NOT NULL PRIMARY KEY,
     batch_key VARCHAR(50) NOT NULL,
     batch_name VARCHAR(100) NOT NULL,
     batch_type ENUM('Reguler', 'Beasiswa') NOT NULL,

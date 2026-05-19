@@ -11,12 +11,15 @@ import (
 
 func NewMySQL(ctx context.Context, cfg MySQLConfig) (*sql.DB, error) {
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?parseTime=true&charset=utf8mb4&collation=utf8mb4_unicode_ci",
+		"%s:%s@tcp(%s:%d)/%s?parseTime=true&collation=utf8mb4_0900_ai_ci&timeout=%ds&readTimeout=%ds&writeTimeout=%ds",
 		cfg.User,
 		cfg.Password,
 		cfg.Host,
 		cfg.Port,
 		cfg.DBName,
+		cfg.TCPTimeout,
+		cfg.ReadTimeout,
+		cfg.WriteTimeout,
 	)
 
 	conn, err := sql.Open("mysql", dsn)

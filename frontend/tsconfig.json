@@ -24,6 +24,9 @@
     "plugins": [
       {
         "name": "next"
+      },
+      {
+          "name": "tsec"
       }
     ],
     "paths": {

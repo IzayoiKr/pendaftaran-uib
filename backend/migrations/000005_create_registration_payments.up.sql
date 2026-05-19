@@ -1,5 +1,5 @@
 CREATE TABLE registration_payments (
-    id CHAR(36) NOT NULL PRIMARY KEY,
+    id BINARY(16) NOT NULL PRIMARY KEY,
     registration_id CHAR(36) NOT NULL,
     registration_type ENUM('S1', 'S2') NOT NULL,
     pemilik_rekening VARCHAR(255) NOT NULL,
