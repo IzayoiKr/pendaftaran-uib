@@ -1,0 +1,244 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-pendaftaran-uib-dev
+    command: --port=${MYSQL_PORT}
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - ${MYSQL_PORTS}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "mysql",
+          "-P",
+          "${MYSQL_PORT}",
+          "-u",
+          "${MYSQL_USER}",
+          "-p${MYSQL_PASSWORD}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin-pendaftaran-uib-dev
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: ${MYSQL_PORT}
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "8081:80"
+
+  mongodb:
+    image: mongo:7
+    container_name: mongodb-pendaftaran-uib-dev
+    command:
+      - "mongod"
+      - "--port"
+      - "${MONGO_PORT}"
+      - "--auth"
+      - "--quiet"
+      - "--setParameter"
+      - 'logComponentVerbosity={"storage":{"verbosity":-1}}'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DATABASE}
+    ports:
+      - ${MONGO_PORTS}
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'mongosh --port ${MONGO_PORT} --username "${MONGO_USER}" --password "${MONGO_PASSWORD}" --authenticationDatabase admin --eval "db.adminCommand(''ping'')" --quiet',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo-express-pendaftaran-uib-dev
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_PORT: ${MONGO_PORT}
+      ME_CONFIG_MONGODB_URL: ${MONGO_URI}
+      ME_CONFIG_BASICAUTH: false
+    ports:
+      - "8082:8081"
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mailpit-pendaftaran-uib-db
+    restart: unless-stopped
+    environment:
+      MP_UI_BIND_ADDR: ${MP_UI_BIND_ADDR}
+      MP_SMTP_BIND_ADDR: ${MP_SMTP_BIND_ADDR}
+      MP_MAX_MESSAGES: ${MP_MAX_MESSAGES}
+      MP_SMTP_AUTH_ACCEPT_ANY: ${MP_SMTP_AUTH_ACCEPT_ANY}
+      MP_SMTP_AUTH_ALLOW_INSECURE: ${MP_SMTP_AUTH_ALLOW_INSECURE}
+    ports:
+      - ${MP_WEB_PORTS}
+      - ${MP_SMTP_PORTS}
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:6969"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    profiles:
+      - "tools"
+    build:
+      context: ./backend
+      target: development
+    container_name: migrate-pendaftaran-uib-dev
+    volumes:
+      - ./backend/migrations/:/app/migrations
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: ${MYSQL_PORT}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+    entrypoint:
+      - "migrate"
+      - "-path"
+      - "/app/migrations"
+      - "-database"
+      - "mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(mysql:${MYSQL_PORT})/${MYSQL_DATABASE}"
+
+  mongo-reset:
+    image: mongo:7
+    container_name: mongo-reset-pendaftaran-uib-dev
+    profiles: ["tools"]
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      - MONGO_URI=${MONGO_URI}
+    entrypoint: ["/bin/sh", "-c"]
+    command: |
+      mongosh "$$MONGO_URI" <<'EOF'
+      db.getCollectionNames().forEach(function(name) {
+        if (!name.startsWith("system.")) {
+          print("Dropping collection: " + name);
+          db.getCollection(name).drop();
+        }
+      });
+      print("Successfully down all mongo collections.");
+      EOF
+
+  backend:
+    build:
+      context: ./backend
+      target: development
+    container_name: backend-pendaftaran-uib-dev
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    environment:
+      DB_HOST: mysql
+      DB_PORT: ${MYSQL_PORT}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_TCP_TIMEOUT: ${MYSQL_TCP_TIMEOUT}
+      DB_READ_TIMEOUT: ${MYSQL_READ_TIMEOUT}
+      DB_WRITE_TIMEOUT: ${MYSQL_WRITE_TIMEOUT}
+      DB_MAX_OPEN_CONNS: ${MYSQL_MAX_OPEN_CONNS}
+      DB_MAX_IDLE_CONNS: ${MYSQL_MAX_IDLE_CONNS}
+      DB_MAX_LIFETIME_MIN: ${MYSQL_MAX_LIFETIME_MIN}
+      DB_MAX_IDLE_LIFETIME_MIN: ${MYSQL_MAX_IDLE_LIFETIME_MIN}
+
+      MONGO_URI: ${MONGO_URI}
+      MONGO_DB: ${MONGO_DATABASE}
+      MONGO_CONNECT_TIMEOUT: ${MONGO_CONNECT_TIMEOUT}
+      MONGO_PING_TIMEOUT: ${MONGO_PING_TIMEOUT}
+
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      SMTP_FROM: ${SMTP_FROM}
+      SMTP_DISABLE_TLS: ${SMTP_DISABLE_TLS}
+
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ISSUER: ${JWT_ISSUER}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      TURNSTILE_SECRET: ${TURNSTILE_SECRET}
+      TURNSTILE_EXPECTED_HOSTNAME: ${TURNSTILE_EXPECTED_HOSTNAME}
+      NIK_ENCRYPTION_KEY: ${NIK_ENCRYPTION_KEY}
+      NIK_BLIND_INDEX_KEY: ${NIK_BLIND_INDEX_KEY}
+      APP_ENV: ${APP_ENV}
+      APP_URL: ${APP_URL}
+      APP_HEALTH_URL: ${APP_HEALTH_URL}
+      SERVER_PORT: ${SERVER_PORT}
+    ports:
+      - ${BACKEND_PORTS}
+    volumes:
+      - ./backend:/app
+      - /app/tmp
+      - /dev/null:/app/.env
+    command: ["air", "-c", ".air.toml"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "${APP_HEALTH_URL}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  frontend:
+    build:
+      context: ./frontend
+      target: development
+      args:
+        - NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+    container_name: frontend-pendaftaran-uib-dev
+    depends_on:
+      - backend
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - BACKEND_URL=${BACKEND_URL}
+      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
+      - NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+      - EXTRA_DEV_ORIGINS=${EXTRA_DEV_ORIGINS}
+      - WATCHPACK_POLLING=true
+    ports:
+      - ${FRONTEND_PORTS}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+      - /dev/null:/app/.env
+
+volumes:
+  mysql_data:
+  mongo_data:
