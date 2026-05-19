@@ -12,19 +12,42 @@ export default function ProgramStudiSkeleton() {
                     <Skeleton className={skeleton.sectionTitle} />
                     <Skeleton className={skeleton.sectionSubtitle} />
                 </div>
+
                 <div className={styles.carouselWrapper}>
-                    {[1, 2, 3, 4].map(i => (
-                        <div key={i} className={styles.slide}>
-                            <div className={styles.card}>
-                                <Skeleton className={skeleton.cardImage} />
-                                <div className={styles.courseContent}>
-                                    <Skeleton className={skeleton.badge} />
-                                    <Skeleton className={skeleton.tag} />
-                                    <Skeleton className={skeleton.cardTitle} />
-                                    <Skeleton className={skeleton.cardText} count={2} />
+                    <div className={`${styles.navBtn} ${styles.prev}`} aria-hidden="true">
+                        ‹
+                    </div>
+
+                    <div className={styles.viewport}>
+                        <div className={styles.track}>
+                            {[1, 2, 3, 4].map(i => (
+                                <div key={i} className={styles.slide}>
+                                    <div className={styles.card}>
+                                        <div className={styles.courseHead}>
+                                            <Skeleton className={skeleton.cardImage} />
+                                        </div>
+                                        <div className={styles.courseContent}>
+                                            <Skeleton className={skeleton.badge} />
+                                            <Skeleton className={skeleton.tag} />
+                                            <h3>
+                                                <Skeleton className={skeleton.cardTitle} />
+                                            </h3>
+                                            <Skeleton className={skeleton.cardText} count={2} />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            ))}
                         </div>
+                    </div>
+
+                    <div className={`${styles.navBtn} ${styles.next}`} aria-hidden="true">
+                        ›
+                    </div>
+                </div>
+
+                <div className={styles.dots}>
+                    {[1, 2, 3, 4].map(i => (
+                        <div key={i} className={styles.dot} aria-hidden="true" />
                     ))}
                 </div>
             </div>

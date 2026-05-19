@@ -12,7 +12,7 @@ export const register: Form[] = [
         label: "No NIK (National Identification Number)",
         type: "text",
         autoComplete: "off",
-        maxLength: 16
+        maxLength: 20
     },
     {
         name: "email",
@@ -28,7 +28,7 @@ export const register: Form[] = [
         minLength: 8
     },
     {
-        name: "retypePassword",
+        name: "confirmPassword",
         label: "Retype Password *",
         type: "password",
         autoComplete: "new-password",

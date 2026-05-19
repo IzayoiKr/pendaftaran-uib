@@ -150,10 +150,9 @@ export const api = {
         logout: () =>
             apiClient.post<never, { message: string }>('/api/auth/logout'),
 
-        forgotPassword: (email: string, nik: string, turnstileToken: string) =>
+        forgotPassword: (email: string, turnstileToken: string) =>
             apiClient.post<never, { message: string }>("/api/auth/forgot-password", {
                 email,
-                nik,
                 cf_turnstile_token: turnstileToken,
             }, {
                 headers: { 'X-Device-ID': getDeviceId() },
@@ -183,6 +182,9 @@ export const api = {
             apiClient.post<never, { message: string }>("/api/profile", {
                 full_name: data.fullName,
             }),
+
+        revealNIK: () =>
+            apiClient.get<never, { nik: string }>('/api/profile/nik'),
 
         getRegistrationStatus: () =>
             apiClient.get<never, { is_registered: boolean; registrations: any[] }>('/api/registration-status'),

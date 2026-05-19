@@ -6,10 +6,11 @@ import { toast } from "sonner";
 import { api } from "@/api";
 import useAuthStore from "@/store/useAuthStore";
 import type { User } from "@/types/api";
+import NIKReveal from "@/components/NIKReveal/NIKReveal";
+import AccountSkeleton from "./Account.skeleton";
 import styles from "./Account.module.scss";
 import { RegisterIcon, EditIcon, LetterIcon, ReceiptIcon, ChangeIcon, EraserIcon, LockIcon, LogoutIcon, ProfileIcon } from "@/components/Icons/Icons";
 import { downloadSuratHasil, downloadStaticPdf } from "@/utils/downloadPdf";
-import AccountSkeleton from "./Account.skeleton";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -41,19 +42,23 @@ interface RegistrationHandlers {
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function AccountInfo({ user }: { user: User }) {
-    const rows: [string, string][] = [
-        ["Nama Lengkap", user.full_name || "-"],
-        ["Alamat Email", user.email || "-"],
-        ["Nomor NIK", user.nik || "-"],
-    ];
     return (
         <div className={styles.accountInfo}>
-            {rows.map(([label, value]) => (
-                <div key={label} className={styles.infoRow}>
-                    <span className={styles.infoLabel}>{label}</span>
-                    <span className={styles.infoValue}>: {value}</span>
-                </div>
-            ))}
+            <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Nama Lengkap</span>
+                <span className={styles.infoValue}>: {user.full_name || "-"}</span>
+            </div>
+            <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Alamat Email</span>
+                <span className={styles.infoValue}>: {user.email || "-"}</span>
+            </div>
+            <div className={styles.infoRow}>
+                <span className={styles.infoLabel}>Nomor NIK</span>
+                <span className={styles.infoValue}>
+                    {": "}
+                    <NIKReveal masked={user.nik || "-"} />
+                </span>
+            </div>
         </div>
     );
 }
@@ -163,11 +168,10 @@ function RegistrationTable({ registrations, handlers }: {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Account() {
-    const { user, isLoading, logout } = useAuthStore();
+    const { user, isLoggingOut, logout } = useAuthStore();
     const router = useRouter();
     const [registrations, setRegistrations] = useState<Registration[]>([]);
-    const [isLogout, setIsLogout] = useState(false);
-    const [isFetchingReg, setIsFetchingReg] = useState(false);
+    const [isFetching, setIsFetching] = useState(true);
 
     // ── Fetch profile terbaru ──────────────────────────────────────────────────
     useEffect(() => {
@@ -181,7 +185,6 @@ export default function Account() {
             }).catch(() => { });
 
         // Fetch registration status
-        setIsFetchingReg(true);
         api.profile.getRegistrationStatus()
             .then(res => {
                 const mapped: Registration[] = (res.registrations || []).map(r => ({
@@ -200,11 +203,10 @@ export default function Account() {
             .catch(err => {
                 console.error("Failed to fetch registration status", err);
             })
-            .finally(() => setIsFetchingReg(false));
+            .finally(() => setIsFetching(false));
     }, [user]);
 
     const handleLogout = async () => {
-        setIsLogout(true);
         const toastId = toast.loading("Sedang logout...");
         try {
             await api.auth.logout();
@@ -213,9 +215,7 @@ export default function Account() {
             router.push("/login");
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Logout gagal! Coba lagi...", { id: toastId });
-        } finally {
-            setIsLogout(false);
-        }
+        };
     };
 
     const handlers: RegistrationHandlers = {
@@ -244,7 +244,7 @@ export default function Account() {
             router.push(`/account/prasyarat-ospek?nomorDaftar=${reg.nomorDaftar}`),
     };
 
-    if (isLoading) return <AccountSkeleton />;
+    if (isFetching) return <AccountSkeleton />;
     if (!user) return null;
 
     return (
@@ -273,22 +273,22 @@ export default function Account() {
                     <button
                         className={`${styles.btnLg} ${styles.btnLgWarning}`}
                         onClick={() => router.push("/account/change-password")}
-                        disabled={isLogout}
+                        disabled={isLoggingOut}
                     >
                         <LockIcon /> UBAH PASSWORD
                     </button>
                     <button
                         className={`${styles.btnLg} ${styles.btnLgGrey}`}
                         onClick={() => router.push("/account/update-profile")}
-                        disabled={isLogout}
+                        disabled={isLoggingOut}
                     >
                         <ProfileIcon /> UBAH PROFILE
                     </button>
                     <button
                         className={`${styles.btnLg} ${styles.btnLgDanger}`}
                         onClick={handleLogout}
-                        disabled={isLogout}
-                        aria-busy={isLogout}
+                        disabled={isLoggingOut}
+                        aria-busy={isLoggingOut}
                     >
                         <LogoutIcon /> LOGOUT
                     </button>

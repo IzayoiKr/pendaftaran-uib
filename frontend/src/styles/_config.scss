@@ -32,6 +32,7 @@ $container-max-widths: (
 
 @mixin main-layout {
   display: flex;
+  align-items: center;
   justify-content: center;
   margin: calc(var(--space-2xl) + var(--space-xl)) 0 var(--space-2xl);
 }

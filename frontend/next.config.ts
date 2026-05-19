@@ -27,6 +27,18 @@ const nextConfig: NextConfig = {
                             'usb=()',
                             'interest-cohort=()',
                         ].join(', ')
+                    },
+                    {
+                        key: 'X-Content-Type-Options',
+                        value: 'nosniff'
+                    },
+                    {
+                        key: 'X-Frame-Options',
+                        value: 'DENY'
+                    },
+                    {
+                        key: 'Referrer-Policy',
+                        value: 'strict-origin-when-cross-origin'
                     }
                 ]
             }
@@ -40,7 +52,8 @@ const nextConfig: NextConfig = {
             }
         ];
     },
-    output: isProduction ? 'standalone' : undefined
+    output: isProduction ? 'standalone' : undefined,
+    poweredByHeader: false,
 };
 
 export default nextConfig;

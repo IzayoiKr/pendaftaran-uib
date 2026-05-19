@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useRef } from "react";
+import type { FormEvent, ChangeEvent } from "react";
 import { toast } from "sonner";
 import { api } from "@/api";
-import type { Form } from "@/types/ui";
-import { forgotPassword } from "./data";
 import { forgotPasswordSchema } from "@/validation/schema";
 import TurnstileWidget from "@/components/TurnstileWidget";
 import type { TurnstileHandle } from "@/components/TurnstileWidget";
@@ -14,22 +13,21 @@ import Link from "next/link";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface ForgotForm {
-    email: string;
-    nik: string;
+interface ForgotInputProps {
+    value?: string;
+    onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function ForgotInput({ name, type, placeholder, autoComplete, maxLength, value, onChange }: Form) {
+function ForgotInput({ value, onChange }: ForgotInputProps) {
     return (
         <input
-            id={name}
-            name={name}
-            type={type}
-            placeholder={placeholder}
-            autoComplete={autoComplete}
-            maxLength={maxLength}
+            id="email"
+            name="email"
+            type="email"
+            placeholder="Email saat daftar (Registration Email) *"
+            autoComplete="email"
             value={value}
             onChange={onChange}
             required
@@ -55,17 +53,16 @@ function ForgotAction({ isLoading }: { isLoading: boolean }) {
 export default function ForgotPassword() {
     const turnstileRef = useRef<TurnstileHandle>(null);
 
-    const [form, setForm] = useState<ForgotForm>({ email: "", nik: "" });
+    const [form, setForm] = useState({ email: "" });
     const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        const clean = name === "nik" ? value.replace(/\D/g, "") : value;
-        setForm(prev => ({ ...prev, [name]: clean }));
+        setForm(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const valid = forgotPasswordSchema.safeParse(form);
@@ -82,9 +79,9 @@ export default function ForgotPassword() {
 
         setIsLoading(true);
         try {
-            await api.auth.forgotPassword(form.email, form.nik, turnstileToken);
+            await api.auth.forgotPassword(form.email, turnstileToken);
             toast.success("Link reset password telah dikirim ke email Anda.");
-            setForm({ email: "", nik: "" });
+            setForm({ email: "" });
         } catch (err) {
             toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");
             turnstileRef.current?.reset();
@@ -98,16 +95,11 @@ export default function ForgotPassword() {
         <main className={styles.forgot}>
             <div className={styles.container}>
                 <h1>Lupa Password</h1>
-                <p className={styles.required}>* Wajib di Isi (Required)</p>
                 <form onSubmit={handleSubmit} noValidate>
-                    {forgotPassword.map((props) => (
-                        <ForgotInput
-                            key={props.name}
-                            {...props}
-                            value={form[props.name as keyof typeof form]}
-                            onChange={handleChange}
-                        />
-                    ))}
+                    <ForgotInput
+                        value={form.email}
+                        onChange={handleChange}
+                    />
                     <Link href="/login" className={styles.loginlink}>
                         Back to Login
                     </Link>

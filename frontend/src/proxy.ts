@@ -1,33 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const isDev = process.env.NODE_ENV === 'development';
+
 export const config = {
-    matcher: '/((?!_next/static|_next/image|favicon|images|manifest\\.json).*)',
+    matcher: '/((?!api(?:/|$)|_next/static|_next/image|favicon|images|manifest\\.json).*)',
 };
 
 function buildCSP(nonce: string): string {
-    const isDev = process.env.NODE_ENV === 'development';
-
     return [
         "default-src 'self'",
 
         [
             "script-src 'self'",
             `'nonce-${nonce}'`,
+            "'strict-dynamic'",
             "'unsafe-inline'",
             isDev ? "'unsafe-eval'" : '',
-            'challenges.cloudflare.com',
-            isDev ? 'unpkg.com' : '',
         ].filter(Boolean).join(' '),
 
         "style-src 'self' 'unsafe-inline'",
 
-        [
-            "img-src 'self' data: blob:",
-        ].join(' '),
+        "img-src 'self' data: blob:",
 
-        [
-            "font-src 'self'",
-        ].join(' '),
+        "font-src 'self'",
 
         [
             "connect-src 'self'",

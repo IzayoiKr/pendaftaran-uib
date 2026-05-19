@@ -1,20 +1,21 @@
 'use client';
 
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { ReactNode, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/api";
 import useAuthStore from "@/store/useAuthStore";
 import { updateProfileSchema } from "@/validation/schema";
 import type { User } from "@/types/api";
+import NIKReveal from "@/components/NIKReveal/NIKReveal";
 import { RightArrowIcon } from "@/components/Icons/Icons";
 import styles from "./UpdateProfile.module.scss";
 import UpdateProfileSkeleton from "./UpdateProfile.skeleton";
 
 interface InfoRowProps {
     label: string;
-    value: string;
+    value: string | ReactNode;
 }
 
 interface NameFieldProps {
@@ -128,7 +129,7 @@ function UpdateProfileForm({ user }: { user: User }) {
         <form className={styles.formBody} onSubmit={handleSubmit} noValidate>
             <section className={styles.infoSection}>
                 <h2 className={styles.sectionTitle}>Informasi Akun</h2>
-                <InfoRow label="Nomor NIK" value={user.nik} />
+                <InfoRow label="Nomor NIK" value={<NIKReveal masked={user.nik} />} />
                 <InfoRow label="Alamat Email" value={user.email} />
             </section>
 

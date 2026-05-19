@@ -59,7 +59,7 @@ export default function Register() {
         nik: "",
         email: "",
         password: "",
-        retypePassword: ""
+        confirmPassword: ""
     })
 
     const [turnstileToken, setTurnstileToken] = useState<string | null>(null);

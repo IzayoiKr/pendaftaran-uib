@@ -1,66 +1,63 @@
 import z from "zod";
 
+const fullNameSchema = z
+    .string()
+    .trim()
+    .min(1, "Nama wajib diisi")
+    .max(255, "Nama terlalu panjang");
+
+const emailSchema = z
+    .string()
+    .trim()
+    .toLowerCase()
+    .min(1, "Email wajib diisi")
+    .email("Format email tidak valid");
+
+const passwordSchema = (label: string = "password") => z
+    .string()
+    .min(8, `${label} minimal 8 karakter`)
+    .max(72, `${label} terlalu panjang`);
+
+const confirmPasswordSchema = z
+    .string()
+    .min(8, `Konfirmasi password minimal 8 karakter`)
+    .max(72, `Konfirmasi password terlalu panjang`);
+
 export const loginSchema = z.object({
-    email: z
-        .email("Format email tidak valid")
-        .min(1, "Email wajib diisi"),
-    password: z
-        .string()
-        .min(1, "Password wajib diisi")
+    email: emailSchema,
+    password: passwordSchema()
 });
 
 export const registerSchema = z.object({
-    fullName: z
-        .string()
-        .min(1, "Nama lengkap wajib diisi"),
+    fullName: fullNameSchema,
     nik: z
         .string()
-        .length(16, "NIK harus 16 digit")
-        .regex(/^\d+$/, "NIK harus berupa angka"),
-    email: z
-        .email("Format email tidak valid")
-        .min(1, "Email wajib diisi"),
-    password: z
-        .string()
-        .min(8, "Password minimal 8 karakter")
-        .max(72, "Password terlalu panjang"),
-    retypePassword: z
-        .string()
-        .min(8, "Konfirmasi password wajib diisi")
-}).refine((data) => data.password === data.retypePassword, {
-    message: "Password dan konfirmasi tidak cocok",
-    path: ["retypePassword"]
+        .trim()
+        .min(6, "NIK minimal 6 karakter")
+        .max(20, "NIK maksimal 20 karakter")
+        .regex(/^[A-Za-z0-9]+$/, "NIK hanya boleh huruf dan angka"),
+    email: emailSchema,
+    password: passwordSchema(),
+    confirmPassword: confirmPasswordSchema
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Password dan konfirmasi password tidak cocok",
+    path: ["confirmPassword"]
 });
 
 export const forgotPasswordSchema = z.object({
-    email: z
-        .email("Format email tidak valid")
-        .min(1, "Email wajib diisi"),
-    nik: z
-        .string()
-        .length(16, "NIK harus 16 digit")
-        .regex(/^\d+$/, "NIK harus berupa angka"),
+    email: emailSchema
 });
 
 export const updateProfileSchema = z.object({
-    fullName: z
-        .string()
-        .min(1, "Nama lengkap wajib diisi")
+    fullName: fullNameSchema
 })
 
 export const changePasswordSchema = z.object({
-    oldPassword: z
-        .string()
-        .min(1, "Password lama wajib diisi"),
-    newPassword: z
-        .string()
-        .min(8, "Password baru minimal 8 karakter")
-        .max(72, "Password baru maksimal 72 karakter"),
-    confirmPassword: z
-        .string()
-        .min(1, "Konfirmasi password wajib diisi"),
+    oldPassword: passwordSchema("Password Lama"),
+    newPassword: passwordSchema("Password Baru"),
+    confirmPassword: confirmPasswordSchema
 }).refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Password baru dan konfirmasi tidak cocok",
+    message: "Password baru dan konfirmasi password baru tidak cocok",
     path: ["confirmPassword"],
 }).refine((data) => data.oldPassword !== data.newPassword, {
     message: "Password baru harus berbeda dari password lama",
@@ -68,13 +65,8 @@ export const changePasswordSchema = z.object({
 });
 
 export const resetPasswordSchema = z.object({
-    newPassword: z
-        .string()
-        .min(8, "Password minimal 8 karakter")
-        .max(72, "Password maksimal 72 karakter"),
-    confirmPassword: z
-        .string()
-        .min(1, "Konfirmasi password wajib diisi"),
+    newPassword: passwordSchema(),
+    confirmPassword: confirmPasswordSchema
 }).refine((data) => data.newPassword === data.confirmPassword, {
     message: "Password dan konfirmasi tidak cocok",
     path: ["confirmPassword"],
