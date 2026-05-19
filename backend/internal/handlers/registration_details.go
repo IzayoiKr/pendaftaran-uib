@@ -25,7 +25,14 @@ func GetRegistrationDetails(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		resolvedID, isS2, err := ResolveRegistrationID(r.Context(), db, claims.UserID, regID)
+		idBytes, err := utils.UUIDToBytes(claims.UserID)
+		if err != nil {
+			slog.Error("reveal_nil: parse uuid to bytes", "error", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+
+		resolvedID, isS2, err := ResolveRegistrationID(r.Context(), db, regID, idBytes)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON("registration not found"))
 			return
@@ -40,7 +47,7 @@ func GetRegistrationDetails(db *sql.DB) http.HandlerFunc {
 				JOIN program_studi p ON r.prodi_pil = p.id
 				LEFT JOIN gelombang g ON r.registration_key = g.batch_key
 				WHERE r.id = ? AND r.user_id = ?
-			`, resolvedID, claims.UserID)
+			`, resolvedID, idBytes)
 
 			if err == nil && rows.Next() {
 				var nik, email, nama, jk, kewarganegaraan, tempatLahir, tanggalLahir, noHp, noHp2, jenisDaftar, prodiPil, prodiPilName, waktuKuliah, asalSekolah, regKey, batchName, docStatus, payStatus string
@@ -111,7 +118,8 @@ func GetRegistrationDetails(db *sql.DB) http.HandlerFunc {
 						"batchName":           batchName,
 						"doc_check_status":    docStatus,
 						"payment_status":      payStatus,
-						"doc_check_notes":     docNotes.String,						"payment_notes":       payNotes.String,
+						"doc_check_notes":     docNotes.String,
+						"payment_notes":       payNotes.String,
 						"usm_password":        usmPass.String,
 						"payments":            payments,
 					}
@@ -132,7 +140,7 @@ func GetRegistrationDetails(db *sql.DB) http.HandlerFunc {
 				FROM s2_registrations r
 				LEFT JOIN gelombang g ON r.registration_key = g.batch_key
 				WHERE r.id = ? AND r.user_id = ?
-			`, resolvedID, claims.UserID)
+			`, resolvedID, idBytes)
 
 			if err == nil && rowsS2.Next() {
 				var nik, nama, jk, kewarganegaraan, tempatLahir, tanggalLahir, email, noHp, agama, sumberStudi, alamat, kelurahan, kecamatan, jurusan, gelar, namaAyah, noTelpAyah, namaIbu, noTelpIbu, regKey, batchName, waktuKuliah, docStatus, payStatus string
@@ -236,7 +244,14 @@ func UpdateRegistration(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		resolvedID, isS2, err := ResolveRegistrationID(r.Context(), db, claims.UserID, regID)
+		idBytes, err := utils.UUIDToBytes(claims.UserID)
+		if err != nil {
+			slog.Error("registration_details: parse uuid to bytes", "error", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+
+		resolvedID, isS2, err := ResolveRegistrationID(r.Context(), db, regID, idBytes)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON("registration not found"))
 			return
@@ -258,9 +273,9 @@ func UpdateRegistration(db *sql.DB) http.HandlerFunc {
 
 			_, err := db.ExecContext(r.Context(), `
 				UPDATE s1_registrations SET
-					nik = ?, email = ?, nama = ?, jk = ?, kewarganegaraan = ?, tempat_lahir = ?, tanggal_lahir = ?, 
-					no_hp = ?, no_hp2 = ?, jenis_daftar = ?, prodi_pil = ?, prodi_pil2 = ?, prodi_pil3 = ?, 
-					waktu_kuliah = ?, asal_sekolah = ?, konfirmasi = ?, universitas_asal = ?, prodi_asal = ?, 
+					nik = ?, email = ?, nama = ?, jk = ?, kewarganegaraan = ?, tempat_lahir = ?, tanggal_lahir = ?,
+					no_hp = ?, no_hp2 = ?, jenis_daftar = ?, prodi_pil = ?, prodi_pil2 = ?, prodi_pil3 = ?,
+					waktu_kuliah = ?, asal_sekolah = ?, konfirmasi = ?, universitas_asal = ?, prodi_asal = ?,
 					ipk = ?, jenjang_pendidikan = ?
 				WHERE id = ? AND user_id = ?
 			`,
@@ -269,7 +284,7 @@ func UpdateRegistration(db *sql.DB) http.HandlerFunc {
 				r.FormValue("jenisdaftar"), r.FormValue("prodipil"), emptyToNil(r.FormValue("prodipil2")), emptyToNil(r.FormValue("prodipil3")),
 				r.FormValue("waktukuliah"), r.FormValue("asal_sekolah"), r.FormValue("konfirmasi") == "true",
 				emptyToNil(r.FormValue("universitas_asal")), emptyToNil(r.FormValue("prodi_asal")), emptyToNil(r.FormValue("ipk")), emptyToNil(r.FormValue("jenjang_pendidikan")),
-				resolvedID, claims.UserID,
+				resolvedID, idBytes,
 			)
 			if err != nil {
 				slog.Error("Failed to update S1 registration", "error", err, "resolvedID", resolvedID)
@@ -287,8 +302,8 @@ func UpdateRegistration(db *sql.DB) http.HandlerFunc {
 
 			_, err := db.ExecContext(r.Context(), `
 				UPDATE s2_registrations SET
-					nik = ?, nama = ?, jk = ?, kewarganegaraan = ?, tempat_lahir = ?, tanggal_lahir = ?, 
-					email = ?, no_hp = ?, agama = ?, sumber_studi = ?, alamat = ?, kelurahan = ?, kecamatan = ?, 
+					nik = ?, nama = ?, jk = ?, kewarganegaraan = ?, tempat_lahir = ?, tanggal_lahir = ?,
+					email = ?, no_hp = ?, agama = ?, sumber_studi = ?, alamat = ?, kelurahan = ?, kecamatan = ?,
 					jurusan = ?, ipk = ?, gelar = ?, nama_ayah = ?, notelp_ayah = ?, nama_ibu = ?, notelp_ibu = ?
 				WHERE id = ? AND user_id = ?
 			`,
@@ -297,7 +312,7 @@ func UpdateRegistration(db *sql.DB) http.HandlerFunc {
 				r.FormValue("agama"), r.FormValue("sumber_studi"), r.FormValue("alamat"), r.FormValue("kelurahan"),
 				r.FormValue("kecamatan"), r.FormValue("jurusan"), emptyToNil(r.FormValue("ipk")), r.FormValue("gelar"),
 				r.FormValue("nama_ayah"), r.FormValue("notelp_ayah"), r.FormValue("nama_ibu"), r.FormValue("notelp_ibu"),
-				resolvedID, claims.UserID,
+				resolvedID, idBytes,
 			)
 			if err != nil {
 				slog.Error("Failed to update S2 registration", "error", err, "resolvedID", resolvedID)

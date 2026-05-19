@@ -31,10 +31,11 @@ func ResendVerification(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http
 		}
 
 		var user models.User
+		var idBytes []byte
 		err := db.QueryRowContext(r.Context(),
-			"SELECT id, full_name, email, email_verified FROM user WHERE email = ?",
+			"SELECT id, full_name, email, email_verified FROM users WHERE email = ?",
 			req.Email,
-		).Scan(&user.ID, &user.FullName, &user.Email, &user.EmailVerified)
+		).Scan(&idBytes, &user.FullName, &user.Email, &user.EmailVerified)
 
 		if errors.Is(err, sql.ErrNoRows) {
 			utils.WriteJSON(w, http.StatusOK, map[string]string{"message": vagueMsg})
@@ -55,16 +56,21 @@ func ResendVerification(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http
 			return
 		}
 
+		user.ID, err = utils.UUIDFromBytes(idBytes)
+		if err != nil {
+			slog.Error("forgot_password: parse uuid to string", "error", err)
+		}
+
 		if _, err = db.ExecContext(r.Context(),
 			"UPDATE email_verification SET is_used = 1 WHERE user_id = ? AND is_used = 0",
-			user.ID,
+			idBytes,
 		); err != nil {
 			slog.Error("resend_verification: invalidate old tokens", "user_id", user.ID, "error", err)
 		}
 
 		if _, err = db.ExecContext(r.Context(),
 			"INSERT INTO email_verification (user_id, token_hash, expired_at) VALUES (?, ?, ?)",
-			user.ID, tokenHash, time.Now().Add(verifyTokenTTL),
+			idBytes, tokenHash, time.Now().Add(verifyTokenTTL),
 		); err != nil {
 			slog.Error("resend_verification: store token", "user_id", user.ID, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))

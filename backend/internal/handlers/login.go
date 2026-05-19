@@ -4,17 +4,16 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"time"
 
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
+	nikCrypto "pendaftaran-uib/backend/internal/crypto"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
-
-	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 const captchaThreshold = 3
@@ -95,10 +94,11 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 		}
 
 		var user models.User
+		var idBytes []byte
 		err := db.QueryRowContext(r.Context(),
-			"SELECT id, full_name, nik, email, password_hash, email_verified FROM user WHERE email = ?",
+			"SELECT id, full_name, nik, email, password_hash, email_verified FROM users WHERE email = ?",
 			req.Email,
-		).Scan(&user.ID, &user.FullName, &user.NIK, &user.Email, &user.PasswordHash, &user.EmailVerified)
+		).Scan(&idBytes, &user.FullName, &user.NIK, &user.Email, &user.PasswordHash, &user.EmailVerified)
 
 		if errors.Is(err, sql.ErrNoRows) {
 			failCount := tracker.Increment(req.Email)
@@ -122,9 +122,14 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 			return
 		}
 
-		if err := bcrypt.CompareHashAndPassword(
-			[]byte(user.PasswordHash), []byte(req.Password),
-		); err != nil {
+		user.ID, err = utils.UUIDFromBytes(idBytes)
+		if err != nil {
+			slog.Error("login: invalid user id bytes", "error", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+
+		if err := nikCrypto.VerifyPassword(user.PasswordHash, req.Password); err != nil {
 			failCount := tracker.Increment(req.Email)
 			al.Log(audit.Entry{
 				Event: audit.EventLoginFailure,
@@ -154,7 +159,7 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 			return
 		}
 
-		sessionID := uuid.NewString()
+		sessionID := utils.GenerateUUIDString()
 
 		accessToken, err := auth.GenerateAccessToken(user.ID, sessionID, user.Email)
 		if err != nil {
@@ -185,9 +190,10 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 
 		setRefreshCookie(w, refreshToken)
 
+		maskedNIK := decryptAndMask(user.NIK)
 		utils.WriteJSON(w, http.StatusOK, accessTokenResponse{
 			AccessToken: accessToken,
-			User: user.ToDTO(),
+			User: user.ToDTO(maskedNIK),
 		})
 	}
 }

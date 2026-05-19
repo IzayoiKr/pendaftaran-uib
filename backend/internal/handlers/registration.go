@@ -48,6 +48,13 @@ func RegisterStudent(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 		batchName := r.FormValue("batchName")
 		isS2 := strings.HasPrefix(strings.ToLower(registrationKey), "s2") || strings.HasPrefix(strings.ToLower(registrationKey), "magister")
 
+		idBytes, err := utils.UUIDToBytes(claims.UserID)
+		if err != nil {
+			slog.Error("registration: parse uuid to bytes", "error", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+
 		// Check for existing registration
 		var existingID string
 		tableName := "s1_registrations"
@@ -55,7 +62,7 @@ func RegisterStudent(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			tableName = "s2_registrations"
 		}
 		checkQuery := fmt.Sprintf("SELECT id FROM %s WHERE user_id = ? AND registration_key = ?", tableName)
-		err := db.QueryRowContext(r.Context(), checkQuery, claims.UserID, registrationKey).Scan(&existingID)
+		err = db.QueryRowContext(r.Context(), checkQuery, idBytes, registrationKey).Scan(&existingID)
 		if err == nil {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("Anda sudah terdaftar di gelombang ini. (You are already registered for this batch)"))
 			return
@@ -107,10 +114,10 @@ func RegisterStudent(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			transkripS1Path := uploadFile("r4")
 
 			_, err := db.ExecContext(r.Context(), `
-				INSERT INTO s2_registrations 
-				(id, user_id, registration_key, batch_name, nik, nama, jk, kewarganegaraan, tempat_lahir, tanggal_lahir, email, no_hp, agama, sumber_studi, alamat, kelurahan, kecamatan, jurusan, ipk, gelar, nama_ayah, notelp_ayah, nama_ibu, notelp_ibu, pas_foto_path, ktp_path, kk_path, bukti_bayar_path, akta_lahir_path, ijazah_s1_path, transkrip_s1_path, pemilik_rek, bank) 
+				INSERT INTO s2_registrations
+				(id, user_id, registration_key, batch_name, nik, nama, jk, kewarganegaraan, tempat_lahir, tanggal_lahir, email, no_hp, agama, sumber_studi, alamat, kelurahan, kecamatan, jurusan, ipk, gelar, nama_ayah, notelp_ayah, nama_ibu, notelp_ibu, pas_foto_path, ktp_path, kk_path, bukti_bayar_path, akta_lahir_path, ijazah_s1_path, transkrip_s1_path, pemilik_rek, bank)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-				registrationID, claims.UserID, registrationKey, batchName, nik, nama, r.FormValue("jk"), r.FormValue("kewarganegaraan"), r.FormValue("tempatlahir"), r.FormValue("tanggallahir"), r.FormValue("email"), r.FormValue("nohp"), r.FormValue("agama"), r.FormValue("sumber_studi"), r.FormValue("alamat"), r.FormValue("kelurahan"), r.FormValue("kecamatan"), r.FormValue("jurusan"), emptyToNil(r.FormValue("ipk")), r.FormValue("gelar"), r.FormValue("nama_ayah"), r.FormValue("notelp_ayah"), r.FormValue("nama_ibu"), r.FormValue("notelp_ibu"), pasFotoPath, ktpPath, kkPath, buktiBayarPath, aktaLahirPath, ijazahS1Path, transkripS1Path, r.FormValue("pemilikrek"), r.FormValue("bank"),
+				registrationID, idBytes, registrationKey, batchName, nik, nama, r.FormValue("jk"), r.FormValue("kewarganegaraan"), r.FormValue("tempatlahir"), r.FormValue("tanggallahir"), r.FormValue("email"), r.FormValue("nohp"), r.FormValue("agama"), r.FormValue("sumber_studi"), r.FormValue("alamat"), r.FormValue("kelurahan"), r.FormValue("kecamatan"), r.FormValue("jurusan"), emptyToNil(r.FormValue("ipk")), r.FormValue("gelar"), r.FormValue("nama_ayah"), r.FormValue("notelp_ayah"), r.FormValue("nama_ibu"), r.FormValue("notelp_ibu"), pasFotoPath, ktpPath, kkPath, buktiBayarPath, aktaLahirPath, ijazahS1Path, transkripS1Path, r.FormValue("pemilikrek"), r.FormValue("bank"),
 			)
 
 			if err != nil {
@@ -135,10 +142,10 @@ func RegisterStudent(db *sql.DB, al *audit.Logger) http.HandlerFunc {
             }
 
 			_, err := db.ExecContext(r.Context(), `
-				INSERT INTO s1_registrations 
-				(id, user_id, registration_key, batch_name, nik, email, nama, jk, kewarganegaraan, tempat_lahir, tanggal_lahir, no_hp, no_hp2, jenis_daftar, prodi_pil, prodi_pil2, prodi_pil3, waktu_kuliah, asal_sekolah, pas_foto_path, ktp_path, kk_path, bukti_bayar_path, transkrip_nilai_path, ijazah_path, pemilik_rek, bank, konfirmasi, universitas_asal, prodi_asal, ipk, jenjang_pendidikan) 
+				INSERT INTO s1_registrations
+				(id, user_id, registration_key, batch_name, nik, email, nama, jk, kewarganegaraan, tempat_lahir, tanggal_lahir, no_hp, no_hp2, jenis_daftar, prodi_pil, prodi_pil2, prodi_pil3, waktu_kuliah, asal_sekolah, pas_foto_path, ktp_path, kk_path, bukti_bayar_path, transkrip_nilai_path, ijazah_path, pemilik_rek, bank, konfirmasi, universitas_asal, prodi_asal, ipk, jenjang_pendidikan)
 				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-				registrationID, claims.UserID, registrationKey, batchName, nik, r.FormValue("email"), nama, r.FormValue("jk"), r.FormValue("kewarganegaraan"), r.FormValue("tempatlahir"), r.FormValue("tanggallahir"), r.FormValue("nohp"), r.FormValue("nohp2"), r.FormValue("jenisdaftar"), prodiPil, emptyToNil(r.FormValue("prodipil2")), emptyToNil(r.FormValue("prodipil3")), r.FormValue("waktukuliah"), r.FormValue("asal_sekolah"), pasFotoPath, ktpPath, kkPath, buktiBayarPath, transkripPath, ijazahPath, r.FormValue("pemilikrek"), r.FormValue("bank"), r.FormValue("konfirmasi") == "true", emptyToNil(r.FormValue("universitas_asal")), emptyToNil(r.FormValue("prodi_asal")), emptyToNil(r.FormValue("ipk")), emptyToNil(r.FormValue("jenjang_pendidikan")),
+				registrationID, idBytes, registrationKey, batchName, nik, r.FormValue("email"), nama, r.FormValue("jk"), r.FormValue("kewarganegaraan"), r.FormValue("tempatlahir"), r.FormValue("tanggallahir"), r.FormValue("nohp"), r.FormValue("nohp2"), r.FormValue("jenisdaftar"), prodiPil, emptyToNil(r.FormValue("prodipil2")), emptyToNil(r.FormValue("prodipil3")), r.FormValue("waktukuliah"), r.FormValue("asal_sekolah"), pasFotoPath, ktpPath, kkPath, buktiBayarPath, transkripPath, ijazahPath, r.FormValue("pemilikrek"), r.FormValue("bank"), r.FormValue("konfirmasi") == "true", emptyToNil(r.FormValue("universitas_asal")), emptyToNil(r.FormValue("prodi_asal")), emptyToNil(r.FormValue("ipk")), emptyToNil(r.FormValue("jenjang_pendidikan")),
 			)
 
 			if err != nil {

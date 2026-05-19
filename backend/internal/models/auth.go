@@ -1,17 +1,15 @@
 package models
 
 import (
-	"errors"
-	"net/mail"
-	"pendaftaran-uib/backend/internal/utils"
 	"strings"
-	"unicode/utf8"
+
+	"pendaftaran-uib/backend/internal/utils"
 )
 
 type LoginRequest struct {
-	Email string `json:"email"`
-	Password string `json:"password"`
-	TurnstileToken string `json:"cf_turnstile_token,omitempty"`
+	Email string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=8,max=72"`
+	TurnstileToken string `json:"cf_turnstile_token,omitempty" validate:"-"`
 }
 
 func (r *LoginRequest) Sanitize() {
@@ -19,13 +17,7 @@ func (r *LoginRequest) Sanitize() {
 }
 
 func (r *LoginRequest) Validate() error {
-	switch {
-	case r.Email == "":
-		return errors.New("email dan password wajib diisi")
-	case r.Password == "":
-		return errors.New("email dan password wajib diisi")
-	}
-	return nil
+	return utils.ValidateStruct(r)
 }
 
 type LoginErrorResponse struct {
@@ -34,39 +26,19 @@ type LoginErrorResponse struct {
 }
 
 type RegisterRequest struct {
-	FullName string `json:"full_name"`
-	NIK string `json:"nik"`
-	Email string `json:"email"`
-	Password string `json:"password"`
-	TurnstileToken string `json:"cf_turnstile_token"`
+	FullName string `json:"full_name" validate:"required,max=255"`
+	NIK string `json:"nik" validate:"required,min=6,max=20,alphanum_ascii"`
+	Email string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=8,max=72"`
+	TurnstileToken string `json:"cf_turnstile_token" validate:"-"`
 }
 
 func (r *RegisterRequest) Sanitize() {
 	r.FullName = strings.TrimSpace(r.FullName)
+	r.NIK = strings.ToUpper(strings.TrimSpace(r.NIK))
 	r.Email = strings.ToLower(strings.TrimSpace(r.Email))
 }
 
 func (r *RegisterRequest) Validate() error {
-	switch {
-	case r.FullName == "":
-		return errors.New("nama wajib diisi")
-	case utf8.RuneCountInString(r.FullName) > 255:
-		return errors.New("nama terlalu panjang")
-	case len(r.NIK) != 16:
-		return errors.New("NIK harus 16 digit")
-	case !utils.IsAllDigits(r.NIK):
-		return errors.New("NIK harus berupa angka")
-	case r.Email == "":
-		return errors.New("email wajib diisi")
-	case len(r.Password) < 8:
-		return errors.New("password 8 minimal karakter")
-	case len(r.Password) > 72:
-		return errors.New("password terlalu panjang")
-	}
-
-	if _, err := mail.ParseAddress(r.Email); err != nil {
-		return errors.New("format email tidak valid")
-	}
-
-	return nil
+	return utils.ValidateStruct(r)
 }

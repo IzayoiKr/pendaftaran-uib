@@ -11,8 +11,6 @@ import (
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
-
-	"github.com/google/uuid"
 )
 
 func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc {
@@ -88,11 +86,18 @@ func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc
 			return
 		}
 
+		idBytes, err := utils.UUIDToBytes(claims.UserID)
+		if err != nil {
+			slog.Error("refresh: parse uuid to bytes", "error", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+
 		var user models.User
 		err = db.QueryRowContext(r.Context(),
-			`SELECT id, full_name, nik, email FROM user WHERE id = ?`,
-			claims.UserID,
-		).Scan(&user.ID, &user.FullName, &user.NIK, &user.Email)
+			`SELECT full_name, nik, email FROM users WHERE id = ?`,
+			idBytes,
+		).Scan(&user.FullName, &user.NIK, &user.Email)
 
 		if errors.Is(err, sql.ErrNoRows) {
 			clearRefreshCookie(w)
@@ -104,7 +109,14 @@ func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc
 			return
 		}
 
-		newSessionID := uuid.NewString()
+		user.ID, err = utils.UUIDFromBytes(idBytes)
+		if err != nil {
+			slog.Error("refresh: parse uuid to string", "error", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+
+		newSessionID := utils.GenerateUUIDString()
 
 		if err := ts.StoreSession(r.Context(), newSessionID, user.ID, time.Now().Add(auth.RefreshTokenTTL)); err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
@@ -141,9 +153,10 @@ func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc
 			Meta: map[string]any{"old_session_id": sessionID},
 		})
 
+		maskedNIK := decryptAndMask(user.NIK)
 		utils.WriteJSON(w, http.StatusOK, accessTokenResponse{
 			AccessToken: newAccessToken,
-			User: user.ToDTO(),
+			User: user.ToDTO(maskedNIK),
 		})
 	}
 }

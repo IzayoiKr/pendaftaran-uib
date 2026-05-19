@@ -28,7 +28,14 @@ func UploadTransferProof(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		resolvedID, isS2, err := ResolveRegistrationID(r.Context(), db, claims.UserID, regID)
+		idBytes, err := utils.UUIDToBytes(claims.UserID)
+		if err != nil {
+			slog.Error("transfer: parse uuid to bytes", "error", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+
+		resolvedID, isS2, err := ResolveRegistrationID(r.Context(), db, regID, idBytes)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON("registration not found"))
 			return
@@ -70,7 +77,7 @@ func UploadTransferProof(db *sql.DB) http.HandlerFunc {
 		// Get user info for folder name
 		var nama, nik, regKey string
 		var createdAt time.Time
-		err = db.QueryRowContext(r.Context(), fmt.Sprintf("SELECT nama, nik, registration_key, created_at FROM %s WHERE id = ? AND user_id = ?", tableName), resolvedID, claims.UserID).Scan(&nama, &nik, &regKey, &createdAt)
+		err = db.QueryRowContext(r.Context(), fmt.Sprintf("SELECT nama, nik, registration_key, created_at FROM %s WHERE id = ? AND user_id = ?", tableName), resolvedID, idBytes).Scan(&nama, &nik, &regKey, &createdAt)
 		if err != nil {
 			slog.Error("Failed to get registration info", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("Failed to process upload"))
@@ -84,7 +91,7 @@ func UploadTransferProof(db *sql.DB) http.HandlerFunc {
 		}
 
 		folderPath := filepath.Join("uploads", "registrations", formattedID, "bukti transfer")
-		
+
 		path, err := utils.SaveUploadedFile(file, header, folderPath)
 		if err != nil {
 			slog.Error("Failed to save transfer proof", "error", err)
@@ -93,13 +100,13 @@ func UploadTransferProof(db *sql.DB) http.HandlerFunc {
 		}
 
 		// Update database: Insert into registration_payments
-		paymentID := utils.GenerateUUID()
+		paymentID := utils.GenerateUUIDBytes()
 		query := `
 			INSERT INTO registration_payments (
-				id, registration_id, registration_type, 
+				id, registration_id, registration_type,
 				pemilik_rekening, bank, bukti_bayar_path, status
 			) VALUES (?, ?, ?, ?, ?, ?, 'Masih dalam pemeriksaan')`
-		
+
 		_, err = db.ExecContext(r.Context(), query, paymentID, resolvedID, strings.ToUpper(tableName[:2]), pemilikRek, bank, path)
 		if err != nil {
 			slog.Error("Failed to insert registration payment", "error", err)

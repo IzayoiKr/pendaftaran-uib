@@ -22,7 +22,11 @@ func ErrJSON(msg string) APIError {
 
 func DecodeJSON(r *http.Request, dst any) error {
 	if err := json.NewDecoder(r.Body).Decode(dst); err != nil {
-		return errors.New("permintaan tidak valid")
+		var maxErr *http.MaxBytesError
+		if errors.As(err, &maxErr) {
+			return errors.New("ukuran data terlalu besar")
+		}
+		return errors.New("data yang dimasukkan tidak valid")
 	}
 	return nil
 }

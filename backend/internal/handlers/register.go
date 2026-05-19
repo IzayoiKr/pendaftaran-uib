@@ -11,11 +11,10 @@ import (
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/email"
 	"pendaftaran-uib/backend/internal/models"
+	nikCrypto "pendaftaran-uib/backend/internal/crypto"
 	"pendaftaran-uib/backend/internal/utils"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFunc {
@@ -63,17 +62,32 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 			return
 		}
 
-		hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+		encryptedNIK, err := nikCrypto.EncryptNIK(req.NIK)
 		if err != nil {
+			slog.Error("register: encrypt NIK", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
-		id := uuid.NewString()
+		blindNIK, err := nikCrypto.NIKBlindIndex(req.NIK)
+		if err != nil {
+			slog.Error("register: NIK blind index", "error", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+
+		hash, err := nikCrypto.HashPassword(req.Password)
+		if err != nil {
+			slog.Error("register: encrypt password", "error", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+
+		idBytes := utils.GenerateUUIDBytes()
 
 		_, err = db.ExecContext(r.Context(),
-			"INSERT INTO user (id, full_name, nik, email, password_hash) VALUES (?, ?, ?, ?, ?)",
-		 id, req.FullName, req.NIK, req.Email, string(hash),
+			"INSERT INTO users (id, full_name, nik, nik_blind, email, password_hash) VALUES (?, ?, ?, ?, ?, ?)",
+		 idBytes, req.FullName, encryptedNIK, blindNIK, req.Email, string(hash),
 		)
 		if err != nil {
 			var mysqlErr *mysql.MySQLError
@@ -96,9 +110,14 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 			return
 		}
 
+		idStr, err := utils.UUIDFromBytes(idBytes)
+		if err != nil {
+			slog.Error("register: parse uuid", "error", err)
+		}
+
 		al.Log(audit.Entry{
 			Event: audit.EventRegisterSuccess,
-			UserID: id,
+			UserID: idStr,
 			Email: req.Email,
 			IP: base.IP,
 			UserAgent: base.UserAgent,
@@ -107,7 +126,7 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 
 		rawToken, tokenHash, err := generateVerificationToken()
 		if err != nil {
-			slog.Error("register: generate verification token", "user_id", id, "error", err)
+			slog.Error("register: generate verification token", "user_id", idBytes, "error", err)
 			utils.WriteJSON(w, http.StatusCreated, map[string]string{
 				"message": "Registrasi berhasil! Silahkan cek email Anda untuk verifikasi",
 			})
@@ -116,9 +135,9 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 
 		if _, err = db.ExecContext(r.Context(),
 			"INSERT INTO email_verification (user_id, token_hash, expired_at) VALUES (?, ?, ?)",
-			id, tokenHash, time.Now().Add(verifyTokenTTL),
+			idBytes, tokenHash, time.Now().Add(verifyTokenTTL),
 		); err != nil {
-			slog.Error("register: store verification token", "user_id", id, "error", err)
+			slog.Error("register: store verification token", "user_id", idBytes, "error", err)
 			utils.WriteJSON(w, http.StatusCreated, map[string]string{
 				"message": "Registrasi berhasil! Silahkan cek email Anda untuk verifikasi",
 			})
@@ -127,7 +146,7 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 
 		go func() {
 			if err := mailer.SendVerificationEmail(req.Email, req.FullName, rawToken); err != nil {
-				slog.Error("register: send verification email", "user_id", id, "error", err)
+				slog.Error("register: send verification email", "user_id", idBytes, "error", err)
 			}
 		}()
 

@@ -15,10 +15,12 @@ import (
 
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
+	"pendaftaran-uib/backend/internal/crypto"
 	"pendaftaran-uib/backend/internal/db"
 	"pendaftaran-uib/backend/internal/email"
 	"pendaftaran-uib/backend/internal/handlers"
 	"pendaftaran-uib/backend/internal/middleware"
+	"pendaftaran-uib/backend/internal/utils"
 )
 
 func main() {
@@ -34,6 +36,16 @@ func main() {
 
 	if err := auth.InitJWT(os.Getenv("JWT_SECRET"), os.Getenv("JWT_ISSUER")); err != nil {
 		slog.Error("jwt config error", "error", err)
+		os.Exit(1)
+	}
+
+	if err := crypto.InitNIKCrypto(); err != nil {
+		slog.Error("nik cyrpto init error", "error", err)
+		os.Exit(1)
+	}
+
+	if err := utils.InitValidator(); err != nil {
+		slog.Error("validator init error", "error", err)
 		os.Exit(1)
 	}
 
@@ -71,124 +83,118 @@ func main() {
 	auditLogger := audit.NewLogger()
 
 	r := chi.NewRouter()
-	r.Use(chimiddleware.Logger)
-	r.Use(chimiddleware.Recoverer)
 	r.Use(chimiddleware.RequestID)
+	r.Use(chimiddleware.Recoverer)
+	r.Use(chimiddleware.Timeout(30 * time.Second))
 	r.Use(middleware.CORS)
 	r.Use(middleware.SecFetch)
 	r.Use(middleware.SecurityHeaders)
+	r.Use(chimiddleware.Logger)
 
 	fileServer := http.FileServer(http.Dir("./uploads"))
 	r.Handle("/uploads/*", http.StripPrefix("/uploads/", fileServer))
 
 	rl := newRateLimiters()
 
-	// Public Routes
 	r.Get("/health", handlers.HealthCheck(provider))
-	r.Get("/api/program_studi", handlers.ProgramStudi(provider.MySQL))
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.LimitJSON)
 
-	r.Get("/api/gelombang",
-		rl.gelombang.RateLimit(
-			handlers.GetGelombangList(provider.MySQL),
-		),
-	)
-	r.Get("/api/gelombang/{registrationKey}",
-		rl.gelombang.RateLimit(
-			handlers.GetGelombangByKey(provider.MySQL),
-		),
-	)
+		r.Get("/api/program_studi", handlers.ProgramStudi(provider.MySQL))
 
-	r.Post("/api/auth/login",
-		rl.loginIP.RateLimit(
-			handlers.Login(provider.MySQL, tokenStore, rl.loginEmail, auditLogger),
-		),
-	)
-	r.Post("/api/auth/register",
-		rl.register.RateLimitDevice(
-			handlers.Register(provider.MySQL, mailer, auditLogger),
-		),
-	)
-	r.Post("/api/auth/refresh",
-		auth.RateLimitRefresh(
-			rl.refreshIP,
-			rl.refreshUser,
-			handlers.Refresh(provider.MySQL, tokenStore, auditLogger),
-		),
-	)
-	r.Post("/api/auth/forgot-password",
-		rl.forgotPasswordIP.RateLimitDevice(
-			handlers.ForgotPassword(provider.MySQL, mailer, rl.forgotPasswordEmail, auditLogger),
-		),
-	)
-	r.Post("/api/auth/reset-password",
-		rl.resetPassword.RateLimit(
-			handlers.ResetPassword(provider.MySQL, tokenStore, auditLogger),
-		),
-	)
-	r.Post("/api/auth/verify-email",
-		rl.verifyEmail.RateLimitDevice(
-			handlers.VerifyEmail(provider.MySQL, auditLogger),
-		),
-	)
-	r.Post("/api/auth/resend-verification",
-		rl.resendVerify.RateLimitDevice(
-			handlers.ResendVerification(provider.MySQL, mailer, auditLogger),
-		),
-	)
+		r.Get("/api/gelombang",
+			rl.gelombang.RateLimit(
+				handlers.GetGelombangList(provider.MySQL),
+			),
+		)
 
+		r.Post("/api/auth/login",
+			rl.loginIP.RateLimit(
+				handlers.Login(provider.MySQL, tokenStore, rl.loginEmail, auditLogger),
+			),
+		)
+		r.Post("/api/auth/register",
+			rl.register.RateLimitDevice(
+				handlers.Register(provider.MySQL, mailer, auditLogger),
+			),
+		)
+		r.Post("/api/auth/refresh",
+			auth.RateLimitRefresh(
+				rl.refreshIP,
+				rl.refreshUser,
+				handlers.Refresh(provider.MySQL, tokenStore, auditLogger),
+			),
+		)
+		r.Post("/api/auth/forgot-password",
+			rl.forgotPasswordIP.RateLimitDevice(
+				handlers.ForgotPassword(provider.MySQL, mailer, rl.forgotPasswordEmail, auditLogger),
+			),
+		)
+		r.Post("/api/auth/reset-password",
+			rl.resetPassword.RateLimit(
+				handlers.ResetPassword(provider.MySQL, tokenStore, auditLogger),
+			),
+		)
+		r.Post("/api/auth/verify-email",
+			rl.verifyEmail.RateLimitDevice(
+				handlers.VerifyEmail(provider.MySQL, auditLogger),
+			),
+		)
+		r.Post("/api/auth/resend-verification",
+			rl.resendVerify.RateLimitDevice(
+				handlers.ResendVerification(provider.MySQL, mailer, auditLogger),
+			),
+		)
+	})
 	// Protected Routes
 	r.Group(func(r chi.Router) {
 		r.Use(auth.Middleware(tokenStore))
+		r.Use(middleware.LimitJSON)
+
 		r.Get("/api/profile",
-			rl.profile.RateLimitUser(
-				handlers.Profile(provider.MySQL),
-			),
+			rl.profile.RateLimitUser(handlers.Profile(provider.MySQL)),
 		)
 		r.Post("/api/profile",
-			rl.updateProfile.RateLimitUser(
-				handlers.UpdateProfile(provider.MySQL, auditLogger),
-			),
+			rl.updateProfile.RateLimitUser(handlers.UpdateProfile(provider.MySQL, auditLogger)),
+		)
+		r.Get("/api/profile/nik",
+			rl.revealNIK.RateLimitUser(handlers.RevealNIK(provider.MySQL, auditLogger)),
 		)
 		r.Post("/api/auth/logout",
-			rl.logout.RateLimitUser(
-				handlers.Logout(tokenStore, auditLogger),
-			),
+			rl.logout.RateLimitUser(handlers.Logout(tokenStore, auditLogger)),
 		)
 		r.Post("/api/profile/password",
-			rl.changePassword.RateLimitUser(
-				handlers.ChangePassword(provider.MySQL, tokenStore, auditLogger),
-			),
+			rl.changePassword.RateLimitUser(handlers.ChangePassword(provider.MySQL, tokenStore, auditLogger)),
 		)
 
-		r.Post("/api/registration",
-			rl.studentRegister.RateLimitUser(
-				handlers.RegisterStudent(provider.MySQL, auditLogger),
+		r.Get("/api/gelombang/{registrationKey}",
+			rl.gelombang.RateLimit(
+				handlers.GetGelombangByKey(provider.MySQL),
 			),
 		)
 		r.Get("/api/registration/{id}",
-			rl.profile.RateLimitUser(
-				handlers.GetRegistrationDetails(provider.MySQL),
-			),
-		)
-		r.Post("/api/registration/{id}",
-			rl.studentRegister.RateLimitUser(
-				handlers.UpdateRegistration(provider.MySQL),
-			),
-		)
-		r.Post("/api/registration/{id}/transfer",
-			rl.studentRegister.RateLimitUser(
-				handlers.UploadTransferProof(provider.MySQL),
-			),
+			rl.profile.RateLimitUser(handlers.GetRegistrationDetails(provider.MySQL)),
 		)
 		r.Get("/api/registration-status",
-			rl.profile.RateLimitUser(
-				handlers.GetRegistrationStatus(provider.MySQL),
-			),
+			rl.profile.RateLimitUser(handlers.GetRegistrationStatus(provider.MySQL)),
 		)
 		r.Get("/api/registration/latest",
-			rl.profile.RateLimitUser(
-				handlers.GetLatestRegistration(provider.MySQL),
-			),
+			rl.profile.RateLimitUser(handlers.GetLatestRegistration(provider.MySQL)),
+		)
+	})
+
+	r.Group(func(r chi.Router) {
+		r.Use(auth.Middleware(tokenStore))
+		r.Use(middleware.LimitMultipart)
+
+		r.Post("/api/registration",
+			rl.studentRegister.RateLimitUser(handlers.RegisterStudent(provider.MySQL, auditLogger)),
+		)
+		r.Post("/api/registration/{id}",
+			rl.studentRegister.RateLimitUser(handlers.UpdateRegistration(provider.MySQL)),
+		)
+		r.Post("/api/registration/{id}/transfer",
+			rl.studentRegister.RateLimitUser(handlers.UploadTransferProof(provider.MySQL)),
 		)
 	})
 
@@ -231,6 +237,7 @@ type rateLimiters struct {
 	refreshIP           *auth.RateLimiter
 	refreshUser         *auth.RateLimiter
 	profile             *auth.RateLimiter
+	revealNIK			*auth.RateLimiter
 	updateProfile       *auth.RateLimiter
 	changePassword      *auth.RateLimiter
 	forgotPasswordIP    *auth.RateLimiter
@@ -251,6 +258,7 @@ func newRateLimiters() rateLimiters {
 		refreshIP:           auth.NewRateLimiter(60, 1*time.Minute),
 		refreshUser:         auth.NewRateLimiter(30, 1*time.Minute),
 		profile:             auth.NewRateLimiter(60, 1*time.Minute),
+		revealNIK:			 auth.NewRateLimiter(10, 5*time.Minute),
 		updateProfile:       auth.NewRateLimiter(10, 1*time.Minute),
 		changePassword:      auth.NewRateLimiter(5, 15*time.Minute),
 		forgotPasswordIP:    auth.NewRateLimiter(3, 60*time.Minute),

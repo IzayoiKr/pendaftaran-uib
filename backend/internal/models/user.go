@@ -19,10 +19,10 @@ type UserDTO struct {
 	Email string `json:"email"`
 }
 
-func (u *User) ToDTO() UserDTO {
+func (u *User) ToDTO(maskedNIK string) UserDTO {
 	return UserDTO {
 		FullName: u.FullName,
-		NIK: u.NIK,
+		NIK: maskedNIK,
 		Email: u.Email,
 	}
 }

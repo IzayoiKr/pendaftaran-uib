@@ -2,13 +2,15 @@ package models
 
 import (
 	"errors"
-	"net/mail"
+	"pendaftaran-uib/backend/internal/utils"
 	"strings"
 )
 
+// VerifyEmailRequest — Token uses a deliberate vague message for security
+// TurnstileToken is checked separately in the handler for audit logging
 type VerifyEmailRequest struct {
-	Token string `json:"token"`
-	TurnstileToken string `json:"cf_turnstile_token"`
+	Token string `json:"token" validate:"-"`
+	TurnstileToken string `json:"cf_turnstile_token" validate:"-"`
 }
 
 func (r *VerifyEmailRequest) Validate() error {
@@ -19,7 +21,7 @@ func (r *VerifyEmailRequest) Validate() error {
 }
 
 type ResendVerifyEmailRequest struct {
-	Email string `json:"email"`
+	Email string `json:"email" validate:"required,email"`
 }
 
 func (r *ResendVerifyEmailRequest) Sanitize() {
@@ -27,11 +29,5 @@ func (r *ResendVerifyEmailRequest) Sanitize() {
 }
 
 func (r *ResendVerifyEmailRequest) Validate() error {
-	if r.Email == "" {
-		return errors.New("email wajib diisi")
-	}
-	if _, err := mail.ParseAddress(r.Email); err != nil {
-		return errors.New("format email tidak valid")
-	}
-	return nil
+	return utils.ValidateStruct(r)
 }

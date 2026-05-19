@@ -55,7 +55,7 @@ func ForgotPassword(db *sql.DB, mailer *email.Mailer, emailLimiter *auth.RateLim
 				RequestID: base.RequestID,
 				Meta: map[string]any{"retry_after_seconds": int(retryAfter.Seconds())},
 			})
-			w.Header().Set("Retry-After", strconv.Itoa(int(retryAfter)))
+			w.Header().Set("Retry-After", strconv.Itoa(int(retryAfter.Seconds())))
 			utils.WriteJSON(w, http.StatusTooManyRequests, utils.ErrJSON(
 				fmt.Sprintf("terlalu banyak percobaan, coba lagi dalam %d detik",
 					int(retryAfter.Seconds())),
@@ -80,11 +80,12 @@ func ForgotPassword(db *sql.DB, mailer *email.Mailer, emailLimiter *auth.RateLim
 			return
 		}
 
-		var userID, fullName string
+		var idBytes []byte
+		var fullName string
 		err = db.QueryRowContext(r.Context(),
-			"SELECT id, full_name FROM user WHERE email = ? and nik = ?",
-			req.Email, req.NIK,
-		).Scan(&userID, &fullName)
+			"SELECT id, full_name FROM users WHERE email = ?",
+			req.Email,
+		).Scan(&idBytes, &fullName)
 
 		if errors.Is(err, sql.ErrNoRows) {
 			al.Log(audit.Entry{
@@ -109,25 +110,30 @@ func ForgotPassword(db *sql.DB, mailer *email.Mailer, emailLimiter *auth.RateLim
 			return
 		}
 
+		idStr, err := utils.UUIDFromBytes(idBytes)
+		if err != nil {
+			slog.Error("forgot_password: parse uuid to string", "error", err)
+		}
+
 		expiry := time.Now().Add(resetTokenTTL)
 		if _, err = db.ExecContext(r.Context(),
 			"INSERT INTO reset_password (user_id, token_hash, expired_at) VALUES (?, ?, ?)",
-			userID, tokenHash, expiry,
+			idBytes, tokenHash, expiry,
 		); err != nil {
-			slog.Error("forgot_password: store token hash", "user_id", userID, "error", err)
+			slog.Error("forgot_password: store token hash", "user_id", idStr, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
 		go func() {
 			if err := mailer.SendPasswordResetEmail(req.Email, fullName, rawToken); err != nil {
-				slog.Error("forgot_password: send reset password email", "user_id", userID, "error", err)
+				slog.Error("forgot_password: send reset password email", "user_id", idStr, "error", err)
 			}
 		}()
 
 		al.Log(audit.Entry{
 			Event: audit.EventPasswordResetRequested,
-			UserID: userID,
+			UserID: idStr,
 			Email: req.Email,
 			IP: base.IP,
 			UserAgent: base.UserAgent,

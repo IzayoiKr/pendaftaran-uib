@@ -8,10 +8,9 @@ import (
 
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
+	nikCrypto "pendaftaran-uib/backend/internal/crypto"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc {
@@ -35,10 +34,17 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 			return
 		}
 
+		idBytes, err := utils.UUIDToBytes(claims.UserID)
+		if err != nil {
+			slog.Error("change_password: parse uuid to bytes", "error", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+
 		var currentHash string
-		err := db.QueryRowContext(r.Context(),
-			"SELECT password_hash FROM user WHERE id = ?",
-			claims.UserID,
+		err = db.QueryRowContext(r.Context(),
+			"SELECT password_hash FROM users WHERE id = ?",
+			idBytes,
 		).Scan(&currentHash)
 
 		if errors.Is(err, sql.ErrNoRows) {
@@ -50,20 +56,20 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 			return
 		}
 
-		if err := bcrypt.CompareHashAndPassword([]byte(currentHash), []byte(req.OldPassword)); err != nil {
+		if err := nikCrypto.VerifyPassword(currentHash, req.OldPassword); err != nil {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password lama tidak sesuai"))
 			return
 		}
 
-		newHash, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+		newHash, err := nikCrypto.HashPassword(req.NewPassword)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
 		if _, err = db.ExecContext(r.Context(),
-			"UPDATE user SET password_hash = ? WHERE id = ?",
-			string(newHash), claims.UserID,
+			"UPDATE users SET password_hash = ? WHERE id = ?",
+			string(newHash), idBytes,
 		); err != nil {
 			slog.Error("change_password: exec", "user_id", claims.UserID, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
@@ -80,6 +86,8 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 				"error", err,
 			)
 		}
+
+		clearRefreshCookie(w)
 
 		al.Log(audit.Entry{
 			Event: audit.EventPasswordChanged,

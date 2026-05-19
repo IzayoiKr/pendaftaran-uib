@@ -16,6 +16,8 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
 
+		const vagueMsg = "link verifikasi tidak valid atau sudah kadaluwarsa"
+
 		var req models.VerifyEmailRequest
 		if err := utils.DecodeJSON(r, &req); err != nil {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
@@ -58,17 +60,18 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 
 		var (
 			recordID int64
-			userID string
+			userIDBytes []byte
+			userIDStr string
 			expiredAt time.Time
 			isUsed bool
 		)
 		err = db.QueryRowContext(r.Context(),
 			"SELECT id, user_id, expired_at, is_used FROM email_verification WHERE token_hash = ?",
 			tokenHash,
-		).Scan(&recordID, &userID, &expiredAt, &isUsed)
+		).Scan(&recordID, &userIDBytes, &expiredAt, &isUsed)
 
 		if errors.Is(err, sql.ErrNoRows) {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("link verifikasi tidak valid atau sudah kadaluwarsa"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(vagueMsg))
 			return
 		}
 		if err != nil {
@@ -76,11 +79,16 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			return
 		}
 
+		userIDStr, err = utils.UUIDFromBytes(userIDBytes)
+		if err != nil {
+			slog.Error("forgot_password: parse uuid to string", "error", err)
+		}
+
 		if isUsed || time.Now().After(expiredAt) {
 			if isUsed {
 				al.Log(audit.Entry{
 					Event: audit.EventEmailVerificationUsed,
-					UserID: userID,
+					UserID: userIDStr,
 					IP: base.IP,
 					UserAgent: base.UserAgent,
 					RequestID: base.RequestID,
@@ -88,14 +96,14 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			} else {
 				al.Log(audit.Entry{
 					Event: audit.EventEmailVerificationExpired,
-					UserID: userID,
+					UserID: userIDStr,
 					IP: base.IP,
 					UserAgent: base.UserAgent,
 					RequestID: base.RequestID,
 				})
 			}
 			utils.WriteJSON(w, http.StatusBadRequest, map[string]any{
-				"error": "link verifikasi tidak valid atau sudah kadaluwarsa",
+				"error": vagueMsg,
 				"expired": true,
 			})
 			return
@@ -125,10 +133,10 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 		}
 
 		if _, err := tx.ExecContext(r.Context(),
-			"UPDATE user SET email_verified = 1, email_verified_at = NOW() WHERE id = ?",
-			userID,
+			"UPDATE users SET email_verified = 1, email_verified_at = NOW() WHERE id = ?",
+			userIDBytes,
 		); err != nil {
-			slog.Error("verify_email: mark user verified", "user_id", userID, "error", err)
+			slog.Error("verify_email: mark user verified", "user_id", userIDStr, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
@@ -142,7 +150,7 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 
 		al.Log(audit.Entry{
 			Event: audit.EventEmailVerified,
-			UserID: userID,
+			UserID: userIDStr,
 			IP: base.IP,
 			UserAgent: base.UserAgent,
 			RequestID: base.RequestID,

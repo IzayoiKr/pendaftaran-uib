@@ -5,18 +5,20 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
-	"pendaftaran-uib/backend/internal/audit"
-	"pendaftaran-uib/backend/internal/auth"
-	"pendaftaran-uib/backend/internal/models"
-	"pendaftaran-uib/backend/internal/utils"
 	"time"
 
-	"golang.org/x/crypto/bcrypt"
+	"pendaftaran-uib/backend/internal/audit"
+	"pendaftaran-uib/backend/internal/auth"
+	"pendaftaran-uib/backend/internal/crypto"
+	"pendaftaran-uib/backend/internal/models"
+	"pendaftaran-uib/backend/internal/utils"
 )
 
 func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
+
+		const vagueMsg = "link verifikasi tidak valid atau sudah kadaluwarsa"
 
 		var req models.ResetPasswordRequest
 		if err := utils.DecodeJSON(r, &req); err != nil {
@@ -33,17 +35,18 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 
 		var (
 			recordID int64
-			userID string
+			userIDBytes []byte
+			userIDStr string
 			expiredAt time.Time
 			isUsed bool
 		)
 		err := db.QueryRowContext(r.Context(),
 			"SELECT id, user_id, expired_at, is_used FROM reset_password WHERE token_hash = ?",
 			tokenHash,
-		).Scan(&recordID, &userID, &expiredAt, &isUsed)
+		).Scan(&recordID, &userIDBytes, &expiredAt, &isUsed)
 
 		if errors.Is(err, sql.ErrNoRows) {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("link tidak valid atau sudah kadaluwarsa"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(vagueMsg))
 			return
 		}
 		if err != nil {
@@ -51,11 +54,16 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 			return
 		}
 
+		userIDStr, err = utils.UUIDFromBytes(userIDBytes)
+		if err != nil {
+			slog.Error("forgot_password: parse uuid to string", "error", err)
+		}
+
 		if isUsed || time.Now().After(expiredAt) {
 			if isUsed {
 				al.Log(audit.Entry{
 					Event: audit.EventPasswordResetUsed,
-					UserID: userID,
+					UserID: userIDStr,
 					IP: base.IP,
 					UserAgent: base.UserAgent,
 					RequestID: base.RequestID,
@@ -63,20 +71,20 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 			} else {
 				al.Log(audit.Entry{
 					Event: audit.EventPasswordResetExpired,
-					UserID: userID,
+					UserID: userIDStr,
 					IP: base.IP,
 					UserAgent: base.UserAgent,
 					RequestID: base.RequestID,
 				})
 			}
 			utils.WriteJSON(w, http.StatusBadRequest, map[string]any{
-				"error": "link verifikasi tidak valid atau sudah kadaluwarsa",
+				"error": vagueMsg,
 				"expired": true,
 			})
 			return
 		}
 
-		newHash, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+		newHash, err := crypto.HashPassword(req.NewPassword)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
@@ -97,10 +105,10 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 		}()
 
 		if _, err = tx.ExecContext(r.Context(),
-			"UPDATE user SET password_hash = ? WHERE id = ?",
-			string(newHash), userID,
+			"UPDATE users SET password_hash = ? WHERE id = ?",
+			string(newHash), userIDBytes,
 		); err != nil {
-			slog.Error("reset_password: update password:", "user_id", userID, "error", err)
+			slog.Error("reset_password: update password:", "user_id", userIDStr, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
@@ -117,16 +125,17 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 		if err = tx.Commit(); err != nil {
 			slog.Error("reset_password: commit", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
 		}
 		committed = true
 
-		if err := ts.RevokeAllUserSessions(r.Context(), userID); err != nil {
-			slog.Error("reset_passsword: revoke all sessions", "user_id", userID, "error", err)
+		if err := ts.RevokeAllUserSessions(r.Context(), userIDStr); err != nil {
+			slog.Error("reset_passsword: revoke all sessions", "user_id", userIDStr, "error", err)
 		}
 
 		al.Log(audit.Entry{
 			Event: audit.EventPasswordResetSuccess,
-			UserID: userID,
+			UserID: userIDStr,
 			IP: base.IP,
 			UserAgent: base.UserAgent,
 			RequestID: base.RequestID,

@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"errors"
+	"log/slog"
 	"net/http"
 
 	"pendaftaran-uib/backend/internal/auth"
@@ -18,10 +19,17 @@ func Profile(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		idBytes, err := utils.UUIDToBytes(claims.UserID)
+		if err != nil {
+			slog.Error("reveal_nil: parse uuid to bytes", "error", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+
 		var user models.User
-		err := db.QueryRowContext(r.Context(),
-			"SELECT full_name, nik, email FROM user WHERE id = ?",
-			claims.UserID,
+		err = db.QueryRowContext(r.Context(),
+			"SELECT full_name, nik, email FROM users WHERE id = ?",
+			idBytes,
 		).Scan(&user.FullName, &user.NIK, &user.Email)
 
 		if errors.Is(err, sql.ErrNoRows) {
@@ -34,9 +42,9 @@ func Profile(db *sql.DB) http.HandlerFunc {
 		}
 
 		res := models.ProfileResponse{
-			FullName:      user.FullName,
-			NIK:           user.NIK,
-			Email:         user.Email,
+			FullName: user.FullName,
+			NIK: decryptAndMask(user.NIK),
+			Email: user.Email,
 			Registrations: []models.RegistrationDTO{},
 		}
 
@@ -46,7 +54,7 @@ func Profile(db *sql.DB) http.HandlerFunc {
 			FROM s1_registrations r
 			JOIN program_studi p ON r.prodi_pil = p.id
 			WHERE r.user_id = ?
-		`, claims.UserID)
+		`, idBytes)
 		if err == nil {
 			defer rowsS1.Close()
 			for rowsS1.Next() {
@@ -62,7 +70,7 @@ func Profile(db *sql.DB) http.HandlerFunc {
 			SELECT id, YEAR(created_at), batch_name, jurusan, doc_status, payment_status
 			FROM s2_registrations
 			WHERE user_id = ?
-		`, claims.UserID)
+		`, idBytes)
 		if err == nil {
 			defer rowsS2.Close()
 			for rowsS2.Next() {

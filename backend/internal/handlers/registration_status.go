@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -32,6 +33,14 @@ func GetRegistrationStatus(db *sql.DB) http.HandlerFunc {
 
 		registrations := []RegistrationInfo{}
 
+		idBytes, err := utils.UUIDToBytes(claims.UserID)
+		if err != nil {
+			slog.Error("registration_status: parse uuid to bytes", "error", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+
+
 		// Check S1 registrations
 		rows, err := db.QueryContext(r.Context(), `
 			SELECT r.id, YEAR(r.created_at), r.batch_name, p.title, r.doc_check_status, r.payment_status, r.registration_key, r.created_at,
@@ -40,7 +49,7 @@ func GetRegistrationStatus(db *sql.DB) http.HandlerFunc {
 			JOIN program_studi p ON r.prodi_pil = p.id
 			LEFT JOIN gelombang g ON r.registration_key = g.batch_key
 			WHERE r.user_id = ?
-		`, claims.UserID)
+		`, idBytes)
 
 		if err == nil {
 			defer rows.Close()
@@ -55,17 +64,17 @@ func GetRegistrationStatus(db *sql.DB) http.HandlerFunc {
 					reg.BiodataStatus = completeness
 					reg.PaymentStatus = payment
 					reg.USMResult = usmStatus.String
-					
+
 					if completeness == "Telah Lengkap" && payment == "Telah Lunas" {
 						sTime := "00:00"
 						if len(startTime.String) >= 5 { sTime = startTime.String[:5] }
 						eTime := "00:00"
 						if len(endTime.String) >= 5 { eTime = endTime.String[:5] }
 
-						reg.USM = fmt.Sprintf("%s,\n%s\n(%s - %s)", 
+						reg.USM = fmt.Sprintf("%s,\n%s\n(%s - %s)",
 							location.String,
-							eventDate.Time.Format("02 Jan 2006"), 
-							sTime, 
+							eventDate.Time.Format("02 Jan 2006"),
+							sTime,
 							eTime)
 						reg.USMPassword = usmPass.String
 						if reg.USMPassword == "" { reg.USMPassword = "TBA" }
@@ -85,7 +94,7 @@ func GetRegistrationStatus(db *sql.DB) http.HandlerFunc {
 			FROM s2_registrations r
 			LEFT JOIN gelombang g ON r.registration_key = g.batch_key
 			WHERE r.user_id = ?
-		`, claims.UserID)
+		`, idBytes)
 
 		if err == nil {
 			defer rowsS2.Close()
@@ -107,10 +116,10 @@ func GetRegistrationStatus(db *sql.DB) http.HandlerFunc {
 						eTime := "00:00"
 						if len(endTime.String) >= 5 { eTime = endTime.String[:5] }
 
-						reg.USM = fmt.Sprintf("%s,\n%s\n(%s - %s)", 
+						reg.USM = fmt.Sprintf("%s,\n%s\n(%s - %s)",
 							location.String,
-							eventDate.Time.Format("02 Jan 2006"), 
-							sTime, 
+							eventDate.Time.Format("02 Jan 2006"),
+							sTime,
 							eTime)
 						reg.USMPassword = usmPass.String
 						if reg.USMPassword == "" { reg.USMPassword = "TBA" }

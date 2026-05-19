@@ -1,13 +1,13 @@
 package models
 
 import (
-	"errors"
 	"strings"
-	"unicode/utf8"
+
+	"pendaftaran-uib/backend/internal/utils"
 )
 
 type UpdateProfileRequest struct {
-	FullName string `json:"full_name"`
+	FullName string `json:"full_name" validate:"required,max=255"`
 }
 
 func (r *UpdateProfileRequest) Sanitize() {
@@ -15,11 +15,5 @@ func (r *UpdateProfileRequest) Sanitize() {
 }
 
 func (r *UpdateProfileRequest) Validate() error {
-	if r.FullName == "" {
-		return errors.New("nama wajib diisi")
-	}
-	if utf8.RuneCountInString(r.FullName) > 255 {
-		return errors.New("nama terlalu panjang")
-	}
-	return nil
+	return utils.ValidateStruct(r)
 }

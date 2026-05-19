@@ -34,10 +34,17 @@ func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			return
 		}
 
+		idBytes, err := utils.UUIDToBytes(claims.UserID)
+		if err != nil {
+			slog.Error("reveal_nil: parse uuid to bytes", "error", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+
 		var oldFullname string
-		err := db.QueryRowContext(r.Context(),
-			"SELECT full_name FROM user WHERE id = ?",
-			claims.UserID,
+		err = db.QueryRowContext(r.Context(),
+			"SELECT full_name FROM users WHERE id = ?",
+			idBytes,
 		).Scan(&oldFullname)
 
 		if errors.Is(err, sql.ErrNoRows) {
@@ -55,8 +62,8 @@ func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 		}
 
 		if _, err := db.ExecContext(r.Context(),
-			"UPDATE user SET full_name = ? WHERE id = ?",
-			req.FullName, claims.UserID,
+			"UPDATE users SET full_name = ? WHERE id = ?",
+			req.FullName, idBytes,
 		); err != nil {
 			slog.Error("update_profile: exec", "user_id", claims.UserID, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))

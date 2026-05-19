@@ -68,13 +68,13 @@ func GetRegistrationID(ctx context.Context, db *sql.DB, id string, registrationK
 	if isS2 {
 		tableName = "s2_registrations"
 	}
-	
+
 	query := fmt.Sprintf(`
-		SELECT COUNT(*) 
-		FROM %s 
+		SELECT COUNT(*)
+		FROM %s
 		WHERE id LIKE ? AND (created_at < ? OR (created_at = ? AND id < ?))
 	`, tableName)
-	
+
 	err = db.QueryRowContext(ctx, query, prefix+"%", createdAt, createdAt, id).Scan(&count)
 	if err != nil {
 		return prefix + "0001", nil // Fallback
@@ -93,7 +93,7 @@ func GenerateNewRegistrationID(ctx context.Context, db *sql.DB, registrationKey 
 
 // ResolveRegistrationID takes an ID (could be UUID or formatted ID like BM2510001)
 // and returns the actual UUID and a boolean indicating if it's S2.
-func ResolveRegistrationID(ctx context.Context, db *sql.DB, userID, inputID string) (uuid string, isS2 bool, err error) {
+func ResolveRegistrationID(ctx context.Context, db *sql.DB, inputID string, userID []byte) (uuid string, isS2 bool, err error) {
 	// 1. If it looks like a UUID (36 chars with dashes), try direct lookup first
 	if !formattedIDRegex.MatchString(inputID) {
 		// Check S1
@@ -113,7 +113,7 @@ func ResolveRegistrationID(ctx context.Context, db *sql.DB, userID, inputID stri
 
 	// 2. If it matches the formatted ID pattern, we need to find which UUID it corresponds to.
 	// We'll fetch all registrations for this user and check their formatted IDs.
-	
+
 	// Check S1 registrations for this user
 	rows, err := db.QueryContext(ctx, "SELECT id, registration_key, created_at FROM s1_registrations WHERE user_id = ?", userID)
 	if err == nil {

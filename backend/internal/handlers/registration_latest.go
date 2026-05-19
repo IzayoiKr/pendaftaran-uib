@@ -17,6 +17,14 @@ func GetLatestRegistration(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		idBytes, err := utils.UUIDToBytes(claims.UserID)
+		if err != nil {
+			slog.Error("registration_latest: parse uuid to bytes", "error", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			return
+		}
+
+
 		// Try to get latest from S1 first
 		var s1Data map[string]interface{}
 		row := db.QueryRowContext(r.Context(), `
@@ -26,11 +34,11 @@ func GetLatestRegistration(db *sql.DB) http.HandlerFunc {
 			WHERE r.user_id = ?
 			ORDER BY r.created_at DESC
 			LIMIT 1
-		`, claims.UserID)
+		`, idBytes)
 
 		var nik, email, nama, jk, kewarganegaraan, tempatLahir, tanggalLahir, noHp, noHp2, waktuKuliah, asalSekolah, prodiPilName string
-		err := row.Scan(&nik, &email, &nama, &jk, &kewarganegaraan, &tempatLahir, &tanggalLahir, &noHp, &noHp2, &waktuKuliah, &asalSekolah, &prodiPilName)
-		
+		err = row.Scan(&nik, &email, &nama, &jk, &kewarganegaraan, &tempatLahir, &tanggalLahir, &noHp, &noHp2, &waktuKuliah, &asalSekolah, &prodiPilName)
+
 		if err == nil {
 			s1Data = map[string]interface{}{
 				"nik":             nik,
@@ -56,7 +64,7 @@ func GetLatestRegistration(db *sql.DB) http.HandlerFunc {
 			WHERE user_id = ?
 			ORDER BY created_at DESC
 			LIMIT 1
-		`, claims.UserID)
+		`, idBytes)
 
 		var nik2, nama2, jk2, kewarganegaraan2, tempatLahir2, tanggalLahir2, email2, noHp3, agama, sumberStudi, alamat, kelurahan, kecamatan, jurusan, gelar, namaAyah, noTelpAyah, namaIbu, noTelpIbu string
 		var ipk sql.NullFloat64
@@ -93,21 +101,21 @@ func GetLatestRegistration(db *sql.DB) http.HandlerFunc {
 		// Actually, let's just return both and let the frontend decide, or merge them.
 		// Merging:
 		merged := make(map[string]interface{})
-		
+
 		// Fill from S2 if exists (usually has more fields)
 		if s2Data != nil {
 			for k, v := range s2Data {
 				merged[k] = v
 			}
 		}
-		
+
 		// Fill/Override from S1 for common fields if S2 doesn't have it or S1 is newer
 		// For simplicity, let's just take the absolute latest from either table.
-		
+
 		// Let's check which one is newer
 		var s1Time, s2Time string
-		db.QueryRowContext(r.Context(), "SELECT created_at FROM s1_registrations WHERE user_id = ? ORDER BY created_at DESC LIMIT 1", claims.UserID).Scan(&s1Time)
-		db.QueryRowContext(r.Context(), "SELECT created_at FROM s2_registrations WHERE user_id = ? ORDER BY created_at DESC LIMIT 1", claims.UserID).Scan(&s2Time)
+		db.QueryRowContext(r.Context(), "SELECT created_at FROM s1_registrations WHERE user_id = ? ORDER BY created_at DESC LIMIT 1", idBytes).Scan(&s1Time)
+		db.QueryRowContext(r.Context(), "SELECT created_at FROM s2_registrations WHERE user_id = ? ORDER BY created_at DESC LIMIT 1", idBytes).Scan(&s2Time)
 
 		if s1Time > s2Time && s1Data != nil {
 			for k, v := range s1Data {
