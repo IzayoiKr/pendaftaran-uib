@@ -1,21 +1,28 @@
 'use client';
 
 // src/utils/downloadPdf.ts
-// Utility terpusat untuk download PDF dari protected Route Handler.
-// Surat Hasil → buka tab baru (user Ctrl+P / Save as PDF sendiri)
-// File statis → trigger download langsung
 
-export async function downloadPdf(endpoint: string, filename: string): Promise<void> {
-    const res = await fetch(endpoint, { credentials: "include" });
+import useAuthStore from "@/store/useAuthStore";
 
-    if (res.status === 401) {
-        window.location.href = "/login";
-        return;
-    }
+// ─── Core fetch dengan Authorization header ───────────────────────────────────
+async function fetchProtected(endpoint: string): Promise<Response> {
+    const token = useAuthStore.getState().accessToken ?? "";
+    return fetch(endpoint, {
+        credentials: "include",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+}
 
+// ─── Download file statis (VA, pengunduran, contoh pasphoto, qris) ────────────
+// Route handler: src/app/api/files/[filename]/route.ts
+// URL: /api/files/:key — ini TIDAK kena rewrite karena ada route handler-nya
+export async function downloadStaticPdf(key: string, filename: string): Promise<void> {
+    const res = await fetchProtected(`/api/files/${encodeURIComponent(key)}`);
+
+    if (res.status === 401) { window.location.href = "/login"; return; }
     if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error((data as { error?: string }).error ?? `Gagal mengunduh: ${filename}`);
+        const text = await res.text().catch(() => "");
+        throw new Error(text || `Gagal mengunduh: ${filename}`);
     }
 
     const blob = await res.blob();
@@ -27,26 +34,25 @@ export async function downloadPdf(endpoint: string, filename: string): Promise<v
     URL.revokeObjectURL(url);
 }
 
-/**
- * Download file statis dari /api/files/:key
- * Contoh: downloadStaticPdf("VA", "panduan-VA.pdf")
- *         downloadStaticPdf("pengunduran", "pengunduran.pdf")
- *         downloadStaticPdf("contoh_pasphoto", "contoh_pasphoto.pdf")
- *         downloadStaticPdf("panduanpenggunaanqris", "panduan-qris.pdf")
- */
-export async function downloadStaticPdf(key: string, filename: string): Promise<void> {
-    return downloadPdf(`/api/files/${encodeURIComponent(key)}`, filename);
-}
-
-/**
- * Buka Surat Hasil (LoA) di tab baru sebagai HTML.
- * User bisa Ctrl+P → Save as PDF dari browser.
- * Tidak perlu Puppeteer sama sekali.
- */
-export function downloadSuratHasil(nomorDaftar: string): void {
-    window.open(
-        `/api/surat-hasil/${encodeURIComponent(nomorDaftar)}`,
-        "_blank",
-        "noopener,noreferrer"
+// ─── Buka Surat Hasil (LoA) di tab baru ──────────────────────────────────────
+// Route handler: src/app/surat-hasil/[nomorDaftar]/route.ts
+// URL: /surat-hasil/:nomorDaftar — BUKAN /api/ sehingga TIDAK kena rewrite
+// Fetch dulu HTML-nya pakai Authorization header, lalu buka sebagai blob di tab baru.
+// User klik tombol Print → Save as PDF.
+export async function downloadSuratHasil(nomorDaftar: string): Promise<void> {
+    const res = await fetchProtected(
+        `/surat-hasil/${encodeURIComponent(nomorDaftar)}`
     );
+
+    if (res.status === 401) { window.location.href = "/login"; return; }
+    if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(text || "Gagal membuka surat hasil");
+    }
+
+    const html = await res.text();
+    const blob = new Blob([html], { type: "text/html; charset=utf-8" });
+    const url  = URL.createObjectURL(blob);
+    const tab  = window.open(url, "_blank", "noopener,noreferrer");
+
 }
