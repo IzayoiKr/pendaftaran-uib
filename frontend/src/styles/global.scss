@@ -1,5 +1,5 @@
-@use 'utopia-core-scss/src/utopia' as utopia;
-@use './_config.scss';
+@use "utopia-core-scss/src/utopia" as utopia;
+@use "./_config.scss";
 
 // ─── Fluid Scale (:root CSS custom properties) ────────────────────────────────
 // Min viewport: 320px  →  Max viewport: 1400px (your xxl breakpoint)
@@ -29,33 +29,52 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  @include utopia.generateTypeScale((
-    "minWidth":      320,
-    "maxWidth":      1600,
-    "minFontSize":   16,
-    "maxFontSize":   20,
-    "minTypeScale":  1.2,   // minor third — gentle on small screens
-    "maxTypeScale":  1.25,  // major third — more expressive on large screens
-    "positiveSteps": 4,
-    "negativeSteps": 2,
-  ));
+  @include utopia.generateTypeScale(
+    (
+      "minWidth": 320,
+      "maxWidth": 1600,
+      "minFontSize": 16,
+      "maxFontSize": 20,
+      "minTypeScale": 1.2,
+      // minor third — gentle on small screens
+      "maxTypeScale": 1.25,
+      // major third — more expressive on large screens
+      "positiveSteps": 4,
+      "negativeSteps": 2,
+    )
+  );
 
-  @include utopia.generateSpaceScale((
-    "minWidth":       320,
-    "maxWidth":       1600,
-    "minSize":        16,
-    "maxSize":        20,
-    "positiveSteps":  (1.5, 2, 3, 4.5),  // → m, l, xl, 2xl
-    "negativeSteps":  (0.75, 0.5),        // → xs, 2xs
-  ));
+  @include utopia.generateSpaceScale(
+    (
+      "minWidth": 320,
+      "maxWidth": 1600,
+      "minSize": 16,
+      "maxSize": 20,
+      "positiveSteps": (
+        1.5,
+        2,
+        3,
+        4.5,
+      ),
+      // → m, l, xl, 2xl
+      "negativeSteps": (
+          0.75,
+          0.5,
+        ),
+      // → xs, 2xs
+    )
+  );
 }
 
 html {
   box-sizing: border-box;
+  scroll-padding-top: calc(var(--space-2xl) + var(--space-2xs));
 }
 
 // Reset & Base
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;

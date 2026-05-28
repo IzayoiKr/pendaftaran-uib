@@ -1,4 +1,4 @@
-import styles from './AnimatedIcons.module.scss';
+import styles from "./AnimatedIcons.module.scss";
 
 /*
  Original SVG animation concept by iAmEcko via CodePen.
@@ -33,7 +33,7 @@ export function CheckmarkIcon() {
                 points="100.2,40.2 51.5,88.8 29.8,67.5 "
             />
         </svg>
-    )
+    );
 }
 
 /*
@@ -84,7 +84,7 @@ export function CrossmarkIcon() {
                 y2="92.2"
             />
         </svg>
-    )
+    );
 }
 
 /*
@@ -189,7 +189,7 @@ export function TubeSpinnerIcon() {
             </defs>
 
             <circle
-                style={{ transformOrigin: 'center' }}
+                style={{ transformOrigin: "center" }}
                 fill="none"
                 opacity=".2"
                 stroke="#002347"
@@ -201,7 +201,7 @@ export function TubeSpinnerIcon() {
             />
 
             <circle
-                style={{ transformOrigin: 'center' }}
+                style={{ transformOrigin: "center" }}
                 fill="none"
                 stroke="url(#a3)"
                 strokeWidth="15"

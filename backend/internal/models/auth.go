@@ -8,7 +8,7 @@ import (
 
 type LoginRequest struct {
 	Email string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=8,max=72"`
+	Password string `json:"password" validate:"required,min=8,max=128"`
 	TurnstileToken string `json:"cf_turnstile_token,omitempty" validate:"-"`
 }
 
@@ -29,7 +29,7 @@ type RegisterRequest struct {
 	FullName string `json:"full_name" validate:"required,max=255"`
 	NIK string `json:"nik" validate:"required,min=6,max=20,alphanum_ascii"`
 	Email string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=8,max=72"`
+	Password string `json:"password" validate:"required,min=8,max=128"`
 	TurnstileToken string `json:"cf_turnstile_token" validate:"-"`
 }
 

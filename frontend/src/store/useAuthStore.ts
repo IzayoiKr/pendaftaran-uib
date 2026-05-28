@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { User, AuthState, AccessTokenResponse } from "@/types/api";
+import type { AccessTokenResponse, AuthState, User } from "@/types/api";
 
 interface AuthActions {
     login: (user: User, accessToken: string) => void;
@@ -50,20 +50,22 @@ const useAuthStore = create<AuthStore>((set) => ({
     isLoading: true,
     isLoggingOut: false,
 
-    login: (user, accessToken) => set({
-        user,
-        accessToken,
-        isAuthenticated: true,
-        isLoading: false
-    }),
+    login: (user, accessToken) =>
+        set({
+            user,
+            accessToken,
+            isAuthenticated: true,
+            isLoading: false,
+        }),
 
-    logout: () => set({
-        user: null,
-        accessToken: null,
-        isAuthenticated: false,
-        isLoading: false,
-        isLoggingOut: true,
-    }),
+    logout: () =>
+        set({
+            user: null,
+            accessToken: null,
+            isAuthenticated: false,
+            isLoading: false,
+            isLoggingOut: true,
+        }),
 
     setAccessToken: (token) => set({ accessToken: token }),
 
@@ -74,10 +76,10 @@ const useAuthStore = create<AuthStore>((set) => ({
     restoreSession: async () => {
         set({ isLoading: true });
         try {
-            const response = await fetchWithRetry(
-                "/api/auth/refresh",
-                { method: "POST", credentials: "include" },
-            );
+            const response = await fetchWithRetry("/api/auth/refresh", {
+                method: "POST",
+                credentials: "include",
+            });
 
             if (response.ok) {
                 const data: AccessTokenResponse = await response.json();

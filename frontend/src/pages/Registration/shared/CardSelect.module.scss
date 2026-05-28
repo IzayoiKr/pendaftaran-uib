@@ -1,0 +1,43 @@
+$border-subtle: #e5e7eb;
+$border-focus: #29b6f6;
+$accent: #002347;
+$accent-light: #f0f4ff;
+$text-primary: #111827;
+$text-secondary: #6b7280;
+$radius-sm: 8px;
+
+.cardSelectGroup {
+  display: grid;
+  gap: var(--space-xs);
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.cardSelect {
+  padding: var(--space-s);
+  border: 2px solid $border-subtle;
+  border-radius: $radius-sm;
+  background: #ffffff;
+  cursor: pointer;
+  text-align: center;
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: $text-secondary;
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: $border-focus;
+    color: $text-primary;
+  }
+
+  &.active {
+    border-color: $accent;
+    background: $accent-light;
+    color: $accent;
+    box-shadow: 0 0 0 3px rgba($accent, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $border-focus;
+    outline-offset: 2px;
+  }
+}

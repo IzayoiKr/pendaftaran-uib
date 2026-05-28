@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { type ChangeEvent, type FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 // import { api } from "@/api";
@@ -76,14 +76,26 @@ function ReadonlySelect({ label, value }: { label: string; value: string }) {
     return (
         <div className={styles.formField}>
             <label className={styles.fieldLabel}>{label}</label>
-            <select disabled tabIndex={-1} aria-readonly="true" defaultValue={value}>
+            <select
+                disabled
+                tabIndex={-1}
+                aria-readonly="true"
+                defaultValue={value}
+            >
                 <option>{value}</option>
             </select>
         </div>
     );
 }
 
-function EditableSelect({ id, label, value, required, onChange, children }: {
+function EditableSelect({
+    id,
+    label,
+    value,
+    required,
+    onChange,
+    children,
+}: {
     id: string;
     label: string;
     value: string;
@@ -95,26 +107,56 @@ function EditableSelect({ id, label, value, required, onChange, children }: {
         <div className={styles.formField}>
             <label htmlFor={id} className={styles.fieldLabel}>
                 {label}
-                {required && <span className={styles.requiredStar} aria-hidden="true"> *</span>}
+                {required && (
+                    <span className={styles.requiredStar} aria-hidden="true">
+                        {" "}
+                        *
+                    </span>
+                )}
             </label>
-            <select id={id} value={value} onChange={onChange} required={required}>
+            <select
+                id={id}
+                value={value}
+                onChange={onChange}
+                required={required}
+            >
                 {children}
             </select>
         </div>
     );
 }
 
-function ActionRow({ isLoading, onCancel }: { isLoading: boolean; onCancel: () => void }) {
+function ActionRow({
+    isLoading,
+    onCancel,
+}: {
+    isLoading: boolean;
+    onCancel: () => void;
+}) {
     return (
         <div className={styles.bottomActions}>
-            <button type="button" className={styles.btnDanger} onClick={onCancel} disabled={isLoading}>
+            <button
+                type="button"
+                className={styles.btnDanger}
+                onClick={onCancel}
+                disabled={isLoading}
+            >
                 Batal
             </button>
-            <button type="submit" className={styles.btn} disabled={isLoading} aria-busy={isLoading}>
-                {isLoading
-                    ? <><div className={styles.spinner} aria-hidden="true" /> Simpan</>
-                    : "Simpan"
-                }
+            <button
+                type="submit"
+                className={styles.btn}
+                disabled={isLoading}
+                aria-busy={isLoading}
+            >
+                {isLoading ? (
+                    <>
+                        <div className={styles.spinner} aria-hidden="true" />{" "}
+                        Simpan
+                    </>
+                ) : (
+                    "Simpan"
+                )}
             </button>
         </div>
     );
@@ -147,8 +189,8 @@ export default function ChangeProdi() {
 
     const handleSelectChange =
         (field: keyof RequestPindahForm) =>
-            (e: ChangeEvent<HTMLSelectElement>) =>
-                setForm(prev => ({ ...prev, [field]: e.target.value }));
+        (e: ChangeEvent<HTMLSelectElement>) =>
+            setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -158,7 +200,9 @@ export default function ChangeProdi() {
             toast.success("Request perpindahan prodi berhasil dikirim!");
             router.back();
         } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");
+            toast.error(
+                err instanceof Error ? err.message : "Terjadi kesalahan",
+            );
         } finally {
             setIsLoading(false);
         }
@@ -170,7 +214,9 @@ export default function ChangeProdi() {
                 <h2 className={styles.sectionTitle}>Biodata Pendaftaran</h2>
                 <BiodataSection data={MOCK_BIODATA} />
 
-                <h3 className={styles.formTitle}>Form Request Pindah Program Studi</h3>
+                <h3 className={styles.formTitle}>
+                    Form Request Pindah Program Studi
+                </h3>
 
                 <form onSubmit={handleSubmit} noValidate>
                     <div className={styles.formGrid}>
@@ -185,8 +231,14 @@ export default function ChangeProdi() {
                             required
                             onChange={handleSelectChange("prodiTujuan")}
                         >
-                            <option value="" disabled>Program Studi Pilihan (Selected Study Program) *</option>
-                            {PRODI_OPTIONS.map(p => <option key={p} value={p}>{p}</option>)}
+                            <option value="" disabled>
+                                Program Studi Pilihan (Selected Study Program) *
+                            </option>
+                            {PRODI_OPTIONS.map((p) => (
+                                <option key={p} value={p}>
+                                    {p}
+                                </option>
+                            ))}
                         </EditableSelect>
 
                         <ReadonlySelect
@@ -200,14 +252,21 @@ export default function ChangeProdi() {
                             required
                             onChange={handleSelectChange("waktuKuliahBaru")}
                         >
-                            <option value="" disabled>Pilih Waktu Kuliah *</option>
+                            <option value="" disabled>
+                                Pilih Waktu Kuliah *
+                            </option>
                             {WAKTU_KULIAH_OPTIONS.map(({ value, label }) => (
-                                <option key={value} value={value}>{label}</option>
+                                <option key={value} value={value}>
+                                    {label}
+                                </option>
                             ))}
                         </EditableSelect>
                     </div>
 
-                    <ActionRow isLoading={isLoading} onCancel={() => router.back()} />
+                    <ActionRow
+                        isLoading={isLoading}
+                        onCancel={() => router.back()}
+                    />
                 </form>
             </div>
         </main>

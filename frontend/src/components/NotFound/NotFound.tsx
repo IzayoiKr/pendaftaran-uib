@@ -10,5 +10,5 @@ export default function NotFound() {
                 <Link href="/">Kembali ke Beranda</Link>
             </div>
         </main>
-    )
+    );
 }

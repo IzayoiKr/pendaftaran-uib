@@ -1,5 +1,5 @@
-@use '@/styles/skeleton.scss' as *;
-@use '@/styles/config.scss' as global;
+@use "@/styles/skeleton.scss" as *;
+@use "@/styles/config.scss" as global;
 
 .avatarSkeleton {
   @extend .skeleton;
@@ -14,13 +14,6 @@
   width: 13.75rem;
   height: var(--step-1);
   margin: 0 auto;
-}
-
-.subTitleSkeleton {
-  @extend .skeleton;
-  width: 11.25rem;
-  height: var(--step--1);
-  margin: var(--space-2xs) auto 0;
 }
 
 .sectionTitleSkeleton {

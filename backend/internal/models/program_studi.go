@@ -1,7 +1,9 @@
 package models
 
+import "github.com/google/uuid"
+
 type ProgramStudiDTO struct {
-	ID string `json:"id"`
+	ID uuid.UUID `json:"id"`
 	Title string `json:"title"`
 	Faculty string `json:"faculty"`
 	Degree string `json:"degree"`

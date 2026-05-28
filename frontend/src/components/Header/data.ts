@@ -1,14 +1,12 @@
-import type { HeaderNavLinks } from "@/types/ui";
-
-export const headerNavLinks: HeaderNavLinks[] = [
-    { to: "/#home", label: "Beranda", hashId: "home" },
-    { to: "/#gelombang", label: "Gelombang", hashId: "gelombang" },
-    { to: "/info-umum", label: "Informasi Umum" },
-    { to: "#kontak", label: "Kontak", hashId: "kontak" },
-    { to: "/panduan", label: "Panduan" },
-    { to: "/login", label: "Daftar/Login" },
-]
+export const headerNavLinks = [
+    { to: "/#home", labelKey: "home", hashId: "home" },
+    { to: "/#gelombang", labelKey: "gelombang", hashId: "gelombang" },
+    { to: "/info-umum", labelKey: "infoUmum", hashId: undefined },
+    { to: "#kontak", labelKey: "kontak", hashId: "kontak" },
+    { to: "/panduan", labelKey: "panduan", hashId: undefined },
+    { to: "/login", labelKey: "login", hashId: undefined },
+] as const;
 
 export const spyIds = headerNavLinks
-    .filter(l => l.hashId)
-    .map(l => l.hashId as string);
+    .filter((l) => l.hashId)
+    .map((l) => l.hashId as string);

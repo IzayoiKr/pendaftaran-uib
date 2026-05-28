@@ -12,6 +12,8 @@ func HashToken(raw string) string {
 	return hex.EncodeToString(h[:])
 }
 
+// GenerateUSMPassword will be used for create gelombang functionality at admin dashboard page
+// For now it will be hardcoded at mysql seed data
 func GenerateUSMPassword() string {
 	const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	b := make([]byte, 6)

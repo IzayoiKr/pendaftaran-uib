@@ -8,9 +8,11 @@ import (
 
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
-	nikCrypto "pendaftaran-uib/backend/internal/crypto"
+	"pendaftaran-uib/backend/internal/crypto"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
+
+	"github.com/google/uuid"
 )
 
 func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc {
@@ -34,9 +36,9 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 			return
 		}
 
-		idBytes, err := utils.UUIDToBytes(claims.UserID)
+		id, err := uuid.Parse(claims.UserID)
 		if err != nil {
-			slog.Error("change_password: parse uuid to bytes", "error", err)
+			slog.Error("change_password: parse uuid from claims", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
@@ -44,7 +46,7 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 		var currentHash string
 		err = db.QueryRowContext(r.Context(),
 			"SELECT password_hash FROM users WHERE id = ?",
-			idBytes,
+			id[:],
 		).Scan(&currentHash)
 
 		if errors.Is(err, sql.ErrNoRows) {
@@ -56,12 +58,12 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 			return
 		}
 
-		if err := nikCrypto.VerifyPassword(currentHash, req.OldPassword); err != nil {
+		if err := crypto.VerifyPassword(currentHash, req.OldPassword); err != nil {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password lama tidak sesuai"))
 			return
 		}
 
-		newHash, err := nikCrypto.HashPassword(req.NewPassword)
+		newHash, err := crypto.HashPassword(req.NewPassword)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
@@ -69,7 +71,7 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 
 		if _, err = db.ExecContext(r.Context(),
 			"UPDATE users SET password_hash = ? WHERE id = ?",
-			string(newHash), idBytes,
+			string(newHash), id[:],
 		); err != nil {
 			slog.Error("change_password: exec", "user_id", claims.UserID, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))

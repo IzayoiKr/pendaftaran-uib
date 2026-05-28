@@ -9,13 +9,15 @@
   letter-spacing: 0.06em;
   font-weight: 500;
   color: #1a1a1a;
-  transition: filter 0.2s ease, opacity 0.2s ease;
+  transition:
+    filter 0.2s ease,
+    opacity 0.2s ease;
 
-  &[data-revealed='true'] {
+  &[data-revealed="true"] {
     font-weight: 600;
   }
 
-  &[data-revealed='false'] {
+  &[data-revealed="false"] {
     filter: blur(0.3px);
     opacity: 0.75;
   }

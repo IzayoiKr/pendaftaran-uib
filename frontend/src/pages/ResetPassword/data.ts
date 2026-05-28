@@ -1,17 +1,17 @@
-import type { Form } from "@/types/ui"
+import type { Form } from "@/types/ui";
 
 export const resetPassword: Form[] = [
     {
         name: "newPassword",
-        placeholder: "Password Baru (New Password) *",
+        placeholderKey: "newPasswordPlaceholder",
         type: "password",
         autoComplete: "new-password",
-        minLength: 8
+        minLength: 8,
     },
     {
         name: "confirmPassword",
-        placeholder: "Konfirmasi Password Baru (Confirm New Password) *",
+        placeholderKey: "confirmPasswordPlaceholder",
         type: "password",
         autoComplete: "new-password",
-    }
-]
+    },
+];

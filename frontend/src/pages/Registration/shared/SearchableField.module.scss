@@ -1,0 +1,237 @@
+@use "@/styles/config.scss" as global;
+@use "@/styles/formConfig.scss" as form;
+
+$border-subtle: #e5e7eb;
+$border-focus: #29b6f6;
+$accent: #002347;
+$accent-light: #f0f4ff;
+$text-primary: #111827;
+$text-secondary: #6b7280;
+$text-muted: #9ca3af;
+$error: #ef4444;
+$error-bg: #fee2e2;
+$surface-raised: #f9fafb;
+$radius-sm: 8px;
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  position: relative;
+  z-index: 1;
+
+  > label {
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: $text-primary;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .required {
+      color: $error;
+    }
+  }
+}
+
+.searchInputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  input {
+    @include form.input-template;
+    padding-right: 80px;
+    margin-bottom: 0;
+
+    &.manualInput {
+      background: #fffbeb;
+      border-color: #f59e0b;
+    }
+  }
+
+  &.hasError input {
+    border-color: $error;
+    background: $error-bg;
+  }
+
+  .searchIcon {
+    color: $text-muted;
+    display: flex;
+    align-items: center;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .checkIcon {
+      color: #10b981;
+    }
+  }
+}
+
+.inputActions {
+  position: absolute;
+  right: var(--space-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.spinnerWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.clearBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+
+  &:hover {
+    color: $text-secondary;
+    background: $surface-raised;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-sm;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  max-height: 280px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 4px;
+  margin: 0;
+
+  li {
+    padding: var(--space-xs) var(--space-s);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: var(--step--1);
+    color: $text-primary;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+
+    &:hover,
+    &:focus {
+      background: $accent-light;
+    }
+  }
+}
+
+.dropdownItem {
+  .resultLabel {
+    flex: 1;
+    line-height: 1.4;
+  }
+}
+
+.sourceTag {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+
+  &.indonesia {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  &.global {
+    background: #f3f4f6;
+    color: #6b7280;
+  }
+}
+
+.dropdownItemManual {
+  border-top: 1px dashed $border-subtle;
+  margin-top: 2px;
+  color: $accent !important;
+  font-weight: 600;
+  font-style: italic;
+
+  &:hover {
+    background: $accent-light !important;
+  }
+}
+
+.dropdownEmpty {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-sm;
+  padding: var(--space-m);
+  text-align: center;
+  z-index: 100;
+
+  p {
+    color: $text-muted;
+    font-size: var(--step--1);
+    margin-bottom: var(--space-s);
+  }
+}
+
+.manualBtn {
+  background: none;
+  border: 1px dashed $accent;
+  color: $accent;
+  padding: var(--space-xs) var(--space-s);
+  border-radius: $radius-sm;
+  font-size: var(--step--2);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    background: $accent-light;
+  }
+}
+
+.error {
+  font-size: var(--step--2);
+  color: $error;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+
+  &::before {
+    content: "•";
+    font-weight: 700;
+  }
+}

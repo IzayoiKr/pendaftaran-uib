@@ -10,6 +10,8 @@ import (
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
+
+	"github.com/google/uuid"
 )
 
 func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
@@ -34,9 +36,9 @@ func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			return
 		}
 
-		idBytes, err := utils.UUIDToBytes(claims.UserID)
+		id, err := uuid.Parse(claims.UserID)
 		if err != nil {
-			slog.Error("reveal_nil: parse uuid to bytes", "error", err)
+			slog.Error("reveal_nil: parse uuid from claims", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
@@ -44,7 +46,7 @@ func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 		var oldFullname string
 		err = db.QueryRowContext(r.Context(),
 			"SELECT full_name FROM users WHERE id = ?",
-			idBytes,
+			id[:],
 		).Scan(&oldFullname)
 
 		if errors.Is(err, sql.ErrNoRows) {
@@ -63,7 +65,7 @@ func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 
 		if _, err := db.ExecContext(r.Context(),
 			"UPDATE users SET full_name = ? WHERE id = ?",
-			req.FullName, idBytes,
+			req.FullName, id[:],
 		); err != nil {
 			slog.Error("update_profile: exec", "user_id", claims.UserID, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))

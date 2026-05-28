@@ -1,36 +1,36 @@
-import type { Form } from "@/types/ui"
+import type { Form } from "@/types/ui";
 
 export const register: Form[] = [
     {
         name: "fullName",
-        label: "Nama Lengkap (FullName)",
+        labelKey: "fullNameLabel",
         type: "text",
         autoComplete: "name",
     },
     {
         name: "nik",
-        label: "No NIK (National Identification Number)",
+        labelKey: "nikLabel",
         type: "text",
         autoComplete: "off",
-        maxLength: 20
+        maxLength: 20,
     },
     {
         name: "email",
-        label: "Email *",
+        labelKey: "emailLabel",
         type: "email",
-        autoComplete: "email"
+        autoComplete: "email",
     },
     {
         name: "password",
-        label: "Password *",
+        labelKey: "passwordLabel",
         type: "password",
         autoComplete: "new-password",
-        minLength: 8
+        minLength: 8,
     },
     {
         name: "confirmPassword",
-        label: "Retype Password *",
+        labelKey: "confirmPasswordLabel",
         type: "password",
         autoComplete: "new-password",
-    }
-]
+    },
+];

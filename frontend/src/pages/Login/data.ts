@@ -1,17 +1,17 @@
-import type { Form } from "@/types/ui"
+import type { Form } from "@/types/ui";
 
 export const login: Form[] = [
     {
         name: "email",
         type: "email",
-        placeholder: "Email",
-        autoComplete: "email"
+        placeholderKey: "emailLabel",
+        autoComplete: "email",
     },
     {
         name: "password",
         type: "password",
-        placeholder: "Password",
+        placeholderKey: "passwordLabel",
         autoComplete: "current-password",
-        minLength: 8
-    }
-]
+        minLength: 8,
+    },
+];

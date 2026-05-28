@@ -3,7 +3,7 @@ import styles from "./GlobalError.module.scss";
 
 interface GlobalErrorProps {
     reset: () => void;
-    type: 'globalError' | 'error';
+    type: "globalError" | "error";
 }
 
 export default function GlobalError({ reset, type }: GlobalErrorProps) {
@@ -11,12 +11,13 @@ export default function GlobalError({ reset, type }: GlobalErrorProps) {
         <main>
             <div className={`${styles.container} ${styles[type]}`}>
                 <h1>Terjadi Kesalahan</h1>
-                <p>Terjadi kesalahan yang tidak terduga. Silakan muat ulang halaman dan coba lagi.</p>
-                <button onClick={reset}>
-                    Muat Ulang
-                </button>
+                <p>
+                    Terjadi kesalahan yang tidak terduga. Silakan muat ulang
+                    halaman dan coba lagi.
+                </p>
+                <button onClick={reset}>Muat Ulang</button>
                 <Link href="/">Kembali ke Beranda</Link>
             </div>
         </main>
-    )
+    );
 }

@@ -1,5 +1,5 @@
-@use '@/styles/config.scss' as global;
-@use '@/styles/formConfig.scss' as form;
+@use "@/styles/config.scss" as global;
+@use "@/styles/formConfig.scss" as form;
 
 .verifyEmail {
   @include global.main-layout;
@@ -33,21 +33,23 @@
 }
 
 .turnstile {
-  margin-bottom: var(--space-s)
+  margin-bottom: var(--space-s);
 }
 
 .btn {
   @include form.submit-button;
   text-decoration: none;
-  transition: opacity 0.2s ease, background-color 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease;
 
   &:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
+    opacity: 0.45;
+    cursor: not-allowed;
 
-      &:hover {
-        background: form.$primary;
-        color: global.$white;
-      }
+    &:hover {
+      background: form.$primary;
+      color: global.$white;
+    }
   }
 }

@@ -1,6 +1,6 @@
-'use client';
-import { createContext, useContext, useState, useCallback } from 'react';
-import type { ReactNode } from 'react';
+"use client";
+import { createContext, useCallback, useContext, useState } from "react";
+import type { ReactNode } from "react";
 
 interface ScrollSpyContextValue {
     ready: number;
@@ -9,7 +9,7 @@ interface ScrollSpyContextValue {
 
 const ScrollSpyContext = createContext<ScrollSpyContextValue>({
     ready: 0,
-    notify: () => { },
+    notify: () => {},
 });
 
 export function ScrollSpyProvider({ children }: { children: ReactNode }) {

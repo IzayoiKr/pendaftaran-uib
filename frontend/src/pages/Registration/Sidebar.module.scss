@@ -1,0 +1,105 @@
+@use "@/styles/config.scss" as global;
+@use "sass:map";
+
+$surface: #ffffff;
+$border-subtle: #e5e7eb;
+$text-secondary: #6b7280;
+$text-primary: #111827;
+$accent: #002347;
+$accent-light: #f0f4ff;
+$border-focus: #29b6f6;
+$radius: 12px;
+$radius-sm: 8px;
+
+// Status colors
+$status-empty: #9ca3af;
+$status-partial: #f59e0b;
+$status-complete: #10b981;
+
+.sidebar {
+  display: none;
+
+  @media (min-width: map.get(global.$breakpoints, lg)) {
+    display: flex;
+    position: sticky;
+    top: calc(var(--space-2xl) + var(--space-2xs));
+    flex-direction: column;
+    gap: 4px;
+    background: $surface;
+    border: 1px solid $border-subtle;
+    border-radius: $radius;
+    padding: var(--space-xs);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    height: fit-content;
+  }
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-s);
+  border-radius: $radius-sm;
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  border: none;
+  background: none;
+  text-align: left;
+  text-decoration: none;
+  width: 100%;
+
+  &:hover {
+    background: $accent-light;
+    color: $accent;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $border-focus;
+    outline-offset: -2px;
+  }
+
+  &.partial {
+    color: $text-primary;
+  }
+
+  &.complete {
+    color: $text-primary;
+    font-weight: 600;
+  }
+}
+
+.navStatus {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--step--2);
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+
+  &.empty {
+    border: 2px solid $status-empty;
+    background: transparent;
+    color: $status-empty;
+  }
+
+  &.partial {
+    background: $status-partial;
+    color: white;
+    border: 2px solid $status-partial;
+  }
+
+  &.complete {
+    background: $status-complete;
+    color: white;
+    border: 2px solid $status-complete;
+    font-size: 14px;
+  }
+}

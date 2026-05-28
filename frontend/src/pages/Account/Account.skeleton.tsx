@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import Skeleton from 'react-loading-skeleton';
-import styles from './Account.module.scss';
-import skeleton from './Account.skeleton.module.scss';
+import Skeleton from "react-loading-skeleton";
+import styles from "./Account.module.scss";
+import skeleton from "./Account.skeleton.module.scss";
 
 export default function AccountSkeleton() {
     return (
@@ -13,7 +13,7 @@ export default function AccountSkeleton() {
                 </h2>
 
                 <div className={skeleton.accountInfo}>
-                    {[1, 2, 3].map(i => (
+                    {[1, 2, 3].map((i) => (
                         <div key={i} className={styles.infoRow}>
                             <span className={styles.infoLabel}>
                                 <Skeleton className={skeleton.labelSkeleton} />
@@ -35,7 +35,7 @@ export default function AccountSkeleton() {
                 </div>
 
                 <div className={styles.bottomActions}>
-                    {[1, 2, 3].map(i => (
+                    {[1, 2, 3].map((i) => (
                         <Skeleton key={i} className={skeleton.actionSkeleton} />
                     ))}
                 </div>

@@ -1,210 +1,314 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import GetInitials from "@/utils/GetInitials";
 import { toast } from "sonner";
 import { api } from "@/api";
 import useAuthStore from "@/store/useAuthStore";
-import type { User } from "@/types/api";
+import {
+    CancelIcon,
+    CheckIcon,
+    ClipboardIcon,
+    ClockIcon,
+    DownloadIcon,
+    EditIcon,
+    FileIcon,
+    LightningIcon,
+    LockIcon,
+    LogoutIcon,
+    MoneyIcon,
+    ProfileIcon,
+    TrashIcon,
+    WarningIcon,
+} from "@/components/Icons/Icons";
 import NIKReveal from "@/components/NIKReveal/NIKReveal";
+import type { User } from "@/types/api";
 import AccountSkeleton from "./Account.skeleton";
 import styles from "./Account.module.scss";
-import { RegisterIcon, EditIcon, LetterIcon, ReceiptIcon, ChangeIcon, EraserIcon, LockIcon, LogoutIcon, ProfileIcon } from "@/components/Icons/Icons";
-import { downloadSuratHasil, downloadStaticPdf } from "@/utils/downloadPdf";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// ─── Mock Toggle ─────────────────────────────────────────────────────────────
+const DESIGN_STATE = "examinee" as
+    | "draft"
+    | "submitted"
+    | "rejected"
+    | "examinee";
 
-type BiodataStatus = "Belum Lengkap" | "Telah Lengkap";
-type PaymentStatus = "Belum Lunas" | "Telah Lunas";
-
-interface Registration {
-    nomorDaftar: string;
-    periode: number;
-    gelombang: string;
-    jurusan: string;
-    biodata: string;
-    pembayaran: string;
-    usm: string;
-    passwordUSM: string;
-    usmResult: string;
-}
-
-interface RegistrationHandlers {
-    onCheckPendaftaran: (reg: Registration) => void;
-    onUbahBiodata: (reg: Registration) => void;
-    onDownloadSuratHasil: (reg: Registration) => void;
-    onBuktiTransfer: (reg: Registration) => void;
-    onPerubahanProdi: (reg: Registration) => void;
-    onDownloadPengunduran: (reg: Registration) => void;
-    onPrasyaratOspek: (reg: Registration) => void;
+function StatusIcon({ status }: { status: string }) {
+    if (status === "submitted" || status === "examinee")
+        return <CheckIcon className={styles.statusIconSvg} />;
+    if (status === "rejected")
+        return <WarningIcon className={styles.statusIconSvg} />;
+    return <ClockIcon className={styles.statusIconSvg} />;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function AccountInfo({ user }: { user: User }) {
+function ProfileHero({ user }: { user: User }) {
     return (
-        <div className={styles.accountInfo}>
-            <div className={styles.infoRow}>
-                <span className={styles.infoLabel}>Nama Lengkap</span>
-                <span className={styles.infoValue}>: {user.full_name || "-"}</span>
+        <div className={styles.profileHero}>
+            <div className={styles.heroInner}>
+                <div className={styles.avatar}>
+                    {user.full_name ? GetInitials(user.full_name) : "?"}
+                </div>
+                <div className={styles.heroText}>
+                    <h1 className={styles.heroName}>{user.full_name || "-"}</h1>
+                    <p className={styles.heroSubtitle}>Akun Mahasiswa</p>
+                </div>
             </div>
-            <div className={styles.infoRow}>
-                <span className={styles.infoLabel}>Alamat Email</span>
-                <span className={styles.infoValue}>: {user.email || "-"}</span>
+        </div>
+    );
+}
+
+function AccountDetails({ user }: { user: User }) {
+    return (
+        <section className={styles.card}>
+            <div className={styles.cardHeaderLine}>
+                <ProfileIcon className={styles.cardHeaderIcon} />
+                <h2 className={styles.cardTitle}>Detail Akun</h2>
             </div>
-            <div className={styles.infoRow}>
-                <span className={styles.infoLabel}>Nomor NIK</span>
-                <span className={styles.infoValue}>
-                    {": "}
-                    <NIKReveal masked={user.nik || "-"} />
+            <div className={styles.detailsGrid}>
+                <div className={styles.detailItem}>
+                    <span className={styles.detailLabel}>Alamat Email</span>
+                    <span className={styles.detailValue}>
+                        {user.email || "-"}
+                    </span>
+                </div>
+                <div className={styles.detailItem}>
+                    <span className={styles.detailLabel}>Nomor NIK</span>
+                    <span className={styles.detailValue}>
+                        <NIKReveal masked={user.nik || "-"} />
+                    </span>
+                </div>
+            </div>
+        </section>
+    );
+}
+
+function RegistrationCard() {
+    const statusMap = {
+        draft: { label: "DRAFT", color: "draft" },
+        submitted: { label: "TERKIRIM", color: "submitted" },
+        rejected: { label: "DITOLAK", color: "rejected" },
+        examinee: { label: "PESERTA UJIAN", color: "examinee" },
+    };
+
+    const current = statusMap[DESIGN_STATE];
+
+    return (
+        <section className={`${styles.card} ${styles.cardAccent}`}>
+            <div className={styles.cardHeaderLine}>
+                <FileIcon className={styles.cardHeaderIcon} />
+                <h2 className={styles.cardTitle}>Status Pendaftaran</h2>
+                <span
+                    className={styles.statusBadge}
+                    data-status={current.color}
+                >
+                    <StatusIcon status={current.color} />
+                    {current.label}
                 </span>
             </div>
-        </div>
+
+            <div className={styles.infoGrid}>
+                <div className={styles.infoItem}>
+                    <span className={styles.infoItemLabel}>
+                        Periode Akademik
+                    </span>
+                    <span className={styles.infoItemValue}>2026/2027</span>
+                </div>
+                <div className={styles.infoItem}>
+                    <span className={styles.infoItemLabel}>Gelombang</span>
+                    <span className={styles.infoItemValue}>
+                        Gelombang 2 — Juni 2026
+                    </span>
+                </div>
+                <div className={styles.infoItem}>
+                    <span className={styles.infoItemLabel}>Jenjang</span>
+                    <span className={styles.infoItemValue}>S1 (Strata 1)</span>
+                </div>
+                <div className={styles.infoItem}>
+                    <span className={styles.infoItemLabel}>Jadwal USM</span>
+                    <span className={styles.infoItemValue}>
+                        15 Juli 2026, 08:00 WIB
+                    </span>
+                </div>
+                {(DESIGN_STATE === "draft" || DESIGN_STATE === "rejected") && (
+                    <div className={styles.infoItem}>
+                        <span className={styles.infoItemLabel}>
+                            Batas Akhir
+                        </span>
+                        <span className={styles.infoItemValue}>
+                            30 Juni 2026
+                            <span
+                                className={styles.countdownBadge}
+                                data-urgent="true"
+                            >
+                                5 hari tersisa
+                            </span>
+                        </span>
+                    </div>
+                )}
+            </div>
+
+            {DESIGN_STATE === "rejected" && (
+                <div className={styles.alertBox} data-variant="warning">
+                    <div className={styles.alertTitle}>
+                        <WarningIcon />
+                        Perhatian
+                    </div>
+                    <div className={styles.infoGrid}>
+                        <div className={styles.infoItem}>
+                            <span className={styles.infoItemLabel}>
+                                Kelengkapan Formulir
+                            </span>
+                            <span
+                                className={styles.infoItemValue}
+                                data-status="incomplete"
+                            >
+                                Belum Lengkap
+                            </span>
+                        </div>
+                        <div className={styles.infoItem}>
+                            <span className={styles.infoItemLabel}>
+                                Status Pembayaran
+                            </span>
+                            <span
+                                className={styles.infoItemValue}
+                                data-status="unpaid"
+                            >
+                                Belum Lunas
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {DESIGN_STATE === "examinee" && (
+                <div className={styles.examineeInfo}>
+                    <div className={styles.infoItem}>
+                        <span className={styles.infoItemLabel}>
+                            Nomor Pendaftaran
+                        </span>
+                        <span className={styles.infoItemValue} data-mono>
+                            2026001234
+                        </span>
+                    </div>
+                    <div className={styles.infoItem}>
+                        <span className={styles.infoItemLabel}>
+                            Password USM
+                        </span>
+                        <span className={styles.infoItemValue} data-mono>
+                            Uib#1234
+                        </span>
+                    </div>
+                </div>
+            )}
+
+            <div className={styles.actionBar}>
+                {DESIGN_STATE === "draft" && (
+                    <>
+                        <button
+                            className={`${styles.btn} ${styles.btnPrimary}`}
+                        >
+                            <EditIcon /> Edit Draft
+                        </button>
+                        <button
+                            className={`${styles.btn} ${styles.btnDangerOutline}`}
+                        >
+                            <TrashIcon /> Hapus Draft
+                        </button>
+                    </>
+                )}
+
+                {DESIGN_STATE === "submitted" && (
+                    <>
+                        <button
+                            className={`${styles.btn} ${styles.btnPrimary}`}
+                        >
+                            <FileIcon /> Lihat Formulir
+                        </button>
+                        <button
+                            className={`${styles.btn} ${styles.btnWarningOutline}`}
+                        >
+                            <CancelIcon /> Batalkan
+                        </button>
+                    </>
+                )}
+
+                {DESIGN_STATE === "rejected" && (
+                    <>
+                        <button
+                            className={`${styles.btn} ${styles.btnPrimary}`}
+                        >
+                            <EditIcon /> Edit Formulir
+                        </button>
+                        <button
+                            className={`${styles.btn} ${styles.btnDangerOutline}`}
+                        >
+                            <TrashIcon /> Hapus Formulir
+                        </button>
+                    </>
+                )}
+
+                {DESIGN_STATE === "examinee" && (
+                    <div className={styles.actionGrid}>
+                        <button
+                            className={`${styles.btn} ${styles.btnPrimary}`}
+                        >
+                            <DownloadIcon /> Surat Hasil
+                        </button>
+                        <button
+                            className={`${styles.btn} ${styles.btnSecondaryOutline}`}
+                        >
+                            <MoneyIcon /> Bukti Transfer
+                        </button>
+                        <button
+                            className={`${styles.btn} ${styles.btnSecondaryOutline}`}
+                        >
+                            <EditIcon /> Perubahan Prodi
+                        </button>
+                        <button
+                            className={`${styles.btn} ${styles.btnDangerOutline}`}
+                        >
+                            <CancelIcon /> Pengunduran Diri
+                        </button>
+                        <button
+                            className={`${styles.btn} ${styles.btnSecondaryOutline}`}
+                        >
+                            <ClipboardIcon /> Prasyarat OSPEK
+                        </button>
+                    </div>
+                )}
+            </div>
+        </section>
     );
 }
 
-function StatusBadge({ status }: { status: string }) {
-    const s = (status || "").toLowerCase();
-    const isComplete = (s.includes("lengkap") || s.includes("complete") || s.includes("lunas") || s.includes("paid") || s.includes("approved") || s.includes("verified") || s.includes("lulus")) && !s.includes("belum");
-    const isIncomplete = s.includes("belum") || s.includes("tidak") || s.includes("incomplete") || s.includes("pemeriksaan") || s.includes("pending") || s.includes("rejected");
-
-    const cls = isComplete ? styles.statusComplete : (isIncomplete ? styles.statusIncomplete : "");
-
-    return <span className={cls}>{status || "-"}</span>;
-}
-
-function RegistrationActions({ reg, handlers }: {
-    reg: Registration; handlers: RegistrationHandlers;
-}) {
-    const res = (reg.usmResult || "").toLowerCase();
-
-    const isLulus = res.includes("lulus");
-    const isGagal = res.includes("gagal");
-    const isUsmDecided = isLulus || isGagal;
-
-    return (
-        <div className={styles.actionGroup}>
-            {!isUsmDecided && (
-                <>
-
-                    <button className={`${styles.btn} ${styles.btnWarning}`}
-                        onClick={() => handlers.onCheckPendaftaran(reg)}>
-                        <RegisterIcon /> Check Pendaftaran
-                    </button>
-
-                    <button className={`${styles.btn} ${styles.btnAqua}`}
-                        onClick={() => handlers.onUbahBiodata(reg)}>
-                        <EditIcon /> Ubah Biodata
-                    </button>
-                </>
-            )}
-            {isUsmDecided && (
-
-                <button className={`${styles.btn} ${styles.btnWarning}`}
-                    onClick={() => handlers.onDownloadSuratHasil(reg)}>
-                    <LetterIcon /> Surat Hasil
-                </button>
-            )}
-            {isLulus && (
-                <>
-
-                    <button className={`${styles.btn} ${styles.btnAqua}`}
-                        onClick={() => handlers.onBuktiTransfer(reg)}>
-                        <ReceiptIcon /> Bukti Transfer
-                    </button>
-
-                    <button className={`${styles.btn} ${styles.btnPrimary}`}
-                        onClick={() => handlers.onPerubahanProdi(reg)}>
-                        <ChangeIcon /> Perubahan Prodi
-                    </button>
-
-                    <button className={`${styles.btn} ${styles.btnDanger}`}
-                        onClick={() => handlers.onDownloadPengunduran(reg)}>
-                        <EraserIcon /> Pengunduran Diri
-                    </button>
-
-                    <button className={`${styles.btn} ${styles.btnAqua}`}
-                        onClick={() => handlers.onPrasyaratOspek(reg)}>
-                        <ProfileIcon /> Prasyarat Ospek
-                    </button>
-                </>
-            )}
-        </div>
-    );
-}
-
-const TABLE_HEADERS = [
-    "Nomor Daftar", "Periode", "Gelombang", "Jurusan",
-    "Biodata", "Pembayaran", "USM", "Password USM", "Aksi",
-];
-
-function RegistrationTable({ registrations, handlers }: {
-    registrations: Registration[]; handlers: RegistrationHandlers;
-}) {
-    return (
-        <div className={styles.tableWrapper}>
-            <table>
-                <thead><tr>{TABLE_HEADERS.map(h => <th key={h}>{h}</th>)}</tr></thead>
-                <tbody>
-                    {registrations.map(reg => (
-                        <tr key={reg.nomorDaftar}>
-                            <td>{reg.nomorDaftar || "-"}</td>
-                            <td>{reg.periode || "-"}</td>
-                            <td>{reg.gelombang || "-"}</td>
-                            <td>{reg.jurusan || "-"}</td>
-                            <td><StatusBadge status={reg.biodata} /></td>
-                            <td><StatusBadge status={reg.pembayaran} /></td>
-                            <td>{reg.usm || "-"}</td>
-                            <td>{reg.passwordUSM || "-"}</td>
-                            <td><RegistrationActions reg={reg} handlers={handlers} /></td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
-}
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
-export default function Account() {
-    const { user, isLoggingOut, logout } = useAuthStore();
+function EmptyRegistration() {
     const router = useRouter();
-    const [registrations, setRegistrations] = useState<Registration[]>([]);
-    const [isFetching, setIsFetching] = useState(true);
+    return (
+        <section className={`${styles.card} ${styles.cardEmpty}`}>
+            <div className={styles.emptyVisual}>
+                <FileIcon />
+            </div>
+            <h3 className={styles.emptyTitle}>Belum Ada Pendaftaran</h3>
+            <p className={styles.emptyText}>
+                Anda belum melakukan pendaftaran program studi apapun. Silahkan
+                pilih gelombang yang tersedia.
+            </p>
+            <button
+                className={`${styles.btn} ${styles.btnPrimary}`}
+                onClick={() => router.push("/#gelombang")}
+            >
+                Daftar Gelombang Sekarang
+            </button>
+        </section>
+    );
+}
 
-    // ── Fetch profile terbaru ──────────────────────────────────────────────────
-    useEffect(() => {
-        if (!user) return;
-        api.profile.get()
-            .then(freshUser => {
-                const current = useAuthStore.getState().user;
-                if (JSON.stringify(current) !== JSON.stringify(freshUser)) {
-                    useAuthStore.getState().setUser(freshUser);
-                }
-            }).catch(() => { });
-
-        // Fetch registration status
-        api.profile.getRegistrationStatus()
-            .then(res => {
-                const mapped: Registration[] = (res.registrations || []).map(r => ({
-                    nomorDaftar: r.registration_number,
-                    periode: r.period,
-                    gelombang: r.batch,
-                    jurusan: r.major,
-                    biodata: r.biodata_status as BiodataStatus,
-                    pembayaran: r.payment_status as PaymentStatus,
-                    usm: r.usm,
-                    passwordUSM: r.usm_password,
-                    usmResult: r.usm_result,
-                }));
-                setRegistrations(mapped);
-            })
-            .catch(err => {
-                console.error("Failed to fetch registration status", err);
-            })
-            .finally(() => setIsFetching(false));
-    }, [user]);
+function QuickActions({ isLoggingOut }: { isLoggingOut: boolean }) {
+    const router = useRouter();
+    const logout = useAuthStore((s) => s.logout);
 
     const handleLogout = async () => {
         const toastId = toast.loading("Sedang logout...");
@@ -214,86 +318,97 @@ export default function Account() {
             toast.success("Logout berhasil!", { id: toastId });
             router.push("/login");
         } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Logout gagal! Coba lagi...", { id: toastId });
-        };
-    };
-
-    const handlers: RegistrationHandlers = {
-        onCheckPendaftaran: () => router.push("/"),
-
-        onUbahBiodata: (reg) =>
-            router.push(`/account/ubah-biodata?nomorDaftar=${reg.nomorDaftar}`),
-
-        onDownloadSuratHasil: (reg) => {
-            downloadSuratHasil(reg.nomorDaftar);
-        },
-
-        onBuktiTransfer: (reg) =>
-            router.push(`/account/transfer-proof?nomorDaftar=${reg.nomorDaftar}`),
-
-        onPerubahanProdi: (reg) =>
-            router.push(`/account/prodi?nomorDaftar=${reg.nomorDaftar}`),
-
-        onDownloadPengunduran: () => {
-            downloadStaticPdf("pengunduran", "pengunduran.pdf").catch(err =>
-                toast.error(err instanceof Error ? err.message : "Gagal download surat pengunduran")
+            toast.error(
+                err instanceof Error
+                    ? err.message
+                    : "Logout gagal! Coba lagi...",
+                { id: toastId },
             );
-        },
-
-        onPrasyaratOspek: (reg) =>
-            router.push(`/account/prasyarat-ospek?nomorDaftar=${reg.nomorDaftar}`),
+        }
     };
+
+    return (
+        <section className={styles.card}>
+            <div className={styles.cardHeaderLine}>
+                <LightningIcon className={styles.cardHeaderIcon} />
+                <h2 className={styles.cardTitle}>Aksi Cepat</h2>
+            </div>
+            <div className={styles.quickGrid}>
+                <button
+                    className={styles.quickBtn}
+                    onClick={() => router.push("/account/change-password")}
+                    disabled={isLoggingOut}
+                >
+                    <LockIcon />
+                    <span>Ubah Password</span>
+                </button>
+                <button
+                    className={styles.quickBtn}
+                    onClick={() => router.push("/account/update-profile")}
+                    disabled={isLoggingOut}
+                >
+                    <ProfileIcon />
+                    <span>Ubah Profile</span>
+                </button>
+                <button
+                    className={`${styles.quickBtn} ${styles.quickBtnDanger}`}
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    aria-busy={isLoggingOut}
+                >
+                    <LogoutIcon />
+                    <span>Logout</span>
+                </button>
+            </div>
+        </section>
+    );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function Account() {
+    const { user, isLoggingOut } = useAuthStore();
+    const [isFetching, setIsFetching] = useState(true);
+
+    useEffect(() => {
+        if (!user) return;
+        api.profile
+            .get()
+            .then((freshUser) => {
+                const current = useAuthStore.getState().user;
+                if (JSON.stringify(current) !== JSON.stringify(freshUser)) {
+                    useAuthStore.getState().setUser(freshUser);
+                }
+            })
+            .catch(() => {})
+            .finally(() => setIsFetching(false));
+    }, [user]);
 
     if (isFetching) return <AccountSkeleton />;
     if (!user) return null;
 
+    const hasRegistration = true; // TODO: derive from real data
+
     return (
-        <main className={styles.pageContent}>
-            <div className={styles.accountBox}>
-                <h2 className={styles.accountTitle}>Akun Saya</h2>
-                <AccountInfo user={user} />
+        <section className={styles.account}>
+            <ProfileHero user={user} />
 
-                <h3 className={styles.sectionTitle}>Pendaftaran</h3>
-
-                {registrations.length === 0 ? (
-                    <div className={styles.emptyState}>
-                        <p>Anda belum melakukan pendaftaran program studi apapun.</p>
-                        <button
-                            className={`${styles.btn} ${styles.btnPrimary}`}
-                            onClick={() => router.push("/#gelombang")}
-                        >
-                            Daftar Gelombang Sekarang
-                        </button>
+            <main className={styles.accountContent}>
+                <div className={styles.layoutGrid}>
+                    <div className={styles.mainColumn}>
+                        {hasRegistration ? (
+                            <RegistrationCard />
+                        ) : (
+                            <EmptyRegistration />
+                        )}
                     </div>
-                ) : (
-                    <RegistrationTable registrations={registrations} handlers={handlers} />
-                )}
 
-                <div className={styles.bottomActions}>
-                    <button
-                        className={`${styles.btnLg} ${styles.btnLgWarning}`}
-                        onClick={() => router.push("/account/change-password")}
-                        disabled={isLoggingOut}
-                    >
-                        <LockIcon /> UBAH PASSWORD
-                    </button>
-                    <button
-                        className={`${styles.btnLg} ${styles.btnLgGrey}`}
-                        onClick={() => router.push("/account/update-profile")}
-                        disabled={isLoggingOut}
-                    >
-                        <ProfileIcon /> UBAH PROFILE
-                    </button>
-                    <button
-                        className={`${styles.btnLg} ${styles.btnLgDanger}`}
-                        onClick={handleLogout}
-                        disabled={isLoggingOut}
-                        aria-busy={isLoggingOut}
-                    >
-                        <LogoutIcon /> LOGOUT
-                    </button>
+                    <aside className={styles.sideColumn}>
+                        <AccountDetails user={user} />
+                        <QuickActions isLoggingOut={isLoggingOut} />
+                    </aside>
                 </div>
-            </div>
-        </main>
+            </main>
+        </section>
     );
 }

@@ -1,17 +1,41 @@
-'use client';
+"use client";
 
+import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import { BREADCRUMB_LABELS } from "@/constants/breadcrumbs";
+
+const SEGMENT_TO_KEY: Record<string, string> = {
+    "info-umum": "infoUmum",
+    "forgot-password": "forgotPassword",
+    "reset-password": "resetPassword",
+    "verify-email": "verifyEmail",
+    "check-inbox": "checkInbox",
+    "update-profile": "updateProfile",
+    "change-password": "changePassword",
+    "prasyarat-ospek": "prasyaratOspek",
+    "change-prodi": "changeProdi",
+    "transfer-proof": "transferProof",
+    "upload-transfer-proof": "uploadTransferProof",
+};
+
+function formatSegment(seg: string): string {
+    return seg
+        .split("-")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+}
 
 export default function BreadcrumbsJsonLd() {
-    const pathname = usePathname() ?? "";
-    const segments = pathname?.split('/').filter(Boolean);
+    const pathname = usePathname();
+    const t = useTranslations("breadcrumbs");
+
+    const segments = pathname?.split("/").filter(Boolean) ?? [];
 
     const items = [
-        { name: 'Beranda', url: '/' },
+        { name: t("home"), url: "/" },
         ...segments.map((seg, idx) => {
-            const url = '/' + segments.slice(0, idx + 1).join('/');
-            const name = BREADCRUMB_LABELS[seg] ?? seg.charAt(0).toUpperCase() + seg.slice(1);
+            const url = "/" + segments.slice(0, idx + 1).join("/");
+            const key = SEGMENT_TO_KEY[seg];
+            const name = key ? t(key) : formatSegment(seg);
             return { name, url };
         }),
     ];
@@ -19,24 +43,22 @@ export default function BreadcrumbsJsonLd() {
     if (items.length <= 1) return null;
 
     const ldJson = {
-        '@context': 'https://schema.org',
-        '@type': 'BreadcrumbList',
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
         itemListElement: items.map((item, i) => ({
-            '@type': 'ListItem',
+            "@type": "ListItem",
             position: i + 1,
             item: {
-                '@id': `${process.env.NEXT_PUBLIC_BASE_URL}${item.url}`,
+                "@id": `${process.env.NEXT_PUBLIC_BASE_URL}${item.url}`,
                 name: item.name,
             },
         })),
     };
 
     return (
-        <>
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
-            />
-        </>
-    )
+        <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(ldJson) }}
+        />
+    );
 }

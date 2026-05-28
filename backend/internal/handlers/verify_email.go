@@ -5,11 +5,14 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"time"
+
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
-	"time"
+
+	"github.com/google/uuid"
 )
 
 func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
@@ -60,15 +63,14 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 
 		var (
 			recordID int64
-			userIDBytes []byte
-			userIDStr string
+			userID uuid.UUID
 			expiredAt time.Time
 			isUsed bool
 		)
 		err = db.QueryRowContext(r.Context(),
 			"SELECT id, user_id, expired_at, is_used FROM email_verification WHERE token_hash = ?",
 			tokenHash,
-		).Scan(&recordID, &userIDBytes, &expiredAt, &isUsed)
+		).Scan(&recordID, &userID, &expiredAt, &isUsed)
 
 		if errors.Is(err, sql.ErrNoRows) {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(vagueMsg))
@@ -79,16 +81,11 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			return
 		}
 
-		userIDStr, err = utils.UUIDFromBytes(userIDBytes)
-		if err != nil {
-			slog.Error("forgot_password: parse uuid to string", "error", err)
-		}
-
 		if isUsed || time.Now().After(expiredAt) {
 			if isUsed {
 				al.Log(audit.Entry{
 					Event: audit.EventEmailVerificationUsed,
-					UserID: userIDStr,
+					UserID: userID.String(),
 					IP: base.IP,
 					UserAgent: base.UserAgent,
 					RequestID: base.RequestID,
@@ -96,7 +93,7 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			} else {
 				al.Log(audit.Entry{
 					Event: audit.EventEmailVerificationExpired,
-					UserID: userIDStr,
+					UserID: userID.String(),
 					IP: base.IP,
 					UserAgent: base.UserAgent,
 					RequestID: base.RequestID,
@@ -134,9 +131,9 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 
 		if _, err := tx.ExecContext(r.Context(),
 			"UPDATE users SET email_verified = 1, email_verified_at = NOW() WHERE id = ?",
-			userIDBytes,
+			userID[:],
 		); err != nil {
-			slog.Error("verify_email: mark user verified", "user_id", userIDStr, "error", err)
+			slog.Error("verify_email: mark user verified", "user_id", userID.String(), "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
@@ -150,7 +147,7 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 
 		al.Log(audit.Entry{
 			Event: audit.EventEmailVerified,
-			UserID: userIDStr,
+			UserID: userID.String(),
 			IP: base.IP,
 			UserAgent: base.UserAgent,
 			RequestID: base.RequestID,

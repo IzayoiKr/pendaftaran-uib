@@ -1,9 +1,9 @@
-@use '@/styles/config.scss' as global;
-@use '@/styles/formConfig.scss' as form;
-@use 'sass:map';
+@use "@/styles/config.scss" as global;
+@use "@/styles/formConfig.scss" as form;
+@use "sass:map";
 
-$color-danger:        #e74c3c;
-$color-danger-hover:  #c0392b;
+$color-danger: #e74c3c;
+$color-danger-hover: #c0392b;
 
 .page {
   @include global.main-layout;
@@ -31,8 +31,15 @@ $color-danger-hover:  #c0392b;
       margin-bottom: var(--space-2xs);
       font-size: var(--step--1);
 
-      .infoLabel { font-weight: 600; color: global.$primary-color; min-width: 10rem; flex-shrink: 0; }
-      .infoValue { color: global.$text-color2; }
+      .infoLabel {
+        font-weight: 600;
+        color: global.$primary-color;
+        min-width: 10rem;
+        flex-shrink: 0;
+      }
+      .infoValue {
+        color: global.$text-color2;
+      }
     }
   }
 
@@ -60,7 +67,9 @@ $color-danger-hover:  #c0392b;
       font-size: var(--step--1);
       font-weight: 600;
       transition: background 0.2s;
-      &:hover { background: form.$primary-hover; }
+      &:hover {
+        background: form.$primary-hover;
+      }
     }
   }
 
@@ -82,7 +91,9 @@ $color-danger-hover:  #c0392b;
       font-weight: 600;
       color: global.$text-color2;
 
-      .requiredStar { color: $color-danger; }
+      .requiredStar {
+        color: $color-danger;
+      }
     }
 
     input {
@@ -106,7 +117,9 @@ $color-danger-hover:  #c0392b;
         overflow: hidden;
         text-overflow: ellipsis;
 
-        &.hasFile { color: global.$text-color2; }
+        &.hasFile {
+          color: global.$text-color2;
+        }
       }
 
       .browseBtn {
@@ -120,10 +133,14 @@ $color-danger-hover:  #c0392b;
         cursor: pointer;
         white-space: nowrap;
         transition: background 0.2s;
-        &:hover { background: #e0e0e0; }
+        &:hover {
+          background: #e0e0e0;
+        }
       }
 
-      input[type="file"] { display: none; }
+      input[type="file"] {
+        display: none;
+      }
     }
 
     .uploadedHint {
@@ -140,11 +157,23 @@ $color-danger-hover:  #c0392b;
   }
 }
 
-.btn       { @include form.submit-button; }
-.btnDanger { @include form.submit-button; background: $color-danger; border-color: $color-danger; &:hover { background: $color-danger-hover; color: global.$white; border-color: $color-danger-hover; } }
+.btn {
+  @include form.submit-button;
+}
+.btnDanger {
+  @include form.submit-button;
+  background: $color-danger;
+  border-color: $color-danger;
+  &:hover {
+    background: $color-danger-hover;
+    color: global.$white;
+    border-color: $color-danger-hover;
+  }
+}
 
 .spinner {
-  width: 0.875em; height: 0.875em;
+  width: 0.875em;
+  height: 0.875em;
   border: 0.125em solid rgba(global.$white, 0.4);
   border-top-color: global.$white;
   border-radius: 50%;
@@ -152,11 +181,21 @@ $color-danger-hover:  #c0392b;
   flex-shrink: 0;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 @media (max-width: map.get(global.$breakpoints, sm)) {
   .container {
-    .infoRow { flex-direction: column; gap: 0; }
-    .bottomActions { flex-direction: column; align-items: stretch; }
+    .infoRow {
+      flex-direction: column;
+      gap: 0;
+    }
+    .bottomActions {
+      flex-direction: column;
+      align-items: stretch;
+    }
   }
 }

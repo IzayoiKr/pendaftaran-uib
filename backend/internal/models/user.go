@@ -1,9 +1,13 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type User struct {
-	ID string
+	ID uuid.UUID
 	FullName string
 	NIK string
 	Email string
@@ -25,20 +29,4 @@ func (u *User) ToDTO(maskedNIK string) UserDTO {
 		NIK: maskedNIK,
 		Email: u.Email,
 	}
-}
-
-type RegistrationDTO struct {
-	NomorDaftar string `json:"nomorDaftar"`
-	Periode     int    `json:"periode"`
-	Gelombang   string `json:"gelombang"`
-	Jurusan     string `json:"jurusan"`
-	Biodata     string `json:"biodata"`
-	Pembayaran  string `json:"pembayaran"`
-}
-
-type ProfileResponse struct {
-	FullName      string            `json:"full_name"`
-	NIK           string            `json:"nik"`
-	Email         string            `json:"email"`
-	Registrations []RegistrationDTO `json:"registrations"`
 }

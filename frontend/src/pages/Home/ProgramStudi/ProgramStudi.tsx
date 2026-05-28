@@ -1,24 +1,33 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useRef, useState, memo } from 'react';
-import Image from 'next/image';
-import useEmblaCarousel from 'embla-carousel-react';
-import Autoplay from 'embla-carousel-autoplay';
-import type { Program } from '@/types/api';
-import styles from './ProgramStudi.module.scss';
+import { memo, useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import Autoplay from "embla-carousel-autoplay";
+import useEmblaCarousel from "embla-carousel-react";
+import type { Program } from "@/types/api";
+import styles from "./ProgramStudi.module.scss";
 
-interface ProgramStudiProps { programs: Program[] }
+interface ProgramStudiProps {
+    programs: Program[];
+}
 
 interface ProgramCardProps {
     title: string;
     faculty: string;
-    degree: 'S1' | 'S2';
+    degree: "S1" | "S2";
     description: string;
     image: string;
-    link: string
+    link: string;
 }
 
-const ProgramCard = memo(function ProgramCard({ title, faculty, degree, description, image, link }: ProgramCardProps) {
+const ProgramCard = memo(function ProgramCard({
+    title,
+    faculty,
+    degree,
+    description,
+    image,
+    link,
+}: ProgramCardProps) {
     return (
         <div className={styles.card}>
             <div className={styles.courseHead}>
@@ -28,7 +37,7 @@ const ProgramCard = memo(function ProgramCard({ title, faculty, degree, descript
                     width={1080}
                     height={849}
                     sizes="(max-width: 768px) 100vw, (max-width: 992px) 50vw, (max-width: 1400px) 33vw, 25vw"
-                    loading='lazy'
+                    loading="lazy"
                 />
             </div>
             <div className={styles.courseContent}>
@@ -43,27 +52,37 @@ const ProgramCard = memo(function ProgramCard({ title, faculty, degree, descript
             </div>
         </div>
     );
-})
+});
 
-function DotButton({ active, onClick }: { active: boolean; onClick: () => void }) {
+function DotButton({
+    active,
+    onClick,
+}: {
+    active: boolean;
+    onClick: () => void;
+}) {
     return (
         <button
-            className={`${styles.dot} ${active ? styles.dotActive : ''}`}
+            className={`${styles.dot} ${active ? styles.dotActive : ""}`}
             onClick={onClick}
-            aria-label={active ? 'Current slide' : 'Go to slide'}
+            aria-label={active ? "Current slide" : "Go to slide"}
         />
     );
 }
 
 export default function ProgramStudi({ programs }: ProgramStudiProps) {
     const autoplay = useRef(
-        Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true })
+        Autoplay({
+            delay: 4000,
+            stopOnInteraction: false,
+            stopOnMouseEnter: true,
+        }),
     );
 
     const [emblaRef, emblaApi] = useEmblaCarousel(
-        { loop: true, align: 'start', slidesToScroll: 1 },
+        { loop: true, align: "start", slidesToScroll: 1 },
         // eslint-disable-next-line react-hooks/refs
-        [autoplay.current]
+        [autoplay.current],
     );
 
     const [selectedIndex, setSelectedIndex] = useState(0);
@@ -79,19 +98,18 @@ export default function ProgramStudi({ programs }: ProgramStudiProps) {
         setSelectedIndex(emblaApi.selectedScrollSnap());
     }, [emblaApi]);
 
-
     useEffect(() => {
         if (!emblaApi) return;
         // eslint-disable-next-line react-hooks/set-state-in-effect
         onInit();
         onSelect();
-        emblaApi.on('reInit', onInit);
-        emblaApi.on('reInit', onSelect);
-        emblaApi.on('select', onSelect);
+        emblaApi.on("reInit", onInit);
+        emblaApi.on("reInit", onSelect);
+        emblaApi.on("select", onSelect);
         return () => {
-            emblaApi.off('reInit', onInit);
-            emblaApi.off('reInit', onSelect);
-            emblaApi.off('select', onSelect);
+            emblaApi.off("reInit", onInit);
+            emblaApi.off("reInit", onSelect);
+            emblaApi.off("select", onSelect);
         };
     }, [emblaApi, onInit, onSelect]);
 
@@ -108,16 +126,17 @@ export default function ProgramStudi({ programs }: ProgramStudiProps) {
                 </div>
 
                 <div className={styles.carouselWrapper}>
-
                     <button
                         className={`${styles.navBtn} ${styles.prev}`}
                         onClick={scrollPrev}
                         aria-label="Previous programs"
-                    >‹</button>
+                    >
+                        ‹
+                    </button>
 
                     <div className={styles.viewport} ref={emblaRef}>
                         <div className={styles.track}>
-                            {programs.map(program => (
+                            {programs.map((program) => (
                                 <div className={styles.slide} key={program.id}>
                                     <ProgramCard
                                         title={program.title}
@@ -136,8 +155,9 @@ export default function ProgramStudi({ programs }: ProgramStudiProps) {
                         className={`${styles.navBtn} ${styles.next}`}
                         onClick={scrollNext}
                         aria-label="Next programs"
-                    >›</button>
-
+                    >
+                        ›
+                    </button>
                 </div>
 
                 <div className={styles.dots}>
@@ -149,7 +169,6 @@ export default function ProgramStudi({ programs }: ProgramStudiProps) {
                         />
                     ))}
                 </div>
-
             </div>
         </section>
     );

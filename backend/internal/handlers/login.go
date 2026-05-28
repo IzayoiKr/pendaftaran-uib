@@ -4,14 +4,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"strconv"
 	"time"
 
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
-	nikCrypto "pendaftaran-uib/backend/internal/crypto"
+	"pendaftaran-uib/backend/internal/crypto"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 )
@@ -94,11 +93,10 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 		}
 
 		var user models.User
-		var idBytes []byte
 		err := db.QueryRowContext(r.Context(),
 			"SELECT id, full_name, nik, email, password_hash, email_verified FROM users WHERE email = ?",
 			req.Email,
-		).Scan(&idBytes, &user.FullName, &user.NIK, &user.Email, &user.PasswordHash, &user.EmailVerified)
+		).Scan(&user.ID, &user.FullName, &user.NIK, &user.Email, &user.PasswordHash, &user.EmailVerified)
 
 		if errors.Is(err, sql.ErrNoRows) {
 			failCount := tracker.Increment(req.Email)
@@ -122,18 +120,11 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 			return
 		}
 
-		user.ID, err = utils.UUIDFromBytes(idBytes)
-		if err != nil {
-			slog.Error("login: invalid user id bytes", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
-			return
-		}
-
-		if err := nikCrypto.VerifyPassword(user.PasswordHash, req.Password); err != nil {
+		if err := crypto.VerifyPassword(user.PasswordHash, req.Password); err != nil {
 			failCount := tracker.Increment(req.Email)
 			al.Log(audit.Entry{
 				Event: audit.EventLoginFailure,
-				UserID: user.ID,
+				UserID: user.ID.String(),
 				Email: req.Email,
 				IP: base.IP,
 				UserAgent: base.UserAgent,
@@ -161,26 +152,26 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 
 		sessionID := utils.GenerateUUIDString()
 
-		accessToken, err := auth.GenerateAccessToken(user.ID, sessionID, user.Email)
+		accessToken, err := auth.GenerateAccessToken(user.ID.String(), sessionID, user.Email)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
-		refreshToken, err := auth.GenerateRefreshToken(user.ID, sessionID, user.Email)
+		refreshToken, err := auth.GenerateRefreshToken(user.ID.String(), sessionID, user.Email)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
-		if err := ts.StoreSession(r.Context(), sessionID, user.ID, time.Now().Add(auth.RefreshTokenTTL)); err != nil {
+		if err := ts.StoreSession(r.Context(), sessionID, user.ID.String(), time.Now().Add(auth.RefreshTokenTTL)); err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
 		al.Log(audit.Entry{
 			Event: audit.EventLoginSuccess,
-			UserID: user.ID,
+			UserID: user.ID.String(),
 			Email: user.Email,
 			SessionID: sessionID,
 			IP: base.IP,

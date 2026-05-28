@@ -1,12 +1,13 @@
 package models
 
+import "github.com/google/uuid"
+
 type GelombangDTO struct {
-	ID string `json:"id"`
+	ID uuid.UUID `json:"id"`
 	BatchKey string `json:"batch_key"`
 	BatchName string `json:"batch_name"`
-	ProgramType string `json:"program_type"`
-	ProgramTypeEn string `json:"program_type_en"`
 	Degree string `json:"degree"`
+	BatchType string `json:"batch_type"`
 	AcademicYear string `json:"academic_year"`
 	ImagePath string `json:"image_path"`
 	Day string `json:"day"`
@@ -18,5 +19,4 @@ type GelombangDTO struct {
 	RegistrationStartDisplay string `json:"registration_start_display"`
 	RegistrationEnd string `json:"registration_end"`
 	RegistrationEndDisplay string `json:"registration_end_display"`
-	USMPassword string `json:"usm_password"`
 }

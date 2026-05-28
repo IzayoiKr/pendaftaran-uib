@@ -1,15 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useRef } from "react";
-import type { FormEvent, ChangeEvent } from "react";
+import { useRef, useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { toast } from "sonner";
 import { api } from "@/api";
-import { forgotPasswordSchema } from "@/validation/schema";
+import { forgotPasswordSchema } from "@/validation/auth";
+import { RightArrowIcon } from "@/components/Icons/Icons";
 import TurnstileWidget from "@/components/TurnstileWidget";
 import type { TurnstileHandle } from "@/components/TurnstileWidget";
-import { RightArrowIcon } from "@/components/Icons/Icons";
 import styles from "./ForgotPassword.module.scss";
-import Link from "next/link";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -21,12 +22,14 @@ interface ForgotInputProps {
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function ForgotInput({ value, onChange }: ForgotInputProps) {
+    const t = useTranslations("forgotPassword");
+
     return (
         <input
             id="email"
             name="email"
             type="email"
-            placeholder="Email saat daftar (Registration Email) *"
+            placeholder={t("emailPlaceholder")}
             autoComplete="email"
             value={value}
             onChange={onChange}
@@ -36,6 +39,8 @@ function ForgotInput({ value, onChange }: ForgotInputProps) {
 }
 
 function ForgotAction({ isLoading }: { isLoading: boolean }) {
+    const t = useTranslations("forgotPassword");
+
     return (
         <button
             type="submit"
@@ -43,7 +48,7 @@ function ForgotAction({ isLoading }: { isLoading: boolean }) {
             disabled={isLoading}
             aria-busy={isLoading}
         >
-            Reset Password <RightArrowIcon />
+            {t("button")} <RightArrowIcon />
         </button>
     );
 }
@@ -51,6 +56,7 @@ function ForgotAction({ isLoading }: { isLoading: boolean }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ForgotPassword() {
+    const t = useTranslations("forgotPassword");
     const turnstileRef = useRef<TurnstileHandle>(null);
 
     const [form, setForm] = useState({ email: "" });
@@ -59,20 +65,22 @@ export default function ForgotPassword() {
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
+        setForm((prev) => ({ ...prev, [name]: value }));
     };
+
+    const tv = useTranslations("validation");
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const valid = forgotPasswordSchema.safeParse(form);
+        const valid = forgotPasswordSchema(tv).safeParse(form);
         if (!valid.success) {
             toast.error(valid.error.issues[0].message);
             return;
         }
 
         if (!turnstileToken) {
-            toast.error("Verifikasi CAPTCHA belum selesai, coba lagi");
+            toast.error(t("toast.captchaRequired"));
             turnstileRef.current?.reset();
             return;
         }
@@ -80,10 +88,10 @@ export default function ForgotPassword() {
         setIsLoading(true);
         try {
             await api.auth.forgotPassword(form.email, turnstileToken);
-            toast.success("Link reset password telah dikirim ke email Anda.");
+            toast.success(t("toast.success"));
             setForm({ email: "" });
         } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");
+            toast.error(err instanceof Error ? err.message : t("toast.error"));
             turnstileRef.current?.reset();
             setTurnstileToken(null);
         } finally {
@@ -94,14 +102,11 @@ export default function ForgotPassword() {
     return (
         <main className={styles.forgot}>
             <div className={styles.container}>
-                <h1>Lupa Password</h1>
+                <h1>{t("heading")}</h1>
                 <form onSubmit={handleSubmit} noValidate>
-                    <ForgotInput
-                        value={form.email}
-                        onChange={handleChange}
-                    />
+                    <ForgotInput value={form.email} onChange={handleChange} />
                     <Link href="/login" className={styles.loginlink}>
-                        Back to Login
+                        {t("backToLogin")}
                     </Link>
                     <TurnstileWidget
                         ref={turnstileRef}

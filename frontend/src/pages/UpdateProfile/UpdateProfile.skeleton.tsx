@@ -1,27 +1,34 @@
-'use client';
+"use client";
 
-import Skeleton from 'react-loading-skeleton';
-import styles from './UpdateProfile.module.scss';
-import skeleton from './UpdateProfile.skeleton.module.scss';
+import Skeleton from "react-loading-skeleton";
+import styles from "./UpdateProfile.module.scss";
+import skeleton from "./UpdateProfile.skeleton.module.scss";
 
 export default function UpdateProfileSkeleton() {
     return (
-        <main className={styles.updateProfile} aria-busy="true" aria-label="Memuat halaman profil">
+        <main
+            className={styles.updateProfile}
+            aria-busy="true"
+            aria-label="Memuat halaman profil"
+        >
             <div className={styles.container}>
                 <div className={styles.profileHeader}>
                     <Skeleton className={skeleton.avatarSkeleton} />
                     <Skeleton className={skeleton.titleSkeleton} />
-                    <Skeleton className={skeleton.subTitleSkeleton} />
                 </div>
 
                 <div className={styles.formBody}>
                     <section className={styles.infoSection}>
                         <Skeleton className={skeleton.sectionTitleSkeleton} />
-                        {[1, 2].map(i => (
+                        {[1, 2].map((i) => (
                             <div key={i} className={styles.infoRow}>
                                 <div className={styles.infoContent}>
-                                    <Skeleton className={skeleton.infoLabelSkeleton} />
-                                    <Skeleton className={skeleton.infoValueSkeleton} />
+                                    <Skeleton
+                                        className={skeleton.infoLabelSkeleton}
+                                    />
+                                    <Skeleton
+                                        className={skeleton.infoValueSkeleton}
+                                    />
                                 </div>
                             </div>
                         ))}

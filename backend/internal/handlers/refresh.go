@@ -11,6 +11,8 @@ import (
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
+
+	"github.com/google/uuid"
 )
 
 func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc {
@@ -86,9 +88,9 @@ func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc
 			return
 		}
 
-		idBytes, err := utils.UUIDToBytes(claims.UserID)
+		id, err := uuid.Parse(claims.UserID)
 		if err != nil {
-			slog.Error("refresh: parse uuid to bytes", "error", err)
+			slog.Error("refresh: parse uuid from claims", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
@@ -96,7 +98,7 @@ func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc
 		var user models.User
 		err = db.QueryRowContext(r.Context(),
 			`SELECT full_name, nik, email FROM users WHERE id = ?`,
-			idBytes,
+			id[:],
 		).Scan(&user.FullName, &user.NIK, &user.Email)
 
 		if errors.Is(err, sql.ErrNoRows) {
@@ -109,27 +111,20 @@ func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc
 			return
 		}
 
-		user.ID, err = utils.UUIDFromBytes(idBytes)
-		if err != nil {
-			slog.Error("refresh: parse uuid to string", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
-			return
-		}
-
 		newSessionID := utils.GenerateUUIDString()
 
-		if err := ts.StoreSession(r.Context(), newSessionID, user.ID, time.Now().Add(auth.RefreshTokenTTL)); err != nil {
+		if err := ts.StoreSession(r.Context(), newSessionID, claims.UserID, time.Now().Add(auth.RefreshTokenTTL)); err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
-		newAccessToken, err := auth.GenerateAccessToken(user.ID, newSessionID, user.Email)
+		newAccessToken, err := auth.GenerateAccessToken(claims.UserID, newSessionID, user.Email)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
-		newRefreshToken, err := auth.GenerateRefreshToken(user.ID, newSessionID, user.Email)
+		newRefreshToken, err := auth.GenerateRefreshToken(claims.UserID, newSessionID, user.Email)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
@@ -145,7 +140,7 @@ func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc
 
 		al.Log(audit.Entry{
 			Event: audit.EventRefreshSuccess,
-			UserID: user.ID,
+			UserID: claims.UserID,
 			SessionID: newSessionID,
 			IP: base.IP,
 			UserAgent: base.UserAgent,

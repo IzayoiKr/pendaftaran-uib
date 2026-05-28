@@ -1,18 +1,19 @@
-'use client';
+"use client";
 
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import { ApiError, api } from "@/api";
+import useAuthStore from "@/store/useAuthStore";
+import { loginSchema } from "@/validation/auth";
+import { RightArrowIcon } from "@/components/Icons/Icons";
+import TurnstileWidget from "@/components/TurnstileWidget";
+import type { TurnstileHandle } from "@/components/TurnstileWidget";
 import type { AccessTokenResponse } from "@/types/api";
 import type { Form } from "@/types/ui";
 import { login as loginFields } from "./data";
-import { loginSchema } from "@/validation/schema";
-import TurnstileWidget from "@/components/TurnstileWidget";
-import type { TurnstileHandle } from "@/components/TurnstileWidget";
-import { api, ApiError } from "@/api";
-import useAuthStore from "@/store/useAuthStore";
-import { RightArrowIcon } from "@/components/Icons/Icons";
 import styles from "./Login.module.scss";
 
 interface LoginFormProps {
@@ -30,14 +31,22 @@ interface LoginActionProps {
 }
 
 function LoginInput({
-    name, type, placeholder, autoComplete, minLength, value, onChange,
+    name,
+    type,
+    placeholderKey,
+    autoComplete,
+    minLength,
+    value,
+    onChange,
 }: Form) {
+    const t = useTranslations("login");
+
     return (
         <input
             id={name}
             name={name}
             type={type}
-            placeholder={placeholder}
+            placeholder={placeholderKey ? t(placeholderKey) : ""}
             autoComplete={autoComplete}
             minLength={minLength}
             value={value}
@@ -48,12 +57,12 @@ function LoginInput({
 }
 
 function LoginAction({ isLoading, requireCaptcha }: LoginActionProps) {
+    const t = useTranslations("login");
+
     return (
         <>
             {requireCaptcha && (
-                <p className={styles.captchaHint}>
-                    Selesaikan verifikasi di atas untuk melanjutkan.
-                </p>
+                <p className={styles.captchaHint}>{t("captchaHint")}</p>
             )}
 
             <button
@@ -62,18 +71,19 @@ function LoginAction({ isLoading, requireCaptcha }: LoginActionProps) {
                 disabled={isLoading}
                 aria-busy={isLoading}
             >
-                Login <RightArrowIcon />
+                {t("button")} <RightArrowIcon />
             </button>
 
             <p className={styles.registerText}>
-                Belum memiliki akun?{" "}
-                <Link href="/register">Buat Akun</Link>
+                {t("noAccount")}{" "}
+                <Link href="/register">{t("registerLink")}</Link>
             </p>
         </>
     );
 }
 
 function LoginForm({ onLogin, router }: LoginFormProps) {
+    const t = useTranslations("login");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -81,51 +91,49 @@ function LoginForm({ onLogin, router }: LoginFormProps) {
     const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
     const turnstileRef = useRef<TurnstileHandle>(null);
 
+    const tv = useTranslations("validation");
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const valid = loginSchema.safeParse({ email, password });
+        const valid = loginSchema(tv).safeParse({ email, password });
         if (!valid.success) {
             toast.error(valid.error.issues[0].message);
             return;
         }
 
         if (requireCaptcha && !turnstileToken) {
-            toast.error("Selesaikan verifikasi CAPTCHA terlebih dahulu");
+            toast.error(t("toast.captchaRequired"));
             return;
         }
 
         setIsLoading(true);
-        const toastId = toast.loading("Sedang login...");
+        const toastId = toast.loading(t("toast.loading"));
 
         try {
             await onLogin(email, password, turnstileToken ?? undefined);
-            toast.success("Login berhasil!", { id: toastId });
+            toast.success(t("toast.success"), { id: toastId });
         } catch (err) {
-            const needsCaptchaReset = (err instanceof ApiError && err.requireCaptcha) || requireCaptcha;
+            const needsCaptchaReset =
+                (err instanceof ApiError && err.requireCaptcha) ||
+                requireCaptcha;
 
             if (err instanceof ApiError && err.requireVerify) {
                 const params = new URLSearchParams({
                     email: err.email ?? email,
-                    from: 'login',
+                    from: "login",
                 });
-                toast.warning(
-                    "Email belum diverifikasi, mohon verifikasi email terlebih dahulu",
-                    { id: toastId }
-                );
+                toast.warning(t("toast.unverifiedEmail"), { id: toastId });
                 router.push(`/check-inbox?${params.toString()}`);
                 return;
             }
 
             if (err instanceof ApiError && err.requireCaptcha) {
                 setRequireCaptcha(true);
-                toast.warning(
-                    "Terlalu banyak percobaan gagal — selesaikan verifikasi untuk melanjutkan",
-                    { id: toastId },
-                );
+                toast.warning(t("toast.tooManyAttempts"), { id: toastId });
             } else {
                 toast.error(
-                    err instanceof Error ? err.message : "Login gagal! Coba lagi...",
+                    err instanceof Error ? err.message : t("toast.error"),
                     { id: toastId },
                 );
             }
@@ -156,7 +164,7 @@ function LoginForm({ onLogin, router }: LoginFormProps) {
             })}
 
             <Link href="/forgot-password" className={styles.forgotLink}>
-                Lupa Password?
+                {t("forgotPasswordLink")}
             </Link>
 
             {requireCaptcha && (
@@ -169,18 +177,22 @@ function LoginForm({ onLogin, router }: LoginFormProps) {
                 </div>
             )}
 
-            <LoginAction isLoading={isLoading} requireCaptcha={requireCaptcha} />
+            <LoginAction
+                isLoading={isLoading}
+                requireCaptcha={requireCaptcha}
+            />
         </form>
     );
 }
 
 export default function Login() {
+    const t = useTranslations("login");
     const router = useRouter();
     const searchParams = useSearchParams();
     const loginStore = useAuthStore((state) => state.login);
 
     const url = searchParams?.get("from") || "/";
-    const safeUrl = url.startsWith('/') && !url.startsWith('//') ? url : '/';
+    const safeUrl = url.startsWith("/") && !url.startsWith("//") ? url : "/";
 
     const handleLogin = async (
         email: string,
@@ -196,11 +208,8 @@ export default function Login() {
     return (
         <main id="login" className={styles.login}>
             <div className={styles.container}>
-                <h1>LOGIN</h1>
-                <LoginForm
-                    onLogin={handleLogin}
-                    router={router}
-                />
+                <h1>{t("heading")}</h1>
+                <LoginForm onLogin={handleLogin} router={router} />
             </div>
         </main>
     );

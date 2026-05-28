@@ -1,0 +1,309 @@
+@use "@/styles/config.scss" as global;
+@use "@/styles/formConfig.scss" as form;
+@use "sass:map";
+
+// ─── Tokens ─────────────────────────────────────────────────────────────────
+$surface: #ffffff;
+$surface-raised: #f9fafb;
+$border-subtle: #e5e7eb;
+$text-primary: #111827;
+$text-secondary: #6b7280;
+$text-muted: #9ca3af;
+$accent: #002347;
+$accent-light: #f0f4ff;
+$accent-hover: #00152b;
+$success: #10b981;
+$success-bg: #d1fae5;
+$success-text: #047857;
+$warning: #f59e0b;
+$warning-bg: #fef3c7;
+$warning-text: #b45309;
+$error: #ef4444;
+$error-bg: #fee2e2;
+$radius: 12px;
+$radius-sm: 8px;
+
+// ─── Layout ─────────────────────────────────────────────────────────────────
+.registrationPage {
+  @include global.container;
+  display: grid;
+  gap: var(--space-xl);
+  margin: calc(var(--space-2xl) * 1.5) auto;
+
+  @media (min-width: map.get(global.$breakpoints, lg)) {
+    grid-template-columns: 260px 1fr;
+    align-items: start;
+  }
+}
+
+// ─── Page Header ───────────────────────────────────────────────────────────
+.pageHeader {
+  margin-bottom: var(--space-m);
+}
+
+.pageTitle {
+  font-size: var(--step-3);
+  font-weight: 800;
+  color: $text-primary;
+}
+
+.pageSubtitle {
+  font-size: var(--step-0);
+  color: $text-secondary;
+  margin-top: var(--space-2xs);
+}
+
+// ─── Main Content ──────────────────────────────────────────────────────────
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-l);
+}
+
+// ─── Form Grid ─────────────────────────────────────────────────────────────
+.formGrid {
+  display: grid;
+  gap: var(--space-m) var(--space-s);
+
+  @media (min-width: map.get(global.$breakpoints, md)) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  &.singleCol {
+    grid-template-columns: 1fr;
+  }
+
+  &.tripleCol {
+    @media (min-width: map.get(global.$breakpoints, md)) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+
+// ─── Subsection Title ──────────────────────────────────────────────────────
+.subsectionTitle {
+  font-size: var(--step-0);
+  font-weight: 700;
+  margin-top: var(--space-m);
+}
+
+// ─── Parent Section ────────────────────────────────────────────────────────
+.parentSection {
+  border: 1px solid $border-subtle;
+  border-radius: $radius-sm;
+  padding: var(--space-m);
+  background: $surface-raised;
+
+  h3 {
+    font-size: var(--step-0);
+    font-weight: 700;
+    color: $text-primary;
+    margin-bottom: var(--space-m);
+    padding-bottom: var(--space-xs);
+    border-bottom: 2px solid $border-subtle;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+}
+
+// ─── Autocomplete ──────────────────────────────────────────────────────────
+.autocompleteWrapper {
+  position: relative;
+
+  .autocompleteList {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: $surface;
+    border: 1px solid $border-subtle;
+    border-radius: $radius-sm;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+    max-height: 240px;
+    overflow-y: auto;
+    list-style: none;
+    padding: 4px;
+  }
+
+  .autocompleteItem {
+    padding: var(--space-xs) var(--space-s);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: var(--step--1);
+    color: $text-primary;
+
+    &:hover {
+      background: $accent-light;
+    }
+  }
+}
+
+// ─── Payment Card ──────────────────────────────────────────────────────────
+.paymentInfoCard {
+  background: linear-gradient(135deg, $accent, $accent-hover);
+  color: white;
+  border-radius: $radius;
+  padding: var(--space-m);
+  display: grid;
+  gap: var(--space-xs);
+
+  h3 {
+    font-size: var(--step-1);
+    margin-bottom: var(--space-xs);
+  }
+
+  p {
+    font-size: var(--step--1);
+    opacity: 0.9;
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-s);
+
+    strong {
+      opacity: 1;
+      font-weight: 600;
+    }
+  }
+
+  .qrisLink {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-top: var(--space-xs);
+    padding: var(--space-xs) var(--space-s);
+    background: rgba(white, 0.15);
+    border-radius: $radius-sm;
+    color: white;
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.15s;
+    width: fit-content;
+
+    &:hover {
+      background: rgba(white, 0.25);
+    }
+  }
+}
+
+// ─── Confirmation ───────────────────────────────────────────────────────────
+.confirmationBox {
+  background: $surface-raised;
+  border: 1px solid $border-subtle;
+  border-radius: $radius;
+  padding: var(--space-m);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  font-size: var(--step--1);
+  color: $text-primary;
+  cursor: pointer;
+  line-height: 1.5;
+  font-weight: 500;
+
+  input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    accent-color: $accent;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+}
+
+// ─── Buttons ───────────────────────────────────────────────────────────────
+.submitBar {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-s);
+  padding-top: var(--space-s);
+  border-top: 1px solid $border-subtle;
+
+  @media (max-width: map.get(global.$breakpoints, sm)) {
+    flex-direction: column;
+  }
+}
+
+.btn {
+  @include form.button-base;
+  padding: var(--space-xs) var(--space-m);
+
+  &.primary {
+    background: $accent;
+    color: white;
+    border: none;
+
+    &:hover {
+      background: $accent-hover;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &.secondary {
+    background: transparent;
+    color: $text-secondary;
+    border: 1px solid $border-subtle;
+
+    &:hover {
+      background: $surface-raised;
+      color: $text-primary;
+    }
+  }
+}
+
+// ─── Conditional reveal animation ────────────────────────────────────────────
+.reveal {
+  animation: revealIn 0.3s ease;
+}
+
+@keyframes revealIn {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-8px);
+    overflow: hidden;
+  }
+  to {
+    opacity: 1;
+    max-height: 2000px;
+    transform: translateY(0);
+  }
+}
+
+// ─── Hint ──────────────────────────────────────────────────────────────────
+.hint {
+  font-size: var(--step--2);
+  color: $text-muted;
+  margin-top: 2px;
+  margin-bottom: var(--space-m);
+}
+
+// ─── Form Field wrapper ────────────────────────────────────────────────────
+.formField {
+  margin: var(--space-s) 0;
+}
+
+.errorMsg {
+  font-size: var(--step--2);
+  color: $error;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &::before {
+    content: "•";
+    font-weight: 700;
+  }
+}

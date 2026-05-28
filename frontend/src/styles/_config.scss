@@ -1,4 +1,4 @@
-@use 'sass:map';
+@use "sass:map";
 
 $primary-color: #fdc632;
 $secondary-color: #333;
@@ -9,7 +9,7 @@ $link-color: #4a76ee;
 $text-color: #666;
 $text-color2: #1a1c20;
 $white: #fff;
-$error-color: #FF0033;
+$error-color: #ff0033;
 $font-family: "Rubik Variable", "Poppins", sans-serif;
 
 $breakpoints: (
@@ -18,7 +18,7 @@ $breakpoints: (
   lg: 992px,
   xl: 1200px,
   xxl: 1400px,
-  xxxl: 1600px
+  xxxl: 1600px,
 );
 
 $container-max-widths: (
@@ -27,7 +27,7 @@ $container-max-widths: (
   lg: 960px,
   xl: 1140px,
   xxl: 1320px,
-  xxxl: 1520px
+  xxxl: 1520px,
 );
 
 @mixin main-layout {

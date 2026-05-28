@@ -1,6 +1,6 @@
-@use '@/styles/config.scss' as global;
-@use '@/styles/formConfig.scss' as form;
-@use 'sass:color';
+@use "@/styles/config.scss" as global;
+@use "@/styles/formConfig.scss" as form;
+@use "sass:color";
 
 .checkInbox {
   @include global.main-layout;
@@ -32,8 +32,8 @@
   color: global.$text-color;
 
   strong {
-      color: global.$secondary-color;
-      font-weight: 600;
+    color: global.$secondary-color;
+    font-weight: 600;
   }
 }
 

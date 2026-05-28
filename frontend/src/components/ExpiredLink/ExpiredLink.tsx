@@ -1,28 +1,30 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { api } from '@/api';
-import { CrossmarkIcon } from '@/components/Icons/AnimatedIcons';
-import styles from './ExpiredLink.module.scss';
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { api } from "@/api";
+import { CrossmarkIcon } from "@/components/Icons/AnimatedIcons";
+import styles from "./ExpiredLink.module.scss";
 
 interface ExpiredLinkProps {
-    type: 'verify-email' | 'reset-password';
+    type: "verify-email" | "reset-password";
 }
 
 function VerifyExpiredAction() {
     const router = useRouter();
-    const [email, setEmail] = useState('');
-    const [status, setStatus] = useState<'idle' | 'loading'>('idle');
+    const [email, setEmail] = useState("");
+    const [status, setStatus] = useState<"idle" | "loading">("idle");
 
     const handleResend = async () => {
         if (!email.trim()) return;
-        setStatus('loading');
+        setStatus("loading");
         try {
             await api.auth.resendVerification(email.trim());
-        } catch { }
-        router.push(`/check-inbox?email=${encodeURIComponent(email.trim())}&from=resend`);
+        } catch {}
+        router.push(
+            `/check-inbox?email=${encodeURIComponent(email.trim())}&from=resend`,
+        );
     };
 
     return (
@@ -40,10 +42,12 @@ function VerifyExpiredAction() {
             />
             <button
                 onClick={handleResend}
-                disabled={status === 'loading' || !email.trim()}
+                disabled={status === "loading" || !email.trim()}
                 className={styles.btn}
             >
-                {status === 'loading' ? 'Mengirim...' : 'Kirim Ulang Link Verifikasi'}
+                {status === "loading"
+                    ? "Mengirim..."
+                    : "Kirim Ulang Link Verifikasi"}
             </button>
         </div>
     );
@@ -58,7 +62,7 @@ function ResetExpiredAction() {
 }
 
 export default function ExpiredLink({ type }: ExpiredLinkProps) {
-    const isVerify = type === 'verify-email';
+    const isVerify = type === "verify-email";
 
     return (
         <div className={styles.container}>
@@ -68,8 +72,8 @@ export default function ExpiredLink({ type }: ExpiredLinkProps) {
 
             <p className={styles.subheading}>
                 {isVerify
-                    ? 'Link verifikasi ini sudah tidak berlaku. Silakan minta link verifikasi baru.'
-                    : 'Link reset password ini sudah tidak berlaku. Silakan ajukan permintaan baru melalui halaman lupa password.'}
+                    ? "Link verifikasi ini sudah tidak berlaku. Silakan minta link verifikasi baru."
+                    : "Link reset password ini sudah tidak berlaku. Silakan ajukan permintaan baru melalui halaman lupa password."}
             </p>
 
             {isVerify ? <VerifyExpiredAction /> : <ResetExpiredAction />}

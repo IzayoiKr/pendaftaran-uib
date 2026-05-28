@@ -1,47 +1,53 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import Image from 'next/image';
-import styles from './Hero.module.scss';
-import scrollToId from '@/utils/ScrollToId';
+import { useTranslations } from "next-intl";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import scrollToId from "@/utils/ScrollToId";
+import styles from "./Hero.module.scss";
 
 interface handleClickProps {
-    e: React.MouseEvent<HTMLAnchorElement>,
-    hashId: string
+    e: React.MouseEvent<HTMLAnchorElement>;
+    hashId: string;
 }
 
 function HeroPicture() {
+    const t = useTranslations("hero");
+
     return (
         <Image
-            src='/images/hero-bg.jpg'
+            src="/images/hero-bg.jpg"
             width={1920}
             height={1000}
-            alt='A group of international students gathering'
+            alt={t("imageAlt")}
             priority
-            fetchPriority='high'
+            fetchPriority="high"
         />
-    )
+    );
 }
 
 function Content() {
+    const t = useTranslations("hero");
+
     return (
         <div className={styles.content}>
-            <h1>WELCOME TO UNIVERSITAS INTERNASIONAL BATAM</h1>
-            <p>University with international quality standard that produces graduates, science, technology and arts that can meet global dynamic changes.</p>
+            <h1>{t("heading")}</h1>
+            <p>{t("description")}</p>
         </div>
-    )
+    );
 }
 
 function HeroButtons() {
     const pathname = usePathname();
+    const t = useTranslations("hero");
 
     const handleClick = ({ e, hashId }: handleClickProps) => {
-        if (hashId && pathname === '/') {
+        if (hashId && pathname === "/") {
             e.preventDefault();
-            scrollToId(hashId)
+            scrollToId(hashId);
         }
-    }
+    };
 
     return (
         <div className={styles.heroButtons}>
@@ -50,17 +56,17 @@ function HeroButtons() {
                 className={styles.btnPrimary}
                 onClick={(e) => handleClick({ e: e, hashId: "gelombang" })}
             >
-                PENDAFTARAN (REGISTRATION)
+                {t("buttonRegistration")}
             </Link>
             <Link
                 href="#program"
                 className={styles.btnSecondary}
                 onClick={(e) => handleClick({ e: e, hashId: "program" })}
             >
-                AKADEMIK (ACADEMIC)
+                {t("buttonAcademic")}
             </Link>
         </div>
-    )
+    );
 }
 
 export default function Hero() {

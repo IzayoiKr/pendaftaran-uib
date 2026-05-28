@@ -12,7 +12,7 @@ function InstagramIcon() {
         >
             <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
         </svg>
-    )
+    );
 }
 
 function YoutubeIcon() {
@@ -27,7 +27,7 @@ function YoutubeIcon() {
         >
             <path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z" />
         </svg>
-    )
+    );
 }
 
 function PengumumanIcon() {
@@ -42,10 +42,10 @@ function PengumumanIcon() {
         >
             <path d="M18 11v2h4v-2h-4zm-2 6.61c.96.71 2.21 1.65 3.2 2.39.4-.53.8-1.07 1.2-1.6-.99-.74-2.24-1.68-3.2-2.4-.4.54-.8 1.08-1.2 1.61zM20.4 5.6c-.4-.53-.8-1.07-1.2-1.6-.99.74-2.24 1.68-3.2 2.4.4.53.8 1.07 1.2 1.6.96-.72 2.21-1.65 3.2-2.4zM4 9c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h1v4h2v-4h1l5 3V6L8 9H4zm11.5 3c0-1.33-.58-2.53-1.5-3.35v6.69c.92-.81 1.5-2.01 1.5-3.34z" />
         </svg>
-    )
+    );
 }
 
-function ClockIcon() {
+export function ClockIcon({ className }: { className?: string }) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -54,6 +54,7 @@ function ClockIcon() {
             viewBox="0 0 24 24"
             fill="currentColor"
             aria-hidden="true"
+            className={className}
         >
             <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm.5-13H11v6l4.25 2.55.75-1.23-3.5-2.07V7z" />
         </svg>
@@ -90,7 +91,6 @@ export function RightArrowIcon() {
     );
 }
 
-
 export function RegisterIcon() {
     return (
         <svg
@@ -101,10 +101,12 @@ export function RegisterIcon() {
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
         >
-            <path d="M300.606,159.727l-45.333-45.333c-5.857-5.858-15.355-5.858-21.213,0L225,123.454V15c0-8.284-6.716-15-15-15H20
+            <path
+                d="M300.606,159.727l-45.333-45.333c-5.857-5.858-15.355-5.858-21.213,0L225,123.454V15c0-8.284-6.716-15-15-15H20
             C11.716,0,5,6.716,5,15v240.002c0,8.284,6.716,15,15,15h85V295c0,8.284,6.716,15,15,15h45.333c3.979,0,7.794-1.581,10.607-4.394
             l124.667-124.667C306.465,175.081,306.465,165.585,300.606,159.727z M35,30h160v123.454l-85.606,85.605
-            c-0.302,0.301-0.581,0.619-0.854,0.942H35V30z M159.12,280H135v-24.121l109.667-109.666l24.12,24.12L159.12,280z" />
+            c-0.302,0.301-0.581,0.619-0.854,0.942H35V30z M159.12,280H135v-24.121l109.667-109.666l24.12,24.12L159.12,280z"
+            />
         </svg>
     );
 }
@@ -158,7 +160,6 @@ export function LetterIcon() {
     );
 }
 
-
 export function ReceiptIcon() {
     return (
         <svg
@@ -173,8 +174,6 @@ export function ReceiptIcon() {
         </svg>
     );
 }
-
-
 
 export function ChangeIcon() {
     return (
@@ -252,7 +251,7 @@ export function LogoutIcon() {
     );
 }
 
-export function ProfileIcon() {
+export function ProfileIcon({ className }: { className?: string }) {
     return (
         <svg
             width="14"
@@ -261,9 +260,28 @@ export function ProfileIcon() {
             xmlns="http://www.w3.org/2000/svg"
             fill="currentColor"
             aria-hidden="true"
+            className={className}
         >
             <path d="M15 8.5C15 10.433 13.433 12 11.5 12C9.567 12 8 10.433 8 8.5C8 6.567 9.567 5 11.5 5C13.433 5 15 6.567 15 8.5Z" />
             <path d="M17.6305 20H5.94623C5.54449 20 5.31716 19.559 5.56788 19.2451C6.68379 17.8479 9.29072 15 12 15C14.7275 15 17.0627 17.8864 18.0272 19.2731C18.2474 19.5897 18.0161 20 17.6305 20Z" />
+        </svg>
+    );
+}
+
+export function LightningIcon({ className = "" }: { className?: string }) {
+    return (
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+            width="1em"
+            height="1em"
+        >
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
         </svg>
     );
 }
@@ -280,7 +298,7 @@ export function XWrongIcon() {
         >
             <path d="M15.71,8.29a1,1,0,0,0-1.42,0L12,10.59,9.71,8.29A1,1,0,0,0,8.29,9.71L10.59,12l-2.3,2.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0L12,13.41l2.29,2.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42L13.41,12l2.3-2.29A1,1,0,0,0,15.71,8.29Zm3.36-3.36A10,10,0,1,0,4.93,19.07,10,10,0,1,0,19.07,4.93ZM17.66,17.66A8,8,0,1,1,20,12,7.95,7.95,0,0,1,17.66,17.66Z"></path>
         </svg>
-    )
+    );
 }
 
 export function MailEnvelopeIcon() {
@@ -293,9 +311,7 @@ export function MailEnvelopeIcon() {
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
         >
-            <path
-                d="M 27.9999 51.9063 C 41.0546 51.9063 51.9063 41.0781 51.9063 28 C 51.9063 14.9453 41.0312 4.0937 27.9765 4.0937 C 14.8983 4.0937 4.0937 14.9453 4.0937 28 C 4.0937 41.0781 14.9218 51.9063 27.9999 51.9063 Z M 27.9999 47.9219 C 16.9374 47.9219 8.1014 39.0625 8.1014 28 C 8.1014 16.9609 16.9140 8.0781 27.9765 8.0781 C 39.0155 8.0781 47.8983 16.9609 47.9219 28 C 47.9454 39.0625 39.0390 47.9219 27.9999 47.9219 Z M 27.9765 29.2890 C 28.3749 29.2890 28.8202 29.1250 29.2655 28.6797 L 39.6014 18.3437 C 39.3202 18.1094 38.6405 17.8750 37.6327 17.8750 L 18.2968 17.8750 C 17.3124 17.8750 16.6093 18.1094 16.3280 18.3437 L 26.6640 28.6797 C 27.1327 29.1484 27.5780 29.2890 27.9765 29.2890 Z M 23.3358 28.0469 L 15.1796 19.8906 C 15.0390 20.1250 14.9687 20.6875 14.9687 21.5078 L 14.9687 34.4922 C 14.9687 35.3125 15.0390 35.8984 15.2030 36.1797 Z M 32.5234 28.0469 L 40.6562 36.1797 C 40.8202 35.8984 40.8905 35.3125 40.8905 34.4922 L 40.8905 21.5078 C 40.8905 20.6875 40.8202 20.1250 40.7030 19.8906 Z M 27.9530 31.1406 C 27.1093 31.1406 26.4530 30.8359 25.5390 29.9922 L 24.7890 29.2890 L 16.3749 37.7031 C 16.6562 37.9609 17.3124 38.1250 18.2968 38.1250 L 37.6093 38.1250 C 38.5936 38.1250 39.2499 37.9609 39.5312 37.7031 L 31.1171 29.2890 L 30.3671 29.9922 C 29.4530 30.8359 28.7968 31.1406 27.9530 31.1406 Z"
-            />
+            <path d="M 27.9999 51.9063 C 41.0546 51.9063 51.9063 41.0781 51.9063 28 C 51.9063 14.9453 41.0312 4.0937 27.9765 4.0937 C 14.8983 4.0937 4.0937 14.9453 4.0937 28 C 4.0937 41.0781 14.9218 51.9063 27.9999 51.9063 Z M 27.9999 47.9219 C 16.9374 47.9219 8.1014 39.0625 8.1014 28 C 8.1014 16.9609 16.9140 8.0781 27.9765 8.0781 C 39.0155 8.0781 47.8983 16.9609 47.9219 28 C 47.9454 39.0625 39.0390 47.9219 27.9999 47.9219 Z M 27.9765 29.2890 C 28.3749 29.2890 28.8202 29.1250 29.2655 28.6797 L 39.6014 18.3437 C 39.3202 18.1094 38.6405 17.8750 37.6327 17.8750 L 18.2968 17.8750 C 17.3124 17.8750 16.6093 18.1094 16.3280 18.3437 L 26.6640 28.6797 C 27.1327 29.1484 27.5780 29.2890 27.9765 29.2890 Z M 23.3358 28.0469 L 15.1796 19.8906 C 15.0390 20.1250 14.9687 20.6875 14.9687 21.5078 L 14.9687 34.4922 C 14.9687 35.3125 15.0390 35.8984 15.2030 36.1797 Z M 32.5234 28.0469 L 40.6562 36.1797 C 40.8202 35.8984 40.8905 35.3125 40.8905 34.4922 L 40.8905 21.5078 C 40.8905 20.6875 40.8202 20.1250 40.7030 19.8906 Z M 27.9530 31.1406 C 27.1093 31.1406 26.4530 30.8359 25.5390 29.9922 L 24.7890 29.2890 L 16.3749 37.7031 C 16.6562 37.9609 17.3124 38.1250 18.2968 38.1250 L 37.6093 38.1250 C 38.5936 38.1250 39.2499 37.9609 39.5312 37.7031 L 31.1171 29.2890 L 30.3671 29.9922 C 29.4530 30.8359 28.7968 31.1406 27.9530 31.1406 Z" />
         </svg>
     );
 }
@@ -340,13 +356,284 @@ export function EyeOffIcon() {
     );
 }
 
+export function CheckIcon({ className }: { className?: string }) {
+    return (
+        <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+        >
+            <polyline points="20 6 9 17 4 12" />
+        </svg>
+    );
+}
+
+export function XIcon() {
+    return (
+        <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+    );
+}
+
+export function PartialIcon() {
+    return (
+        <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 2a10 10 0 0 1 0 20Z" fill="currentColor" />
+        </svg>
+    );
+}
+
+export function EmptyIcon() {
+    return (
+        <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <circle cx="12" cy="12" r="10" />
+        </svg>
+    );
+}
+
+export function ChevronIcon() {
+    return (
+        <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <polyline points="6 9 12 15 18 9" />
+        </svg>
+    );
+}
+
+export function FileIcon({ className }: { className?: string }) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+        >
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+    );
+}
+
+export function SendIcon() {
+    return (
+        <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <line x1="22" y1="2" x2="11" y2="13" />
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+        </svg>
+    );
+}
+
+export function SearchIcon() {
+    return (
+        <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+    );
+}
+
+export function WarningIcon({ className }: { className?: string }) {
+    return (
+        <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+            aria-hidden="true"
+        >
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+    );
+}
+
+export function TrashIcon({ className }: { className?: string }) {
+    return (
+        <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+            aria-hidden="true"
+        >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+            <line x1="10" y1="11" x2="10" y2="17" />
+            <line x1="14" y1="11" x2="14" y2="17" />
+        </svg>
+    );
+}
+
+export function CancelIcon({ className }: { className?: string }) {
+    return (
+        <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+            aria-hidden="true"
+        >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+        </svg>
+    );
+}
+
+export function DownloadIcon({ className }: { className?: string }) {
+    return (
+        <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+            aria-hidden="true"
+        >
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+    );
+}
+
+export function MoneyIcon({ className }: { className?: string }) {
+    return (
+        <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+            aria-hidden="true"
+        >
+            <line x1="12" y1="1" x2="12" y2="23" />
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        </svg>
+    );
+}
+
+export function ClipboardIcon({ className }: { className?: string }) {
+    return (
+        <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+            aria-hidden="true"
+        >
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+        </svg>
+    );
+}
+
 export const socialIconMap: Record<string, React.ReactNode> = {
     Instagram: <InstagramIcon />,
     Youtube: <YoutubeIcon />,
     Pengumuman: <PengumumanIcon />,
-}
+};
 
 export const gelombangIconMap: Record<string, React.ReactNode> = {
     Clock: <ClockIcon />,
-    Pin: <PinIcon />
-}
+    Pin: <PinIcon />,
+};

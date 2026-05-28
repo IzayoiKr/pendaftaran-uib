@@ -1,11 +1,11 @@
 // ── Tokens ────────────────────────────────────────────────────────────────────
-$accent:    #1a3fa8;
+$accent: #1a3fa8;
 $accent-lt: #e8edf8;
-$text-hi:   #111218;
-$text-md:   #3d3f4f;
-$text-lo:   #8a8c9a;
-$border:    #e4e2db;
-$surface:   #ffffff;
+$text-hi: #111218;
+$text-md: #3d3f4f;
+$text-lo: #8a8c9a;
+$border: #e4e2db;
+$surface: #ffffff;
 
 // ── Section ───────────────────────────────────────────────────────────────────
 
@@ -18,7 +18,8 @@ $surface:   #ffffff;
 // ── Hero ──────────────────────────────────────────────────────────────────────
 
 .hero {
-  padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 5vw, 4rem) clamp(1.5rem, 3vw, 2.5rem);
+  padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 5vw, 4rem)
+    clamp(1.5rem, 3vw, 2.5rem);
   text-align: center;
 }
 

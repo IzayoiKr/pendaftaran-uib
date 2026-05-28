@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { forwardRef, useImperativeHandle, useRef } from "react";
 import { Turnstile } from "@marsidev/react-turnstile";
@@ -33,15 +33,17 @@ const TurnstileWidget = forwardRef<TurnstileHandle, TurnstileWidgetProps>(
                     onExpire={() => onTokenChange(null)}
                     onError={() => {
                         onTokenChange(null);
-                        toast.error("Verifikasi CAPTCHA gagal, coba muat ulang halaman");
+                        toast.error(
+                            "Verifikasi CAPTCHA gagal, coba muat ulang halaman",
+                        );
                     }}
                     options={{ theme: "light", language: "id" }}
                 />
             </div>
         );
-    }
+    },
 );
 
-TurnstileWidget.displayName = "TurnstileWidget"
+TurnstileWidget.displayName = "TurnstileWidget";
 
 export default TurnstileWidget;

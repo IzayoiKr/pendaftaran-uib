@@ -1,5 +1,5 @@
-@use '@/styles/config.scss' as global;
-@use 'sass:map';
+@use "@/styles/config.scss" as global;
+@use "sass:map";
 
 $badge-size: clamp(3rem, 2.7344rem + 1.3281vw, 4.0625rem);
 $badge-font: var(--step-0);
@@ -62,7 +62,7 @@ $dot-size: var(--step--2);
   $card-quantity: (
     xxl: 33%,
     lg: 50%,
-    md: 100%
+    md: 100%,
   );
 
   @each $bp, $width in $card-quantity {
@@ -80,7 +80,9 @@ $dot-size: var(--step--2);
   border: 1px solid rgba(0, 35, 71, 0.06);
   border-radius: 6px;
   overflow: hidden;
-  transition: box-shadow 0.4s ease, transform 0.4s ease;
+  transition:
+    box-shadow 0.4s ease,
+    transform 0.4s ease;
 
   &:hover {
     box-shadow:
@@ -163,7 +165,9 @@ $dot-size: var(--step--2);
   color: global.$tertiary-color;
   font-size: $badge-font;
   font-weight: 500;
-  transition: background 0.3s ease, color 0.3s ease;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 }
 
 .tag {
@@ -192,15 +196,21 @@ $dot-size: var(--step--2);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.3s ease, color 0.3s ease;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 
   &:hover {
     background: global.$primary-color;
     color: global.$tertiary-color;
   }
 
-  &.prev { left: 0; }
-  &.next { right: 0; }
+  &.prev {
+    left: 0;
+  }
+  &.next {
+    right: 0;
+  }
 
   @media (max-width: map.get(global.$breakpoints, sm)) {
     display: none;
@@ -228,7 +238,9 @@ $dot-size: var(--step--2);
   background: #d3d3d3;
   padding: 0;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.3s ease;
+  transition:
+    background 0.3s ease,
+    transform 0.3s ease;
 
   &:hover {
     background: global.$primary-color;

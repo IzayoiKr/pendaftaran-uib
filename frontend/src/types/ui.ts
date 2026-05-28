@@ -34,14 +34,14 @@ export interface Guide {
     id: string;
     title: string;
     description: string;
-    embedUrl: string
+    embedUrl: string;
 }
 
 export interface Form {
     name: string;
-    label?: string;
+    labelKey?: string;
     type: "text" | "email" | "password";
-    placeholder?: string;
+    placeholderKey?: string;
     autoComplete?: string;
     required?: boolean;
     readOnly?: boolean;

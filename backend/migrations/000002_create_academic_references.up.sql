@@ -1,26 +1,32 @@
 CREATE TABLE program_studi (
-    id BINARY(16) NOT NULL PRIMARY KEY,
-    program_key VARCHAR(50) NOT NULL UNIQUE,
-    title VARCHAR(50) NOT NULL,
-    faculty VARCHAR(20) NOT NULL,
+    id BINARY(16) PRIMARY KEY,
+    title VARCHAR(50) NOT NULL UNIQUE,
+    title_en VARCHAR(50) NOT NULL,
+    faculty VARCHAR(10) NOT NULL,
     degree ENUM('S1', 'S2') NOT NULL,
     description TEXT NOT NULL,
     image_path VARCHAR(255) NOT NULL,
     link VARCHAR(255) NOT NULL,
-    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    is_active BOOLEAN NOT NULL DEFAULT 1,
     sort_order SMALLINT UNSIGNED NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_active_degree_sort (is_active, degree, sort_order)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE gelombang (
-    id BINARY(16) NOT NULL PRIMARY KEY,
-    batch_key VARCHAR(50) NOT NULL,
+    id BINARY(16) PRIMARY KEY,
+    batch_key VARCHAR(50) NOT NULL UNIQUE,
     batch_name VARCHAR(100) NOT NULL,
-    batch_type ENUM('Reguler', 'Beasiswa') NOT NULL,
-    program_type VARCHAR(50) NOT NULL,
-    program_type_en VARCHAR(50) NOT NULL,
     degree ENUM('S1', 'S2') NOT NULL,
+    batch_type ENUM('Reguler', 'Beasiswa') NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_degree (degree)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE gelombang_detail (
+    gelombang_id BINARY(16) PRIMARY KEY,
     academic_year VARCHAR(20) NOT NULL,
     image_path VARCHAR(255) NOT NULL,
     event_date DATE NOT NULL,
@@ -29,7 +35,24 @@ CREATE TABLE gelombang (
     location ENUM('Batam', 'Online', 'Tanjung Pinang') NOT NULL,
     registration_start DATE NOT NULL,
     registration_end DATE NOT NULL,
-    usm_password VARCHAR(6),
+    usm_password CHAR(60) NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_gelombang FOREIGN KEY(gelombang_id)
+        REFERENCES gelombang(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    INDEX idx_registration_dates (registration_start, registration_end)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE registration_fee (
+    degree ENUM('S1', 'S2') NOT NULL,
+    batch_type ENUM('Reguler', 'Beasiswa') NOT NULL,
+    bank_name VARCHAR(100) NOT NULL,
+    account_holder VARCHAR(255) NOT NULL,
+    account_number VARCHAR(50) NOT NULL,
+    amount INT UNSIGNED NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY(degree, batch_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

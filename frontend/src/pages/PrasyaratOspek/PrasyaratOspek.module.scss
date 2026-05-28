@@ -1,10 +1,10 @@
-@use '@/styles/config.scss' as global;
-@use '../../styles/formConfig.scss' as form;
-@use 'sass:map';
+@use "@/styles/config.scss" as global;
+@use "../../styles/formConfig.scss" as form;
+@use "sass:map";
 
-$color-warning-text:  #e6a000;
-$color-danger:        #e74c3c;
-$color-danger-hover:  #c0392b;
+$color-warning-text: #e6a000;
+$color-danger: #e74c3c;
+$color-danger-hover: #c0392b;
 
 .page {
   @include global.main-layout;
@@ -39,7 +39,10 @@ $color-danger-hover:  #c0392b;
       color: global.$text-color2;
       margin-bottom: var(--space-2xs);
 
-      .statusValue { color: $color-warning-text; font-weight: 600; }
+      .statusValue {
+        color: $color-warning-text;
+        font-weight: 600;
+      }
     }
   }
 
@@ -76,22 +79,30 @@ $color-danger-hover:  #c0392b;
         cursor: pointer;
         white-space: nowrap;
         transition: background 0.2s;
-        &:hover { background: #e0e0e0; }
+        &:hover {
+          background: #e0e0e0;
+        }
       }
 
-      input[type="file"] { display: none; }
+      input[type="file"] {
+        display: none;
+      }
     }
 
     .uploadLinks {
       font-size: var(--step--2);
       color: global.$text-color2;
 
-      p { margin-bottom: var(--space-2xs); }
+      p {
+        margin-bottom: var(--space-2xs);
+      }
 
       a {
         color: form.$primary;
         font-weight: 600;
-        &:hover { text-decoration: underline; }
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
   }
@@ -105,11 +116,23 @@ $color-danger-hover:  #c0392b;
   }
 }
 
-.btn       { @include form.submit-button; }
-.btnDanger { @include form.submit-button; background: $color-danger; border-color: $color-danger; &:hover { background: $color-danger-hover; color: global.$white; border-color: $color-danger-hover; } }
+.btn {
+  @include form.submit-button;
+}
+.btnDanger {
+  @include form.submit-button;
+  background: $color-danger;
+  border-color: $color-danger;
+  &:hover {
+    background: $color-danger-hover;
+    color: global.$white;
+    border-color: $color-danger-hover;
+  }
+}
 
 .spinner {
-  width: 0.875em; height: 0.875em;
+  width: 0.875em;
+  height: 0.875em;
   border: 0.125em solid rgba(global.$white, 0.4);
   border-top-color: global.$white;
   border-radius: 50%;
@@ -117,8 +140,15 @@ $color-danger-hover:  #c0392b;
   flex-shrink: 0;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 @media (max-width: map.get(global.$breakpoints, sm)) {
-  .container .bottomActions { flex-direction: column; align-items: stretch; }
+  .container .bottomActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }

@@ -1,0 +1,197 @@
+@use "@/styles/config.scss" as global;
+@use "@/styles/formConfig.scss" as form;
+
+$border-subtle: #e5e7eb;
+$border-focus: #29b6f6;
+$accent: #002347;
+$accent-light: #f0f4ff;
+$success: #10b981;
+$success-bg: #d1fae5;
+$success-text: #047857;
+$error: #ef4444;
+$error-bg: #fee2e2;
+$text-secondary: #6b7280;
+$text-muted: #9ca3af;
+$surface-raised: #f9fafb;
+$radius-sm: 8px;
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  > label {
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--color-text-primary, #111827);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .required {
+    color: var(--color-error, #e53935);
+    margin-left: 3px;
+  }
+
+  .optionalBadge {
+    font-size: 10px;
+    font-weight: 700;
+    color: $text-muted;
+    background: $surface-raised;
+    border: 1px solid $border-subtle;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-left: 4px;
+  }
+}
+
+.uploadZone {
+  position: relative;
+  border: 2px dashed $border-subtle;
+  border-radius: 10px;
+  background: $surface-raised;
+  padding: var(--space-s);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $border-focus;
+    background: $accent-light;
+    outline: none;
+  }
+
+  &.dragover {
+    border-color: $accent;
+    background: rgba($accent, 0.05);
+    border-style: solid;
+  }
+
+  &.error {
+    border-color: $error;
+    background: $error-bg;
+  }
+
+  &.success {
+    border-color: $success;
+    background: $success-bg;
+    cursor: default;
+    border-style: solid;
+
+    &:hover {
+      border-color: $success;
+      background: $success-bg;
+    }
+  }
+}
+
+.uploadPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2xs);
+  color: $text-secondary;
+  font-size: var(--step--1);
+  text-align: center;
+  pointer-events: none;
+}
+
+.uploadIcon {
+  color: $text-muted;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.uploadHint {
+  font-size: var(--step--2);
+  color: $text-muted;
+}
+
+.uploadPreview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+  width: 100%;
+
+  svg {
+    flex-shrink: 0;
+    color: $success;
+  }
+}
+
+.fileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.fileName {
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--color-text-primary, #111827);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fileSize {
+  font-size: var(--step--2);
+  color: $text-muted;
+}
+
+.uploadActions {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.removeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba($error, 0.1);
+  color: $error;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: $error;
+    color: #fff;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Error message text below the zone */
+.errorMsg {
+  font-size: var(--step--2);
+  color: $error;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &::before {
+    content: "•";
+    font-weight: 700;
+  }
+}

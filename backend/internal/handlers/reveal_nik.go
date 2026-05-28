@@ -8,8 +8,10 @@ import (
 
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
-	nikCrypto "pendaftaran-uib/backend/internal/crypto"
+	"pendaftaran-uib/backend/internal/crypto"
 	"pendaftaran-uib/backend/internal/utils"
+
+	"github.com/google/uuid"
 )
 
 func RevealNIK(db *sql.DB, al *audit.Logger) http.HandlerFunc {
@@ -22,9 +24,9 @@ func RevealNIK(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			return
 		}
 
-		idBytes, err := utils.UUIDToBytes(claims.UserID)
+		id, err := uuid.Parse(claims.UserID)
 		if err != nil {
-			slog.Error("reveal_nik: parse uuid to bytes", "error", err)
+			slog.Error("reveal_nik: parse uuid from claims", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
@@ -32,7 +34,7 @@ func RevealNIK(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 		var encryptedNIK string
 		err = db.QueryRowContext(r.Context(),
 			"SELECT nik FROM users WHERE id = ?",
-			idBytes,
+			id[:],
 		).Scan(&encryptedNIK)
 
 		if errors.Is(err, sql.ErrNoRows) {
@@ -45,8 +47,8 @@ func RevealNIK(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 		}
 
 		var plainNIK string
-		if nikCrypto.IsEncrypted(encryptedNIK) {
-			plainNIK, err = nikCrypto.DecryptNIK(encryptedNIK)
+		if crypto.IsEncrypted(encryptedNIK) {
+			plainNIK, err = crypto.DecryptNIK(encryptedNIK)
 			if err != nil {
 				utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 				return

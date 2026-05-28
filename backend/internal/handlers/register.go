@@ -83,11 +83,11 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 			return
 		}
 
-		idBytes := utils.GenerateUUIDBytes()
+		id := utils.NewUUID()
 
 		_, err = db.ExecContext(r.Context(),
 			"INSERT INTO users (id, full_name, nik, nik_blind, email, password_hash) VALUES (?, ?, ?, ?, ?, ?)",
-		 idBytes, req.FullName, encryptedNIK, blindNIK, req.Email, string(hash),
+			id[:], req.FullName, encryptedNIK, blindNIK, req.Email, string(hash),
 		)
 		if err != nil {
 			var mysqlErr *mysql.MySQLError
@@ -110,14 +110,9 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 			return
 		}
 
-		idStr, err := utils.UUIDFromBytes(idBytes)
-		if err != nil {
-			slog.Error("register: parse uuid", "error", err)
-		}
-
 		al.Log(audit.Entry{
 			Event: audit.EventRegisterSuccess,
-			UserID: idStr,
+			UserID: id.String(),
 			Email: req.Email,
 			IP: base.IP,
 			UserAgent: base.UserAgent,
@@ -126,7 +121,7 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 
 		rawToken, tokenHash, err := generateVerificationToken()
 		if err != nil {
-			slog.Error("register: generate verification token", "user_id", idBytes, "error", err)
+			slog.Error("register: generate verification token", "user_id", id.String(), "error", err)
 			utils.WriteJSON(w, http.StatusCreated, map[string]string{
 				"message": "Registrasi berhasil! Silahkan cek email Anda untuk verifikasi",
 			})
@@ -135,9 +130,9 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 
 		if _, err = db.ExecContext(r.Context(),
 			"INSERT INTO email_verification (user_id, token_hash, expired_at) VALUES (?, ?, ?)",
-			idBytes, tokenHash, time.Now().Add(verifyTokenTTL),
+			id[:], tokenHash, time.Now().Add(verifyTokenTTL),
 		); err != nil {
-			slog.Error("register: store verification token", "user_id", idBytes, "error", err)
+			slog.Error("register: store verification token", "user_id", id.String(), "error", err)
 			utils.WriteJSON(w, http.StatusCreated, map[string]string{
 				"message": "Registrasi berhasil! Silahkan cek email Anda untuk verifikasi",
 			})
@@ -146,7 +141,7 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 
 		go func() {
 			if err := mailer.SendVerificationEmail(req.Email, req.FullName, rawToken); err != nil {
-				slog.Error("register: send verification email", "user_id", idBytes, "error", err)
+				slog.Error("register: send verification email", "user_id", id.String(), "error", err)
 			}
 		}()
 

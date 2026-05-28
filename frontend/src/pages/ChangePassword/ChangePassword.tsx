@@ -1,14 +1,15 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import type { Form } from "@/types/ui";
-import { changePassword } from "./data";
 import { toast } from "sonner";
 import { api } from "@/api";
-import { changePasswordSchema } from "@/validation/schema";
+import { changePasswordSchema } from "@/validation/auth";
 import { RightArrowIcon } from "@/components/Icons/Icons";
+import type { Form } from "@/types/ui";
+import { changePassword } from "./data";
 import styles from "./ChangePassword.module.scss";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -21,13 +22,23 @@ interface PasswordForm {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function PasswordInput({ type, name, placeholder, autoComplete, minLength, value, onChange }: Form) {
+function PasswordInput({
+    type,
+    name,
+    placeholderKey,
+    autoComplete,
+    minLength,
+    value,
+    onChange,
+}: Form) {
+    const t = useTranslations("account.changePassword");
+
     return (
         <input
             type={type}
             id={name}
             name={name}
-            placeholder={placeholder}
+            placeholder={placeholderKey ? t(placeholderKey) : ""}
             autoComplete={autoComplete}
             minLength={minLength}
             value={value}
@@ -38,6 +49,8 @@ function PasswordInput({ type, name, placeholder, autoComplete, minLength, value
 }
 
 function SubmitAction({ isLoading }: { isLoading: boolean }) {
+    const t = useTranslations("account.changePassword");
+
     return (
         <button
             type="submit"
@@ -45,7 +58,7 @@ function SubmitAction({ isLoading }: { isLoading: boolean }) {
             disabled={isLoading}
             aria-busy={isLoading}
         >
-            Ubah Password <RightArrowIcon />
+            {t("button")} <RightArrowIcon />
         </button>
     );
 }
@@ -57,19 +70,23 @@ export default function ChangePassword() {
     const [form, setForm] = useState<PasswordForm>({
         oldPassword: "",
         newPassword: "",
-        confirmPassword: ""
+        confirmPassword: "",
     });
     const [isLoading, setIsLoading] = useState(false);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setForm(prev => ({ ...prev, [name]: value }));
+        setForm((prev) => ({ ...prev, [name]: value }));
     };
+
+    const tv = useTranslations("validation");
+
+    const t = useTranslations("account.changePassword");
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const valid = changePasswordSchema.safeParse(form);
+        const valid = changePasswordSchema(tv).safeParse(form);
         if (!valid.success) {
             toast.error(valid.error.issues[0].message);
             return;
@@ -77,11 +94,14 @@ export default function ChangePassword() {
 
         setIsLoading(true);
         try {
-            await api.profile.changePassword(form.oldPassword, form.newPassword);
-            toast.success("Password berhasil diubah!");
+            await api.profile.changePassword(
+                form.oldPassword,
+                form.newPassword,
+            );
+            toast.success(t("toast.success"));
             router.push("/account");
         } catch (err) {
-            toast.error(err instanceof Error ? err.message : "Terjadi kesalahan");
+            toast.error(err instanceof Error ? err.message : t("toast.error"));
         } finally {
             setIsLoading(false);
         }
@@ -90,7 +110,7 @@ export default function ChangePassword() {
     return (
         <main className={styles.changePassword}>
             <div className={styles.container}>
-                <h1>Ubah Password (Change Password)</h1>
+                <h1>{t("heading")}</h1>
                 <form onSubmit={handleSubmit} noValidate>
                     {changePassword.map((props) => (
                         <PasswordInput

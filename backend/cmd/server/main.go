@@ -39,6 +39,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err := crypto.InitPasswordPepper(); err != nil {
+		slog.Error("bcrypt pepper init error", "error", err)
+		os.Exit(1)
+	}
+
 	if err := crypto.InitNIKCrypto(); err != nil {
 		slog.Error("nik cyrpto init error", "error", err)
 		os.Exit(1)
@@ -102,11 +107,7 @@ func main() {
 
 		r.Get("/api/program_studi", handlers.ProgramStudi(provider.MySQL))
 
-		r.Get("/api/gelombang",
-			rl.gelombang.RateLimit(
-				handlers.GetGelombangList(provider.MySQL),
-			),
-		)
+		r.Get("/api/gelombang",handlers.Gelombang(provider.MySQL))
 
 		r.Post("/api/auth/login",
 			rl.loginIP.RateLimit(
@@ -145,6 +146,9 @@ func main() {
 				handlers.ResendVerification(provider.MySQL, mailer, auditLogger),
 			),
 		)
+		r.Get("/api/registrations/{batchKey}/init",
+			rl.registrationInit.RateLimit(handlers.RegistrationInit(provider.MySQL)),
+		)
 	})
 	// Protected Routes
 	r.Group(func(r chi.Router) {
@@ -166,36 +170,11 @@ func main() {
 		r.Post("/api/profile/password",
 			rl.changePassword.RateLimitUser(handlers.ChangePassword(provider.MySQL, tokenStore, auditLogger)),
 		)
-
-		r.Get("/api/gelombang/{registrationKey}",
-			rl.gelombang.RateLimit(
-				handlers.GetGelombangByKey(provider.MySQL),
-			),
-		)
-		r.Get("/api/registration/{id}",
-			rl.profile.RateLimitUser(handlers.GetRegistrationDetails(provider.MySQL)),
-		)
-		r.Get("/api/registration-status",
-			rl.profile.RateLimitUser(handlers.GetRegistrationStatus(provider.MySQL)),
-		)
-		r.Get("/api/registration/latest",
-			rl.profile.RateLimitUser(handlers.GetLatestRegistration(provider.MySQL)),
-		)
 	})
 
 	r.Group(func(r chi.Router) {
 		r.Use(auth.Middleware(tokenStore))
 		r.Use(middleware.LimitMultipart)
-
-		r.Post("/api/registration",
-			rl.studentRegister.RateLimitUser(handlers.RegisterStudent(provider.MySQL, auditLogger)),
-		)
-		r.Post("/api/registration/{id}",
-			rl.studentRegister.RateLimitUser(handlers.UpdateRegistration(provider.MySQL)),
-		)
-		r.Post("/api/registration/{id}/transfer",
-			rl.studentRegister.RateLimitUser(handlers.UploadTransferProof(provider.MySQL)),
-		)
 	})
 
 	port := os.Getenv("SERVER_PORT")
@@ -246,8 +225,7 @@ type rateLimiters struct {
 	logout              *auth.RateLimiter
 	verifyEmail         *auth.RateLimiter
 	resendVerify        *auth.RateLimiter
-	gelombang           *auth.RateLimiter
-	studentRegister     *auth.RateLimiter
+	registrationInit 	*auth.RateLimiter
 }
 
 func newRateLimiters() rateLimiters {
@@ -267,7 +245,6 @@ func newRateLimiters() rateLimiters {
 		logout:              auth.NewRateLimiter(20, 60*time.Minute),
 		verifyEmail:         auth.NewRateLimiter(5, 60*time.Minute),
 		resendVerify:        auth.NewRateLimiter(3, 60*time.Minute),
-		gelombang:           auth.NewRateLimiter(120, 1*time.Minute),
-		studentRegister:     auth.NewRateLimiter(10, 60*time.Minute),
+		registrationInit: 	 auth.NewRateLimiter(60, 1*time.Minute),
 	}
 }

@@ -1,11 +1,14 @@
-'use client';
+"use client";
 
 import { useEffect } from "react";
 import { Toaster } from "sonner";
 import useAuthStore from "@/store/useAuthStore";
 
-
-export default function SessionProvider({ children }: { children: React.ReactNode }) {
+export default function SessionProvider({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
     const restoreSession = useAuthStore((state) => state.restoreSession);
 
     useEffect(() => {
@@ -17,11 +20,11 @@ export default function SessionProvider({ children }: { children: React.ReactNod
             <Toaster
                 toastOptions={{
                     classNames: {
-                        toast: 'toast',
-                        title: 'toast-title',
-                        description: 'toast-desc',
-                        closeButton: 'toast-closeBtn',
-                    }
+                        toast: "toast",
+                        title: "toast-title",
+                        description: "toast-desc",
+                        closeButton: "toast-closeBtn",
+                    },
                 }}
                 position="top-center"
                 richColors

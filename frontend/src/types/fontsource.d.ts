@@ -1,2 +1,2 @@
-declare module '@fontsource-variable/rubik';
-declare module '@fontsource/poppins';
+declare module "@fontsource-variable/rubik";
+declare module "@fontsource/poppins";

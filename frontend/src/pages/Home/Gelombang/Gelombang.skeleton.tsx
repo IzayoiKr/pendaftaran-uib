@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import Skeleton from 'react-loading-skeleton';
-import styles from './Gelombang.module.scss';
-import skeleton from './Gelombang.skeleton.module.scss';
+import Skeleton from "react-loading-skeleton";
+import styles from "./Gelombang.module.scss";
+import skeleton from "./Gelombang.skeleton.module.scss";
 
 export default function GelombangSkeleton() {
     return (

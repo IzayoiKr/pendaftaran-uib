@@ -1,7 +1,11 @@
-import axios from 'axios';
-import type { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import type { User, AccessTokenResponse } from '@/types/api';
-import useAuthStore from '@/store/useAuthStore';
+import axios from "axios";
+import type {
+    AxiosError,
+    AxiosInstance,
+    InternalAxiosRequestConfig,
+} from "axios";
+import useAuthStore from "@/store/useAuthStore";
+import type { AccessTokenResponse, User } from "@/types/api";
 
 export class ApiError extends Error {
     requireCaptcha: boolean;
@@ -17,7 +21,7 @@ export class ApiError extends Error {
         expired = false,
     ) {
         super(message);
-        this.name = 'ApiError';
+        this.name = "ApiError";
         this.requireCaptcha = requireCaptcha;
         this.requireVerify = requireVerify;
         this.email = email;
@@ -26,11 +30,11 @@ export class ApiError extends Error {
 }
 
 function getDeviceId(): string {
-    if (typeof window === 'undefined') return '';
-    let id = localStorage.getItem('device_id');
+    if (typeof window === "undefined") return "";
+    let id = localStorage.getItem("device_id");
     if (!id) {
-        id = crypto.randomUUID()
-        localStorage.setItem('device_id', id);
+        id = crypto.randomUUID();
+        localStorage.setItem("device_id", id);
     }
     return id;
 }
@@ -38,8 +42,8 @@ function getDeviceId(): string {
 const apiClient: AxiosInstance = axios.create({
     withCredentials: true,
     headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        "Content-Type": "application/json",
+        Accept: "application/json",
     },
 });
 
@@ -48,12 +52,12 @@ let refreshPromise: Promise<string> | null = null;
 async function refreshAccessToken(): Promise<string> {
     if (refreshPromise) return refreshPromise;
 
-    refreshPromise = fetch('/api/auth/refresh', {
-        method: 'POST',
-        credentials: 'include',
+    refreshPromise = fetch("/api/auth/refresh", {
+        method: "POST",
+        credentials: "include",
     })
         .then(async (res) => {
-            if (!res.ok) throw new ApiError('Refresh failed');
+            if (!res.ok) throw new ApiError("Refresh failed");
             const data: AccessTokenResponse = await res.json();
             useAuthStore.getState().setAccessToken(data.access_token);
             useAuthStore.getState().setUser(data.user);
@@ -70,7 +74,7 @@ apiClient.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         const { accessToken } = useAuthStore.getState();
         if (accessToken) {
-            config.headers.set('Authorization', `Bearer ${accessToken}`);
+            config.headers.set("Authorization", `Bearer ${accessToken}`);
         }
         return config;
     },
@@ -83,13 +87,15 @@ interface RetryableRequest extends InternalAxiosRequestConfig {
 
 apiClient.interceptors.response.use(
     (response) => response.data,
-    async (error: AxiosError<{ error?: string; require_captcha?: boolean }>) => {
+    async (
+        error: AxiosError<{ error?: string; require_captcha?: boolean }>,
+    ) => {
         const originalRequest = error.config as RetryableRequest;
-        const authErrType = error.response?.headers['x-auth-error'];
+        const authErrType = error.response?.headers["x-auth-error"];
 
         if (
             error.response?.status === 401 &&
-            authErrType !== 'credentials' &&
+            authErrType !== "credentials" &&
             !originalRequest._retry
         ) {
             originalRequest._retry = true;
@@ -99,19 +105,21 @@ apiClient.interceptors.response.use(
                 return apiClient(originalRequest);
             } catch {
                 useAuthStore.getState().logout();
-                window.location.href = '/login';
+                window.location.href = "/login";
                 return Promise.reject(error);
             }
         }
 
-        const data = error.response?.data as {
-            error?: string;
-            require_captcha?: boolean;
-            require_verify?: boolean;
-            expired?: boolean;
-            email?: string;
-        } | undefined;
-        const message = data?.error ?? 'Terjadi kesalahan';
+        const data = error.response?.data as
+            | {
+                  error?: string;
+                  require_captcha?: boolean;
+                  require_verify?: boolean;
+                  expired?: boolean;
+                  email?: string;
+              }
+            | undefined;
+        const message = data?.error ?? "Terjadi kesalahan";
         const requireCaptcha = data?.require_captcha ?? false;
         const requireVerify = data?.require_verify ?? false;
         const expired = data?.expired ?? false;
@@ -122,7 +130,7 @@ apiClient.interceptors.response.use(
                 requireVerify,
                 data?.email,
                 expired,
-            )
+            ),
         );
     },
 );
@@ -130,10 +138,12 @@ apiClient.interceptors.response.use(
 export const api = {
     auth: {
         login: (email: string, password: string, turnstileToken?: string) =>
-            apiClient.post<never, AccessTokenResponse>('/api/auth/login', {
+            apiClient.post<never, AccessTokenResponse>("/api/auth/login", {
                 email,
                 password,
-                ...(turnstileToken ? { cf_turnstile_token: turnstileToken } : {}),
+                ...(turnstileToken
+                    ? { cf_turnstile_token: turnstileToken }
+                    : {}),
             }),
 
         register: (data: {
@@ -143,40 +153,52 @@ export const api = {
             password: string;
             cf_turnstile_token: string;
         }) =>
-            apiClient.post<never, User>('/api/auth/register', data, {
-                headers: { 'X-Device-ID': getDeviceId() },
+            apiClient.post<never, User>("/api/auth/register", data, {
+                headers: { "X-Device-ID": getDeviceId() },
             }),
 
         logout: () =>
-            apiClient.post<never, { message: string }>('/api/auth/logout'),
+            apiClient.post<never, { message: string }>("/api/auth/logout"),
 
         forgotPassword: (email: string, turnstileToken: string) =>
-            apiClient.post<never, { message: string }>("/api/auth/forgot-password", {
-                email,
-                cf_turnstile_token: turnstileToken,
-            }, {
-                headers: { 'X-Device-ID': getDeviceId() },
-            }),
+            apiClient.post<never, { message: string }>(
+                "/api/auth/forgot-password",
+                {
+                    email,
+                    cf_turnstile_token: turnstileToken,
+                },
+                {
+                    headers: { "X-Device-ID": getDeviceId() },
+                },
+            ),
 
         resetPassword: (token: string, newPassword: string) =>
-            apiClient.post<never, { message: string }>('/api/auth/reset-password', {
-                token,
-                new_password: newPassword,
-            }),
+            apiClient.post<never, { message: string }>(
+                "/api/auth/reset-password",
+                {
+                    token,
+                    new_password: newPassword,
+                },
+            ),
 
         verifyEmail: (token: string, turnstileToken: string) =>
-            apiClient.post<never, { message: string }>('/api/auth/verify-email', {
-                token,
-                cf_turnstile_token: turnstileToken,
-            }),
+            apiClient.post<never, { message: string }>(
+                "/api/auth/verify-email",
+                {
+                    token,
+                    cf_turnstile_token: turnstileToken,
+                },
+            ),
 
         resendVerification: (email: string) =>
-            apiClient.post<never, { message: string }>('/api/auth/resend-verification', { email }),
+            apiClient.post<never, { message: string }>(
+                "/api/auth/resend-verification",
+                { email },
+            ),
     },
 
     profile: {
-        get: () =>
-            apiClient.get<never, User>('/api/profile'),
+        get: () => apiClient.get<never, User>("/api/profile"),
 
         update: (data: { fullName: string }) =>
             apiClient.post<never, { message: string }>("/api/profile", {
@@ -184,39 +206,15 @@ export const api = {
             }),
 
         revealNIK: () =>
-            apiClient.get<never, { nik: string }>('/api/profile/nik'),
-
-        getRegistrationStatus: () =>
-            apiClient.get<never, { is_registered: boolean; registrations: any[] }>('/api/registration-status'),
-
-        getRegistration: (id: string) =>
-            apiClient.get<never, any>(`/api/registration/${id}`),
-
-        registerStudent: (data: FormData) =>
-            apiClient.post<never, { message: string }>('/api/registration', data),
-
-        updateRegistration: (id: string, data: FormData) =>
-            apiClient.post<never, { message: string }>(`/api/registration/${id}`, data),
-
-        getLatestRegistration: () =>
-            apiClient.get<never, any>('/api/registration/latest'),
+            apiClient.get<never, { nik: string }>("/api/profile/nik"),
 
         changePassword: (oldPassword: string, newPassword: string) =>
-            apiClient.post<never, { message: string }>("/api/profile/password", {
-                old_password: oldPassword,
-                new_password: newPassword,
-            }),
-    },
-
-    prodi: {
-        getProgramStudi: (degree?: string) =>
-            apiClient.get<never, any[]>("/api/program_studi", {
-                params: { degree },
-            }),
-    },
-
-    transfer: {
-        uploadBukti: (registrationId: string, data: FormData) =>
-            apiClient.post<never, { message: string }>(`/api/registration/${registrationId}/transfer`, data),
+            apiClient.post<never, { message: string }>(
+                "/api/profile/password",
+                {
+                    old_password: oldPassword,
+                    new_password: newPassword,
+                },
+            ),
     },
 };

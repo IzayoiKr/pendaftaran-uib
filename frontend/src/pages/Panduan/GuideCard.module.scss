@@ -1,22 +1,43 @@
 // ─── Design tokens (matching original UIB panduan theme) ─────────────────────
-$accent:      #1a3fa8;
-$accent-lt:   #e8edf8;
-$text-hi:     #111218;
-$text-md:     #3d3f4f;
-$text-lo:     #8a8c9a;
-$border:      #e4e2db;
-$surface:     #ffffff;
+$accent: #1a3fa8;
+$accent-lt: #e8edf8;
+$text-hi: #111218;
+$text-md: #3d3f4f;
+$text-lo: #8a8c9a;
+$border: #e4e2db;
+$surface: #ffffff;
 $radius-card: 16px;
 
 // ─── Per-step gradient icon colours (from App.tsx) ───────────────────────────
 $gradients: (
-  blue:   (start: #3b82f6, end: #2563eb),
-  purple: (start: #a855f7, end: #9333ea),
-  green:  (start: #22c55e, end: #16a34a),
-  orange: (start: #f97316, end: #ea580c),
-  teal:   (start: #14b8a6, end: #0d9488),
-  pink:   (start: #ec4899, end: #db2777),
-  indigo: (start: #6366f1, end: #4f46e5),
+  blue: (
+    start: #3b82f6,
+    end: #2563eb,
+  ),
+  purple: (
+    start: #a855f7,
+    end: #9333ea,
+  ),
+  green: (
+    start: #22c55e,
+    end: #16a34a,
+  ),
+  orange: (
+    start: #f97316,
+    end: #ea580c,
+  ),
+  teal: (
+    start: #14b8a6,
+    end: #0d9488,
+  ),
+  pink: (
+    start: #ec4899,
+    end: #db2777,
+  ),
+  indigo: (
+    start: #6366f1,
+    end: #4f46e5,
+  ),
 );
 
 // ─── Card ────────────────────────────────────────────────────────────────────
@@ -30,17 +51,28 @@ $gradients: (
   padding: 1.5rem;
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
 
   &:hover {
     border-color: rgba($accent, 0.45);
     box-shadow: 0 10px 32px rgba($accent, 0.12);
     transform: translateY(-3px);
 
-    .cardFooter { opacity: 1; }
-    .iconBox     { transform: scale(1.08); }
-    .titleId     { color: $accent; }
-    .pdfBadge    { color: $accent; }
+    .cardFooter {
+      opacity: 1;
+    }
+    .iconBox {
+      transform: scale(1.08);
+    }
+    .titleId {
+      color: $accent;
+    }
+    .pdfBadge {
+      color: $accent;
+    }
   }
 }
 
@@ -72,7 +104,11 @@ $gradients: (
 // ─── Generate icon gradient per step ─────────────────────────────────────────
 @each $key, $colors in $gradients {
   .#{$key} .iconBox {
-    background: linear-gradient(135deg, map-get($colors, start), map-get($colors, end));
+    background: linear-gradient(
+      135deg,
+      map-get($colors, start),
+      map-get($colors, end)
+    );
   }
 }
 

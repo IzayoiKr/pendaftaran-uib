@@ -1,0 +1,25 @@
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: var(--step--2);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  &.complete {
+    background: #d1fae5;
+    color: #047857;
+  }
+  &.partial {
+    background: #fef3c7;
+    color: #b45309;
+  }
+  &.empty {
+    background: #f9fafb;
+    color: #9ca3af;
+    border: 1px solid #e5e7eb;
+  }
+}

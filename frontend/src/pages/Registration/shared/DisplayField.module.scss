@@ -1,0 +1,40 @@
+$border-subtle: #e5e7eb;
+$surface-raised: #f9fafb;
+$text-primary: #111827;
+$text-secondary: #6b7280;
+$radius-sm: 8px;
+
+.displayField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.displayLabel {
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: $text-secondary;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.displayValue {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-s);
+  background: $surface-raised;
+  border: 1px dashed $border-subtle;
+  border-radius: $radius-sm;
+  font-size: var(--step--1);
+  color: $text-primary;
+  font-weight: 500;
+  min-height: 48px;
+  line-height: 1.4;
+}
+
+.displayValueText {
+  flex: 1;
+  word-break: break-all;
+}

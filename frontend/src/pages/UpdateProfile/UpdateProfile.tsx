@@ -1,17 +1,19 @@
-'use client';
+"use client";
 
 import { useState } from "react";
-import type { ReactNode, FormEvent } from "react";
+import type { FormEvent, ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import GetInitials from "@/utils/GetInitials";
 import { toast } from "sonner";
 import { api } from "@/api";
 import useAuthStore from "@/store/useAuthStore";
-import { updateProfileSchema } from "@/validation/schema";
-import type { User } from "@/types/api";
-import NIKReveal from "@/components/NIKReveal/NIKReveal";
+import { updateProfileSchema } from "@/validation/auth";
 import { RightArrowIcon } from "@/components/Icons/Icons";
-import styles from "./UpdateProfile.module.scss";
+import NIKReveal from "@/components/NIKReveal/NIKReveal";
+import type { User } from "@/types/api";
 import UpdateProfileSkeleton from "./UpdateProfile.skeleton";
+import styles from "./UpdateProfile.module.scss";
 
 interface InfoRowProps {
     label: string;
@@ -32,16 +34,18 @@ function InfoRow({ label, value }: InfoRowProps) {
                 <span className={styles.infoValue}>{value}</span>
             </div>
         </div>
-    )
+    );
 }
 
 function NameField({ id, value, onChange }: NameFieldProps) {
+    const t = useTranslations("account.updateProfile");
+
     return (
         <input
             id={id}
             name={id}
             type="text"
-            placeholder="Nama Lengkap (Fullname) *"
+            placeholder={t("namePlaceholder")}
             autoComplete="name"
             value={value}
             onChange={(e) => onChange(e.target.value)}
@@ -52,6 +56,8 @@ function NameField({ id, value, onChange }: NameFieldProps) {
 }
 
 function SubmitButton({ isLoading }: { isLoading: boolean }) {
+    const t = useTranslations("account.updateProfile");
+
     return (
         <button
             type="submit"
@@ -59,32 +65,23 @@ function SubmitButton({ isLoading }: { isLoading: boolean }) {
             disabled={isLoading}
             aria-busy={isLoading}
         >
-            Simpan Perubahan <RightArrowIcon />
+            {t("button")} <RightArrowIcon />
         </button>
     );
 }
 
 function UpdateProfileHeader({ user }: { user: User }) {
-    const initials = user?.full_name
-        ? user.full_name
-            .split(' ')
-            .map(n => n[0])
-            .join('')
-            .slice(0, 2)
-            .toUpperCase()
-        : user?.email?.[0]?.toUpperCase() ?? '?';
+    const t = useTranslations("account.updateProfile");
+    const initials = user?.full_name ? GetInitials(user.full_name) : "?";
 
     return (
         <div className={styles.profileHeader}>
             <div className={styles.avatar} aria-hidden="true">
                 {initials}
             </div>
-            <h1 className={styles.title}>
-                Ubah Profile Akun
-                <span className={styles.subTitle}>(Change Account Profile)</span>
-            </h1>
+            <h1 className={styles.title}>{t("heading")}</h1>
         </div>
-    )
+    );
 }
 
 function UpdateProfileForm({ user }: { user: User }) {
@@ -93,17 +90,20 @@ function UpdateProfileForm({ user }: { user: User }) {
     const [fullName, setFullName] = useState(user.full_name ?? "");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const tv = useTranslations("validation");
+    const t = useTranslations("account.updateProfile");
+
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const valid = updateProfileSchema.safeParse({ fullName: fullName });
+        const valid = updateProfileSchema(tv).safeParse({ fullName: fullName });
         if (!valid.success) {
             toast.error(valid.error.issues[0].message);
             return;
         }
 
         setIsSubmitting(true);
-        const toastId = toast.loading("Profil sedang diupdate...")
+        const toastId = toast.loading(t("toast.loading"));
         try {
             await api.profile.update({
                 fullName: fullName,
@@ -113,13 +113,12 @@ function UpdateProfileForm({ user }: { user: User }) {
                 setUser({ ...user, full_name: fullName });
             }
 
-            toast.success("Profil berhasil diperbarui!", { id: toastId });
+            toast.success(t("toast.success"), { id: toastId });
             router.push("/account");
         } catch (err) {
-            toast.error(
-                err instanceof Error ? err.message : "Terjadi kesalahan",
-                { id: toastId }
-            );
+            toast.error(err instanceof Error ? err.message : t("toast.error"), {
+                id: toastId,
+            });
         } finally {
             setIsSubmitting(false);
         }
@@ -128,19 +127,19 @@ function UpdateProfileForm({ user }: { user: User }) {
     return (
         <form className={styles.formBody} onSubmit={handleSubmit} noValidate>
             <section className={styles.infoSection}>
-                <h2 className={styles.sectionTitle}>Informasi Akun</h2>
-                <InfoRow label="Nomor NIK" value={<NIKReveal masked={user.nik} />} />
-                <InfoRow label="Alamat Email" value={user.email} />
+                <h2 className={styles.sectionTitle}>{t("infoTitle")}</h2>
+                <InfoRow
+                    label={t("nikLabel")}
+                    value={<NIKReveal masked={user.nik} />}
+                />
+                <InfoRow label={t("emailLabel")} value={user.email} />
             </section>
 
             <section className={styles.editSection}>
-                <h2 className={styles.sectionTitle}>Edit Profile</h2>
+                <h2 className={styles.sectionTitle}>{t("editTitle")}</h2>
 
-                <label
-                    htmlFor="namaLengkap"
-                    className={styles.fieldLabel}
-                >
-                    Nama Lengkap
+                <label htmlFor="namaLengkap" className={styles.fieldLabel}>
+                    {t("nameLabel")}
                 </label>
                 <NameField
                     id="namaLengkap"
@@ -151,7 +150,7 @@ function UpdateProfileForm({ user }: { user: User }) {
                 <SubmitButton isLoading={isSubmitting} />
             </section>
         </form>
-    )
+    );
 }
 
 export default function UpdateProfile() {

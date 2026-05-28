@@ -1,5 +1,5 @@
-@use '@/styles/config.scss' as global;
-@use 'sass:map';
+@use "@/styles/config.scss" as global;
+@use "sass:map";
 
 .gelombang {
   background: global.$tertiary-color;
@@ -52,7 +52,10 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    background 0.3s ease;
 
   &:hover {
     transform: translateY(-4px);
@@ -190,7 +193,9 @@
   text-decoration: none;
   border: none;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 
   &:hover {
     background: global.$white;

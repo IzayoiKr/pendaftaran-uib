@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import type { Event } from '@/types/api';
-import { useScrollSpyContext } from '@/providers/ScrollSpyProvider';
-import { gelombangIconMap } from '@/components/Icons/Icons';
-import styles from './Gelombang.module.scss';
+import { useEffect } from "react";
+import Image from "next/image";
+import { Link } from "@/i18n/navigation";
+import { useScrollSpyContext } from "@/providers/ScrollSpyProvider";
+import { gelombangIconMap } from "@/components/Icons/Icons";
+import type { Event } from "@/types/api";
+import styles from "./Gelombang.module.scss";
 
 interface GelombangProps {
     events: Event[];
@@ -32,22 +32,35 @@ function EventCard({ event }: EventCardProps) {
             <div className={styles.body}>
                 <h3 className={styles.batch}>{event.batch_name}</h3>
                 <p className={styles.program}>
-                    {event.program_type} <br />
-                    <i>{event.program_type_en}</i>
+                    {event.degree === "S1"
+                        ? "Program Sarjana"
+                        : "Program Magister"}
+                    <br />
+                    <i>
+                        {event.degree === "S1"
+                            ? "Undergraduate Program"
+                            : "Magister Program"}
+                    </i>
                 </p>
                 <p className={styles.year}>{event.academic_year}</p>
 
                 <div className={styles.meta}>
                     <div className={styles.calendar}>
                         <span className={styles.calendarDay}>{event.day}</span>
-                        <span className={styles.calendarMonth}>{event.month}</span>
+                        <span className={styles.calendarMonth}>
+                            {event.month}
+                        </span>
                     </div>
                     <div className={styles.info}>
                         <p className={styles.infoRow}>
                             {gelombangIconMap.Clock}
-                            <time dateTime={event.start_time}>{event.start_time}</time>
-                            {' - '}
-                            <time dateTime={event.end_time}>{event.end_time}</time>
+                            <time dateTime={event.start_time}>
+                                {event.start_time}
+                            </time>
+                            {" - "}
+                            <time dateTime={event.end_time}>
+                                {event.end_time}
+                            </time>
                         </p>
                         <p className={styles.infoRow}>
                             {gelombangIconMap.Pin} {event.location}
@@ -63,30 +76,18 @@ function EventCard({ event }: EventCardProps) {
                     <time dateTime={event.registration_start}>
                         {event.registration_start_display}
                     </time>
-                    {' s.d. '}
+                    {" s.d. "}
                     <time dateTime={event.registration_end}>
                         {event.registration_end_display}
                     </time>
                 </p>
 
-                {  /* TODO: replace the registerLink later with backend token */}
-                {event.register_link && event.register_link.startsWith('http') ? (
-                    <a
-                        href={event.register_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.registerBtn}
-                    >
-                        Daftar (Register)
-                    </a>
-                ) : (
-                    <Link
-                        href={`/batch-registration/${event.batch_key}`}
-                        className={styles.registerBtn}
-                    >
-                        Daftar (Register)
-                    </Link>
-                )}
+                <Link
+                    href={`/registration/${event.batch_key}`}
+                    className={styles.registerBtn}
+                >
+                    Daftar (Register)
+                </Link>
             </div>
         </article>
     );

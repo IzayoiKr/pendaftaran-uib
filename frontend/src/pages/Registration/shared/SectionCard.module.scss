@@ -1,0 +1,124 @@
+@use "@/styles/config.scss" as global;
+@use "sass:map";
+@use "sass:color";
+
+$surface: #ffffff;
+$surface-raised: #f9fafb;
+$border-subtle: #e5e7eb;
+$text-primary: #111827;
+$text-muted: #9ca3af;
+$accent: #002347;
+$radius: 12px;
+$radius-sm: 8px;
+
+.sectionCard {
+  background: $surface;
+  border: 1px solid $border-subtle;
+  border-radius: $radius;
+  overflow: visible;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-s) var(--space-m);
+  background: linear-gradient(to right, $surface-raised, $surface);
+  border-bottom: 1px solid $border-subtle;
+  gap: var(--space-s);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: linear-gradient(
+      to right,
+      color.adjust($surface-raised, $lightness: -2%),
+      color.adjust($surface, $lightness: -2%)
+    );
+  }
+}
+
+.sectionHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex: 1;
+}
+
+.collapseToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: $text-muted;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    background: $border-subtle;
+    color: #6b7280;
+  }
+
+  svg {
+    transition: transform 0.25s ease;
+    width: 18px;
+    height: 18px;
+  }
+
+  &.collapsed svg {
+    transform: rotate(-90deg);
+  }
+}
+
+.sectionTitle {
+  font-size: var(--step-0);
+  font-weight: 700;
+  color: $text-primary;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.sectionNumber {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: $accent;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--step--2);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.sectionBody {
+  padding: var(--space-m);
+  display: grid;
+  gap: var(--space-m);
+  animation: expandIn 0.25s ease;
+}
+
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

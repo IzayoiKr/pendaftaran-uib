@@ -1,23 +1,28 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { toast } from 'sonner';
-import { api, ApiError } from '@/api';
-import TurnstileWidget from '@/components/TurnstileWidget';
-import type { TurnstileHandle } from '@/components/TurnstileWidget';
-import ExpiredLink from '@/components/ExpiredLink/ExpiredLink';
-import { CheckmarkIcon, BouncingBallsIcon } from '@/components/Icons/AnimatedIcons';
-import styles from './VerifyEmail.module.scss';
+import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { ApiError, api } from "@/api";
+import ExpiredLink from "@/components/ExpiredLink/ExpiredLink";
+import {
+    BouncingBallsIcon,
+    CheckmarkIcon,
+} from "@/components/Icons/AnimatedIcons";
+import TurnstileWidget from "@/components/TurnstileWidget";
+import type { TurnstileHandle } from "@/components/TurnstileWidget";
+import styles from "./VerifyEmail.module.scss";
 
-type State = 'pending' | 'loading' | 'success' | 'expired';
+type State = "pending" | "loading" | "success" | "expired";
 
 export default function VerifyEmail() {
+    const t = useTranslations("verifyEmail");
     const searchParams = useSearchParams();
-    const token = searchParams?.get('token');
+    const token = searchParams?.get("token");
 
-    const [state, setState] = useState<State>('pending');
+    const [state, setState] = useState<State>("pending");
     const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
     const turnstileRef = useRef<TurnstileHandle>(null);
 
@@ -32,11 +37,11 @@ export default function VerifyEmail() {
     const handleVerify = async () => {
         if (!turnstileToken) return;
 
-        setState('loading');
-        const toastId = toast.loading("Sedang verifikasi...")
+        setState("loading");
+        const toastId = toast.loading(t("toast.loading"));
         try {
             await api.auth.verifyEmail(token, turnstileToken);
-            setState('success');
+            setState("success");
             toast.dismiss(toastId);
         } catch (err) {
             turnstileRef.current?.reset();
@@ -44,19 +49,19 @@ export default function VerifyEmail() {
 
             const isExpired = err instanceof ApiError && err.expired;
             if (isExpired) {
-                setState('expired');
-                toast.warning("Link sudah tidak valid, mohon verifikasi ulang", { id: toastId });
+                setState("expired");
+                toast.warning(t("toast.invalidLink"), { id: toastId });
             } else {
-                setState('pending');
+                setState("pending");
                 toast.error(
-                    err instanceof Error ? err.message : 'Verifikasi gagal, coba lagi',
+                    err instanceof Error ? err.message : t("toast.error"),
                     { id: toastId },
                 );
             }
         }
     };
 
-    if (state === 'expired') {
+    if (state === "expired") {
         return (
             <main className={styles.verifyEmail}>
                 <ExpiredLink type="verify-email" />
@@ -64,17 +69,15 @@ export default function VerifyEmail() {
         );
     }
 
-    if (state === 'success') {
+    if (state === "success") {
         return (
             <main className={styles.verifyEmail}>
                 <div className={styles.container}>
                     <CheckmarkIcon />
-                    <h1 className={styles.heading}>Email Berhasil Diverifikasi!</h1>
-                    <p className={styles.body}>
-                        Akun Anda telah aktif. Silakan login untuk melanjutkan.
-                    </p>
+                    <h1 className={styles.heading}>{t("headingSuccess")}</h1>
+                    <p className={styles.body}>{t("bodySuccess")}</p>
                     <Link href="/login" className={styles.btn}>
-                        Login Sekarang
+                        {t("buttonSuccess")}
                     </Link>
                 </div>
             </main>
@@ -86,10 +89,8 @@ export default function VerifyEmail() {
             <div className={styles.container}>
                 <BouncingBallsIcon />
 
-                <h1 className={styles.heading}>Hampir Selesai...</h1>
-                <p className={styles.body}>
-                    Selesaikan verifikasi di bawah lalu klik tombol untuk mengaktifkan akun Anda.
-                </p>
+                <h1 className={styles.heading}>{t("headingPending")}</h1>
+                <p className={styles.body}>{t("bodyPending")}</p>
 
                 <TurnstileWidget
                     ref={turnstileRef}
@@ -99,13 +100,13 @@ export default function VerifyEmail() {
 
                 <button
                     onClick={handleVerify}
-                    disabled={!turnstileToken || state === 'loading'}
+                    disabled={!turnstileToken || state === "loading"}
                     className={styles.btn}
-                    aria-busy={state === 'loading'}
+                    aria-busy={state === "loading"}
                 >
-                    {state === 'loading'
-                        ? 'Memverifikasi...'
-                        : 'Verifikasi & Aktifkan Akun'}
+                    {state === "loading"
+                        ? t("buttonLoading")
+                        : t("buttonDefault")}
                 </button>
             </div>
         </main>

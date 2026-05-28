@@ -1,0 +1,90 @@
+@use "@/styles/config.scss" as global;
+@use "@/styles/formConfig.scss" as form;
+
+$text-primary: #111827;
+$text-muted: #9ca3af;
+$error: #ef4444;
+$error-bg: #fee2e2;
+$border-subtle: #e5e7eb;
+$surface-raised: #f9fafb;
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+
+  > label {
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: $text-primary;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .required {
+      color: $error;
+    }
+  }
+
+  .hint {
+    font-size: var(--step--2);
+    color: $text-muted;
+    margin-top: 2px;
+  }
+
+  input,
+  select,
+  textarea {
+    @include form.input-template;
+    margin-bottom: 0;
+  }
+
+  textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+
+  .error {
+    font-size: var(--step--2);
+    color: $error;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+
+    &::before {
+      content: "•";
+      font-weight: 700;
+    }
+  }
+
+  &.hasError {
+    input,
+    select,
+    textarea {
+      border-color: $error;
+      background: $error-bg;
+
+      &:focus {
+        border-color: $error;
+        background: #ffffff;
+      }
+    }
+  }
+}
+
+.readonlyField {
+  input,
+  select,
+  textarea {
+    background: $surface-raised;
+    color: #6b7280;
+    cursor: not-allowed;
+    border-style: dashed;
+
+    &:focus {
+      border-color: $border-subtle;
+      background: $surface-raised;
+    }
+  }
+}

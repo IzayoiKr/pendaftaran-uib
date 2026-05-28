@@ -2,8 +2,9 @@
 export interface Program {
     id: string;
     title: string;
+    title_en: string;
     faculty: string;
-    degree: 'S1' | 'S2';
+    degree: "S1" | "S2";
     description: string;
     image_path: string;
     link: string;
@@ -14,15 +15,14 @@ export interface Event {
     id: string;
     batch_key: string;
     batch_name: string;
-    program_type: string;
-    program_type_en: string;
+    degree: "S1" | "S2";
     academic_year: string;
     image_path: string;
     day: string;
     month: string;
     start_time: string;
     end_time: string;
-    location: 'Batam' | 'Online' | 'Tanjung Pinang';
+    location: "Batam" | "Online" | "Tanjung Pinang";
     registration_start: string;
     registration_start_display: string;
     registration_end: string;

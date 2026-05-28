@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -15,7 +15,7 @@ export default function useRequireAuth() {
             toast.warning("Mohon login terlebih dahulu!");
             router.push(`/login?from=${encodeURIComponent(pathname)}`);
         }
-    }, [isLoading, isLoggingOut, user, router, pathname])
+    }, [isLoading, isLoggingOut, user, router, pathname]);
 
     return { user, isLoading, isLoggingOut };
 }

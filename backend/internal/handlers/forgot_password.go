@@ -14,6 +14,8 @@ import (
 	"pendaftaran-uib/backend/internal/email"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
+
+	"github.com/google/uuid"
 )
 
 func ForgotPassword(db *sql.DB, mailer *email.Mailer, emailLimiter *auth.RateLimiter, al *audit.Logger) http.HandlerFunc {
@@ -80,12 +82,14 @@ func ForgotPassword(db *sql.DB, mailer *email.Mailer, emailLimiter *auth.RateLim
 			return
 		}
 
-		var idBytes []byte
-		var fullName string
+		var (
+			id uuid.UUID
+			fullName string
+		)
 		err = db.QueryRowContext(r.Context(),
 			"SELECT id, full_name FROM users WHERE email = ?",
 			req.Email,
-		).Scan(&idBytes, &fullName)
+		).Scan(&id, &fullName)
 
 		if errors.Is(err, sql.ErrNoRows) {
 			al.Log(audit.Entry{
@@ -110,30 +114,25 @@ func ForgotPassword(db *sql.DB, mailer *email.Mailer, emailLimiter *auth.RateLim
 			return
 		}
 
-		idStr, err := utils.UUIDFromBytes(idBytes)
-		if err != nil {
-			slog.Error("forgot_password: parse uuid to string", "error", err)
-		}
-
 		expiry := time.Now().Add(resetTokenTTL)
 		if _, err = db.ExecContext(r.Context(),
 			"INSERT INTO reset_password (user_id, token_hash, expired_at) VALUES (?, ?, ?)",
-			idBytes, tokenHash, expiry,
+			id[:], tokenHash, expiry,
 		); err != nil {
-			slog.Error("forgot_password: store token hash", "user_id", idStr, "error", err)
+			slog.Error("forgot_password: store token hash", "user_id", id.String(), "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
 		go func() {
 			if err := mailer.SendPasswordResetEmail(req.Email, fullName, rawToken); err != nil {
-				slog.Error("forgot_password: send reset password email", "user_id", idStr, "error", err)
+				slog.Error("forgot_password: send reset password email", "user_id", id.String, "error", err)
 			}
 		}()
 
 		al.Log(audit.Entry{
 			Event: audit.EventPasswordResetRequested,
-			UserID: idStr,
+			UserID: id.String(),
 			Email: req.Email,
 			IP: base.IP,
 			UserAgent: base.UserAgent,

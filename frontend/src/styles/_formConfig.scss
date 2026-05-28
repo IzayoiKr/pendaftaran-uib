@@ -1,12 +1,12 @@
-@use '@/styles/config.scss' as global;
-@use 'sass:map';
+@use "@/styles/config.scss" as global;
+@use "sass:map";
 
-$input-bg:      #f9f9ff;
-$input-focus:   #f0f4ff;
-$input-border:  #d0d5dd;
-$primary:       #29b6f6;
+$input-bg: #f9f9ff;
+$input-focus: #f0f4ff;
+$input-border: #d0d5dd;
+$primary: #29b6f6;
 $primary-hover: #039be5;
-$placeholder:   #888;
+$placeholder: #888;
 
 $form-cap: 700px;
 
@@ -16,17 +16,16 @@ $container-form-max-widths: (
   lg: $form-cap,
   xl: $form-cap,
   xxl: $form-cap,
-  xxxl: $form-cap
+  xxxl: $form-cap,
 );
 
-$input-error:  #ef4444;
-$danger:       #ef4444;
+$input-error: #ef4444;
+$danger: #ef4444;
 $danger-hover: #dc2626;
-$text-muted:   #6b7280;
-$text-dark:    #0b3c5d;
+$text-muted: #6b7280;
+$text-dark: #0b3c5d;
 $border-light: #ddd;
-$bg-light:     #f9fafb;
-
+$bg-light: #f9fafb;
 
 @mixin container-form {
   width: 100%;
@@ -54,7 +53,9 @@ $bg-light:     #f9fafb;
   padding: var(--space-2xs) var(--space-s);
   margin-bottom: var(--space-2xs);
 
-  &::placeholder { color: $placeholder; }
+  &::placeholder {
+    color: $placeholder;
+  }
   &:focus {
     background: $input-focus;
     border-color: $primary;
@@ -78,7 +79,10 @@ $bg-light:     #f9fafb;
   border: 1px solid $primary;
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
 
   &:hover {
     background: transparent;
@@ -102,7 +106,10 @@ $bg-light:     #f9fafb;
   font-family: global.$font-family;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
 
   svg {
     width: 1em;

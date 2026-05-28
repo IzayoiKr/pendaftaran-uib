@@ -6,46 +6,56 @@ interface UseScrollSpyProps {
     ready?: number;
 }
 
-export default function useScrollSpy({ ids, offset = 80, ready = 0 }: UseScrollSpyProps) {
-    const [activeId, setActiveId] = useState<string>('');
+export default function useScrollSpy({
+    ids,
+    offset = 80,
+    ready = 0,
+}: UseScrollSpyProps) {
+    const [activeId, setActiveId] = useState<string>("");
 
     const idsRef = useRef(ids);
-    useEffect(() => { idsRef.current = ids });
+    useEffect(() => {
+        idsRef.current = ids;
+    });
 
     useEffect(() => {
         const intersecting = new Set<string>();
         const observer = new IntersectionObserver(
             (entries) => {
-                entries.forEach(entry => {
+                entries.forEach((entry) => {
                     if (entry.isIntersecting) intersecting.add(entry.target.id);
                     else intersecting.delete(entry.target.id);
-                })
+                });
 
                 if (intersecting.size === 0) {
-                    setActiveId('');
+                    setActiveId("");
                     return;
                 }
 
                 const topmost = [...intersecting]
-                    .map(id => document.getElementById(id))
+                    .map((id) => document.getElementById(id))
                     .filter((el): el is HTMLElement => el !== null)
-                    .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)[0];
+                    .sort(
+                        (a, b) =>
+                            a.getBoundingClientRect().top -
+                            b.getBoundingClientRect().top,
+                    )[0];
 
                 if (topmost) setActiveId(topmost.id);
             },
             {
                 rootMargin: `-${offset}px 0px -40% 0px`,
-                threshold: 0
-            }
+                threshold: 0,
+            },
         );
 
-        idsRef.current.forEach(id => {
+        idsRef.current.forEach((id) => {
             const el = document.getElementById(id);
             if (el) observer.observe(el);
-        })
+        });
 
         return () => observer.disconnect();
-    }, [offset, ready])
+    }, [offset, ready]);
 
     return activeId;
 }
