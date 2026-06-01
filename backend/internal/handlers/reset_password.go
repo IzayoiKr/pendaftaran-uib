@@ -126,7 +126,7 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 		committed = true
 
 		if err := ts.RevokeAllUserSessions(r.Context(), userID.String()); err != nil {
-			slog.Error("reset_passsword: revoke all sessions", "user_id", userID.String(), "error", err)
+			slog.Error("reset_password: revoke all sessions", "user_id", userID.String(), "error", err)
 		}
 
 		al.Log(audit.Entry{

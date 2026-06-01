@@ -38,7 +38,7 @@ func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 
 		id, err := uuid.Parse(claims.UserID)
 		if err != nil {
-			slog.Error("reveal_nil: parse uuid from claims", "error", err)
+			slog.Error("reveal_nik: parse uuid from claims", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}

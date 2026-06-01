@@ -6,10 +6,10 @@ import (
 )
 
 func decryptAndMask(encryptedNIK string) string {
-	plain, err := crypto.DecryptNIK(encryptedNIK)
+	b, err := crypto.Decrypt(encryptedNIK)
 	if err != nil {
 		slog.Error("NIK decrypt failed; returning placeholder", "error", err)
 		return "****************"
 	}
-	return crypto.MaskNIK(plain)
+	return crypto.MaskNIK(b)
 }

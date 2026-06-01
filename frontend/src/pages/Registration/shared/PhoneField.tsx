@@ -70,12 +70,13 @@ export default function PhoneField({
     name,
     required,
     placeholder,
-    value = "",
+    value: propValue,
     onChange,
     error,
 }: PhoneFieldProps) {
     const t = useTranslations("registration");
     const [localError, setLocalError] = useState<string | undefined>(undefined);
+    const value = propValue ?? "";
     const [displayValue, setDisplayValue] = useState(value);
 
     const isInternalChange = useRef(false);
@@ -116,6 +117,7 @@ export default function PhoneField({
 
     const handleBlur = useCallback(() => {
         if (!displayValue.trim()) {
+            onChange?.("");
             setLocalError(undefined);
             return;
         }

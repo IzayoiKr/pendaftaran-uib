@@ -307,24 +307,43 @@ export function optHsGpa(t: TV, fieldKey: string) {
     );
 }
 
-export function reqPdf(t: TV, fieldKey: string) {
-    return z
-        .file()
-        .max(MAX_FILE_SIZE, {
-            message: t(`registration.${fieldKey}Size`, { size: "2MB" }),
-        })
-        .mime(ACCEPTED_MIME_TYPES, {
-            error: t(`registration.${fieldKey}Type`),
+const newFileUpload = (t: TV, fieldKey: string) =>
+    z.preprocess(
+        (val) => val instanceof File ? val : undefined,
+        z
+            .file()
+            .max(MAX_FILE_SIZE, {
+                message: t(`registration.${fieldKey}Size`, { size: "2MB" }),
+            })
+            .mime(ACCEPTED_MIME_TYPES, {
+                error: t(`registration.${fieldKey}Type`),
+            })
+            .refine(
+                (f) => f.type !== "" || f.name.toLowerCase().endsWith(".pdf"),
+                { message: t(`registration.${fieldKey}Type`) },
+            ),
+    );
+
+const existingDbRef = (t: TV, fieldKey: string) =>
+    z
+        .string()
+        .regex(/^[^|]+\|\d+$/, {
+            message: t(`registration.${fieldKey}Invalid`),
         });
+
+export function reqDoc(t: TV, fieldKey: string) {
+    return z.union([newFileUpload(t, fieldKey), existingDbRef(t, fieldKey)], {
+        error: t(`registration.${fieldKey}Required`),
+    });
 }
 
-export function optPdf(t: TV, fieldKey: string) {
+export function optDoc(t: TV, fieldKey: string) {
     return z
-        .file()
-        .max(MAX_FILE_SIZE, {
-            message: t(`registration.${fieldKey}Size`, { size: "2MB" }),
-        })
-        .mime(ACCEPTED_MIME_TYPES, { error: t(`registration.${fieldKey}Type`) })
+        .union([
+            newFileUpload(t, fieldKey),
+            existingDbRef(t, fieldKey),
+            z.null(),
+        ])
         .optional();
 }
 
@@ -340,7 +359,7 @@ export function paymentFields(t: TV) {
     return {
         accountHolder: reqString(t, "accountHolder", 255),
         bank: reqString(t, "bank", 100),
-        paymentProof: reqPdf(t, "paymentProof"),
+        paymentProof: reqDoc(t, "paymentProof"),
     };
 }
 
@@ -348,7 +367,7 @@ export function paymentDraftFields(t: TV) {
     return {
         accountHolder: optString(t, "accountHolder", 255),
         bank: optString(t, "bank", 100),
-        paymentProof: optPdf(t, "paymentProof"),
+        paymentProof: optDoc(t, "paymentProof"),
     };
 }
 
@@ -398,7 +417,7 @@ export function validateRequiredString(
 }
 
 export function validateRequiredFile(
-    value: File | undefined,
+    value: File | string | undefined | null,
     ctx: z.RefinementCtx,
     path: string,
     message: string,

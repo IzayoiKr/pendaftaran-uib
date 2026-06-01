@@ -55,12 +55,12 @@ export default function SearchableField({
     debounceMs = 300,
     allowManualEntry = true,
     manualEntryLabel,
-    value = "",
+    value: propValue,
     onChange,
     onResultSelect,
 }: SearchableFieldProps) {
     const t = useTranslations("options");
-
+    const value = propValue ?? "";
     const [query, setQuery] = useState(value);
     const [selected, setSelected] = useState<SearchResult | null>(
         value ? { value, label: value } : null,
@@ -76,6 +76,7 @@ export default function SearchableField({
     const prevValueRef = useRef(value);
 
     const [debouncedQuery] = useDebounce(query, debounceMs);
+    const safeDebouncedQuery = debouncedQuery ?? "";
 
     const {
         data: results = [],
@@ -84,7 +85,7 @@ export default function SearchableField({
     } = useQuery({
         queryKey: ["search", searchEndpoint, debouncedQuery],
         queryFn: ({ signal }) =>
-            fetchResults(searchEndpoint, debouncedQuery, signal),
+            fetchResults(searchEndpoint, safeDebouncedQuery, signal),
         enabled:
             !isManual && !selected && debouncedQuery.length >= minQueryLength,
         staleTime: 24 * 60 * 60 * 1000,

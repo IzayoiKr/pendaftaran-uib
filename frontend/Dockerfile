@@ -7,8 +7,7 @@ ENV NEXT_PUBLIC_TURNSTILE_SITE_KEY=$NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
 FROM base AS development
 RUN --mount=type=cache,target=/home/node/.npm npm install --legacy-peer-deps
-COPY --chown=node:node . .
-USER node
+COPY . .
 EXPOSE 8989
 CMD [ "npm", "run", "dev", "--", "--webpack", "-H", "0.0.0.0" ]
 

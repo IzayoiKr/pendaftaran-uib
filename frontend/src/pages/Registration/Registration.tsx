@@ -1,14 +1,16 @@
 "use client";
 
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
 import { useRevealNik } from "@/hooks/UseRevealNIK";
 import scrollToId from "@/utils/ScrollToId";
 import { Controller, FormProvider, useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
 import useAuthStore from "@/store/useAuthStore";
 import { s1SubmitSchema } from "@/validation/registration/s1";
 import { s2SubmitSchema } from "@/validation/registration/s2";
-import { SendIcon } from "../../components/Icons/Icons";
+import { SendIcon } from "@/components/Icons/Icons";
 import Sidebar from "./Sidebar";
 import { S1_BEASISWA_DOCS, S1_DOCS, S2_DOCS } from "./registerOptions";
 import Dokumen from "./sections/Dokumen";
@@ -18,11 +20,14 @@ import S1Pendidikan from "./sections/S1Pendidikan";
 import S2Biodata from "./sections/S2Biodata";
 import S2OrangTua from "./sections/S2OrangTua";
 import type {
+    DocumentField,
     RegistrationFormProps,
     RegistrationFormValues,
     SectionStatus,
 } from "./types";
-import { REGISTRATION_DEFAULT_VALUES } from "./types";
+import { REGISTRATION_DEFAULT_VALUES, hasDocument } from "./types";
+import { useRegistrationStatus } from "./useRegistrationStatus";
+import { useRegistrationSubmit } from "./useRegistrationSubmit";
 import styles from "./Registration.module.scss";
 
 const MemoS1Identitas = memo(S1Identitas);
@@ -75,14 +80,19 @@ function str(
     key: keyof RegistrationFormValues,
 ): boolean {
     const v = values[key];
-    return typeof v === "string" && v.trim() !== "";
+    if (v === null || v === undefined) return false;
+    if (typeof v === "boolean") return v;
+    if (typeof v === "string") return v.trim() !== "";
+    if (v instanceof File) return true;
+    return false;
 }
 
 function hasFile(
     values: Partial<RegistrationFormValues>,
     key: keyof RegistrationFormValues,
 ): boolean {
-    return values[key] instanceof File;
+    const v = values[key] as DocumentField;
+    return hasDocument(v);
 }
 
 function getErrorSectionId(field: string, level: "S1" | "S2"): string {
@@ -169,7 +179,7 @@ function getErrorSectionId(field: string, level: "S1" | "S2"): string {
         rapot4: "document",
         al: "document",
         r1: "document",
-        r4: "document",
+        r2: "document",
         accountHolder: "payment",
         bank: "payment",
         paymentProof: "payment",
@@ -278,17 +288,41 @@ export default function RegistrationForm({
     programOptions,
     paymentConfig,
 }: RegistrationFormProps) {
+    const params = useParams();
+    const batchKey = params?.batchKey as string;
+
+    const {
+        status,
+        draftData,
+        isLoading: statusLoading,
+    } = useRegistrationStatus(batchKey);
+
     const t = useTranslations("registration");
     const tv = useTranslations("validation");
+
+    const router = useRouter();
     const { user } = useAuthStore();
     const { data: nikData } = useRevealNik();
     const unmaskedNik = nikData?.nik ?? "";
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const methods = useForm<RegistrationFormValues>({
         defaultValues: REGISTRATION_DEFAULT_VALUES,
         mode: "onTouched",
     });
-    const { control, handleSubmit, setError, clearErrors } = methods;
+    const { control, handleSubmit, setError, clearErrors, reset, getValues } =
+        methods;
+
+    const { submit } = useRegistrationSubmit(batchKey, getValues);
+
+    useEffect(() => {
+        if (draftData && (status === "DRAFT" || status === "REJECTED")) {
+            reset({
+                ...REGISTRATION_DEFAULT_VALUES,
+                ...draftData,
+            });
+        }
+    }, [draftData, status, reset]);
 
     const [collapsed, setCollapsed] = useState<Record<string, boolean>>({
         identity: true,
@@ -325,50 +359,62 @@ export default function RegistrationForm({
         );
     }, []);
 
-    const onSubmit = (data: RegistrationFormValues) => {
-        const result =
-            level === "S1"
-                ? s1SubmitSchema(tv).safeParse(data)
-                : s2SubmitSchema(tv).safeParse(data);
+    const onSubmit = async (data: RegistrationFormValues) => {
+        setIsSubmitting(true);
+        const toastId = toast.loading("Submitting...");
+        try {
+            const result =
+                level === "S1"
+                    ? s1SubmitSchema(tv).safeParse(data)
+                    : s2SubmitSchema(tv).safeParse(data);
 
-        if (!result.success) {
-            clearErrors();
-
-            result.error.issues.forEach((issue) => {
-                const field = issue.path[0] as keyof RegistrationFormValues;
-                setError(field, {
-                    type: "manual",
-                    message: issue.message,
+            if (!result.success) {
+                clearErrors();
+                result.error.issues.forEach((issue) => {
+                    const field = issue.path[0] as keyof RegistrationFormValues;
+                    setError(field, { type: "manual", message: issue.message });
                 });
-            });
 
-            const firstError = result.error.issues[0];
-            if (firstError) {
-                const fieldName = firstError.path[0] as string;
-                const sectionId = getErrorSectionId(fieldName, level);
-
-                setCollapsed((prev) => collapseAllExcept(prev, sectionId));
-
-                requestAnimationFrame(() => {
+                const firstError = result.error.issues[0];
+                if (firstError) {
+                    const fieldName = firstError.path[0] as string;
+                    const sectionId = getErrorSectionId(fieldName, level);
+                    setCollapsed((prev) => collapseAllExcept(prev, sectionId));
                     requestAnimationFrame(() => {
-                        scrollToId(sectionId);
-                        setTimeout(() => {
-                            const el = document.querySelector<HTMLElement>(
-                                `#${sectionId} input[name="${fieldName}"],
-                                 #${sectionId} select[name="${fieldName}"],
-                                 #${sectionId} textarea[name="${fieldName}"],
-                                 [data-section="${sectionId}"] input[name="${fieldName}"]`,
-                            );
-                            el?.focus();
-                        }, 350);
+                        requestAnimationFrame(() => {
+                            scrollToId(sectionId);
+                            setTimeout(() => {
+                                const el = document.querySelector<HTMLElement>(
+                                    `#${sectionId} input[name="${fieldName}"],
+                                     #${sectionId} select[name="${fieldName}"],
+                                     #${sectionId} textarea[name="${fieldName}"],
+                                     [data-section="${sectionId}"] input[name="${fieldName}"]`,
+                                );
+                                el?.focus();
+                            }, 350);
+                        });
                     });
-                });
+                }
+                setIsSubmitting(false);
+                toast.dismiss(toastId);
+                return;
             }
-            return;
-        }
 
-        console.log("Submit valid:", result.data);
+            await submit(false);
+            toast.success("Pendaftaran berhasil dikirim!", { id: toastId });
+            router.push(`/account`);
+        } catch (err) {
+            const message =
+                err instanceof Error ? err.message : "Terjadi kesalahan";
+            toast.error(message, { id: toastId });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
+
+    if (statusLoading) {
+        return null;
+    }
 
     return (
         <FormProvider {...methods}>
@@ -500,15 +546,35 @@ export default function RegistrationForm({
                             <button
                                 type="button"
                                 className={`${styles.btn} ${styles.secondary}`}
-                                onClick={() =>
-                                    console.log("Draft:", methods.getValues())
-                                }
+                                onClick={async () => {
+                                    setIsSubmitting(true);
+                                    const toastId =
+                                        toast.loading("Menyimpan draft...");
+                                    try {
+                                        await submit(true);
+                                        toast.success(
+                                            "Draft berhasil disimpan!",
+                                            { id: toastId },
+                                        );
+                                        router.replace(`/registration/${batchKey}?edit=1`)
+                                    } catch (err) {
+                                        const message =
+                                            err instanceof Error
+                                                ? err.message
+                                                : "Terjadi kesalahan";
+                                        toast.error(message, { id: toastId });
+                                    } finally {
+                                        setIsSubmitting(false);
+                                    }
+                                }}
+                                disabled={isSubmitting}
                             >
                                 {t("buttons.saveDraft")}
                             </button>
                             <button
                                 type="submit"
                                 className={`${styles.btn} ${styles.primary}`}
+                                disabled={isSubmitting}
                             >
                                 <SendIcon /> {t("buttons.submit")}
                             </button>

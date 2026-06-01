@@ -309,8 +309,10 @@ function EmptyRegistration() {
 function QuickActions({ isLoggingOut }: { isLoggingOut: boolean }) {
     const router = useRouter();
     const logout = useAuthStore((s) => s.logout);
+    const setIsLoggingOut = useAuthStore((s) => s.setIsLoggingOut);
 
     const handleLogout = async () => {
+        setIsLoggingOut(true);
         const toastId = toast.loading("Sedang logout...");
         try {
             await api.auth.logout();

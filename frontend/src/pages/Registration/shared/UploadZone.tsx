@@ -4,14 +4,15 @@ import { useCallback, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { UPLOAD_CONSTRAINTS } from "@/pages/Registration/registerOptions";
 import { FileIcon, XIcon } from "@/components/Icons/Icons";
+import { type DocumentField, getDocumentDisplay } from "../types";
 import styles from "./UploadZone.module.scss";
 
 interface UploadZoneProps {
     label: string;
     name: string;
     required?: boolean;
-    file?: File | null;
-    onFileChange?: (file: File | null) => void;
+    file?: DocumentField;
+    onFileChange?: (file: DocumentField) => void;
     error?: string;
 }
 
@@ -112,8 +113,8 @@ export default function UploadZone({
     );
 
     const openPicker = useCallback(() => {
-        if (!file) inputRef.current?.click();
-    }, [file]);
+        inputRef.current?.click();
+    }, []);
 
     const effectiveError = error || localError;
 
@@ -125,6 +126,8 @@ export default function UploadZone({
     ]
         .filter(Boolean)
         .join(" ");
+
+    const displayInfo = file ? getDocumentDisplay(file) : null;
 
     return (
         <div className={styles.formField}>
@@ -155,17 +158,21 @@ export default function UploadZone({
                 }}
                 aria-label={
                     file
-                        ? t("fileSelected", { fileName: file.name })
+                        ? t("fileSelected", {
+                              fileName: displayInfo?.name ?? "",
+                          })
                         : t("uploadLabel", { label })
                 }
             >
-                {file ? (
+                {displayInfo ? (
                     <div className={styles.uploadPreview}>
                         <FileIcon />
                         <div className={styles.fileInfo}>
-                            <span className={styles.fileName}>{file.name}</span>
+                            <span className={styles.fileName}>
+                                {displayInfo.name}
+                            </span>
                             <span className={styles.fileSize}>
-                                {formatSize(file.size)}
+                                {formatSize(displayInfo.size)}
                             </span>
                         </div>
                         <div className={styles.uploadActions}>

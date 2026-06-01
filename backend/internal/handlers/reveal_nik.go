@@ -46,9 +46,9 @@ func RevealNIK(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			return
 		}
 
-		var plainNIK string
+		var byteNIK []byte
 		if crypto.IsEncrypted(encryptedNIK) {
-			plainNIK, err = crypto.DecryptNIK(encryptedNIK)
+			byteNIK, err = crypto.Decrypt(encryptedNIK)
 			if err != nil {
 				utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 				return
@@ -63,6 +63,6 @@ func RevealNIK(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			RequestID: base.RequestID,
 		})
 
-		utils.WriteJSON(w, http.StatusOK, map[string]string{"nik": plainNIK})
+		utils.WriteJSON(w, http.StatusOK, map[string]string{"nik": string(byteNIK)})
 	}
 }

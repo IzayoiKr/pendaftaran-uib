@@ -1,6 +1,7 @@
 package models
 
 import (
+	"html"
 	"strings"
 
 	"pendaftaran-uib/backend/internal/utils"
@@ -11,7 +12,7 @@ type UpdateProfileRequest struct {
 }
 
 func (r *UpdateProfileRequest) Sanitize() {
-	r.FullName = strings.TrimSpace(r.FullName)
+	r.FullName = html.EscapeString(strings.TrimSpace(r.FullName))
 }
 
 func (r *UpdateProfileRequest) Validate() error {

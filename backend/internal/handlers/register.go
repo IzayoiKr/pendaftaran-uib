@@ -62,7 +62,7 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 			return
 		}
 
-		encryptedNIK, err := nikCrypto.EncryptNIK(req.NIK)
+		encryptedNIK, err := nikCrypto.Encrypt([]byte(req.NIK))
 		if err != nil {
 			slog.Error("register: encrypt NIK", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))

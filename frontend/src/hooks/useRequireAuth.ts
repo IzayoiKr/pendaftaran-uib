@@ -6,16 +6,16 @@ import { toast } from "sonner";
 import useAuthStore from "@/store/useAuthStore";
 
 export default function useRequireAuth() {
-    const { user, isLoading, isLoggingOut } = useAuthStore();
+    const { user, isLoading } = useAuthStore();
     const router = useRouter();
     const pathname = usePathname() ?? "";
 
     useEffect(() => {
-        if (!isLoading && !isLoggingOut && !user) {
+        if (!isLoading && !user) {
             toast.warning("Mohon login terlebih dahulu!");
             router.push(`/login?from=${encodeURIComponent(pathname)}`);
         }
-    }, [isLoading, isLoggingOut, user, router, pathname]);
+    }, [isLoading, user, router, pathname]);
 
-    return { user, isLoading, isLoggingOut };
+    return { user, isLoading };
 }

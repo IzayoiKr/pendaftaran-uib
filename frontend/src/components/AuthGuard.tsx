@@ -9,7 +9,7 @@ interface AuthGuardProps {
 }
 
 export default function AuthGuard({ children }: AuthGuardProps) {
-    const { user, isLoading, isLoggingOut } = useRequireAuth();
-    if (isLoading || !user || isLoggingOut) return <Loading />;
+    const { user, isLoading } = useRequireAuth();
+    if (isLoading || !user) return <Loading />;
     return <>{children}</>;
 }

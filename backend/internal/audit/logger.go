@@ -50,6 +50,10 @@ const (
 	EventPasswordResetSuccess Event = "password_reset.success"
 	EventPasswordResetUsed Event = "password_reset.used"
 	EventPasswordResetExpired Event = "password_reset.expired"
+
+	EventRegistrationDraftSaved Event = "registration_draft.saved"
+	EventRegistrationSubmitSuccess Event = "registration_submit.success"
+	EventRegistrationUploadDocument Event = "registration_document.malware_detected"
 )
 
 type Entry struct {

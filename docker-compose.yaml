@@ -108,6 +108,62 @@ services:
       timeout: 5s
       retries: 5
 
+  clamav:
+    image: clamav/clamav:1.4
+    container_name: clamav-pendaftaran-uib-dev
+    restart: unless-stopped
+    environment:
+      CLAMD_CONF_TCPAddr: ${CLAMD_CONF_TCPAddr}
+      CLAMD_CONF_TCPSocket: ${CLAMD_CONF_TCPSocket}
+      CLAMD_CONF_MaxThreads: ${CLAMD_CONF_MaxThreads}
+      CLAMD_CONF_MaxQueue: ${CLAMD_CONF_MaxQueue}
+      CLAMD_CONF_ReadTimeout: ${CLAMD_CONF_ReadTimeout}
+      CLAMD_CONF_MaxFileSize: ${CLAMD_CONF_MaxFileSize}
+      CLAMD_CONF_MaxScanSize: ${CLAMD_CONF_MaxScanSize}
+      FRESHCLAM_CONF_Checks: ${FRESHCLAM_CONF_Checks}
+    ports:
+      - ${CLAM_PORTS}
+    volumes:
+      - clamav_data:/var/lib/clamav
+    healthcheck:
+      test:
+        ["CMD", "sh", "-c", 'echo "PING" | nc 127.0.0.1 3310 | grep -q PONG']
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 120s
+    deploy:
+      resources:
+        limits:
+          memory: ${CLAM_MEMORY_LIMIT}
+
+  fangfrisch:
+    build:
+      context: .
+      dockerfile: fangfrisch.Dockerfile
+    container_name: fangfrisch-pendaftaran-uib-dev
+    restart: unless-stopped
+    depends_on:
+      clamav:
+        condition: service_healthy
+    volumes:
+      - ./fangfrisch:/etc/fangfrisch:ro
+      - clamav_data:/var/lib/clamav
+    entrypoint: |
+      /bin/sh -c "
+      pip install --no-cache-dir fangfrisch
+      if [ ! -f /var/lib/clamav/fangfrisch.db ]; then
+        echo 'Initializing Fangfrisch Database...'
+        fangfrisch -c /etc/fangfrisch/fangfrisch.conf initdb
+      fi
+      while true; do
+        echo 'Refreshing third-party ClamAV signatures...'
+        fangfrisch -c /etc/fangfrisch/fangfrisch.conf refresh
+        echo 'Update complete. Sleeping for 4 hours...'
+        sleep 14400
+      done
+      "
+
   migrate:
     profiles:
       - "tools"
@@ -164,6 +220,8 @@ services:
         condition: service_healthy
       mongodb:
         condition: service_healthy
+      clamav:
+        condition: service_healthy
     environment:
       DB_HOST: mysql
       DB_PORT: ${MYSQL_PORT}
@@ -195,17 +253,21 @@ services:
       CORS_ORIGIN: ${CORS_ORIGIN}
       TURNSTILE_SECRET: ${TURNSTILE_SECRET}
       TURNSTILE_EXPECTED_HOSTNAME: ${TURNSTILE_EXPECTED_HOSTNAME}
+      BCRYPT_COST: ${BCRYPT_COST}
       PEPPER_KEY: ${PEPPER_KEY}
-      NIK_ENCRYPTION_KEY: ${NIK_ENCRYPTION_KEY}
+      CRYPTO_AES_KEY: ${CRYPTO_AES_KEY}
       NIK_BLIND_INDEX_KEY: ${NIK_BLIND_INDEX_KEY}
+      CLAMD_ADDR: ${CLAMD_ADDR}
       APP_ENV: ${APP_ENV}
       APP_URL: ${APP_URL}
       APP_HEALTH_URL: ${APP_HEALTH_URL}
+      STORAGE_DIR: ${STORAGE_DIR}
       SERVER_PORT: ${SERVER_PORT}
     ports:
       - ${BACKEND_PORTS}
     volumes:
       - ./backend:/app
+      - ./storage:/app/storage
       - /app/tmp
       - /dev/null:/app/.env
     command: ["air", "-c", ".air.toml"]
@@ -239,7 +301,9 @@ services:
       - /app/node_modules
       - /app/.next
       - /dev/null:/app/.env
+      - /dev/null:/app/.env.local
 
 volumes:
   mysql_data:
   mongo_data:
+  clamav_data:

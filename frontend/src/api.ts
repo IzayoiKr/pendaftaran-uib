@@ -7,6 +7,18 @@ import type {
 import useAuthStore from "@/store/useAuthStore";
 import type { AccessTokenResponse, User } from "@/types/api";
 
+const authChannel =
+    typeof window !== "undefined" ? new BroadcastChannel("auth_sync") : null;
+
+if (authChannel) {
+    authChannel.onmessage = (message) => {
+        if (message.data === "LOGOUT") {
+            useAuthStore.getState().logout();
+            window.location.href = "/login";
+        }
+    };
+}
+
 export class ApiError extends Error {
     requireCaptcha: boolean;
     requireVerify: boolean;
@@ -76,6 +88,9 @@ apiClient.interceptors.request.use(
         if (accessToken) {
             config.headers.set("Authorization", `Bearer ${accessToken}`);
         }
+        if (config.data instanceof FormData) {
+            config.headers.delete("Content-Type");
+        }
         return config;
     },
     (error) => Promise.reject(error),
@@ -105,6 +120,7 @@ apiClient.interceptors.response.use(
                 return apiClient(originalRequest);
             } catch {
                 useAuthStore.getState().logout();
+                authChannel?.postMessage("LOGOUT");
                 window.location.href = "/login";
                 return Promise.reject(error);
             }
@@ -216,5 +232,13 @@ export const api = {
                     new_password: newPassword,
                 },
             ),
+    },
+    registrations: {
+        status: (batchKey: string) =>
+            apiClient.get(`/api/registrations/${batchKey}/status`),
+        draft: (batchKey: string, formData: FormData) =>
+            apiClient.post(`/api/registrations/${batchKey}/draft`, formData),
+        submit: (batchKey: string, formData: FormData) =>
+            apiClient.post(`/api/registrations/${batchKey}/submit`, formData),
     },
 };

@@ -9,7 +9,7 @@ import {
     optEmail,
     optEnum,
     optGpa,
-    optPdf,
+    optDoc,
     optPhone,
     optString,
     optYear,
@@ -22,7 +22,7 @@ import {
     reqEmail,
     reqEnum,
     reqGpa,
-    reqPdf,
+    reqDoc,
     reqPhone,
     reqString,
     statusInstansiValues,
@@ -96,12 +96,12 @@ export const s2DraftSchema = (t: TV) =>
 
             parentsAddress: optString(t, "parentsAddress", 500),
 
-            al: optPdf(t, "al"),
-            kk: optPdf(t, "kk"),
-            pp: optPdf(t, "pp"),
-            ktp: optPdf(t, "ktp"),
-            r1: optPdf(t, "r1"),
-            r4: optPdf(t, "r4"),
+            al: optDoc(t, "al"),
+            kk: optDoc(t, "kk"),
+            pp: optDoc(t, "pp"),
+            ktp: optDoc(t, "ktp"),
+            r1: optDoc(t, "r1"),
+            r2: optDoc(t, "r2"),
 
             ...paymentDraftFields(t),
 
@@ -183,12 +183,12 @@ export const s2SubmitSchema = (t: TV) =>
 
             parentsAddress: optString(t, "parentsAddress", 500),
 
-            al: reqPdf(t, "al"),
-            kk: reqPdf(t, "kk"),
-            pp: reqPdf(t, "pp"),
-            ktp: reqPdf(t, "ktp"),
-            r1: reqPdf(t, "r1"),
-            r4: reqPdf(t, "r4"),
+            al: reqDoc(t, "al"),
+            kk: reqDoc(t, "kk"),
+            pp: reqDoc(t, "pp"),
+            ktp: reqDoc(t, "ktp"),
+            r1: reqDoc(t, "r1"),
+            r2: reqDoc(t, "r2"),
 
             ...paymentFields(t),
 

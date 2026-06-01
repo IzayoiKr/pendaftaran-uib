@@ -6,15 +6,20 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
-	"github.com/joho/godotenv"
+
+	// Uncomment this if you are not using docker/podman
+	// "github.com/joho/godotenv"
 
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
+	"pendaftaran-uib/backend/internal/clamav"
 	"pendaftaran-uib/backend/internal/crypto"
 	"pendaftaran-uib/backend/internal/db"
 	"pendaftaran-uib/backend/internal/email"
@@ -29,28 +34,41 @@ func main() {
 	}))
 	slog.SetDefault(logger)
 
-	if err := godotenv.Load(); err != nil {
-		slog.Error("error loading .env file", "error", err)
+	// Uncomment this if you are not using docker/podman
+	// if err := godotenv.Load(); err != nil {
+	// 	slog.Error("error loading .env file", "error", err)
+	// 	os.Exit(1)
+	// }
+
+	if err := auth.InitAuth(); err != nil {
+		slog.Error("auth init error", "error", err)
 		os.Exit(1)
 	}
 
-	if err := auth.InitJWT(os.Getenv("JWT_SECRET"), os.Getenv("JWT_ISSUER")); err != nil {
-		slog.Error("jwt config error", "error", err)
-		os.Exit(1)
-	}
-
-	if err := crypto.InitPasswordPepper(); err != nil {
-		slog.Error("bcrypt pepper init error", "error", err)
-		os.Exit(1)
-	}
-
-	if err := crypto.InitNIKCrypto(); err != nil {
-		slog.Error("nik cyrpto init error", "error", err)
+	if err := crypto.InitCrypto(); err != nil {
+		slog.Error("crypto init error", "error", err)
 		os.Exit(1)
 	}
 
 	if err := utils.InitValidator(); err != nil {
 		slog.Error("validator init error", "error", err)
+		os.Exit(1)
+	}
+
+	clamavAddr := os.Getenv("CLAMD_ADDR")
+	if clamavAddr == "" {
+		slog.Error("CLAMD_ADDR variable not set")
+		os.Exit(1)
+	}
+	scanner := clamav.New(strings.TrimPrefix(clamavAddr, "tcp://"))
+
+	storageDir := os.Getenv("STORAGE_DIR")
+	if storageDir == "" {
+		slog.Error("STORAGE_DIR variable not set")
+		os.Exit(1)
+	}
+	if err := os.MkdirAll(filepath.Join(storageDir), 0700); err != nil {
+		slog.Error("failed to create storage directory", "error", err)
 		os.Exit(1)
 	}
 
@@ -95,9 +113,6 @@ func main() {
 	r.Use(middleware.SecFetch)
 	r.Use(middleware.SecurityHeaders)
 	r.Use(chimiddleware.Logger)
-
-	fileServer := http.FileServer(http.Dir("./uploads"))
-	r.Handle("/uploads/*", http.StripPrefix("/uploads/", fileServer))
 
 	rl := newRateLimiters()
 
@@ -170,11 +185,21 @@ func main() {
 		r.Post("/api/profile/password",
 			rl.changePassword.RateLimitUser(handlers.ChangePassword(provider.MySQL, tokenStore, auditLogger)),
 		)
+		r.Get("/api/registrations/{batchKey}/status",
+			rl.registrationStatus.RateLimitUser(handlers.RegistrationStatus(provider.MySQL)),
+		)
 	})
 
 	r.Group(func(r chi.Router) {
 		r.Use(auth.Middleware(tokenStore))
 		r.Use(middleware.LimitMultipart)
+
+		r.Post("/api/registrations/{batchKey}/draft",
+			rl.registrationDraft.RateLimitUser(handlers.RegistrationDraft(provider.MySQL, storageDir, scanner, auditLogger)),
+		)
+		r.Post("/api/registrations/{batchKey}/submit",
+			rl.registrationSubmit.RateLimitUser(handlers.RegistrationSubmit(provider.MySQL, storageDir, scanner, auditLogger)),
+		)
 	})
 
 	port := os.Getenv("SERVER_PORT")
@@ -226,6 +251,9 @@ type rateLimiters struct {
 	verifyEmail         *auth.RateLimiter
 	resendVerify        *auth.RateLimiter
 	registrationInit 	*auth.RateLimiter
+	registrationStatus 	*auth.RateLimiter
+	registrationDraft	*auth.RateLimiter
+	registrationSubmit	*auth.RateLimiter
 }
 
 func newRateLimiters() rateLimiters {
@@ -246,5 +274,8 @@ func newRateLimiters() rateLimiters {
 		verifyEmail:         auth.NewRateLimiter(5, 60*time.Minute),
 		resendVerify:        auth.NewRateLimiter(3, 60*time.Minute),
 		registrationInit: 	 auth.NewRateLimiter(60, 1*time.Minute),
+		registrationStatus:  auth.NewRateLimiter(60, 1*time.Minute),
+		registrationDraft:   auth.NewRateLimiter(20, 1*time.Minute),
+		registrationSubmit:  auth.NewRateLimiter(5, 15*time.Minute),
 	}
 }

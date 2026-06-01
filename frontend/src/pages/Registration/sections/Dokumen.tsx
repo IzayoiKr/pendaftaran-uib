@@ -9,6 +9,7 @@ import {
 import SectionCard from "@/pages/Registration/shared/SectionCard";
 import UploadZone from "@/pages/Registration/shared/UploadZone";
 import type {
+    DocumentField,
     RegistrationFormValues,
     SectionStatus,
 } from "@/pages/Registration/types";
@@ -68,7 +69,7 @@ export default function Dokumen({
                                 name={doc.name}
                                 label={to(doc.label)}
                                 required={doc.required}
-                                file={field.value as File | null}
+                                file={field.value as DocumentField}
                                 onFileChange={field.onChange}
                                 error={fieldState.error?.message}
                             />
@@ -86,7 +87,7 @@ export default function Dokumen({
                                     name={doc.name}
                                     label={to(doc.label)}
                                     required={doc.required}
-                                    file={field.value as File | null}
+                                    file={field.value as DocumentField}
                                     onFileChange={field.onChange}
                                     error={fieldState.error?.message}
                                 />

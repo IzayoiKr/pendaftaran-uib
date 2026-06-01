@@ -7,6 +7,7 @@ interface AuthActions {
     setAccessToken: (token: string) => void;
     setUser: (user: User) => void;
     setLoading: (isLoading: boolean) => void;
+    setIsLoggingOut: (isLoggingOut: boolean) => void;
     restoreSession: () => Promise<void>;
 }
 
@@ -64,7 +65,7 @@ const useAuthStore = create<AuthStore>((set) => ({
             accessToken: null,
             isAuthenticated: false,
             isLoading: false,
-            isLoggingOut: true,
+            isLoggingOut: false,
         }),
 
     setAccessToken: (token) => set({ accessToken: token }),
@@ -72,6 +73,8 @@ const useAuthStore = create<AuthStore>((set) => ({
     setUser: (user) => set({ user }),
 
     setLoading: (isLoading) => set({ isLoading }),
+
+    setIsLoggingOut: (isLoggingOut) => set({ isLoggingOut }),
 
     restoreSession: async () => {
         set({ isLoading: true });

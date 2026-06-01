@@ -1,5 +1,4 @@
-.env
-!.env.example
+.env*
 node_modules/
 .vscode/
 package-lock.json
@@ -7,6 +6,7 @@ package.json
 tmp/
 
 backend/tmp/
+backend/storage/
 backend/.env
 backend/coverage/
 backend/*.exe
@@ -16,11 +16,10 @@ backend/*.out
 
 frontend/node_modules/
 frontend/dist/
-frontend/.env
-frontend/.env.local
-frontend/.env.*.local
+frontend/.env*
+
+storage/
 
 .DS_Store
 Thumbs.db
 .codex
-backend/uploads/registrations/

@@ -22,7 +22,7 @@ CREATE TABLE gelombang (
     batch_type ENUM('Reguler', 'Beasiswa') NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_degree (degree)
+    INDEX idx_batch_lookup (batch_key, degree, batch_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE gelombang_detail (

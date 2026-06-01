@@ -90,6 +90,7 @@ export default async function RegistrationPage({ params }: PageProps) {
     return (
         <Suspense fallback={<Loading />}>
             <Registration
+                batchKey={batchKey}
                 degree={init.degree}
                 event={event}
                 programOptions={programOptions}

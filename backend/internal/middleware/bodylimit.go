@@ -5,7 +5,7 @@ import (
 )
 
 const jsonBodyLimit = 1 << 20
-const multipartBodyLimit = 12 << 20
+const multipartBodyLimit = 40 << 20
 
 func LimitBody(maxBytes int64) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {

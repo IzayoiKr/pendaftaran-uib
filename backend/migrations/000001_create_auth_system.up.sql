@@ -22,7 +22,8 @@ CREATE TABLE email_verification (
     CONSTRAINT fk_email_verification_user FOREIGN KEY(user_id)
         REFERENCES users(id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    INDEX idx_is_used_expired_at (is_used, expired_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE reset_password (
@@ -35,5 +36,6 @@ CREATE TABLE reset_password (
     CONSTRAINT fk_reset_password_user FOREIGN KEY(user_id)
         REFERENCES users(id)
         ON UPDATE CASCADE
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    INDEX idx_is_used_expired_at (is_used, expired_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

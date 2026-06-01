@@ -5,6 +5,8 @@ export interface SelectOption<T = string | number> {
     label: string;
 }
 
+export type DocumentField = File | string | null;
+
 export interface DocConfig {
     name: string;
     label: string;
@@ -36,7 +38,6 @@ export interface ParentSectionConfig {
 export type SectionStatus = "empty" | "partial" | "complete";
 
 export interface RegistrationFormValues {
-    // ── Identity / S1 ─────────────────────────────────────────────────────────
     jenisdaftar: string | null;
     gender: string;
     citizenship: string;
@@ -49,14 +50,12 @@ export interface RegistrationFormValues {
     gpa: string;
     highestEducation: string;
 
-    // ── Education / S1 ────────────────────────────────────────────────────────
     schoolOrigin: string;
     majorChoice: string;
     waktuKuliah: string | null;
     highschoolGpa: string;
     highschoolGraduateYear: string;
 
-    // ── Biodata / S2 ──────────────────────────────────────────────────────────
     contactEmail: string;
     religion: string;
     fundingSource: string;
@@ -77,7 +76,6 @@ export interface RegistrationFormValues {
     companyStatus: string;
     companyStartYear: string;
 
-    // ── Parents / S2 ─────────────────────────────────────────────────────────
     fatherNik: string;
     fatherName: string;
     fatherBirthdate: string;
@@ -96,35 +94,56 @@ export interface RegistrationFormValues {
     motherStatus: string;
     parentsAddress: string;
 
-    // ── Documents / S1 ───────────────────────────────────────────────────────
-    pp: File | null;
-    ktp: File | null;
-    kk: File | null;
-    transkripNilai: File | null;
-    ijazahDok: File | null;
-    // S1 Beasiswa
-    sktmKip: File | null;
-    fotoRumah: File | null;
-    tagihanListrik: File | null;
-    tagihanAir: File | null;
-    sertifikatPrestasi: File | null;
-    rapot1: File | null;
-    rapot2: File | null;
-    rapot3: File | null;
-    rapot4: File | null;
-    // S2
-    al: File | null;
-    r1: File | null;
-    r4: File | null;
+    pp: DocumentField;
+    ktp: DocumentField;
+    kk: DocumentField;
+    transkripNilai: DocumentField;
+    ijazahDok: DocumentField;
+    sktmKip: DocumentField;
+    fotoRumah: DocumentField;
+    tagihanListrik: DocumentField;
+    tagihanAir: DocumentField;
+    sertifikatPrestasi: DocumentField;
+    rapot1: DocumentField;
+    rapot2: DocumentField;
+    rapot3: DocumentField;
+    rapot4: DocumentField;
+    al: DocumentField;
+    r1: DocumentField;
+    r2: DocumentField;
 
-    // ── Payment ───────────────────────────────────────────────────────────────
     accountHolder: string;
     bank: string;
-    paymentProof: File | null;
+    paymentProof: DocumentField;
 
-    // ── Declarations ──────────────────────────────────────────────────────────
     confirmation: boolean;
     pernyataan: boolean;
+}
+
+export function hasDocument(value: DocumentField): boolean {
+    return value !== null && value !== undefined;
+}
+
+export function getDocumentDisplay(
+    value: DocumentField,
+): { name: string; size: number } | null {
+    if (value === null || value === undefined) return null;
+    if (value instanceof File) {
+        return { name: value.name, size: value.size };
+    }
+    const parts = value.split("|");
+    if (parts.length === 2) {
+        return { name: parts[0], size: parseInt(parts[1], 10) };
+    }
+    return null;
+}
+
+export function isNewUpload(value: DocumentField): value is File {
+    return value instanceof File;
+}
+
+export function isExistingDoc(value: DocumentField): value is string {
+    return typeof value === "string" && value.includes("|");
 }
 
 export const REGISTRATION_DEFAULT_VALUES: RegistrationFormValues = {
@@ -196,7 +215,7 @@ export const REGISTRATION_DEFAULT_VALUES: RegistrationFormValues = {
     rapot4: null,
     al: null,
     r1: null,
-    r4: null,
+    r2: null,
     accountHolder: "",
     bank: "",
     paymentProof: null,

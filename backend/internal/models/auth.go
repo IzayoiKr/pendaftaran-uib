@@ -1,6 +1,7 @@
 package models
 
 import (
+	"html"
 	"strings"
 
 	"pendaftaran-uib/backend/internal/utils"
@@ -34,7 +35,7 @@ type RegisterRequest struct {
 }
 
 func (r *RegisterRequest) Sanitize() {
-	r.FullName = strings.TrimSpace(r.FullName)
+	r.FullName = html.EscapeString(strings.TrimSpace(r.FullName))
 	r.NIK = strings.ToUpper(strings.TrimSpace(r.NIK))
 	r.Email = strings.ToLower(strings.TrimSpace(r.Email))
 }

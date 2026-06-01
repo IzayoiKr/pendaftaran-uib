@@ -262,7 +262,7 @@ export const S2_DOCS: DocConfig[] = [
         required: true,
     },
     {
-        name: "r4",
+        name: "r2",
         label: "transkripSarjana",
         section: "Study",
         required: true,

@@ -1,7 +1,6 @@
 FROM golang:1.25-alpine AS base
 WORKDIR /app
 RUN apk add --no-cache ca-certificates mysql-client curl bash
-RUN adduser -D admin
 
 FROM base AS dependency
 COPY go.mod go.sum ./
@@ -10,8 +9,7 @@ RUN go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@la
 
 FROM dependency AS development
 RUN go install github.com/air-verse/air@latest
-COPY --chown=admin:admin . .
-USER admin
+COPY . .
 CMD ["air", "-c", ".air.toml"]
 
 FROM dependency AS builder

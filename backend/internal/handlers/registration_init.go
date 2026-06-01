@@ -15,14 +15,13 @@ import (
 func RegistrationInit(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		batchKey := chi.URLParam(r, "batchKey")
-		ctx := r.Context()
 
 		var (
 			batchName, degree, batchType string
-			programsJSON, feeJSON []byte
+			programsJSON, feeJSON json.RawMessage
 		)
 
-		err := db.QueryRowContext(ctx,
+		err := db.QueryRowContext(r.Context(),
 			`SELECT
 				g.batch_name,
 				g.degree,
@@ -33,6 +32,7 @@ func RegistrationInit(db *sql.DB) http.HandlerFunc {
 					)
 					FROM program_studi ps
 					WHERE ps.is_active = 1 AND ps.degree = g.degree
+					ORDER BY ps.sort_order ASC
 				) as programs,
 				(
 					SELECT JSON_OBJECT(
@@ -48,7 +48,7 @@ func RegistrationInit(db *sql.DB) http.HandlerFunc {
 			 INNER JOIN gelombang_detail gd ON gd.gelombang_id = g.id
 			 WHERE g.batch_key = ?
 			   AND gd.registration_start <= CURRENT_DATE()
-			   AND gd.registration_end   >= CURRENT_DATE()`,
+			   AND gd.registration_end >= CURRENT_DATE()`,
 			batchKey,
 		).Scan(&batchName, &degree, &batchType, &programsJSON, &feeJSON)
 
@@ -62,26 +62,12 @@ func RegistrationInit(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		var programs []models.ProgramStudiOptions
-		if len(programsJSON) > 0 {
-			if err := json.Unmarshal(programsJSON, &programs); err != nil {
-				slog.Error("registration_init: unmarshal programs error", "error", err)
-			}
-		}
-
-		var fee models.RegistrationFeeDTO
-		if len(feeJSON) > 0 {
-			if err := json.Unmarshal(feeJSON, &fee); err != nil {
-				slog.Error("registration_init: unmarshal fee error", "error", err)
-			}
-		}
-
 		utils.WriteJSON(w, http.StatusOK, models.RegistrationInitDTO{
 			BatchName:       batchName,
 			Degree:          degree,
 			BatchType:       batchType,
-			Programs:        programs,
-			RegistrationFee: fee,
+			Programs:        programsJSON,
+			RegistrationFee: feeJSON,
 		})
 	}
 }
