@@ -1,46 +1,117 @@
-@use "@/styles/skeleton.scss";
+.avatar {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
 
-.titleSkeleton {
-  @extend .skeleton;
-  width: 180px;
-  height: var(--step-3);
+  span {
+    display: block;
+  }
 }
 
-.labelSkeleton {
-  @extend .skeleton;
-  width: 100%;
-  height: var(--step--1);
+.heroName {
+  margin-bottom: var(--space-2xs);
+
+  span {
+    display: inline-block;
+  }
 }
 
-.valueSkeleton {
-  @extend .skeleton;
-  width: 14rem;
-  height: var(--step--1);
+.heroSubtitle {
+  margin: 0;
+
+  span {
+    display: inline-block;
+  }
 }
 
-.sectionSkeleton {
-  @extend .skeleton;
-  width: 140px;
-  height: var(--step-1);
+.headerIcon {
+  color: transparent !important;
+  flex-shrink: 0;
+
+  span {
+    display: block;
+  }
 }
 
-.emptyTextSkeleton {
-  @extend .skeleton;
-  width: 60%;
-  height: var(--step--1);
-  margin: 0 auto var(--space-m);
+.cardTitle {
+  margin: 0;
+  flex: 1;
+
+  span {
+    display: inline-block;
+  }
 }
 
-.emptyButtonSkeleton {
-  @extend .skeleton;
-  width: 220px;
-  height: 40px;
-  border-radius: 0.25em;
+.statusBadge {
+  margin-left: auto;
+  background: #ebebeb !important;
+  color: transparent !important;
+  gap: 0;
+  pointer-events: none;
+
+  span {
+    display: inline-block;
+  }
 }
 
-.actionSkeleton {
-  @extend .skeleton;
-  width: 140px;
-  height: 48px;
-  border-radius: 999px;
+.infoLabel {
+  display: block;
+  margin-bottom: 0.35em;
+
+  span {
+    display: inline-block;
+  }
+}
+
+.infoValue {
+  display: block;
+
+  span {
+    display: inline-block;
+  }
+}
+
+.detailLabel {
+  display: block;
+  margin-bottom: 0.35em;
+
+  span {
+    display: inline-block;
+  }
+}
+
+.detailValue {
+  display: block;
+
+  span {
+    display: inline-block;
+  }
+}
+
+.actionBtn {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: transparent !important;
+  padding: 0 !important;
+  cursor: default !important;
+  pointer-events: none;
+
+  span {
+    display: block;
+  }
+}
+
+.quickBtn {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: transparent !important;
+  cursor: default !important;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-s);
+
+  span {
+    display: inline-block;
+  }
 }
