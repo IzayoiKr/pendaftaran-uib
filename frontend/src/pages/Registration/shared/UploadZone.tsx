@@ -14,6 +14,7 @@ interface UploadZoneProps {
     file?: DocumentField;
     onFileChange?: (file: DocumentField) => void;
     error?: string;
+    readOnly?: boolean;
 }
 
 function formatSize(bytes: number): string {
@@ -29,6 +30,7 @@ export default function UploadZone({
     file,
     onFileChange,
     error,
+    readOnly = false,
 }: UploadZoneProps) {
     const t = useTranslations("options");
     const tr = useTranslations("registration");
@@ -159,8 +161,8 @@ export default function UploadZone({
                 aria-label={
                     file
                         ? t("fileSelected", {
-                              fileName: displayInfo?.name ?? "",
-                          })
+                            fileName: displayInfo?.name ?? "",
+                        })
                         : t("uploadLabel", { label })
                 }
             >
@@ -182,6 +184,7 @@ export default function UploadZone({
                                 onClick={handleRemove}
                                 aria-label={t("removeFile")}
                                 title={t("removeFile")}
+                                disabled={readOnly}
                             >
                                 <XIcon />
                             </button>
@@ -211,6 +214,8 @@ export default function UploadZone({
                 onChange={handleInputChange}
                 tabIndex={-1}
                 aria-hidden="true"
+                readOnly={readOnly}
+                disabled={readOnly}
             />
 
             {effectiveError && (

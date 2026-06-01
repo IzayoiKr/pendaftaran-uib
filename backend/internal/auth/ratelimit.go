@@ -105,18 +105,6 @@ func (rl *RateLimiter) RateLimit(next http.Handler) http.HandlerFunc {
 	}
 }
 
-func (rl *RateLimiter) RateLimitDevice(next http.Handler) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		key := deviceKey(r)
-		allowed, retryAfter := rl.Allow(key)
-		if !allowed {
-			rateLimitResponse(w, retryAfter)
-			return
-		}
-		next.ServeHTTP(w, r)
-	}
-}
-
 func (rl *RateLimiter) RateLimitUser(next http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		claims := GetClaims(r)

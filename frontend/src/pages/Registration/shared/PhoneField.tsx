@@ -12,6 +12,7 @@ interface PhoneFieldProps {
     value?: string;
     onChange?: (val: string) => void;
     error?: string;
+    readOnly?: boolean;
 }
 
 function normalizeToE164(value: string): {
@@ -73,6 +74,7 @@ export default function PhoneField({
     value: propValue,
     onChange,
     error,
+    readOnly = false,
 }: PhoneFieldProps) {
     const t = useTranslations("registration");
     const [localError, setLocalError] = useState<string | undefined>(undefined);
@@ -154,6 +156,8 @@ export default function PhoneField({
                 onBlur={handleBlur}
                 inputMode="tel"
                 autoComplete="tel"
+                readOnly={readOnly}
+                disabled={readOnly}
             />
         </FormField>
     );

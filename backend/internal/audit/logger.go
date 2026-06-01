@@ -54,6 +54,8 @@ const (
 	EventRegistrationDraftSaved Event = "registration_draft.saved"
 	EventRegistrationSubmitSuccess Event = "registration_submit.success"
 	EventRegistrationUploadDocument Event = "registration_document.malware_detected"
+	EventRegistrationDeleted Event = "registration.deleted"
+	EventRegistrationWithdrawn Event = "registration_submitted.withdrawn"
 )
 
 type Entry struct {

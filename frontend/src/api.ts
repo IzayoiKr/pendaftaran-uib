@@ -5,7 +5,12 @@ import type {
     InternalAxiosRequestConfig,
 } from "axios";
 import useAuthStore from "@/store/useAuthStore";
-import type { AccessTokenResponse, User } from "@/types/api";
+import type {
+    AccessTokenResponse,
+    ProfileResponse,
+    RegistrationResponse,
+    User,
+} from "@/types/api";
 
 const authChannel =
     typeof window !== "undefined" ? new BroadcastChannel("auth_sync") : null;
@@ -39,16 +44,6 @@ export class ApiError extends Error {
         this.email = email;
         this.expired = expired;
     }
-}
-
-function getDeviceId(): string {
-    if (typeof window === "undefined") return "";
-    let id = localStorage.getItem("device_id");
-    if (!id) {
-        id = crypto.randomUUID();
-        localStorage.setItem("device_id", id);
-    }
-    return id;
 }
 
 const apiClient: AxiosInstance = axios.create({
@@ -168,10 +163,7 @@ export const api = {
             email: string;
             password: string;
             cf_turnstile_token: string;
-        }) =>
-            apiClient.post<never, User>("/api/auth/register", data, {
-                headers: { "X-Device-ID": getDeviceId() },
-            }),
+        }) => apiClient.post<never, User>("/api/auth/register", data),
 
         logout: () =>
             apiClient.post<never, { message: string }>("/api/auth/logout"),
@@ -182,9 +174,6 @@ export const api = {
                 {
                     email,
                     cf_turnstile_token: turnstileToken,
-                },
-                {
-                    headers: { "X-Device-ID": getDeviceId() },
                 },
             ),
 
@@ -214,7 +203,7 @@ export const api = {
     },
 
     profile: {
-        get: () => apiClient.get<never, User>("/api/profile"),
+        get: () => apiClient.get<never, ProfileResponse>("/api/profile"),
 
         update: (data: { fullName: string }) =>
             apiClient.post<never, { message: string }>("/api/profile", {
@@ -235,10 +224,26 @@ export const api = {
     },
     registrations: {
         status: (batchKey: string) =>
-            apiClient.get(`/api/registrations/${batchKey}/status`),
+            apiClient.get<never, { status: string }>(
+                `/api/registrations/${batchKey}/status`,
+            ),
         draft: (batchKey: string, formData: FormData) =>
-            apiClient.post(`/api/registrations/${batchKey}/draft`, formData),
+            apiClient.post<never, RegistrationResponse>(
+                `/api/registrations/${batchKey}/draft`,
+                formData,
+            ),
         submit: (batchKey: string, formData: FormData) =>
-            apiClient.post(`/api/registrations/${batchKey}/submit`, formData),
+            apiClient.post<never, RegistrationResponse>(
+                `/api/registrations/${batchKey}/submit`,
+                formData,
+            ),
+        delete: (batchKey: string) =>
+            apiClient.delete<never, { message: string }>(
+                `/api/registrations/${batchKey}`,
+            ),
+        withdraw: (batchKey: string) =>
+            apiClient.post<never, RegistrationResponse>(
+                `/api/registrations/${batchKey}/withdraw`,
+            ),
     },
 };

@@ -173,15 +173,14 @@ func cleanOrphanDocs(
 			return nil, err
 		}
 
+		// If a new physical file is uploaded for this type, it replaces the old one
 		if _, isReplaced := newUploads[docType]; isReplaced {
-			// Physical file needs to go; the DB row will be overwritten by the
-			// INSERT ... ON DUPLICATE KEY UPDATE in the caller — no DELETE needed
 			orphanPaths = append(orphanPaths, filePath)
 			continue
 		}
 
-		ptr, exists := formData.GetDocumentFieldPointer(models.DocType(docType))
-		if exists && ptr != nil && isNonEmptyString(*ptr) {
+		val, exists := formData.GetDocumentFieldValue(models.DocType(docType))
+		if exists && len(strings.TrimSpace(val)) > 0 {
 			continue
 		}
 

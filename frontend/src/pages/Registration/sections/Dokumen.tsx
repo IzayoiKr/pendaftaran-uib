@@ -23,6 +23,7 @@ interface DokumenProps {
     status: SectionStatus;
     collapsed: boolean;
     onToggle: () => void;
+    readOnly?: boolean;
 }
 
 export default function Dokumen({
@@ -31,6 +32,7 @@ export default function Dokumen({
     status,
     collapsed,
     onToggle,
+    readOnly = false,
 }: DokumenProps) {
     const t = useTranslations("registration");
     const to = useTranslations("options");
@@ -72,6 +74,7 @@ export default function Dokumen({
                                 file={field.value as DocumentField}
                                 onFileChange={field.onChange}
                                 error={fieldState.error?.message}
+                                readOnly={readOnly}
                             />
                         )}
                     />
@@ -90,6 +93,7 @@ export default function Dokumen({
                                     file={field.value as DocumentField}
                                     onFileChange={field.onChange}
                                     error={fieldState.error?.message}
+                                    readOnly={readOnly}
                                 />
                             )}
                         />

@@ -27,6 +27,7 @@ export function useRegistrationStatus(batchKey: string | undefined) {
     const router = useRouter();
     const params = useSearchParams();
     const isEditMode = params?.get("edit") === "1";
+    const isViewMode = params?.get("view") === "1";
 
     const { data, isLoading, isError, error } = useQuery({
         queryKey: ["registration", "status", batchKey],
@@ -51,23 +52,23 @@ export function useRegistrationStatus(batchKey: string | undefined) {
     useEffect(() => {
         if (!data || !batchKey) return;
 
-        if (data.status === "SUBMITTED" || data.status === "VERIFIED") {
+        if (!isViewMode && (data.status === "SUBMITTED" || data.status === "VERIFIED")) {
             toast.warning("Formulir ini sudah disubmit atau sudah diverifikasi!");
             router.replace("/account");
             return;
         }
 
-        if (data.status === "REJECTED") {
+        if (!isEditMode && !isViewMode && data.status === "REJECTED") {
             toast.warning("Pendaftaran Anda ditolak. Silakan periksa akun Anda.");
             router.replace("/account");
             return;
         }
 
-        if (!isEditMode && data.status === "DRAFT") {
+        if (!isEditMode && !isViewMode && data.status === "DRAFT") {
             router.replace(`/registration/${batchKey}?edit=1`);
             return;
         }
-    }, [data, isEditMode, batchKey, router]);
+    }, [data, isEditMode, isViewMode, batchKey, router]);
 
     const transformedDraftData: Partial<RegistrationFormValues> | undefined =
         data?.draft_data
@@ -106,5 +107,6 @@ export function useRegistrationStatus(batchKey: string | undefined) {
         isLoading,
         isError,
         error: error as Error | null,
+        isViewMode,
     };
 }

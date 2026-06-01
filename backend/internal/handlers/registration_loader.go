@@ -51,10 +51,10 @@ func loadS1Detail(r *http.Request, db *sql.DB, regID uuid.UUID, form *models.Reg
 		hgGpa,
 		hgGradYear,
 		majorChoice,
-		classSession *string
+		classSession sql.NullString
 
 		isFreshGrad,
-		isFinal *bool
+		isFinal sql.NullBool
 	)
 
 	err := db.QueryRowContext(r.Context(), `
@@ -108,24 +108,24 @@ func loadS1Detail(r *http.Request, db *sql.DB, regID uuid.UUID, form *models.Reg
 		return err
 	}
 
-	form.Gender = gender
-	form.Citizenship = nationality
-	form.BirthPlace = birthPlace
-	form.BirthDate = birthDate
-	form.PhoneNumber = phone
-	form.WhatsappNumber = whatsapp
-	form.JenisDaftar = regType
-	form.PreviousUniversity = prevUni
-	form.PreviousMajor = prevMajor
-	form.Gpa = gpa
-	form.HighestEducation = lastEdu
-	form.SchoolOrigin = highschool
-	form.HighschoolGpa = hgGpa
-	form.HighschoolGraduateYear = hgGradYear
-	form.MajorChoice = majorChoice
-	form.WaktuKuliah = classSession
-	form.Confirmation = isFreshGrad
-	form.Pernyataan = isFinal
+	form.Gender = gender.String
+	form.Citizenship = nationality.String
+	form.BirthPlace = birthPlace.String
+	form.BirthDate = birthDate.String
+	form.PhoneNumber = phone.String
+	form.WhatsappNumber = whatsapp.String
+	form.JenisDaftar = regType.String
+	form.PreviousUniversity = prevUni.String
+	form.PreviousMajor = prevMajor.String
+	form.Gpa = gpa.String
+	form.HighestEducation = lastEdu.String
+	form.SchoolOrigin = highschool.String
+	form.HighschoolGpa = hgGpa.String
+	form.HighschoolGraduateYear = hgGradYear.String
+	form.MajorChoice = majorChoice.String
+	form.WaktuKuliah = classSession.String
+	form.Confirmation = isFreshGrad.Bool
+	form.Pernyataan = isFinal.Bool
 
 	return nil
 }
@@ -159,9 +159,9 @@ func loadS2Detail(r *http.Request, db *sql.DB, regID uuid.UUID, form *models.Reg
 		companyStatus,
 		companyStartYear,
 		parentAddress,
-		programStudiTitle *string
+		programStudiTitle sql.NullString
 
-		isFinalDeclared *bool
+		isFinalDeclared sql.NullBool
 	)
 
 	err := db.QueryRowContext(r.Context(), `
@@ -237,35 +237,35 @@ func loadS2Detail(r *http.Request, db *sql.DB, regID uuid.UUID, form *models.Reg
 		return err
 	}
 
-	form.Citizenship = nationality
-	form.BirthPlace = birthPlace
-	form.BirthDate = birthDate
-	form.ContactEmail = contactEmail
-	form.PhoneNumber = phoneNumber
-	form.Religion = religion
-	form.FundingSource = fundingSource
-	form.TaxID = taxNumber
-	form.Reference = referenceSource
-	form.ExpertField = fieldOfExpertise
-	form.Address = address
-	form.SubDistrict = subDistrict
-	form.District = district
-	form.Hamlet = hamlet
-	form.PostalCode = postalCode
-	form.Rt = rt
-	form.Rw = rw
-	form.PreviousMajor = previousMajor
-	form.Gpa = gpa
-	form.Degree = academicDegree
-	form.PreviousUniversity = previousUni
-	form.CompanyName = companyName
-	form.CompanyAddress = companyAddress
-	form.Position = jobPosition
-	form.CompanyStatus = companyStatus
-	form.CompanyStartYear = companyStartYear
-	form.ParentsAddress = parentAddress
-	form.MajorChoice = programStudiTitle
-	form.Pernyataan = isFinalDeclared
+	form.Citizenship = nationality.String
+	form.BirthPlace = birthPlace.String
+	form.BirthDate = birthDate.String
+	form.ContactEmail = contactEmail.String
+	form.PhoneNumber = phoneNumber.String
+	form.Religion = religion.String
+	form.FundingSource = fundingSource.String
+	form.TaxID = taxNumber.String
+	form.Reference = referenceSource.String
+	form.ExpertField = fieldOfExpertise.String
+	form.Address = address.String
+	form.SubDistrict = subDistrict.String
+	form.District = district.String
+	form.Hamlet = hamlet.String
+	form.PostalCode = postalCode.String
+	form.Rt = rt.String
+	form.Rw = rw.String
+	form.PreviousMajor = previousMajor.String
+	form.Gpa = gpa.String
+	form.Degree = academicDegree.String
+	form.PreviousUniversity = previousUni.String
+	form.CompanyName = companyName.String
+	form.CompanyAddress = companyAddress.String
+	form.Position = jobPosition.String
+	form.CompanyStatus = companyStatus.String
+	form.CompanyStartYear = companyStartYear.String
+	form.ParentsAddress = parentAddress.String
+	form.MajorChoice = programStudiTitle.String
+	form.Pernyataan = isFinalDeclared.Bool
 
 	if err := loadS2Parents(r, db, regID, form); err != nil {
 		return err
@@ -306,7 +306,7 @@ func loadS2Parents(r *http.Request, db *sql.DB, regID uuid.UUID, form *models.Re
 			lastEducation,
 			occupation,
 			income,
-			status *string
+			status sql.NullString
 		)
 
 		err := rows.Scan(
@@ -326,23 +326,23 @@ func loadS2Parents(r *http.Request, db *sql.DB, regID uuid.UUID, form *models.Re
 
 		switch parentType {
 		case "FATHER":
-			form.FatherName = name
-			form.FatherPhone = phoneNumber
-			form.FatherNik = nik
-			form.FatherBirthdate = birthDate
-			form.FatherEducation = lastEducation
-			form.FatherOccupation = occupation
-			form.FatherIncome = income
-			form.FatherStatus = status
+			form.FatherName = name.String
+			form.FatherPhone = phoneNumber.String
+			form.FatherNik = nik.String
+			form.FatherBirthdate = birthDate.String
+			form.FatherEducation = lastEducation.String
+			form.FatherOccupation = occupation.String
+			form.FatherIncome = income.String
+			form.FatherStatus = status.String
 		case "MOTHER":
-			form.MotherName = name
-			form.MotherPhone = phoneNumber
-			form.MotherNik = nik
-			form.MotherBirthdate = birthDate
-			form.MotherEducation = lastEducation
-			form.MotherOccupation = occupation
-			form.MotherIncome = income
-			form.MotherStatus = status
+			form.MotherName = name.String
+			form.MotherPhone = phoneNumber.String
+			form.MotherNik = nik.String
+			form.MotherBirthdate = birthDate.String
+			form.MotherEducation = lastEducation.String
+			form.MotherOccupation = occupation.String
+			form.MotherIncome = income.String
+			form.MotherStatus = status.String
 		}
 	}
 
@@ -382,8 +382,8 @@ func loadDocumentPaths(r *http.Request, db *sql.DB, regID uuid.UUID, form *model
 }
 
 func loadPaymentData(r *http.Request, db *sql.DB, regID uuid.UUID, form *models.RegistrationForm) error {
-	var accountHolder, bankName, fileName *string
-	var fileSizeBytes *uint64
+	var accountHolder, bankName, fileName sql.NullString
+	var fileSizeBytes sql.NullInt64
 
 	err := db.QueryRowContext(r.Context(), `
 		SELECT account_holder, bank_name, file_name, file_size_bytes
@@ -399,11 +399,11 @@ func loadPaymentData(r *http.Request, db *sql.DB, regID uuid.UUID, form *models.
 		return err
 	}
 
-	form.AccountHolder = accountHolder
-	form.Bank = bankName
+	form.AccountHolder = accountHolder.String
+	form.Bank = bankName.String
 
-	if fileName != nil && fileSizeBytes != nil {
-		form.PaymentProof = formatDelimitedValuePointer(*fileName, *fileSizeBytes)
+	if fileName.Valid && fileSizeBytes.Valid {
+		form.PaymentProof = formatDelimitedValue(fileName.String, uint64(fileSizeBytes.Int64))
 	}
 
 	return nil
@@ -419,9 +419,4 @@ func formatDelimitedValue(fileName string, sizeBytes uint64) string {
 	copy(res[len(fileName)+1:], b)
 	
 	return string(res)
-}
-
-func formatDelimitedValuePointer(fileName string, sizeBytes uint64) *string {
-	str := formatDelimitedValue(fileName, sizeBytes)
-	return &str
 }

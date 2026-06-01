@@ -130,7 +130,7 @@ func main() {
 			),
 		)
 		r.Post("/api/auth/register",
-			rl.register.RateLimitDevice(
+			rl.register.RateLimit(
 				handlers.Register(provider.MySQL, mailer, auditLogger),
 			),
 		)
@@ -142,7 +142,7 @@ func main() {
 			),
 		)
 		r.Post("/api/auth/forgot-password",
-			rl.forgotPasswordIP.RateLimitDevice(
+			rl.forgotPassword.RateLimit(
 				handlers.ForgotPassword(provider.MySQL, mailer, rl.forgotPasswordEmail, auditLogger),
 			),
 		)
@@ -152,12 +152,12 @@ func main() {
 			),
 		)
 		r.Post("/api/auth/verify-email",
-			rl.verifyEmail.RateLimitDevice(
+			rl.verifyEmail.RateLimit(
 				handlers.VerifyEmail(provider.MySQL, auditLogger),
 			),
 		)
 		r.Post("/api/auth/resend-verification",
-			rl.resendVerify.RateLimitDevice(
+			rl.resendVerify.RateLimit(
 				handlers.ResendVerification(provider.MySQL, mailer, auditLogger),
 			),
 		)
@@ -187,6 +187,12 @@ func main() {
 		)
 		r.Get("/api/registrations/{batchKey}/status",
 			rl.registrationStatus.RateLimitUser(handlers.RegistrationStatus(provider.MySQL)),
+		)
+		r.Delete("/api/registrations/{batchKey}",
+			rl.registrationDelete.RateLimitUser(handlers.RegistrationDelete(provider.MySQL, storageDir, auditLogger)),
+		)
+		r.Post("/api/registrations/{batchKey}/withdraw",
+			rl.registrationWithdraw.RateLimitUser(handlers.RegistrationWithdraw(provider.MySQL, auditLogger)),
 		)
 	})
 
@@ -244,7 +250,7 @@ type rateLimiters struct {
 	revealNIK			*auth.RateLimiter
 	updateProfile       *auth.RateLimiter
 	changePassword      *auth.RateLimiter
-	forgotPasswordIP    *auth.RateLimiter
+	forgotPassword      *auth.RateLimiter
 	forgotPasswordEmail *auth.RateLimiter
 	resetPassword       *auth.RateLimiter
 	logout              *auth.RateLimiter
@@ -254,28 +260,32 @@ type rateLimiters struct {
 	registrationStatus 	*auth.RateLimiter
 	registrationDraft	*auth.RateLimiter
 	registrationSubmit	*auth.RateLimiter
+	registrationDelete 	*auth.RateLimiter
+	registrationWithdraw *auth.RateLimiter
 }
 
 func newRateLimiters() rateLimiters {
 	return rateLimiters{
 		loginIP:             auth.NewRateLimiter(30, 10*time.Minute),
 		loginEmail:          auth.NewRateLimiter(5, 15*time.Minute),
-		register:            auth.NewRateLimiter(5, 60*time.Minute),
+		register:            auth.NewRateLimiter(15, 60*time.Minute),
 		refreshIP:           auth.NewRateLimiter(60, 1*time.Minute),
 		refreshUser:         auth.NewRateLimiter(30, 1*time.Minute),
 		profile:             auth.NewRateLimiter(60, 1*time.Minute),
 		revealNIK:			 auth.NewRateLimiter(10, 5*time.Minute),
 		updateProfile:       auth.NewRateLimiter(10, 1*time.Minute),
 		changePassword:      auth.NewRateLimiter(5, 15*time.Minute),
-		forgotPasswordIP:    auth.NewRateLimiter(3, 60*time.Minute),
-		forgotPasswordEmail: auth.NewRateLimiter(5, 60*time.Minute),
+		forgotPassword:    	 auth.NewRateLimiter(30, 60*time.Minute),
+		forgotPasswordEmail: auth.NewRateLimiter(3, 60*time.Minute),
 		resetPassword:       auth.NewRateLimiter(10, 60*time.Minute),
-		logout:              auth.NewRateLimiter(20, 60*time.Minute),
-		verifyEmail:         auth.NewRateLimiter(5, 60*time.Minute),
-		resendVerify:        auth.NewRateLimiter(3, 60*time.Minute),
+		logout:              auth.NewRateLimiter(10, 1*time.Minute),
+		verifyEmail:         auth.NewRateLimiter(30, 60*time.Minute),
+		resendVerify:        auth.NewRateLimiter(30, 60*time.Minute),
 		registrationInit: 	 auth.NewRateLimiter(60, 1*time.Minute),
 		registrationStatus:  auth.NewRateLimiter(60, 1*time.Minute),
 		registrationDraft:   auth.NewRateLimiter(20, 1*time.Minute),
 		registrationSubmit:  auth.NewRateLimiter(5, 15*time.Minute),
+		registrationDelete:  auth.NewRateLimiter(5, 5*time.Minute),
+		registrationWithdraw: auth.NewRateLimiter(3, 15*time.Minute),
 	}
 }

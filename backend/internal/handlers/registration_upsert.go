@@ -74,8 +74,8 @@ func upsertS1Detail(r *http.Request, tx *sql.Tx, regID uuid.UUID, form *models.R
 		nullableStr(form.HighschoolGraduateYear),
 		majorChoiceName,
 		nullableStr(form.WaktuKuliah),
-		nullableBool(form.Confirmation),
-		nullableBool(form.Pernyataan),
+		form.Confirmation,
+		form.Pernyataan,
 	)
 	return err
 }
@@ -179,7 +179,7 @@ func upsertS2Detail(r *http.Request, tx *sql.Tx, regID uuid.UUID, form *models.R
 		nullableStr(form.CompanyStartYear),
 		nullableStr(form.ParentsAddress),
 		majorChoiceName,
-		nullableBool(form.Pernyataan),
+		form.Pernyataan,
 	)
 	if err != nil {
 		return err
@@ -246,7 +246,7 @@ func upsertPayment(
 	fileName *string,
 	fileSizeBytes *int64,
 ) (string, error) {
-	var oldPath *string
+	var oldPath sql.NullString
 	err := tx.QueryRowContext(r.Context(), 
 		"SELECT file_path FROM registration_payment WHERE registration_id = ? FOR UPDATE", 
 		regID[:],
@@ -276,33 +276,23 @@ func upsertPayment(
 		nullableStr(form.Bank),
 		fileName,
 		fileSizeBytes,
-		nullableStr(&filepath),
+		nullableStr(filepath),
 	)
 	if err != nil {
 		return "", err
 	}
 
-	if oldPath != nil && filepath != "" && *oldPath != filepath {
-		return *oldPath, nil
+	if oldPath.Valid && filepath != "" && oldPath.String != filepath {
+		return oldPath.String, nil
 	}
 
 	return "", nil
 }
 
-func nullableStr(s *string) any {
-	if s == nil {
-		return nil
-	}
-	trimmed := strings.TrimSpace(*s)
+func nullableStr(s string) any {
+	trimmed := strings.TrimSpace(s)
 	if trimmed == "" {
 		return nil
 	}
 	return trimmed
-}
-
-func nullableBool(b *bool) any {
-	if b == nil {
-		return nil
-	}
-	return *b
 }

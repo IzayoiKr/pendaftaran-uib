@@ -16,7 +16,7 @@ function buildRegistrationFormData(values: RegistrationFormValues): FormData {
             formData.append(key, docValue, docValue.name);
         } else if (isExistingDoc(docValue)) {
             jsonPayload[key] = docValue;
-        } else if (value !== null && value !== undefined && value != "") {
+        } else if (value !== null && value !== undefined) {
             jsonPayload[key] = value;
         }
     }

@@ -143,7 +143,7 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 		newStatus := "DRAFT"
 		if isSubmit {
 			newStatus = "SUBMITTED"
-			if err := validateFinalSubmission(&form, degree, batchType); err != nil {
+			if err := validateFinalSubmission(r, &form, degree, batchType); err != nil {
 				utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 				return
 			}
@@ -328,15 +328,17 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 	}
 }
 
-func validateFinalSubmission(form *models.RegistrationForm, degree string, batchType string) error {
+func validateFinalSubmission(r *http.Request, form *models.RegistrationForm, degree string, batchType string) error {
 	if isBlank(form.Citizenship)   { return errors.New("kewarganegaraan wajib diisi") }
 	if isBlank(form.BirthPlace)    { return errors.New("tempat lahir wajib diisi") }
 	if isBlank(form.BirthDate)     { return errors.New("tanggal lahir wajib diisi") }
 	if isBlank(form.MajorChoice)   { return errors.New("pilihan program studi wajib diisi") }
 	if isBlank(form.AccountHolder) { return errors.New("nama pemilik rekening wajib diisi") }
-	if isBlank(form.PaymentProof)  { return errors.New("dokumen bukti pembayaran wajib diunggah") }
+	if !isDocProvided(form.PaymentProof, r, "paymentProof") { 
+		return errors.New("dokumen bukti pembayaran wajib diunggah") 
+	}
 	
-	if form.Pernyataan == nil || !*form.Pernyataan {
+	if !form.Pernyataan {
 		return errors.New("pernyataan keabsahan data pendaftaran wajib dicentang")
 	}
 
@@ -349,23 +351,21 @@ func validateFinalSubmission(form *models.RegistrationForm, degree string, batch
 		if isBlank(form.WaktuKuliah)    { return errors.New("waktu kuliah wajib diisi") }
 		if isBlank(form.Bank)           { return errors.New("nama bank wajib diisi") }
 
-		if isBlank(form.Pp)  { return errors.New("pasfoto wajib diunggah") }
-		if isBlank(form.Ktp) { return errors.New("ktp / sim / passport wajib diunggah") }
-		if isBlank(form.Kk)  { return errors.New("kartu keluarga wajib diunggah") }
+		if !isDocProvided(form.Pp, r, "pp")   { return errors.New("pasfoto wajib diunggah") }
+		if !isDocProvided(form.Ktp, r, "ktp") { return errors.New("ktp / sim / passport wajib diunggah") }
+		if !isDocProvided(form.Kk, r, "kk")   { return errors.New("kartu keluarga wajib diunggah") }
 
-		jenisDaftar := *form.JenisDaftar
-
-		if jenisDaftar == "TRANSFER" || jenisDaftar == "ALIH_JENJANG" {
+		if form.JenisDaftar == "TRANSFER" || form.JenisDaftar == "ALIH_JENJANG" {
 			if isBlank(form.PreviousUniversity) { return errors.New("universitas asal wajib diisi untuk jalur transfer/alih jenjang") }
 			if isBlank(form.PreviousMajor)      { return errors.New("program studi asal wajib diisi untuk jalur transfer/alih jenjang") }
 			if isBlank(form.Gpa)                { return errors.New("ipk wajib diisi untuk jalur transfer/alih jenjang") }
 			if isBlank(form.HighestEducation)   { return errors.New("jenjang pendidikan terakhir wajib diisi untuk jalur transfer/alih jenjang") }
-			if isBlank(form.TranskripNilai)     { return errors.New("dokumen transkrip nilai wajib diunggah untuk jalur transfer/alih jenjang") }
-			if isBlank(form.IjazahDok)          { return errors.New("dokumen ijazah wajib diunggah untuk jalur transfer/alih jenjang") }
+			if !isDocProvided(form.TranskripNilai, r, "transkripNilai") { return errors.New("dokumen transkrip nilai wajib diunggah untuk jalur transfer/alih jenjang") }
+			if !isDocProvided(form.IjazahDok, r, "ijazahDok")           { return errors.New("dokumen ijazah wajib diunggah untuk jalur transfer/alih jenjang") }
 		}
 
-		if jenisDaftar == "BARU" {
-			if form.Confirmation == nil || !*form.Confirmation {
+		if form.JenisDaftar == "BARU" {
+			if !form.Confirmation {
 				return errors.New("konfirmasi belum pernah kuliah wajib dicentang")
 			}
 		}
@@ -395,17 +395,29 @@ func validateFinalSubmission(form *models.RegistrationForm, degree string, batch
 		if isBlank(form.MotherName)  { return errors.New("nama ibu wajib diisi") }
 		if isBlank(form.MotherPhone) { return errors.New("nomor telepon ibu wajib diisi") }
 
-		if isBlank(form.Al)  { return errors.New("dokumen akta lahir wajib diunggah") }
-		if isBlank(form.Kk)  { return errors.New("kartu keluarga wajib diunggah") }
-		if isBlank(form.Pp)  { return errors.New("pasfoto wajib diunggah") }
-		if isBlank(form.Ktp) { return errors.New("ktp wajib diunggah") }
-		if isBlank(form.R1)  { return errors.New("dokumen ijazah sarjana wajib diunggah") }
-		if isBlank(form.R2)  { return errors.New("dokumen transkrip nilai sarjana wajib diunggah") }
+		if !isDocProvided(form.Al, r, "al")   { return errors.New("dokumen akta lahir wajib diunggah") }
+		if !isDocProvided(form.Kk, r, "kk")   { return errors.New("kartu keluarga wajib diunggah") }
+		if !isDocProvided(form.Pp, r, "pp")   { return errors.New("pasfoto wajib diunggah") }
+		if !isDocProvided(form.Ktp, r, "ktp") { return errors.New("ktp wajib diunggah") }
+		if !isDocProvided(form.R1, r, "r1")   { return errors.New("dokumen ijazah sarjana wajib diunggah") }
+		if !isDocProvided(form.R2, r, "r2")   { return errors.New("dokumen transkrip nilai sarjana wajib diunggah") }
 	}
 
 	return nil
 }
 
-func isBlank(ptr *string) bool {
-    return ptr == nil || len(strings.TrimSpace(*ptr)) == 0
+func isDocProvided(formValue string, r *http.Request, docKey string) bool {
+	if !isBlank(formValue) {
+		return true
+	}
+	if r.MultipartForm != nil && r.MultipartForm.File != nil {
+		if headers, exists := r.MultipartForm.File[docKey]; exists && len(headers) > 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func isBlank(s string) bool {
+	return len(strings.TrimSpace(s)) == 0
 }

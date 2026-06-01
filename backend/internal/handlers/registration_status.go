@@ -65,7 +65,7 @@ func RegistrationStatus(db *sql.DB) http.HandlerFunc {
 			Status: status,
 		}
 
-		if status == "DRAFT" || status == "REJECTED" {
+		if status == "DRAFT" || status == "REJECTED" || status == "SUBMITTED" {
 			draftData, err := loadDraftData(r, db, regID, degree)
 			if err != nil {
 				slog.Error("registration_status: load draft data", "reg_id", regID.String(), "error", err)

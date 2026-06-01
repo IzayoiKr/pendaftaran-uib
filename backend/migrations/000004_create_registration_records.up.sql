@@ -1,14 +1,16 @@
 CREATE TABLE registration (
-    id BINARY(16) NOT NULL PRIMARY KEY,
+    id BINARY(16) PRIMARY KEY,
     user_id BINARY(16) NOT NULL,
     gelombang_id BINARY(16) NOT NULL,
     status ENUM('DRAFT', 'SUBMITTED', 'REJECTED', 'VERIFIED') NOT NULL DEFAULT 'DRAFT',
+    examinee_id CHAR(9) DEFAULT NULL,
     feedback_document TEXT DEFAULT NULL,
     feedback_payment TEXT DEFAULT NULL,
 
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uq_user_gelombang_id (user_id, gelombang_id),
+    UNIQUE KEY uq_examinee_id (examinee_id),
     CONSTRAINT fk_registration_user FOREIGN KEY(user_id)
         REFERENCES users(id)
         ON UPDATE CASCADE
@@ -20,7 +22,7 @@ CREATE TABLE registration (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE registration_s1_detail (
-    registration_id BINARY(16) NOT NULL PRIMARY KEY,
+    registration_id BINARY(16) PRIMARY KEY,
 
     gender ENUM('L', 'P') DEFAULT NULL,
     nationality ENUM('WNI', 'WNA', 'STATELESS') DEFAULT NULL,
@@ -56,7 +58,7 @@ CREATE TABLE registration_s1_detail (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE registration_s2_detail (
-    registration_id BINARY(16) NOT NULL PRIMARY KEY,
+    registration_id BINARY(16) PRIMARY KEY,
 
     nationality ENUM('WNI', 'WNA', 'STATELESS') DEFAULT NULL,
     birth_place VARCHAR(100) DEFAULT NULL,

@@ -28,6 +28,7 @@ interface S1IdentitasProps {
     status: SectionStatus;
     collapsed: boolean;
     onToggle: () => void;
+    readOnly?: boolean;
 }
 
 export default function S1Identitas({
@@ -36,6 +37,7 @@ export default function S1Identitas({
     status,
     collapsed,
     onToggle,
+    readOnly = false,
 }: S1IdentitasProps) {
     const t = useTranslations("registration");
     const { control } = useFormContext<RegistrationFormValues>();
@@ -80,6 +82,7 @@ export default function S1Identitas({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -95,6 +98,7 @@ export default function S1Identitas({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -110,6 +114,7 @@ export default function S1Identitas({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -125,6 +130,7 @@ export default function S1Identitas({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -140,6 +146,7 @@ export default function S1Identitas({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -155,6 +162,7 @@ export default function S1Identitas({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -173,6 +181,7 @@ export default function S1Identitas({
                             options={JENIS_DAFTAR_OPTIONS}
                             value={field.value}
                             onChange={field.onChange}
+                            readOnly={readOnly}
                         />
                     </FormField>
                 )}
@@ -196,6 +205,7 @@ export default function S1Identitas({
                                 value={field.value}
                                 onChange={field.onChange}
                                 error={fieldState.error?.message}
+                                readOnly={readOnly}
                             />
                         )}
                     />
@@ -210,6 +220,7 @@ export default function S1Identitas({
                                 value={field.value}
                                 onChange={field.onChange}
                                 error={fieldState.error?.message}
+                                readOnly={readOnly}
                             />
                         )}
                     />
@@ -229,6 +240,7 @@ export default function S1Identitas({
                                 value={field.value}
                                 onChange={field.onChange}
                                 error={fieldState.error?.message}
+                                readOnly={readOnly}
                             />
                         )}
                     />
@@ -244,6 +256,7 @@ export default function S1Identitas({
                                 value={field.value}
                                 onChange={field.onChange}
                                 error={fieldState.error?.message}
+                                readOnly={readOnly}
                             />
                         )}
                     />

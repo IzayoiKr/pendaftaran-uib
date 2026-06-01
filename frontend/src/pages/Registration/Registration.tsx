@@ -287,6 +287,7 @@ export default function RegistrationForm({
     event,
     programOptions,
     paymentConfig,
+    readOnly = false,
 }: RegistrationFormProps) {
     const params = useParams();
     const batchKey = params?.batchKey as string;
@@ -295,7 +296,10 @@ export default function RegistrationForm({
         status,
         draftData,
         isLoading: statusLoading,
+        isViewMode,
     } = useRegistrationStatus(batchKey);
+
+    const isReadOnly = readOnly || isViewMode;
 
     const t = useTranslations("registration");
     const tv = useTranslations("validation");
@@ -316,7 +320,7 @@ export default function RegistrationForm({
     const { submit } = useRegistrationSubmit(batchKey, getValues);
 
     useEffect(() => {
-        if (draftData && (status === "DRAFT" || status === "REJECTED")) {
+        if (draftData && (status === "DRAFT" || status === "REJECTED" || status == "SUBMITTED")) {
             reset({
                 ...REGISTRATION_DEFAULT_VALUES,
                 ...draftData,
@@ -360,6 +364,7 @@ export default function RegistrationForm({
     }, []);
 
     const onSubmit = async (data: RegistrationFormValues) => {
+        if (isReadOnly) return;
         setIsSubmitting(true);
         const toastId = toast.loading("Submitting...");
         try {
@@ -438,6 +443,7 @@ export default function RegistrationForm({
                         </p>
                     </div>
 
+
                     {level === "S1" ? (
                         <>
                             <div id="identity" data-section="identity">
@@ -447,6 +453,7 @@ export default function RegistrationForm({
                                     status={sectionStatuses.identity}
                                     collapsed={collapsed.identity}
                                     onToggle={() => toggleSection("identity")}
+                                    readOnly={isReadOnly}
                                 />
                             </div>
                             <div id="education" data-section="education">
@@ -456,6 +463,7 @@ export default function RegistrationForm({
                                     status={sectionStatuses.education}
                                     collapsed={collapsed.education}
                                     onToggle={() => toggleSection("education")}
+                                    readOnly={isReadOnly}
                                 />
                             </div>
                         </>
@@ -469,6 +477,7 @@ export default function RegistrationForm({
                                     status={sectionStatuses.biodata}
                                     collapsed={collapsed.biodata}
                                     onToggle={() => toggleSection("biodata")}
+                                    readOnly={isReadOnly}
                                 />
                             </div>
                             <div id="parent" data-section="parent">
@@ -476,6 +485,7 @@ export default function RegistrationForm({
                                     status={sectionStatuses.parent}
                                     collapsed={collapsed.parent}
                                     onToggle={() => toggleSection("parent")}
+                                    readOnly={isReadOnly}
                                 />
                             </div>
                         </>
@@ -488,6 +498,7 @@ export default function RegistrationForm({
                             status={sectionStatuses.document}
                             collapsed={collapsed.document}
                             onToggle={() => toggleSection("document")}
+                            readOnly={isReadOnly}
                         />
                     </div>
 
@@ -497,89 +508,94 @@ export default function RegistrationForm({
                             status={sectionStatuses.payment}
                             collapsed={collapsed.payment}
                             onToggle={() => toggleSection("payment")}
+                            readOnly={isReadOnly}
                         />
                     </div>
 
-                    <div className={styles.confirmationBox} id="declarations">
-                        {level === "S1" && (
-                            <Controller
-                                name="jenisdaftar"
-                                control={control}
-                                render={({ field }) =>
-                                    field.value === "BARU" ? (
-                                        <Controller
-                                            name="confirmation"
-                                            control={control}
-                                            render={({ field: cf }) => (
-                                                <BaruDeclarationCheckbox
-                                                    checked={cf.value}
-                                                    onChange={cf.onChange}
-                                                    label={t(
-                                                        "checkboxes.baruDeclaration",
-                                                    )}
-                                                />
-                                            )}
-                                        />
-                                    ) : (
-                                        <></>
-                                    )
-                                }
-                            />
-                        )}
-                        <Controller
-                            name="pernyataan"
-                            control={control}
-                            render={({ field }) => (
-                                <label className={styles.checkboxLabel}>
-                                    <input
-                                        type="checkbox"
-                                        checked={field.value}
-                                        onChange={(e) =>
-                                            field.onChange(e.target.checked)
-                                        }
-                                    />
-                                    {t("checkboxes.finalDeclaration")}
-                                </label>
-                            )}
-                        />
-                        <div className={styles.submitBar}>
-                            <button
-                                type="button"
-                                className={`${styles.btn} ${styles.secondary}`}
-                                onClick={async () => {
-                                    setIsSubmitting(true);
-                                    const toastId =
-                                        toast.loading("Menyimpan draft...");
-                                    try {
-                                        await submit(true);
-                                        toast.success(
-                                            "Draft berhasil disimpan!",
-                                            { id: toastId },
-                                        );
-                                        router.replace(`/registration/${batchKey}?edit=1`)
-                                    } catch (err) {
-                                        const message =
-                                            err instanceof Error
-                                                ? err.message
-                                                : "Terjadi kesalahan";
-                                        toast.error(message, { id: toastId });
-                                    } finally {
-                                        setIsSubmitting(false);
+                    {!isReadOnly && (
+                        <div className={styles.confirmationBox} id="declarations">
+                            {level === "S1" && (
+                                <Controller
+                                    name="jenisdaftar"
+                                    control={control}
+                                    render={({ field }) =>
+                                        field.value === "BARU" ? (
+                                            <Controller
+                                                name="confirmation"
+                                                control={control}
+                                                render={({ field: cf }) => (
+                                                    <BaruDeclarationCheckbox
+                                                        checked={cf.value}
+                                                        onChange={cf.onChange}
+                                                        label={t(
+                                                            "checkboxes.baruDeclaration",
+                                                        )}
+                                                    />
+                                                )}
+                                            />
+                                        ) : (
+                                            <></>
+                                        )
                                     }
-                                }}
-                                disabled={isSubmitting}
-                            >
-                                {t("buttons.saveDraft")}
-                            </button>
-                            <button
-                                type="submit"
-                                className={`${styles.btn} ${styles.primary}`}
-                                disabled={isSubmitting}
-                            >
-                                <SendIcon /> {t("buttons.submit")}
-                            </button>
+                                />
+                            )}
+                            <Controller
+                                name="pernyataan"
+                                control={control}
+                                render={({ field }) => (
+                                    <label className={styles.checkboxLabel}>
+                                        <input
+                                            type="checkbox"
+                                            checked={field.value}
+                                            onChange={(e) =>
+                                                field.onChange(e.target.checked)
+                                            }
+                                        />
+                                        {t("checkboxes.finalDeclaration")}
+                                    </label>
+                                )}
+                            />
+                            <div className={styles.submitBar}>
+                                <button
+                                    type="button"
+                                    className={`${styles.btn} ${styles.secondary}`}
+                                    onClick={async () => {
+                                        setIsSubmitting(true);
+                                        const toastId =
+                                            toast.loading("Menyimpan draft...");
+                                        try {
+                                            await submit(true);
+                                            toast.success(
+                                                "Draft berhasil disimpan!",
+                                                { id: toastId },
+                                            );
+                                            router.replace(
+                                                `/registration/${batchKey}?edit=1`,
+                                            );
+                                        } catch (err) {
+                                            const message =
+                                                err instanceof Error
+                                                    ? err.message
+                                                    : "Terjadi kesalahan";
+                                            toast.error(message, { id: toastId });
+                                        } finally {
+                                            setIsSubmitting(false);
+                                        }
+                                    }}
+                                    disabled={isSubmitting}
+                                >
+                                    {t("buttons.saveDraft")}
+                                </button>
+                                <button
+                                    type="submit"
+                                    className={`${styles.btn} ${styles.primary}`}
+                                    disabled={isSubmitting}
+                                >
+                                    <SendIcon /> {t("buttons.submit")}
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </main>
             </form>
         </FormProvider>

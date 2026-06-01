@@ -29,6 +29,7 @@ interface SearchableFieldProps {
     value?: string;
     onChange?: (value: string) => void;
     onResultSelect?: (result: SearchResult) => void;
+    readOnly?: boolean;
 }
 
 async function fetchResults(
@@ -39,7 +40,7 @@ async function fetchResults(
     const res = await fetch(`${endpoint}?q=${encodeURIComponent(query)}`, {
         signal,
     });
-    if (!res.ok) return [];
+    if (!res.ok) throw new Error("Search Failed");
     const data = await res.json();
     return data.results ?? [];
 }
@@ -58,6 +59,7 @@ export default function SearchableField({
     value: propValue,
     onChange,
     onResultSelect,
+    readOnly = false,
 }: SearchableFieldProps) {
     const t = useTranslations("options");
     const value = propValue ?? "";
@@ -106,6 +108,7 @@ export default function SearchableField({
         prevValueRef.current = value;
         setQuery(value ?? "");
         setSelected(value ? { value, label: value } : null);
+        hasAutoOpened.current = false;
     }, [value]);
 
     useEffect(() => {
@@ -124,15 +127,26 @@ export default function SearchableField({
 
     useEffect(() => {
         if (
-            results.length > 0 &&
             !selected &&
             !isManual &&
-            !hasAutoOpened.current
+            !hasAutoOpened.current &&
+            !isFetching &&
+            debouncedQuery.length >= minQueryLength &&
+            query === debouncedQuery
         ) {
             hasAutoOpened.current = true;
             setIsOpen(true);
         }
-    }, [results, selected, isManual]);
+    }, [
+        results,
+        isError,
+        isFetching,
+        debouncedQuery,
+        query,
+        selected,
+        isManual,
+        minQueryLength,
+    ]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
@@ -216,7 +230,8 @@ export default function SearchableField({
                         if (
                             !isManual &&
                             query.length >= minQueryLength &&
-                            results.length > 0
+                            !isFetching &&
+                            query === debouncedQuery
                         ) {
                             setIsOpen(true);
                         }
@@ -228,6 +243,8 @@ export default function SearchableField({
                     }
                     autoComplete="off"
                     className={isManual ? styles.manualInput : ""}
+                    readOnly={readOnly}
+                    disabled={readOnly}
                 />
                 <div className={styles.inputActions}>
                     {showSpinner && (
@@ -255,7 +272,7 @@ export default function SearchableField({
                 </div>
             </div>
 
-            {isOpen && results.length > 0 && (
+            {isOpen && results.length > 0 && !isError && (
                 <ul className={styles.dropdown} role="listbox">
                     {results.map((result, idx) => (
                         <li
@@ -293,15 +310,18 @@ export default function SearchableField({
 
             {isOpen &&
                 !isFetching &&
-                results.length === 0 &&
+                (results.length === 0 || isError) &&
                 query.length >= minQueryLength && (
                     <div className={styles.dropdownEmpty}>
-                        <p>{t("notFound")}</p>
+                        <p>
+                            {isError ? t("searchErrorManual") : t("notFound")}
+                        </p>
                         {allowManualEntry && (
                             <button
                                 type="button"
                                 onClick={handleManualToggle}
                                 className={styles.manualBtn}
+                                disabled={readOnly}
                             >
                                 {manualEntryLabel || t("manualEntry")}
                             </button>
@@ -310,7 +330,7 @@ export default function SearchableField({
                 )}
 
             {!isManual && selected && (
-                <input type="hidden" name={name} value={selected.value} />
+                <input type="hidden" name={name} value={selected.value} readOnly={readOnly} disabled={readOnly} />
             )}
 
             {isError && (

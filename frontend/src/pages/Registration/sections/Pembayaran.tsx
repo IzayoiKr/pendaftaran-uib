@@ -18,6 +18,7 @@ interface PembayaranProps {
     status: SectionStatus;
     collapsed: boolean;
     onToggle: () => void;
+    readOnly?: boolean;
 }
 
 export default function Pembayaran({
@@ -25,6 +26,7 @@ export default function Pembayaran({
     status,
     collapsed,
     onToggle,
+    readOnly = false,
 }: PembayaranProps) {
     const t = useTranslations("registration");
     const { control } = useFormContext<RegistrationFormValues>();
@@ -80,6 +82,7 @@ export default function Pembayaran({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -95,6 +98,7 @@ export default function Pembayaran({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -111,6 +115,7 @@ export default function Pembayaran({
                         file={field.value}
                         onFileChange={field.onChange}
                         error={fieldState.error?.message}
+                        readOnly={readOnly}
                     />
                 )}
             />

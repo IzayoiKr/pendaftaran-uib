@@ -24,6 +24,7 @@ interface S1PendidikanProps {
     status: SectionStatus;
     collapsed: boolean;
     onToggle: () => void;
+    readOnly?: boolean;
 }
 
 export default function S1Pendidikan({
@@ -32,6 +33,7 @@ export default function S1Pendidikan({
     status,
     collapsed,
     onToggle,
+    readOnly = false,
 }: S1PendidikanProps) {
     const t = useTranslations("registration");
     const { control } = useFormContext<RegistrationFormValues>();
@@ -60,6 +62,7 @@ export default function S1Pendidikan({
                         value={field.value}
                         onChange={field.onChange}
                         error={fieldState.error?.message}
+                        readOnly={readOnly}
                     />
                 )}
             />
@@ -83,6 +86,7 @@ export default function S1Pendidikan({
                                     value={field.value}
                                     onChange={field.onChange}
                                     error={fieldState.error?.message}
+                                    readOnly={readOnly}
                                 />
                             )}
                         />
@@ -99,6 +103,7 @@ export default function S1Pendidikan({
                                     value={field.value}
                                     onChange={field.onChange}
                                     error={fieldState.error?.message}
+                                    readOnly={readOnly}
                                 />
                             )}
                         />
@@ -117,6 +122,7 @@ export default function S1Pendidikan({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -135,6 +141,7 @@ export default function S1Pendidikan({
                             options={WAKTU_KULIAH_OPTIONS}
                             value={field.value}
                             onChange={field.onChange}
+                            readOnly={readOnly}
                         />
                     </FormField>
                 )}

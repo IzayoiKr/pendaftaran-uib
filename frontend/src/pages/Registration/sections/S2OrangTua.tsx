@@ -22,12 +22,14 @@ interface S2OrangTuaProps {
     status: SectionStatus;
     collapsed: boolean;
     onToggle: () => void;
+    readOnly?: boolean;
 }
 
 export default function S2OrangTua({
     status,
     collapsed,
     onToggle,
+    readOnly = false,
 }: S2OrangTuaProps) {
     const t = useTranslations("registration");
     const to = useTranslations("options");
@@ -58,6 +60,7 @@ export default function S2OrangTua({
                                     name={section.fields.nik}
                                     value={field.value as string}
                                     onChange={field.onChange}
+                                    readOnly={readOnly}
                                 />
                             )}
                         />
@@ -75,6 +78,7 @@ export default function S2OrangTua({
                                     value={field.value as string}
                                     onChange={field.onChange}
                                     error={fieldState.error?.message}
+                                    readOnly={readOnly}
                                 />
                             )}
                         />
@@ -91,6 +95,7 @@ export default function S2OrangTua({
                                     type="date"
                                     value={field.value as string}
                                     onChange={field.onChange}
+                                    readOnly={readOnly}
                                 />
                             )}
                         />
@@ -109,6 +114,7 @@ export default function S2OrangTua({
                                     value={field.value as string}
                                     onChange={field.onChange}
                                     error={fieldState.error?.message}
+                                    readOnly={readOnly}
                                 />
                             )}
                         />
@@ -116,7 +122,7 @@ export default function S2OrangTua({
                             ({ fieldKey, options, placeholder }) => {
                                 const fieldName =
                                     section.fields[
-                                        fieldKey as keyof typeof section.fields
+                                    fieldKey as keyof typeof section.fields
                                     ];
                                 return (
                                     <Controller
@@ -129,7 +135,7 @@ export default function S2OrangTua({
                                             <SelectField
                                                 label={t(
                                                     section.labels[
-                                                        fieldKey as keyof typeof section.labels
+                                                    fieldKey as keyof typeof section.labels
                                                     ],
                                                 )}
                                                 name={fieldName}
@@ -137,6 +143,7 @@ export default function S2OrangTua({
                                                 placeholder={to(placeholder)}
                                                 value={field.value as string}
                                                 onChange={field.onChange}
+                                                readOnly={readOnly}
                                             />
                                         )}
                                     />
@@ -156,6 +163,7 @@ export default function S2OrangTua({
                             placeholder={to(PARENT_ADDRESS_FIELD.placeholder)}
                             value={field.value as string}
                             onChange={(e) => field.onChange(e.target.value)}
+                            readOnly={readOnly}
                         />
                     </FormField>
                 )}

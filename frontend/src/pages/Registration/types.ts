@@ -238,4 +238,5 @@ export interface RegistrationFormProps {
         biayaDisplay: string;
         qrisPath: string;
     };
+    readOnly?: boolean;
 }

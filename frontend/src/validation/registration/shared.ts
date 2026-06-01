@@ -309,7 +309,7 @@ export function optHsGpa(t: TV, fieldKey: string) {
 
 const newFileUpload = (t: TV, fieldKey: string) =>
     z.preprocess(
-        (val) => val instanceof File ? val : undefined,
+        (val) => (val instanceof File ? val : undefined),
         z
             .file()
             .max(MAX_FILE_SIZE, {
@@ -325,11 +325,9 @@ const newFileUpload = (t: TV, fieldKey: string) =>
     );
 
 const existingDbRef = (t: TV, fieldKey: string) =>
-    z
-        .string()
-        .regex(/^[^|]+\|\d+$/, {
-            message: t(`registration.${fieldKey}Invalid`),
-        });
+    z.string().regex(/^[^|]+\|\d+$/, {
+        message: t(`registration.${fieldKey}Invalid`),
+    });
 
 export function reqDoc(t: TV, fieldKey: string) {
     return z.union([newFileUpload(t, fieldKey), existingDbRef(t, fieldKey)], {

@@ -29,6 +29,7 @@ interface S2BiodataProps {
     status: SectionStatus;
     collapsed: boolean;
     onToggle: () => void;
+    readOnly?: boolean;
 }
 
 export default function S2Biodata({
@@ -38,6 +39,7 @@ export default function S2Biodata({
     status,
     collapsed,
     onToggle,
+    readOnly = false,
 }: S2BiodataProps) {
     const t = useTranslations("registration");
     const { control } = useFormContext<RegistrationFormValues>();
@@ -79,6 +81,7 @@ export default function S2Biodata({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -94,6 +97,7 @@ export default function S2Biodata({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -109,6 +113,7 @@ export default function S2Biodata({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -125,6 +130,7 @@ export default function S2Biodata({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -140,6 +146,7 @@ export default function S2Biodata({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -155,6 +162,7 @@ export default function S2Biodata({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -170,6 +178,7 @@ export default function S2Biodata({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -186,6 +195,7 @@ export default function S2Biodata({
                             placeholder={t("placeholders.taxID")}
                             value={field.value}
                             onChange={field.onChange}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -199,6 +209,7 @@ export default function S2Biodata({
                             placeholder={t("placeholders.reference")}
                             value={field.value}
                             onChange={field.onChange}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -212,6 +223,7 @@ export default function S2Biodata({
                             placeholder={t("placeholders.expertField")}
                             value={field.value}
                             onChange={field.onChange}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -232,6 +244,8 @@ export default function S2Biodata({
                                 placeholder={t("placeholders.address")}
                                 value={field.value}
                                 onChange={(e) => field.onChange(e.target.value)}
+                                readOnly={readOnly}
+                                disabled={readOnly}
                             />
                         </FormField>
                     )}
@@ -247,6 +261,7 @@ export default function S2Biodata({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -261,6 +276,7 @@ export default function S2Biodata({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -273,6 +289,7 @@ export default function S2Biodata({
                             name="hamlet"
                             value={field.value}
                             onChange={field.onChange}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -286,6 +303,7 @@ export default function S2Biodata({
                             placeholder={t("placeholders.postalCode")}
                             value={field.value}
                             onChange={field.onChange}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -298,6 +316,7 @@ export default function S2Biodata({
                             name="rt"
                             value={field.value}
                             onChange={field.onChange}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -310,6 +329,7 @@ export default function S2Biodata({
                             name="rw"
                             value={field.value}
                             onChange={field.onChange}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -330,6 +350,7 @@ export default function S2Biodata({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -349,6 +370,7 @@ export default function S2Biodata({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -364,6 +386,7 @@ export default function S2Biodata({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -381,6 +404,7 @@ export default function S2Biodata({
                             value={field.value}
                             onChange={field.onChange}
                             error={fieldState.error?.message}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -400,6 +424,7 @@ export default function S2Biodata({
                             placeholder={t("placeholders.companyName")}
                             value={field.value}
                             onChange={field.onChange}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -413,6 +438,7 @@ export default function S2Biodata({
                             placeholder={t("placeholders.companyAddress")}
                             value={field.value}
                             onChange={field.onChange}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -426,6 +452,7 @@ export default function S2Biodata({
                             placeholder={t("placeholders.position")}
                             value={field.value}
                             onChange={field.onChange}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -439,6 +466,7 @@ export default function S2Biodata({
                             options={STATUS_INSTANSI_OPTIONS}
                             value={field.value}
                             onChange={field.onChange}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -453,6 +481,7 @@ export default function S2Biodata({
                             translateLabels={false}
                             value={field.value}
                             onChange={field.onChange}
+                            readOnly={readOnly}
                         />
                     )}
                 />
@@ -471,6 +500,7 @@ export default function S2Biodata({
                         value={field.value}
                         onChange={field.onChange}
                         error={fieldState.error?.message}
+                        readOnly={readOnly}
                     />
                 )}
             />

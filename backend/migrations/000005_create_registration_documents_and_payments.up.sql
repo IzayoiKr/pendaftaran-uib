@@ -31,7 +31,7 @@ CREATE TABLE registration_document (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE registration_payment (
-    registration_id BINARY(16) NOT NULL PRIMARY KEY,
+    registration_id BINARY(16) PRIMARY KEY,
     account_holder VARCHAR(255) DEFAULT NULL,
     bank_name VARCHAR(100) DEFAULT NULL,
     file_path VARCHAR(255) DEFAULT NULL,

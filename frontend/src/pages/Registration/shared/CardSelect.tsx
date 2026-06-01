@@ -7,12 +7,14 @@ interface CardSelectProps {
     options: Array<{ value: string | number | null; label: string }>;
     value: string | number | null;
     onChange: (val: string | number | null) => void;
+    readOnly?: boolean;
 }
 
 export default function CardSelect({
     options,
     value,
     onChange,
+    readOnly = false,
 }: CardSelectProps) {
     const t = useTranslations("options");
 
@@ -26,6 +28,7 @@ export default function CardSelect({
                     onClick={() =>
                         onChange(value === opt.value ? null : opt.value)
                     }
+                    disabled={readOnly}
                 >
                     {t(opt.label)}
                 </button>

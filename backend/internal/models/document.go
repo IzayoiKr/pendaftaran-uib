@@ -20,7 +20,7 @@ const (
 	DocAL                 DocType = "al"
 	DocR1                 DocType = "r1"
 	DocR2                 DocType = "r2"
-	DocPaymentProof 	  DocType = "paymentProof"
+	DocPaymentProof       DocType = "paymentProof"
 )
 
 func (f *RegistrationForm) IsValidDocumentField(dt DocType) bool {
@@ -49,36 +49,31 @@ func (f *RegistrationForm) IsValidDocumentField(dt DocType) bool {
 	}
 }
 
-func stringPtr(s string) *string {
-	return &s
-}
-
 func (f *RegistrationForm) SetDocumentField(dt DocType, val string) bool {
-	ptr := stringPtr(val)
 	switch dt {
-	case DocPP:                 f.Pp = ptr; return true
-	case DocKTP:                f.Ktp = ptr; return true
-	case DocKK:                 f.Kk = ptr; return true
-	case DocTranskripNilai:     f.TranskripNilai = ptr; return true
-	case DocIjazahDok:          f.IjazahDok = ptr; return true
-	case DocSktmKip:            f.SktmKip = ptr; return true
-	case DocFotoRumah:          f.FotoRumah = ptr; return true
-	case DocTagihanListrik:     f.TagihanListrik = ptr; return true
-	case DocTagihanAir:         f.TagihanAir = ptr; return true
-	case DocSertifikatPrestasi: f.SertifikatPrestasi = ptr; return true
-	case DocRapot1:             f.Rapot1 = ptr; return true
-	case DocRapot2:             f.Rapot2 = ptr; return true
-	case DocRapot3:             f.Rapot3 = ptr; return true
-	case DocRapot4:             f.Rapot4 = ptr; return true
-	case DocAL:                 f.Al = ptr; return true
-	case DocR1:                 f.R1 = ptr; return true
-	case DocR2:                 f.R2 = ptr; return true
-	case DocPaymentProof:		f.PaymentProof = ptr; return true
+	case DocPP:                 f.Pp = val; return true
+	case DocKTP:                f.Ktp = val; return true
+	case DocKK:                 f.Kk = val; return true
+	case DocTranskripNilai:     f.TranskripNilai = val; return true
+	case DocIjazahDok:          f.IjazahDok = val; return true
+	case DocSktmKip:            f.SktmKip = val; return true
+	case DocFotoRumah:          f.FotoRumah = val; return true
+	case DocTagihanListrik:     f.TagihanListrik = val; return true
+	case DocTagihanAir:         f.TagihanAir = val; return true
+	case DocSertifikatPrestasi: f.SertifikatPrestasi = val; return true
+	case DocRapot1:             f.Rapot1 = val; return true
+	case DocRapot2:             f.Rapot2 = val; return true
+	case DocRapot3:             f.Rapot3 = val; return true
+	case DocRapot4:             f.Rapot4 = val; return true
+	case DocAL:                 f.Al = val; return true
+	case DocR1:                 f.R1 = val; return true
+	case DocR2:                 f.R2 = val; return true
+	case DocPaymentProof:       f.PaymentProof = val; return true
 	default:                    return false
 	}
 }
 
-func (f *RegistrationForm) GetDocumentFieldPointer(dt DocType) (*string, bool) {
+func (f *RegistrationForm) GetDocumentFieldValue(dt DocType) (string, bool) {
 	switch dt {
 	case DocPP:                 return f.Pp, true
 	case DocKTP:                return f.Ktp, true
@@ -91,13 +86,13 @@ func (f *RegistrationForm) GetDocumentFieldPointer(dt DocType) (*string, bool) {
 	case DocTagihanAir:         return f.TagihanAir, true
 	case DocSertifikatPrestasi: return f.SertifikatPrestasi, true
 	case DocRapot1:             return f.Rapot1, true
-	case DocRapot2: 			return f.Rapot2, true
-	case DocRapot3: 			return f.Rapot3, true
-	case DocRapot4: 			return f.Rapot4, true
-	case DocAL:     			return f.Al, true
-	case DocR1:     			return f.R1, true
-	case DocR2:     			return f.R2, true
-	case DocPaymentProof:		return f.PaymentProof, true
-	default:        			return nil, false
+	case DocRapot2:             return f.Rapot2, true
+	case DocRapot3:             return f.Rapot3, true
+	case DocRapot4:             return f.Rapot4, true
+	case DocAL:                 return f.Al, true
+	case DocR1:                 return f.R1, true
+	case DocR2:                 return f.R2, true
+	case DocPaymentProof:       return f.PaymentProof, true
+	default:                    return "", false
 	}
 }
