@@ -303,7 +303,10 @@
         "withdrawError": "An error occurred",
         "loadProfileError": "Failed to load profile",
         "wib": " WIB",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "continueDraft": "Continue Draft",
+        "viewSubmission": "View Submission",
+        "noRegistrationSub": "You haven't registered for any batch yet. Browse available batches to get started."
     },
     "registration": {
         "pageTitle": "Registration {programType}",

@@ -126,12 +126,12 @@ apiClient.interceptors.response.use(
 
         const data = error.response?.data as
             | {
-                  error?: string;
-                  require_captcha?: boolean;
-                  require_verify?: boolean;
-                  expired?: boolean;
-                  email?: string;
-              }
+                error?: string;
+                require_captcha?: boolean;
+                require_verify?: boolean;
+                expired?: boolean;
+                email?: string;
+            }
             | undefined;
         const message = data?.error ?? "Terjadi kesalahan";
         const requireCaptcha = data?.require_captcha ?? false;
@@ -286,6 +286,10 @@ export const api = {
         withdraw: (batchKey: string) =>
             apiClient.post<never, RegistrationResponse>(
                 `/api/registrations/${batchKey}/withdraw`,
+            ),
+        loa: (batchKey: string) =>
+            apiClient.get<never, Blob>(
+                `/api/registrations/${batchKey}/loa`, { responseType: "blob" }
             ),
     },
     transferProof: {

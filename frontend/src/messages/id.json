@@ -303,7 +303,10 @@
         "withdrawError": "Terjadi kesalahan",
         "loadProfileError": "Gagal memuat profil",
         "wib": " WIB",
-        "cancel": "Batal"
+        "cancel": "Batal",
+        "continueDraft": "Lanjutkan Draft",
+        "viewSubmission": "Lihat Pengiriman",
+        "noRegistrationSub": "Anda belum mendaftar gelombang manapun. Lihat gelombang yang tersedia untuk memulai."
     },
     "registration": {
         "pageTitle": "Pendaftaran {programType}",

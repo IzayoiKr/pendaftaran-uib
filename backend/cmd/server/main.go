@@ -218,6 +218,9 @@ func main() {
 		r.Get("/api/ospek/prasyarat/file/{regID}/ijazah",
 			rl.ospekGet.RateLimitUser(handlers.ServeOspekPrerequisite(provider.MySQL, "ijazah")),
 		)
+		r.Get("/api/registrations/{batchKey}/loa",
+			rl.registrationLoa.RateLimitUser(handlers.RegistrationLoA(provider.MySQL)),
+		)
 	})
 
 	r.Group(func(r chi.Router) {
@@ -296,6 +299,7 @@ type rateLimiters struct {
 	transferProofUpload *auth.RateLimiter
 	ospekGet            *auth.RateLimiter
 	ospekUpload         *auth.RateLimiter
+	registrationLoa		*auth.RateLimiter
 }
 
 func newRateLimiters() rateLimiters {
@@ -325,5 +329,6 @@ func newRateLimiters() rateLimiters {
 		transferProofUpload: auth.NewRateLimiter(10, 5*time.Minute),
 		ospekGet:            auth.NewRateLimiter(60, 1*time.Minute),
 		ospekUpload:         auth.NewRateLimiter(10, 5*time.Minute),
+		registrationLoa: 	 auth.NewRateLimiter(10, 5*time.Minute),
 	}
 }

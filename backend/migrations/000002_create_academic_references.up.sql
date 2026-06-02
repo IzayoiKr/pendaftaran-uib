@@ -20,6 +20,7 @@ CREATE TABLE gelombang (
     id BINARY(16) PRIMARY KEY,
     batch_key VARCHAR(50) NOT NULL UNIQUE,
     batch_name VARCHAR(100) NOT NULL,
+    batch_number TINYINT UNSIGNED NOT NULL,
     degree ENUM('S1', 'S2') NOT NULL,
     batch_type ENUM('Reguler', 'Beasiswa') NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -47,6 +48,17 @@ CREATE TABLE gelombang_detail (
         ON UPDATE CASCADE
         ON DELETE CASCADE,
     INDEX idx_registration_dates (registration_start, registration_end)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE examinee_sequence (
+    gelombang_id BINARY(16) NOT NULL,
+    prefix_key CHAR(5) NOT NULL,
+    next_value INT UNSIGNED NOT NULL DEFAULT 1,
+    PRIMARY KEY (gelombang_id, prefix_key),
+    CONSTRAINT fk_sequence_gelombang FOREIGN KEY (gelombang_id)
+        REFERENCES gelombang(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE registration_fee (

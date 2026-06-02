@@ -353,6 +353,19 @@ $header-height: var(--space-2xl);
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: var(--space-s);
   width: 100%;
+  
+  @media (min-width: map.get(global.$breakpoints, xl)) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.cardActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s);
+  padding-top: var(--space-m);
+  border-top: 1px solid #e2e8f0;
+  align-items: center;
 }
 
 // ─── Buttons ─────────────────────────────────────────────────────────────────
@@ -383,6 +396,10 @@ $header-height: var(--space-2xl);
     height: 1em;
     flex-shrink: 0;
   }
+}
+
+.btnFull {
+  width: 100%;
 }
 
 .btnPrimary {
@@ -431,6 +448,12 @@ $header-height: var(--space-2xl);
 // ─── Quick Actions (Sidebar) ──────────────────────────────────────────────────
 
 .quickGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.actionsList {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);

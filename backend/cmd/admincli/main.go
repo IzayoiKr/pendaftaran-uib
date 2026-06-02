@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/joho/godotenv"
 	"pendaftaran-uib/backend/internal/db"
+	"pendaftaran-uib/backend/internal/loa"
 
 	"github.com/google/uuid"
 )
@@ -49,7 +51,6 @@ func main() {
 			printUsage()
 			os.Exit(1)
 		}
-
 		switch commandVerb {
 		case "verify":
 			cmdVerify(ctx, provider.MySQL, os.Args[2:])
@@ -58,6 +59,14 @@ func main() {
 		case "reset":
 			cmdReset(ctx, provider.MySQL, os.Args[2:])
 		}
+
+	case "loa-set-assessment":
+		if len(os.Args) < 3 {
+			slog.Error("missing required registration_id target positional argument", "command", commandVerb)
+			printUsage()
+			os.Exit(1)
+		}
+		cmdLoaSetAssessment(ctx, provider.MySQL, os.Args[2:])
 
 	default:
 		slog.Error("unrecognized or invalid administration tool instruction", "input", commandVerb)
@@ -75,12 +84,27 @@ Commands:
 
   verify  <registration_id>
           Verify a submitted application. Automates sequence-safe examinee_id assignment.
+          For S1: automatically computes and stores fee breakdown in registration_loa_fee.
+          Requires assessment (usm_rank) to be set via loa-set-assessment first.
 
   reject  <registration_id> [--feedback-document="..."] [--feedback-payment="..."]
           Reject an application back to applicants with targeted remediation logs.
 
   reset   <registration_id>
-          Emergency reset back to a blank slate DRAFT state, clearing old sequences/feedback.`)
+          Emergency reset back to a blank slate DRAFT state, clearing old sequences/feedback.
+
+  loa-set-assessment  <registration_id> [S1 flags] [S2 flags]
+          Set or update the USM assessment for a VERIFIED registration before LoA generation.
+
+          S1 flags:
+            --usm-rank=<1-5>          USM result rank (1=best, 5=worst)
+            --scholarship=<1-7>       Scholarship ID (optional; omit for no scholarship)
+
+          S2 flags:
+            --s2-package=<1-3>        S2 package ID (1=Umum, 2=Sivitas/Alumni, 3=FastTrack)
+            --no-matriculation        Waive the matriculation fee (default: required)
+
+          The command detects degree (S1 or S2) automatically from the registration.`)
 }
 
 func cmdList(ctx context.Context, dbConn *sql.DB, args []string) {
@@ -179,12 +203,36 @@ func cmdVerify(ctx context.Context, dbConn *sql.DB, args []string) {
 		os.Exit(1)
 	}
 
-	regIDHex := positionalArgs[0]
-	regID, err := uuid.Parse(regIDHex)
+	regID := parseRegID(positionalArgs[0])
+
+	var degree string
+	err := dbConn.QueryRowContext(ctx,
+		`SELECT g.degree FROM registration r
+		 INNER JOIN gelombang g ON g.id = r.gelombang_id
+		 WHERE r.id = ? AND r.status = 'SUBMITTED'`,
+		regID[:],
+	).Scan(&degree)
+	if err == sql.ErrNoRows {
+		fmt.Println("Action aborted: registration must be in 'SUBMITTED' status to verify.")
+		os.Exit(1)
+	}
 	if err != nil {
-		regID, err = uuid.Parse(strings.ReplaceAll(regIDHex, "-", ""))
-		if err != nil {
-			slog.Error("invalid registration id format", "error", err)
+		slog.Error("degree lookup failed", "error", err)
+		os.Exit(1)
+	}
+
+	if degree == "S1" {
+		var rankSet bool
+		_ = dbConn.QueryRowContext(ctx,
+			`SELECT usm_rank IS NOT NULL
+			 FROM registration_s1_assessment
+			 WHERE registration_id = ?`,
+			regID[:],
+		).Scan(&rankSet)
+
+		if !rankSet {
+			fmt.Println("Action aborted: S1 registration requires usm_rank before verify.")
+			fmt.Printf("  Set it first:  admincli loa-set-assessment %s --usm-rank=<1-5>\n", regID.String())
 			os.Exit(1)
 		}
 	}
@@ -225,6 +273,15 @@ func cmdVerify(ctx context.Context, dbConn *sql.DB, args []string) {
 		os.Exit(1)
 	}
 
+	if degree == "S1" {
+		if err := computeAndStoreFeeS1InTx(ctx, dbConn, tx, regID); err != nil {
+			slog.Error("fee calculation failed — verify will still commit but LoA will need manual recalc",
+				"reg_id", regID.String(), "error", err)
+		} else {
+			fmt.Println("Fee breakdown computed and stored.")
+		}
+	}
+
 	if err := tx.Commit(); err != nil {
 		slog.Error("commit failed", "error", err)
 		os.Exit(1)
@@ -232,6 +289,79 @@ func cmdVerify(ctx context.Context, dbConn *sql.DB, args []string) {
 	committed = true
 
 	fmt.Printf("Verified successfully. Examinee ID assigned: %s\n", examineeID)
+}
+
+func computeAndStoreFeeS1InTx(ctx context.Context, db *sql.DB, tx *sql.Tx, regID uuid.UUID) error {
+	var prodiID uuid.UUID
+	var gelombangNumber int
+	var usmRank sql.NullInt64
+	var scholarshipID sql.NullInt64
+
+	err := db.QueryRowContext(ctx, `
+		SELECT
+			s1.program_studi_id,
+			g.batch_number,
+			a.usm_rank,
+			a.scholarship_id
+		FROM registration r
+		INNER JOIN gelombang g ON g.id = r.gelombang_id
+		INNER JOIN registration_s1_detail s1 ON s1.registration_id = r.id
+		LEFT  JOIN registration_s1_assessment a ON a.registration_id = r.id
+		WHERE r.id = ?`,
+		regID[:],
+	).Scan(&prodiID, &gelombangNumber, &usmRank, &scholarshipID)
+	if err != nil {
+		return fmt.Errorf("fee input lookup: %w", err)
+	}
+	if !usmRank.Valid {
+		return loa.ErrInvalidAssessment
+	}
+
+	var bppPokok, perSKS, basePPL, labFee int
+	err = db.QueryRowContext(ctx, `
+		SELECT bpp_pokok, per_sks_cost, base_ppl, lab_fee
+		FROM master_s1_prodi_fee WHERE program_studi_id = ?`,
+		prodiID[:],
+	).Scan(&bppPokok, &perSKS, &basePPL, &labFee)
+	if err != nil {
+		return fmt.Errorf("prodi fee: %w", err)
+	}
+
+	var sppAmount int
+	err = db.QueryRowContext(ctx, `
+		SELECT spp_amount FROM master_s1_spp_matrix
+		WHERE gelombang_number = ? AND usm_rank = ?`,
+		gelombangNumber, usmRank.Int64,
+	).Scan(&sppAmount)
+	if err != nil {
+		return fmt.Errorf("spp matrix: %w", err)
+	}
+
+	const defaultSKS = 20
+	bppSKS := perSKS * defaultSKS
+
+	var discSPPPct, discPPLPct, discBPPPct, discSKSPct float64
+	if scholarshipID.Valid {
+		_ = db.QueryRowContext(ctx, `
+			SELECT spp_discount_pct, ppl_discount_pct, bpp_discount_pct, sks_discount_pct
+			FROM master_s1_scholarship WHERE id = ?`,
+			scholarshipID.Int64,
+		).Scan(&discSPPPct, &discPPLPct, &discBPPPct, &discSKSPct)
+	}
+
+	f := &loa.S1FeeBreakdown{
+		SPP:              sppAmount,
+		PPL:              basePPL,
+		BPPPokok:         bppPokok,
+		BPPSKS:           bppSKS,
+		BPPPraktikum:     labFee,
+		DiscountSPP:      int(float64(sppAmount) * discSPPPct / 100),
+		DiscountPPL:      int(float64(basePPL) * discPPLPct / 100),
+		DiscountBPPPokok: int(float64(bppPokok) * discBPPPct / 100),
+		DiscountBPPSKS:   int(float64(bppSKS) * discSKSPct / 100),
+	}
+
+	return loa.StoreFeeS1(ctx, tx, regID, f)
 }
 
 func cmdReject(ctx context.Context, dbConn *sql.DB, args []string) {
@@ -249,15 +379,7 @@ func cmdReject(ctx context.Context, dbConn *sql.DB, args []string) {
 		os.Exit(1)
 	}
 
-	regIDHex := positionalArgs[0]
-	regID, err := uuid.Parse(regIDHex)
-	if err != nil {
-		regID, err = uuid.Parse(strings.ReplaceAll(regIDHex, "-", ""))
-		if err != nil {
-			slog.Error("invalid registration id format", "error", err)
-			os.Exit(1)
-		}
-	}
+	regID := parseRegID(positionalArgs[0])
 
 	inputDoc := strings.TrimSpace(*fbDocFlag)
 	inputPay := strings.TrimSpace(*fbPayFlag)
@@ -348,15 +470,7 @@ func cmdReset(ctx context.Context, dbConn *sql.DB, args []string) {
 		os.Exit(1)
 	}
 
-	regIDHex := positionalArgs[0]
-	regID, err := uuid.Parse(regIDHex)
-	if err != nil {
-		regID, err = uuid.Parse(strings.ReplaceAll(regIDHex, "-", ""))
-		if err != nil {
-			slog.Error("invalid registration id format", "error", err)
-			os.Exit(1)
-		}
-	}
+	regID := parseRegID(positionalArgs[0])
 
 	res, err := dbConn.ExecContext(ctx, `
 		UPDATE registration 
@@ -385,6 +499,126 @@ func cmdReset(ctx context.Context, dbConn *sql.DB, args []string) {
 	}
 
 	fmt.Printf("Emergency reset completed successfully. Registration %s is now in DRAFT status.\n", regID.String())
+}
+
+func cmdLoaSetAssessment(ctx context.Context, dbConn *sql.DB, args []string) {
+	fs := flag.NewFlagSet("loa-set-assessment", flag.ContinueOnError)
+	usmRankFlag := fs.Int("usm-rank", 0, "S1: USM rank (1=best … 5=worst)")
+	scholarshipFlag := fs.Int("scholarship", 0, "S1: scholarship ID (0 = no scholarship)")
+	s2PackageFlag := fs.Int("s2-package", 0, "S2: package ID")
+	noMatriculationFlag := fs.Bool("no-matriculation", false, "S2: waive matriculation fee")
+
+	if err := fs.Parse(args); err != nil {
+		os.Exit(1)
+	}
+
+	positionalArgs := fs.Args()
+	if len(positionalArgs) < 1 {
+		fmt.Println("Usage: admincli loa-set-assessment <registration_id> [flags]")
+		os.Exit(1)
+	}
+
+	regID := parseRegID(positionalArgs[0])
+
+	var degree string
+	err := dbConn.QueryRowContext(ctx,
+		`SELECT g.degree FROM registration r
+		 INNER JOIN gelombang g ON g.id = r.gelombang_id
+		 WHERE r.id = ?`,
+		regID[:],
+	).Scan(&degree)
+	if err == sql.ErrNoRows {
+		fmt.Printf("Error: registration %s not found.\n", regID.String())
+		os.Exit(1)
+	}
+	if err != nil {
+		slog.Error("degree lookup failed", "error", err)
+		os.Exit(1)
+	}
+
+	switch degree {
+	case "S1":
+		if *usmRankFlag == 0 {
+			fmt.Println("Error: --usm-rank is required for S1 registrations (1-5).")
+			os.Exit(1)
+		}
+		if *usmRankFlag < 1 || *usmRankFlag > 5 {
+			fmt.Println("Error: --usm-rank must be between 1 and 5.")
+			os.Exit(1)
+		}
+		setS1Assessment(ctx, dbConn, regID, *usmRankFlag, *scholarshipFlag)
+
+	case "S2":
+		if *s2PackageFlag == 0 {
+			fmt.Println("Error: --s2-package is required for S2 registrations (1, 2, or 3).")
+			os.Exit(1)
+		}
+		setS2Assessment(ctx, dbConn, regID, *s2PackageFlag, !*noMatriculationFlag)
+
+	default:
+		fmt.Printf("Error: unknown degree %q for this registration.\n", degree)
+		os.Exit(1)
+	}
+}
+
+func setS1Assessment(ctx context.Context, db *sql.DB, regID uuid.UUID, usmRank, scholarshipID int) {
+	var scholarshipArg any
+	if scholarshipID > 0 {
+		scholarshipArg = scholarshipID
+	}
+
+	_, err := db.ExecContext(ctx, `
+		INSERT INTO registration_s1_assessment (registration_id, usm_rank, scholarship_id)
+		VALUES (?, ?, ?)
+		ON DUPLICATE KEY UPDATE
+			usm_rank      = VALUES(usm_rank),
+			scholarship_id = VALUES(scholarship_id)`,
+		regID[:], usmRank, scholarshipArg,
+	)
+	if err != nil {
+		slog.Error("set s1 assessment failed", "error", err)
+		os.Exit(1)
+	}
+
+	scholarshipLabel := "none"
+	if scholarshipID > 0 {
+		scholarshipLabel = strconv.Itoa(scholarshipID)
+	}
+	fmt.Printf("S1 assessment set: usm_rank=%d, scholarship_id=%s\n", usmRank, scholarshipLabel)
+	fmt.Println("Run 'admincli verify' to finalize and auto-compute fee breakdown.")
+}
+
+func setS2Assessment(ctx context.Context, db *sql.DB, regID uuid.UUID, packageID int, isMatriculation bool) {
+	_, err := db.ExecContext(ctx, `
+		INSERT INTO registration_s2_assessment (registration_id, s2_package_id, is_matriculation_required)
+		VALUES (?, ?, ?)
+		ON DUPLICATE KEY UPDATE
+			s2_package_id             = VALUES(s2_package_id),
+			is_matriculation_required = VALUES(is_matriculation_required)`,
+		regID[:], packageID, isMatriculation,
+	)
+	if err != nil {
+		slog.Error("set s2 assessment failed", "error", err)
+		os.Exit(1)
+	}
+
+	matLabel := "yes"
+	if !isMatriculation {
+		matLabel = "no"
+	}
+	fmt.Printf("S2 assessment set: package_id=%d, matriculation=%s\n", packageID, matLabel)
+}
+
+func parseRegID(s string) uuid.UUID {
+	id, err := uuid.Parse(s)
+	if err != nil {
+		id, err = uuid.Parse(strings.ReplaceAll(s, "-", ""))
+		if err != nil {
+			slog.Error("invalid registration id format", "error", err)
+			os.Exit(1)
+		}
+	}
+	return id
 }
 
 func truncate(s string, n int) string {
