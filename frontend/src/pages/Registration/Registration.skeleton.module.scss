@@ -1,0 +1,54 @@
+.navItemSkeleton {
+  pointer-events: none;
+  cursor: default;
+}
+
+.sectionNumberSkeleton,
+.collapseToggleSkeleton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uploadZoneSkeleton {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  border: 2px dashed #e5e7eb;
+  border-radius: 10px;
+}
+
+.paymentInfoCardSkeleton {
+  background: #ebebeb !important;
+  color: transparent !important;
+
+  h3,
+  p,
+  a,
+  strong,
+  span {
+    color: transparent !important;
+  }
+}
+
+.paymentLine {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-s);
+  margin-bottom: 2px;
+}
+
+.checkboxSquare {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.btnSkeleton {
+  height: 40px;
+  border-radius: 8px;
+}

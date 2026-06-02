@@ -52,14 +52,21 @@ export function useRegistrationStatus(batchKey: string | undefined) {
     useEffect(() => {
         if (!data || !batchKey) return;
 
-        if (!isViewMode && (data.status === "SUBMITTED" || data.status === "VERIFIED")) {
-            toast.warning("Formulir ini sudah disubmit atau sudah diverifikasi!");
+        if (
+            !isViewMode &&
+            (data.status === "SUBMITTED" || data.status === "VERIFIED")
+        ) {
+            toast.warning(
+                "Formulir ini sudah disubmit atau sudah diverifikasi!",
+            );
             router.replace("/account");
             return;
         }
 
-        if (!isEditMode && !isViewMode && data.status === "REJECTED") {
-            toast.warning("Pendaftaran Anda ditolak. Silakan periksa akun Anda.");
+        if (!isEditMode && data.status === "REJECTED") {
+            toast.warning(
+                "Pendaftaran Anda ditolak. Silakan periksa akun Anda.",
+            );
             router.replace("/account");
             return;
         }

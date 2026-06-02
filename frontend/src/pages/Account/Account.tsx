@@ -26,10 +26,10 @@ import {
 } from "@/components/Icons/Icons";
 import NIKReveal from "@/components/NIKReveal/NIKReveal";
 import type { RegistrationCard, User } from "@/types/api";
+import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
+import { useConfirm } from "../../components/ConfirmDialog/useConfirm";
 import AccountSkeleton from "./Account.skeleton";
 import styles from "./Account.module.scss";
-import { useConfirm } from "../../components/ConfirmDialog/useConfirm";
-import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
 
 type RegistrationStatus =
     | "DRAFT"
@@ -51,13 +51,13 @@ function getStatusConfig(
     t: (key: string) => string,
 ) {
     const map: Record<RegistrationStatus, { label?: string; color?: string }> =
-    {
-        DRAFT: { label: t("statusDraft"), color: "draft" },
-        SUBMITTED: { label: t("statusSubmitted"), color: "submitted" },
-        REJECTED: { label: t("statusRejected"), color: "rejected" },
-        VERIFIED: { label: t("statusVerified"), color: "examinee" },
-        NONE: {},
-    };
+        {
+            DRAFT: { label: t("statusDraft"), color: "draft" },
+            SUBMITTED: { label: t("statusSubmitted"), color: "submitted" },
+            REJECTED: { label: t("statusRejected"), color: "rejected" },
+            VERIFIED: { label: t("statusVerified"), color: "examinee" },
+            NONE: {},
+        };
     return map[status];
 }
 
@@ -420,7 +420,7 @@ function RegistrationCardItem({
                     <div className={styles.actionGrid}>
                         <button
                             className={`${styles.btn} ${styles.btnPrimary}`}
-                            onClick={() => { }}
+                            onClick={() => {}}
                             disabled={isActionDisabled}
                             title={t("resultLetterComingSoon")}
                         >
@@ -444,7 +444,7 @@ function RegistrationCardItem({
                         </button>
                         <button
                             className={`${styles.btn} ${styles.btnDangerOutline}`}
-                            onClick={() => { }}
+                            onClick={() => {}}
                             disabled={isActionDisabled}
                             title={t("resignationComingSoon")}
                         >

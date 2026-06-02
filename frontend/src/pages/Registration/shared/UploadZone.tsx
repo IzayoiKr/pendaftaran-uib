@@ -161,8 +161,8 @@ export default function UploadZone({
                 aria-label={
                     file
                         ? t("fileSelected", {
-                            fileName: displayInfo?.name ?? "",
-                        })
+                              fileName: displayInfo?.name ?? "",
+                          })
                         : t("uploadLabel", { label })
                 }
             >

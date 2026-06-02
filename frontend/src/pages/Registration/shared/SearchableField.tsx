@@ -330,7 +330,13 @@ export default function SearchableField({
                 )}
 
             {!isManual && selected && (
-                <input type="hidden" name={name} value={selected.value} readOnly={readOnly} disabled={readOnly} />
+                <input
+                    type="hidden"
+                    name={name}
+                    value={selected.value}
+                    readOnly={readOnly}
+                    disabled={readOnly}
+                />
             )}
 
             {isError && (

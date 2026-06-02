@@ -40,9 +40,10 @@ export default function ConfirmDialog({
                 onCancel();
             }
             if (e.key === "Tab") {
-                const focusable = overlayRef.current?.querySelectorAll<HTMLElement>(
-                    'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-                );
+                const focusable =
+                    overlayRef.current?.querySelectorAll<HTMLElement>(
+                        'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+                    );
                 if (!focusable || focusable.length === 0) return;
                 const first = focusable[0];
                 const last = focusable[focusable.length - 1];

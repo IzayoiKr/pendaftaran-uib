@@ -11,6 +11,7 @@ import useAuthStore from "@/store/useAuthStore";
 import { s1SubmitSchema } from "@/validation/registration/s1";
 import { s2SubmitSchema } from "@/validation/registration/s2";
 import { SendIcon } from "@/components/Icons/Icons";
+import RegistrationSkeleton from "./Registration.skeleton";
 import Sidebar from "./Sidebar";
 import { S1_BEASISWA_DOCS, S1_DOCS, S2_DOCS } from "./registerOptions";
 import Dokumen from "./sections/Dokumen";
@@ -320,7 +321,12 @@ export default function RegistrationForm({
     const { submit } = useRegistrationSubmit(batchKey, getValues);
 
     useEffect(() => {
-        if (draftData && (status === "DRAFT" || status === "REJECTED" || status == "SUBMITTED")) {
+        if (
+            draftData &&
+            (status === "DRAFT" ||
+                status === "REJECTED" ||
+                status == "SUBMITTED")
+        ) {
             reset({
                 ...REGISTRATION_DEFAULT_VALUES,
                 ...draftData,
@@ -417,9 +423,7 @@ export default function RegistrationForm({
         }
     };
 
-    if (statusLoading) {
-        return null;
-    }
+    if (statusLoading) <RegistrationSkeleton />;
 
     return (
         <FormProvider {...methods}>
@@ -442,7 +446,6 @@ export default function RegistrationForm({
                             {t("pageSubtitle", { batchName: event.batchName })}
                         </p>
                     </div>
-
 
                     {level === "S1" ? (
                         <>
@@ -513,7 +516,10 @@ export default function RegistrationForm({
                     </div>
 
                     {!isReadOnly && (
-                        <div className={styles.confirmationBox} id="declarations">
+                        <div
+                            className={styles.confirmationBox}
+                            id="declarations"
+                        >
                             {level === "S1" && (
                                 <Controller
                                     name="jenisdaftar"
@@ -577,7 +583,9 @@ export default function RegistrationForm({
                                                 err instanceof Error
                                                     ? err.message
                                                     : "Terjadi kesalahan";
-                                            toast.error(message, { id: toastId });
+                                            toast.error(message, {
+                                                id: toastId,
+                                            });
                                         } finally {
                                             setIsSubmitting(false);
                                         }

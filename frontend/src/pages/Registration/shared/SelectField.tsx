@@ -34,8 +34,15 @@ export default function SelectField({
 
     return (
         <FormField label={label} required={required} error={error}>
-            <select name={name} value={value ?? ""} onChange={handleChange} disabled={readOnly}>
-                <option value="" disabled={readOnly}>{placeholder}</option>
+            <select
+                name={name}
+                value={value ?? ""}
+                onChange={handleChange}
+                disabled={readOnly}
+            >
+                <option value="" disabled={readOnly}>
+                    {placeholder}
+                </option>
                 {options.map((o) => (
                     <option key={o.value} value={o.value} disabled={readOnly}>
                         {translateLabels ? t(o.label) : o.label}

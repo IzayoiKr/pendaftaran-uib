@@ -26,19 +26,16 @@ export function useConfirm() {
         isLoading: false,
     });
 
-    const confirm = useCallback(
-        (options: ConfirmOptions): Promise<boolean> => {
-            return new Promise((resolve) => {
-                setState({
-                    isOpen: true,
-                    ...options,
-                    resolve,
-                    isLoading: false,
-                });
+    const confirm = useCallback((options: ConfirmOptions): Promise<boolean> => {
+        return new Promise((resolve) => {
+            setState({
+                isOpen: true,
+                ...options,
+                resolve,
+                isLoading: false,
             });
-        },
-        [],
-    );
+        });
+    }, []);
 
     const handleConfirm = useCallback(() => {
         setState((prev) => {

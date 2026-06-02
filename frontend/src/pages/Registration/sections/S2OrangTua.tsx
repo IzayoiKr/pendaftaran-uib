@@ -122,7 +122,7 @@ export default function S2OrangTua({
                             ({ fieldKey, options, placeholder }) => {
                                 const fieldName =
                                     section.fields[
-                                    fieldKey as keyof typeof section.fields
+                                        fieldKey as keyof typeof section.fields
                                     ];
                                 return (
                                     <Controller
@@ -135,7 +135,7 @@ export default function S2OrangTua({
                                             <SelectField
                                                 label={t(
                                                     section.labels[
-                                                    fieldKey as keyof typeof section.labels
+                                                        fieldKey as keyof typeof section.labels
                                                     ],
                                                 )}
                                                 name={fieldName}
