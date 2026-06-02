@@ -8,6 +8,7 @@ import (
 
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/utils"
 
 	"github.com/go-chi/chi/v5"
@@ -17,23 +18,24 @@ import (
 func RegistrationWithdraw(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
+		lang := utils.Lang(r)
 
 		claims := auth.GetClaims(r)
 		if claims == nil {
-			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("unauthorized"))
+			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON(i18n.T("common.unauthorized", lang)))
 			return
 		}
 
 		batchKey := chi.URLParam(r, "batchKey")
 		if batchKey == "" {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("permintaan tidak valid"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.T("common.invalid_request", lang)))
 			return
 		}
 
 		userID, err := uuid.Parse(claims.UserID)
 		if err != nil {
 			slog.Error("registration_withdraw: parse uuid", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -50,17 +52,17 @@ func RegistrationWithdraw(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 		).Scan(&regID, &currentStatus)
 
 		if errors.Is(err, sql.ErrNoRows) {
-			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON("pendaftaran tidak ditemukan"))
+			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON(i18n.T("registration.not_found", lang)))
 			return
 		}
 		if err != nil {
 			slog.Error("registration_withdraw: find registration", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
 		if currentStatus != "SUBMITTED" {
-			utils.WriteJSON(w, http.StatusConflict, utils.ErrJSON("hanya pendaftaran yang sudah dikirim dapat ditarik"))
+			utils.WriteJSON(w, http.StatusConflict, utils.ErrJSON(i18n.T("registration.withdraw_conflict", lang)))
 			return
 		}
 
@@ -72,7 +74,7 @@ func RegistrationWithdraw(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 		)
 		if err != nil {
 			slog.Error("registration_withdraw: update status", "reg_id", regID, "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -89,7 +91,7 @@ func RegistrationWithdraw(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 		})
 
 		utils.WriteJSON(w, http.StatusOK, map[string]string{
-			"message": "pendaftaran berhasil ditarik",
+			"message": i18n.T("registration.withdraw_success", lang),
 			"status":  "DRAFT",
 		})
 	}

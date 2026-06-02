@@ -11,6 +11,7 @@ import (
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/crypto"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 )
@@ -22,6 +23,7 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
+		lang := utils.Lang(r)
 
 		var req models.LoginRequest
 		if err := utils.DecodeJSON(r, &req); err != nil {
@@ -30,7 +32,7 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 		}
 
 		req.Sanitize()
-		if err := req.Validate(); err != nil {
+		if err := req.Validate(lang); err != nil {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
@@ -64,7 +66,7 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 				})
 				w.Header().Set("X-Auth-Error", "credentials")
 				utils.WriteJSON(w, http.StatusUnauthorized, models.LoginErrorResponse{
-					Error: "verifikasi CAPTCHA diperlukan",
+					Error: i18n.T("auth.captcha_required", lang),
 					RequireCaptcha: true,
 				})
 				return
@@ -110,13 +112,13 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 			})
 			w.Header().Set("X-Auth-Error", "credentials")
 			utils.WriteJSON(w, http.StatusUnauthorized, models.LoginErrorResponse{
-				Error: "email atau password salah",
+				Error: i18n.T("auth.login_failed", lang),
 				RequireCaptcha: failCount >= captchaThreshold,
 			})
 			return
 		}
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -133,7 +135,7 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 			})
 			w.Header().Set("X-Auth-Error", "credentials")
 			utils.WriteJSON(w, http.StatusUnauthorized, models.LoginErrorResponse{
-				Error: "email atau password salah",
+				Error: i18n.T("auth.login_failed", lang),
 				RequireCaptcha: failCount >= captchaThreshold,
 			})
 			return
@@ -154,18 +156,18 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 
 		accessToken, err := auth.GenerateAccessToken(user.ID.String(), sessionID, user.Email)
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
 		refreshToken, err := auth.GenerateRefreshToken(user.ID.String(), sessionID, user.Email)
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
 		if err := ts.StoreSession(r.Context(), sessionID, user.ID.String(), time.Now().Add(auth.RefreshTokenTTL)); err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 

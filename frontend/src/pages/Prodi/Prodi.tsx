@@ -9,7 +9,6 @@ import styles from "./Prodi.module.scss";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface BiodataPendaftaran {
-    nomorDaftar: string;
     periode: string;
     gelombang: string;
     jurusan: string;
@@ -19,20 +18,21 @@ interface BiodataPendaftaran {
 }
 
 interface RequestPerpindahan {
-    tanggalRequest: string;
-    programStudiSebelumnya: string;
-    programStudiPerpindahan: string;
-    waktuKuliahSebelumnya: string;
-    waktuKuliahPerpindahan: string;
-    statusValidasi: string;
-    tanggalValidasi: string;
+    id: string;
+    createdAt: string;
+    previousProgramStudi: string;
+    newProgramStudi: string;
+    previousClassSession: string;
+    newClassSession: string;
+    status: string;
+    updatedAt: string;
+    notes?: string;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function BiodataSection({ data }: { data: BiodataPendaftaran }) {
     const rows: [string, string][] = [
-        ["Nomor Daftar (Registration Number)", data.nomorDaftar],
         ["Periode (Period)", data.periode],
         ["Gelombang (Group)", data.gelombang],
         ["Jurusan (Study Program)", data.jurusan],
@@ -61,7 +61,7 @@ const TABLE_HEADERS = [
     "Waktu Kuliah Perpindahan (New Shift)",
     "Status Validasi (Validation Status)",
     "Tanggal Validasi (Validation Date)",
-    "Aksi (Action)",
+    "Catatan (Notes)",
 ];
 
 function RequestTable({ requests }: { requests: RequestPerpindahan[] }) {
@@ -87,16 +87,16 @@ function RequestTable({ requests }: { requests: RequestPerpindahan[] }) {
                             </td>
                         </tr>
                     ) : (
-                        requests.map((req, i) => (
-                            <tr key={i}>
-                                <td>{req.tanggalRequest}</td>
-                                <td>{req.programStudiSebelumnya}</td>
-                                <td>{req.programStudiPerpindahan}</td>
-                                <td>{req.waktuKuliahSebelumnya}</td>
-                                <td>{req.waktuKuliahPerpindahan}</td>
-                                <td>{req.statusValidasi}</td>
-                                <td>{req.tanggalValidasi}</td>
-                                <td>{/* TODO: aksi per row */}</td>
+                        requests.map((req) => (
+                            <tr key={req.id}>
+                                <td>{req.createdAt.split(" ")[0]}</td>
+                                <td>{req.previousProgramStudi}</td>
+                                <td>{req.newProgramStudi}</td>
+                                <td>{req.previousClassSession}</td>
+                                <td>{req.newClassSession}</td>
+                                <td>{req.status}</td>
+                                <td>{req.updatedAt.split(" ")[0]}</td>
+                                <td>{req.notes || "-"}</td>
                             </tr>
                         ))
                     )}
@@ -111,11 +111,10 @@ function RequestTable({ requests }: { requests: RequestPerpindahan[] }) {
 export default function PerubahanProdiPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const nomorDaftar = searchParams.get("nomorDaftar");
+    const regID = searchParams.get("regID");
 
     const [isFetchingData, setIsFetchingData] = useState(false);
     const [biodata, setBiodata] = useState<BiodataPendaftaran>({
-        nomorDaftar: nomorDaftar || "",
         periode: "",
         gelombang: "",
         jurusan: "",
@@ -127,31 +126,40 @@ export default function PerubahanProdiPage() {
     const [requests, setRequests] = useState<RequestPerpindahan[]>([]);
 
     useEffect(() => {
-        if (!nomorDaftar) return;
+        if (!regID) return;
 
         const fetchData = async () => {
             setIsFetchingData(true);
             try {
-                const data = await api.profile.getRegistration(nomorDaftar);
-                if (data) {
+                const res = await api.profile.getRegistration(regID);
+                if (res) {
+                    const { registration, user, current_prodi } = res;
                     setBiodata({
-                        nomorDaftar: nomorDaftar,
-                        periode: new Date(data.created_at || Date.now())
-                            .getFullYear()
-                            .toString(),
-                        gelombang: data.batchName || "-",
-                        jurusan:
-                            data.type === "S1"
-                                ? data.prodi_pil_name || data.prodi_pil || "-"
-                                : data.jurusan || "-",
-                        namaLengkap: data.nama || "-",
-                        alamatEmail: data.email || "-",
-                        nomorNIK: data.nik || "-",
+                        periode: registration.academic_year || "-",
+                        gelombang: registration.batch_name || "-",
+                        jurusan: current_prodi || "-",
+                        namaLengkap: user.full_name || "-",
+                        alamatEmail: user.email || "-",
+                        nomorNIK: user.nik || "-",
                     });
-
-                    // Fetch perpindahan prodi requests if endpoint exists
-                    // For now, we'll keep it empty or mock it if there's no backend yet
                 }
+
+                const history = await api.prodiChange.getHistory();
+                setRequests(
+                    history
+                        .filter((r) => r.registration_id === regID)
+                        .map((r) => ({
+                            id: r.id,
+                            createdAt: r.created_at,
+                            previousProgramStudi: r.previous_program_studi,
+                            newProgramStudi: r.new_program_studi,
+                            previousClassSession: r.previous_class_session,
+                            newClassSession: r.new_class_session,
+                            status: r.status,
+                            updatedAt: r.updated_at,
+                            notes: r.notes,
+                        })),
+                );
             } catch (err) {
                 console.error("Failed to fetch registration details", err);
                 toast.error("Gagal mengambil data pendaftaran.");
@@ -161,7 +169,7 @@ export default function PerubahanProdiPage() {
         };
 
         fetchData();
-    }, [nomorDaftar]);
+    }, [regID]);
 
     return (
         <main className={styles.page}>
@@ -192,7 +200,7 @@ export default function PerubahanProdiPage() {
                         className={styles.btnSuccess}
                         onClick={() =>
                             router.push(
-                                `/account/prodi/prodi-request?nomorDaftar=${nomorDaftar}`,
+                                `/account/prodi/change-prodi?regID=${regID}`,
                             )
                         }
                     >

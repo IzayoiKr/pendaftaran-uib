@@ -29,6 +29,7 @@ export class ApiError extends Error {
     requireVerify: boolean;
     email?: string;
     expired: boolean;
+    status?: number;
 
     constructor(
         message: string,
@@ -36,6 +37,7 @@ export class ApiError extends Error {
         requireVerify = false,
         email?: string,
         expired = false,
+        status?: number,
     ) {
         super(message);
         this.name = "ApiError";
@@ -43,6 +45,7 @@ export class ApiError extends Error {
         this.requireVerify = requireVerify;
         this.email = email;
         this.expired = expired;
+        this.status = status;
     }
 }
 
@@ -141,6 +144,7 @@ apiClient.interceptors.response.use(
                 requireVerify,
                 data?.email,
                 expired,
+                error.response?.status,
             ),
         );
     },
@@ -205,6 +209,17 @@ export const api = {
     profile: {
         get: () => apiClient.get<never, ProfileResponse>("/api/profile"),
 
+        getRegistration: (regID: string) =>
+            apiClient.get<
+                never,
+                {
+                    registration: RegistrationResponse;
+                    user: User;
+                    current_prodi: string;
+                    current_session: string;
+                }
+            >(`/api/registrations/${regID}`),
+
         update: (data: { fullName: string }) =>
             apiClient.post<never, { message: string }>("/api/profile", {
                 full_name: data.fullName,
@@ -220,6 +235,33 @@ export const api = {
                     old_password: oldPassword,
                     new_password: newPassword,
                 },
+            ),
+    },
+    prodiChange: {
+        getHistory: () =>
+            apiClient.get<
+                never,
+                {
+                    id: string;
+                    registration_id: string;
+                    previous_program_studi: string;
+                    new_program_studi: string;
+                    previous_class_session: string;
+                    new_class_session: string;
+                    status: string;
+                    notes: string | null;
+                    created_at: string;
+                    updated_at: string;
+                }[]
+            >("/api/prodi-change"),
+        create: (data: {
+            registration_id: string;
+            new_program_studi_id: string;
+            new_class_session: string;
+        }) =>
+            apiClient.post<never, { message: string }>(
+                "/api/prodi-change",
+                data,
             ),
     },
     registrations: {
@@ -245,5 +287,29 @@ export const api = {
             apiClient.post<never, RegistrationResponse>(
                 `/api/registrations/${batchKey}/withdraw`,
             ),
+    },
+    transferProof: {
+        getHistory: (regID?: string) =>
+            apiClient.get(`/api/transfer-proof${regID ? `?regID=${regID}` : ""}`),
+        upload: (formData: FormData) =>
+            apiClient.post("/api/transfer-proof", formData),
+    },
+    ospek: {
+        getPrasyarat: (regID?: string) =>
+            apiClient.get(`/api/ospek/prasyarat${regID ? `?regID=${regID}` : ""}`),
+        uploadPrasyarat: (formData: FormData) =>
+            apiClient.post("/api/ospek/prasyarat", formData),
+    },
+    programStudi: {
+        getAll: () =>
+            apiClient.get<
+                never,
+                {
+                    id: string;
+                    code: string;
+                    title: string;
+                    degree: string;
+                }[]
+            >("/api/program_studi"),
     },
 };

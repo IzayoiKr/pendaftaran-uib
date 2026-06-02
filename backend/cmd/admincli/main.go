@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/joho/godotenv"
 	"pendaftaran-uib/backend/internal/db"
 
 	"github.com/google/uuid"
@@ -21,6 +22,8 @@ func main() {
 		Level: slog.LevelInfo,
 	}))
 	slog.SetDefault(logger)
+
+	_ = godotenv.Load() // Ignore error if .env doesn't exist
 
 	provider, err := db.NewProvider(ctx)
 	if err != nil {

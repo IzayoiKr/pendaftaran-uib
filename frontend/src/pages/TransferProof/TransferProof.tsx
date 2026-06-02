@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { api } from "@/api";
+import { api, ApiError } from "@/api";
+import { viewProtectedPdf } from "@/utils/downloadPdf";
+import NIKReveal from "@/components/NIKReveal/NIKReveal";
 import styles from "./TransferProof.module.scss";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -15,7 +17,7 @@ interface BiodataPendaftaran {
     jurusan: string;
     namaLengkap: string;
     alamatEmail: string;
-    nomorNIK: string;
+    nomorNIK: string | ReactNode;
 }
 
 interface BuktiTransferRow {
@@ -31,7 +33,7 @@ interface BuktiTransferRow {
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function BiodataSection({ data }: { data: BiodataPendaftaran }) {
-    const rows: [string, string][] = [
+    const rows: [string, string | ReactNode][] = [
         ["Nomor Daftar (Registration Number)", data.nomorDaftar],
         ["Periode (Period)", data.periode],
         ["Gelombang (Group)", data.gelombang],
@@ -44,7 +46,7 @@ function BiodataSection({ data }: { data: BiodataPendaftaran }) {
     return (
         <div className={styles.biodataInfo}>
             {rows.map(([label, value]) => (
-                <div key={label} className={styles.infoRow}>
+                <div key={label.toString()} className={styles.infoRow}>
                     <span className={styles.infoLabel}>{label}</span>
                     <span className={styles.infoValue}>: {value || "-"}</span>
                 </div>
@@ -93,14 +95,13 @@ function BuktiTransferTable({ rows }: { rows: BuktiTransferRow[] }) {
                                 <td>{row.bank}</td>
                                 <td>
                                     {row.buktiTransferUrl ? (
-                                        <a
-                                            href={row.buktiTransferUrl}
+                                        <button
+                                            type="button"
+                                            onClick={() => viewProtectedPdf(row.buktiTransferUrl, "bukti_transfer.pdf")}
                                             className={styles.buktiLink}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
                                         >
                                             🧾 Bukti Transfer
-                                        </a>
+                                        </button>
                                     ) : (
                                         "-"
                                     )}
@@ -158,88 +159,88 @@ function BuktiTransferTable({ rows }: { rows: BuktiTransferRow[] }) {
 export default function BuktiTransferPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const nomorDaftar = searchParams.get("nomorDaftar");
+    const regID = searchParams.get("regID");
 
     const [biodata, setBiodata] = useState<BiodataPendaftaran>({
-        nomorDaftar: nomorDaftar || "",
-        periode: "",
-        gelombang: "",
-        jurusan: "",
-        namaLengkap: "",
-        alamatEmail: "",
-        nomorNIK: "",
+        nomorDaftar: "-",
+        periode: "-",
+        gelombang: "-",
+        jurusan: "-",
+        namaLengkap: "-",
+        alamatEmail: "-",
+        nomorNIK: "-",
     });
     const [rows, setRows] = useState<BuktiTransferRow[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        if (!nomorDaftar) return;
+        if (!regID) return;
 
         const fetchData = async () => {
             setIsLoading(true);
             try {
-                const data = await api.profile.getRegistration(nomorDaftar);
-                if (data) {
+                // Fetch registration biodata
+                const res = await api.profile.getRegistration(regID);
+                if (res) {
+                    const { registration, user, current_prodi } = res;
                     setBiodata({
-                        nomorDaftar: nomorDaftar,
-                        periode: new Date(data.created_at || Date.now())
-                            .getFullYear()
-                            .toString(),
-                        gelombang: data.batchName || "-",
-                        jurusan:
-                            data.type === "S1"
-                                ? data.prodi_pil_name || data.prodi_pil || "-"
-                                : data.jurusan || "-",
-                        namaLengkap: data.nama || "-",
-                        alamatEmail: data.email || "-",
-                        nomorNIK: data.nik || "-",
+                        nomorDaftar: registration.examinee_id || registration.registration_id.slice(0, 8),
+                        periode: registration.academic_year || "-",
+                        gelombang: registration.batch_name || "-",
+                        jurusan: current_prodi || "-",
+                        namaLengkap: user.full_name || "-",
+                        alamatEmail: user.email || "-",
+                        nomorNIK: <NIKReveal masked={user.nik} /> || "-",
                     });
+                }
 
-                    // If there's payment records
-                    if (data.payments && Array.isArray(data.payments)) {
-                        const mappedRows: BuktiTransferRow[] =
-                            data.payments.map((p: any) => ({
-                                tanggalUpload: p.created_at
-                                    ? new Date(p.created_at).toLocaleDateString(
-                                          "id-ID",
-                                          {
-                                              day: "2-digit",
-                                              month: "short",
-                                              year: "numeric",
-                                          },
-                                      )
-                                    : "-",
-                                pemilikRekening: p.pemilik_rekening || "-",
-                                bank: p.bank || "-",
-                                buktiTransferUrl: p.bukti_bayar_path,
-                                statusValidasi:
-                                    p.status || "Masih dalam pemeriksaan",
-                                tanggalValidasi: p.validation_date
-                                    ? new Date(
-                                          p.validation_date,
-                                      ).toLocaleDateString("id-ID", {
-                                          day: "2-digit",
-                                          month: "short",
-                                          year: "numeric",
-                                      })
-                                    : "-",
-                                ropUrl: `/api/registration/${nomorDaftar}/rop/${p.id}`, // Specific ROP URL
+                // Fetch tuition fee history
+                try {
+                    const tf = await api.transferProof.getHistory(regID);
+                    if (tf && typeof tf === "object" && !Array.isArray(tf)) {
+                        // Mapped single object if backend only returns one
+                        const p = tf as any;
+                        if (p.registration_id === regID) {
+                            const mappedRow: BuktiTransferRow = {
+                                tanggalUpload: p.uploaded_at || "-",
+                                pemilikRekening: p.account_holder,
+                                bank: p.bank_name,
+                                buktiTransferUrl: `/api/transfer-proof/file/${regID}`,
+                                statusValidasi: p.status,
+                                tanggalValidasi: p.verified_at || "-",
+                                ropUrl: "#",
+                            };
+                            setRows([mappedRow]);
+                        }
+                    } else if (Array.isArray(tf)) {
+                        const mappedRows: BuktiTransferRow[] = (tf as any[])
+                            .filter((p) => p.registration_id === regID)
+                            .map((p) => ({
+                                tanggalUpload: p.uploaded_at || "-",
+                                pemilikRekening: p.account_holder,
+                                bank: p.bank_name,
+                                buktiTransferUrl: `/api/transfer-proof/file/${regID}`,
+                                statusValidasi: p.status,
+                                tanggalValidasi: p.verified_at || "-",
+                                ropUrl: "#",
                             }));
                         setRows(mappedRows);
                     }
+                } catch (err) {
+                    if (err instanceof ApiError && err.status === 404) {
+                        setRows([]);
+                    } else {
+                        console.error("Failed to fetch tuition fee", err);
+                        toast.error("Gagal mengambil data riwayat pembayaran.");
+                    }
                 }
-            } catch (err) {
-                console.error("Failed to fetch registration details", err);
-                toast.error(
-                    "Gagal mengambil data pendaftaran. (Failed to fetch registration data.)",
-                );
             } finally {
                 setIsLoading(false);
             }
         };
 
         fetchData();
-    }, [nomorDaftar]);
+    }, [regID]);
 
     return (
         <main className={styles.page}>
@@ -269,7 +270,7 @@ export default function BuktiTransferPage() {
                         className={styles.btnSuccess}
                         onClick={() =>
                             router.push(
-                                `/account/transfer-proof/upload-transfer-proof?nomorDaftar=${nomorDaftar}`,
+                                `/account/transfer-proof/upload-transfer-proof?regID=${regID}`,
                             )
                         }
                     >

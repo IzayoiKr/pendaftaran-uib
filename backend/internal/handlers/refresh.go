@@ -9,6 +9,7 @@ import (
 
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 
@@ -18,6 +19,7 @@ import (
 func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
+		lang := utils.Lang(r)
 
 		cookie, err := r.Cookie("refresh_token")
 		if err != nil {
@@ -61,13 +63,13 @@ func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc
 				RequestID: base.RequestID,
 				Meta: map[string]any{"reason": "jti_revoked", "jti": claims.ID},
 			})
-			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("token has been revoked"))
+			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON(i18n.T("auth.session_invalid", lang)))
 			return
 		}
 
 		consumed, err := ts.ConsumeSession(r.Context(), sessionID)
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 		if !consumed {
@@ -84,7 +86,7 @@ func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc
 			slog.Warn("SECURITY: refresh on missing/expired session - possible token reuse",
 				"session_id", sessionID,
 				"user_id", claims.UserID)
-			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("sesi tidak valid, silahkan login kembali"))
+			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON(i18n.T("auth.session_invalid", lang)))
 			return
 		}
 
@@ -103,7 +105,7 @@ func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc
 
 		if errors.Is(err, sql.ErrNoRows) {
 			clearRefreshCookie(w)
-			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("user tidak ditemukan"))
+			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON(i18n.T("common.user_not_found", lang)))
 			return
 		}
 		if err != nil {

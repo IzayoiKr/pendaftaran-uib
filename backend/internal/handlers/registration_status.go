@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"pendaftaran-uib/backend/internal/auth"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 
@@ -17,21 +18,23 @@ import (
 func RegistrationStatus(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		batchKey := chi.URLParam(r, "batchKey")
+		lang := utils.Lang(r)
+
 		if batchKey == "" {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("batch key is required"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.T("common.invalid_request", lang)))
 			return
 		}
 
 		claims := auth.GetClaims(r)
 		if claims == nil {
-			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("unauthorized"))
+			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON(i18n.T("common.unauthorized", lang)))
 			return
 		}
 
 		userID, err := uuid.Parse(claims.UserID)
 		if err != nil {
 			slog.Error("registration_status: parse uuid from claims", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -57,7 +60,7 @@ func RegistrationStatus(db *sql.DB) http.HandlerFunc {
 		}
 		if err != nil {
 			slog.Error("registration_status: query registration", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -69,7 +72,7 @@ func RegistrationStatus(db *sql.DB) http.HandlerFunc {
 			draftData, err := loadDraftData(r, db, regID, degree)
 			if err != nil {
 				slog.Error("registration_status: load draft data", "reg_id", regID.String(), "error", err)
-				utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+				utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 				return
 			}
 			resp.DraftData = draftData

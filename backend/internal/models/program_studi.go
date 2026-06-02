@@ -4,6 +4,7 @@ import "github.com/google/uuid"
 
 type ProgramStudiDTO struct {
 	ID uuid.UUID `json:"id"`
+	Code string `json:"code"`
 	Title string `json:"title"`
 	Faculty string `json:"faculty"`
 	Degree string `json:"degree"`

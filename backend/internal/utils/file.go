@@ -21,8 +21,8 @@ type UploadConfig struct {
 }
 
 var (
-	ErrFileTooLarge    = errors.New("salah satu dokumen melebihi batas maksimal 2MB")
-	ErrInvalidType     = errors.New("format dokumen harus berupa file PDF")
+	ErrFileTooLarge    = errors.New("file too large")
+	ErrInvalidType     = errors.New("invalid file type")
 	ErrMissingHeader   = errors.New("missing file header")
 	ErrMalwareDetected = errors.New("malware detected")
 )

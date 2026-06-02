@@ -611,7 +611,25 @@
             "motherEducationInvalid": "Pendidikan ibu tidak valid",
             "motherOccupationInvalid": "Pekerjaan ibu tidak valid",
             "motherIncomeInvalid": "Penghasilan ibu tidak valid",
-            "motherStatusInvalid": "Status ibu tidak valid"
+            "motherStatusInvalid": "Status ibu tidak valid",
+            "ppInvalid": "Dokumen pas photo tidak valid",
+            "ktpInvalid": "Dokumen KTP tidak valid",
+            "kkInvalid": "Dokumen kartu keluarga tidak valid",
+            "transkripNilaiInvalid": "Dokumen transkrip nilai tidak valid",
+            "ijazahDokInvalid": "Dokumen ijazah tidak valid",
+            "sktmKipInvalid": "Dokumen SKTM/KIP tidak valid",
+            "fotoRumahInvalid": "Dokumen foto rumah tidak valid",
+            "tagihanListrikInvalid": "Dokumen tagihan listrik tidak valid",
+            "tagihanAirInvalid": "Dokumen tagihan air tidak valid",
+            "sertifikatPrestasiInvalid": "Dokumen sertifikat prestasi tidak valid",
+            "rapot1Invalid": "Dokumen rapot semester 1 tidak valid",
+            "rapot2Invalid": "Dokumen rapot semester 2 tidak valid",
+            "rapot3Invalid": "Dokumen rapot semester 3 tidak valid",
+            "rapot4Invalid": "Dokumen rapot semester 4 tidak valid",
+            "alInvalid": "Dokumen akta lahir tidak valid",
+            "r1Invalid": "Dokumen ijazah sarjana tidak valid",
+            "r2Invalid": "Dokumen transkrip sarjana tidak valid",
+            "paymentProofInvalid": "Dokumen bukti pembayaran tidak valid"
         }
     },
     "options": {
@@ -710,5 +728,63 @@
         "occupationPlaceholder": "Pekerjaan",
         "incomePlaceholder": "Pendapatan",
         "statusPlaceholder": "Status"
+    },
+    "program": {
+        "ts": {
+            "title": "Teknik Sipil",
+            "description": "Sebagai program study yang menghasilkan lulusan berstandar internasional yang berkompeten dalam menerapkan keilmuan dalam pengembangan teknologi di bidang rekayasa sipil serta mampu mengaplikasikan dalam pembangunan berkelanjutan (sustainable development) di wilayah kepulauan untuk menghadapi tuntutan dan perubahan global dunia yang bersifat dinamis."
+        },
+        "ar": {
+            "title": "Arsitektur",
+            "description": "Menjadi program studi arsitektur maritim berbasis kearifan lokal dengan daya saing global yang mendukung pembangunan wilayah pesisir berkelanjutan."
+        },
+        "si": {
+            "title": "Sistem Informasi",
+            "description": "Sebagai program sarjana yang menghasilkan lulusan berkualitas di bidang Sistem Informasi melalui pendidikan, penelitian, dan pengabdian kepada masyarakat, pada tingkat nasional dan internasional di tahun 2021."
+        },
+        "ti": {
+            "title": "Teknologi Informasi",
+            "description": "Sebagai program sarjana yang menghasilkan lulusan berkualitas dalam bidang teknologi informasi khususnya teknologi cloud dan keamanan melalui pendidikan, penelitian, dan pengabdian masyarakat, pada tingkat nasional dan internasional di tahun 2021."
+        },
+        "mn": {
+            "title": "Manajemen",
+            "description": "Sebagai Program Sarjana Manajemen berstandar internasional dalam menghasilkan lulusan yang memiliki jiwa kepemimpinan dan kewirausahaan, berkompeten dalam bidang hubungan industri, keuangan perusahaan, pemasaran business to consumer, serta tanggap dalam mengantisipasi perubahan global yang dinamis."
+        },
+        "ak": {
+            "title": "Akuntansi",
+            "description": "Sebagai program studi yang menghasilkan lulusan profesional di bidang akuntansi keuangan sesuai standar internasional dengan jiwa kepemimpinan dan kewirausahaan serta mampu mengikuti perubahan global yang dinamis."
+        },
+        "pr": {
+            "title": "Pariwisata",
+            "description": "Menjadi program studi pariwisata dengan standar mutu internasional yang menghasilkan IPTEKS dan lulusan yang mampu mengikuti dinamika perubahan pariwisata di tingkat nasional dan internasional."
+        },
+        "mm": {
+            "title": "Magister Manajemen",
+            "description": "Sebagai program studi dengan standar kualitas internasional yang menghasilkan lulusan berkualitas dengan kepemimpinan dan kewirausahaan bersemangat dan kompetensi dalam manajemen internasional di tingkat manajerial."
+        },
+        "ih": {
+            "title": "Ilmu Hukum",
+            "description": "Sebagai Program Studi dengan standar kualitas internasional yang menghasilkan lulusan hukum yang dapat memenuhi perubahan dinamis hukum bisnis dalam konteks nasional dan internasional."
+        },
+        "mh": {
+            "title": "Magister Hukum",
+            "description": "Sebagai program studi dengan standar mutu internasional yang menghasilkan lulusan berkualitas yang mampu mengikuti dinamika perubahan hukum bisnis di tingkat nasional dan internasional."
+        },
+        "pbi": {
+            "title": "Pendidikan Bahasa Inggris",
+            "description": "Menjadi program sarjana yang menghasilkan lulusan dengan kompetensi unggul dalam bidang pendidikan bahasa Inggris yang dinamis berbasis Edutechnopreneur (education, technology, and entrepreneurship) sesuai dengan standar kualitas internasional."
+        },
+        "bio": {
+            "title": "Biologi",
+            "description": "Program studi Biologi menghasilkan lulusan yang menguasai ilmu hayati, berorientasi pada penelitian, dan mampu berkontribusi dalam bidang bioteknologi, konservasi, dan pengelolaan sumber daya alam hayati di tingkat nasional maupun internasional."
+        },
+        "giz": {
+            "title": "Gizi",
+            "description": "Program studi Gizi bertujuan menghasilkan lulusan yang kompeten dalam ilmu gizi, mampu merancang dan mengelola program gizi masyarakat serta klinis, dan berperan aktif dalam peningkatan status gizi di tingkat nasional dan internasional."
+        },
+        "ked": {
+            "title": "Kedokteran",
+            "description": "Program studi Kedokteran menghasilkan dokter yang profesional, beretika, dan berwawasan global, mampu memberikan pelayanan kesehatan prima serta berkontribusi dalam pengembangan ilmu kedokteran dan kesehatan masyarakat."
+        }
     }
 }

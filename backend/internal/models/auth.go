@@ -17,8 +17,8 @@ func (r *LoginRequest) Sanitize() {
 	r.Email = strings.ToLower(strings.TrimSpace(r.Email))
 }
 
-func (r *LoginRequest) Validate() error {
-	return utils.ValidateStruct(r)
+func (r *LoginRequest) Validate(lang string) error {
+	return utils.ValidateStruct(r, lang)
 }
 
 type LoginErrorResponse struct {
@@ -40,6 +40,6 @@ func (r *RegisterRequest) Sanitize() {
 	r.Email = strings.ToLower(strings.TrimSpace(r.Email))
 }
 
-func (r *RegisterRequest) Validate() error {
-	return utils.ValidateStruct(r)
+func (r *RegisterRequest) Validate(lang string) error {
+	return utils.ValidateStruct(r, lang)
 }

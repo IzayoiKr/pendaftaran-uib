@@ -1,22 +1,22 @@
 "use client";
 
-import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState, type ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { downloadStaticPdf } from "@/utils/downloadPdf";
+import { downloadStaticPdf, viewProtectedPdf } from "@/utils/downloadPdf";
 import { toast } from "sonner";
 import { api } from "@/api";
+import NIKReveal from "@/components/NIKReveal/NIKReveal";
 import styles from "./PrasyaratOspek.module.scss";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface BiodataPendaftaran {
-    nomorDaftar: string;
     periode: string;
     gelombang: string;
     jurusan: string;
     namaLengkap: string;
     alamatEmail: string;
-    nomorNIK: string;
+    nomorNIK: string | ReactNode;
 }
 
 interface UploadField {
@@ -28,8 +28,7 @@ interface UploadField {
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function BiodataSection({ data }: { data: BiodataPendaftaran }) {
-    const rows: [string, string][] = [
-        ["Nomor Daftar (Registration Number)", data.nomorDaftar],
+    const rows: [string, string | ReactNode][] = [
         ["Periode (Period)", data.periode],
         ["Gelombang (Group)", data.gelombang],
         ["Jurusan (Study Program)", data.jurusan],
@@ -53,12 +52,16 @@ function BiodataSection({ data }: { data: BiodataPendaftaran }) {
 function FileUploadRow({
     field,
     file,
+    regID,
+    uploadedFileName,
     onChange,
     onDownloadContoh,
     isDownloading,
 }: {
     field: UploadField;
     file: File | null;
+    regID: string | null;
+    uploadedFileName?: string;
     onChange: (name: string, file: File | null) => void;
     onDownloadContoh?: () => void;
     isDownloading?: boolean;
@@ -105,16 +108,16 @@ function FileUploadRow({
                         </button>
                     </p>
                 )}
-                {field.uploadedUrl && (
+                {uploadedFileName && (
                     <p>
                         {field.label} Terupload :{" "}
-                        <a
-                            href={field.uploadedUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <button
+                            type="button"
+                            onClick={() => viewProtectedPdf(`/api/ospek/prasyarat/file/${regID}/${field.name.toLowerCase()}`, uploadedFileName)}
+                            className={styles.buktiLink}
                         >
-                            Klik Untuk Download
-                        </a>
+                            <strong>{uploadedFileName}</strong>
+                        </button>
                     </p>
                 )}
             </div>
@@ -134,7 +137,7 @@ const UPLOAD_FIELDS: UploadField[] = [
 export default function PrasyaratOspek() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const nomorDaftar = searchParams.get("nomorDaftar");
+    const regID = searchParams.get("regID");
 
     const [isLoading, setIsLoading] = useState(false);
     const [isDownloadingContoh, setIsDownloadingContoh] = useState(false);
@@ -144,59 +147,57 @@ export default function PrasyaratOspek() {
     );
 
     const [biodata, setBiodata] = useState<BiodataPendaftaran>({
-        nomorDaftar: nomorDaftar || "",
-        periode: "",
-        gelombang: "",
-        jurusan: "",
-        namaLengkap: "",
-        alamatEmail: "",
-        nomorNIK: "",
+        periode: "-",
+        gelombang: "-",
+        jurusan: "-",
+        namaLengkap: "-",
+        alamatEmail: "-",
+        nomorNIK: "-",
     });
 
     const [status, setStatus] = useState("Menunggu Status (Pending)");
     const [catatanPemeriksaan, setCatatanPemeriksaan] = useState("");
+    const [currentFiles, setCurrentFiles] = useState<{
+        pasFoto?: string;
+        ijazah?: string;
+    }>({});
 
     useEffect(() => {
-        if (!nomorDaftar) return;
+        if (!regID) return;
 
         const fetchData = async () => {
             setIsFetchingData(true);
             try {
-                const data = await api.profile.getRegistration(nomorDaftar);
+                const data: any = await api.ospek.getPrasyarat(regID);
                 if (data) {
                     setBiodata({
-                        nomorDaftar: nomorDaftar,
-                        periode: new Date(data.created_at || Date.now())
-                            .getFullYear()
-                            .toString(),
-                        gelombang: data.batchName || "-",
-                        jurusan:
-                            data.type === "S1"
-                                ? data.prodi_pil_name || data.prodi_pil || "-"
-                                : data.jurusan || "-",
-                        namaLengkap: data.nama || "-",
+                        periode: data.academic_year || "-",
+                        gelombang: data.batch_name || "-",
+                        jurusan: data.study_program || "-",
+                        namaLengkap: data.full_name || "-",
                         alamatEmail: data.email || "-",
-                        nomorNIK: data.nik || "-",
+                        nomorNIK: <NIKReveal masked={data.nik} /> || "-",
                     });
 
-                    // Update status if available in data
-                    if (data.doc_check_status) {
-                        setStatus(data.doc_check_status);
-                    }
-                    if (data.doc_check_notes) {
-                        setCatatanPemeriksaan(data.doc_check_notes);
-                    }
+                    setStatus(data.status || "Menunggu Status (Pending)");
+                    setCatatanPemeriksaan(data.notes || "");
+                    setCurrentFiles({
+                        pasFoto: data.pas_foto_name,
+                        ijazah: data.ijazah_name,
+                    });
                 }
-            } catch (err) {
-                console.error("Failed to fetch registration details", err);
-                toast.error("Gagal mengambil data pendaftaran.");
+            } catch (err: any) {
+                if (err?.status !== 404) {
+                    console.error("Failed to fetch ospek prerequisites", err);
+                    toast.error("Gagal mengambil data prasyarat OSPEK.");
+                }
             } finally {
                 setIsFetchingData(false);
             }
         };
 
         fetchData();
-    }, [nomorDaftar]);
+    }, [regID]);
 
     const handleFileChange = (name: string, file: File | null) =>
         setFiles((prev) => ({ ...prev, [name]: file }));
@@ -217,22 +218,37 @@ export default function PrasyaratOspek() {
     };
 
     const handleUpload = async () => {
+        if (!regID) {
+            toast.error("Registration ID tidak ditemukan.");
+            return;
+        }
         setIsLoading(true);
         try {
             const formData = new FormData();
+            formData.append("registrationID", regID);
+            let hasFiles = false;
             UPLOAD_FIELDS.forEach((f) => {
-                if (files[f.name])
+                if (files[f.name]) {
                     formData.append(f.name, files[f.name] as File);
+                    hasFiles = true;
+                }
             });
-            // Fallback for missing api.ospek
-            if ((api as any).ospek?.uploadPrasyarat) {
-                await (api as any).ospek.uploadPrasyarat(formData);
-                toast.success("Upload berhasil!");
-            } else {
-                // Temporary mock or direct axios call if needed
-                toast.error(
-                    "Endpoint upload belum tersedia. (Upload endpoint not available yet.)",
-                );
+
+            if (!hasFiles) {
+                toast.error("Pilih minimal satu file untuk diupload.");
+                return;
+            }
+
+            await api.ospek.uploadPrasyarat(formData);
+            toast.success("Upload berhasil!");
+            // Refresh names
+            const data: any = await api.ospek.getPrasyarat(regID);
+            if (data) {
+                setCurrentFiles({
+                    pasFoto: data.pas_foto_name,
+                    ijazah: data.ijazah_name,
+                });
+                setStatus(data.status);
             }
         } catch (err) {
             toast.error(
@@ -278,6 +294,8 @@ export default function PrasyaratOspek() {
                         key={field.name}
                         field={field}
                         file={files[field.name]}
+                        regID={regID}
+                        uploadedFileName={(currentFiles as any)[field.name]}
                         onChange={handleFileChange}
                         onDownloadContoh={
                             field.name === "pasFoto"

@@ -613,7 +613,25 @@
             "motherEducationInvalid": "Invalid mother's education",
             "motherOccupationInvalid": "Invalid mother's occupation",
             "motherIncomeInvalid": "Invalid mother's income",
-            "motherStatusInvalid": "Invalid mother's status"
+            "motherStatusInvalid": "Invalid mother's status",
+            "ppInvalid": "Invalid passport photo document",
+            "ktpInvalid": "Invalid ID card document",
+            "kkInvalid": "Invalid family card document",
+            "transkripNilaiInvalid": "Invalid academic transcript document",
+            "ijazahDokInvalid": "Invalid diploma document",
+            "sktmKipInvalid": "Invalid SKTM/KIP document",
+            "fotoRumahInvalid": "Invalid house photo document",
+            "tagihanListrikInvalid": "Invalid electricity bill document",
+            "tagihanAirInvalid": "Invalid water bill document",
+            "sertifikatPrestasiInvalid": "Invalid achievement certificate document",
+            "rapot1Invalid": "Invalid first term report document",
+            "rapot2Invalid": "Invalid second term report document",
+            "rapot3Invalid": "Invalid third term report document",
+            "rapot4Invalid": "Invalid fourth term report document",
+            "alInvalid": "Invalid birth certificate document",
+            "r1Invalid": "Invalid bachelor certificate document",
+            "r2Invalid": "Invalid bachelor academic transcript document",
+            "paymentProofInvalid": "Invalid payment proof document"
         }
     },
     "options": {
@@ -712,5 +730,63 @@
         "occupationPlaceholder": "Occupation",
         "incomePlaceholder": "Income",
         "statusPlaceholder": "Status"
+    },
+    "program": {
+        "ts": {
+            "title": "Civil Engineering",
+            "description": "A study program that produces internationally standard graduates who are competent in applying science in the development of technology in the field of civil engineering and are able to apply it in sustainable development in archipelagic regions to face the demands and dynamic global changes of the world."
+        },
+        "ar": {
+            "title": "Architecture",
+            "description": "Become a maritime architecture study program based on local wisdom with global competitiveness that supports sustainable coastal area development."
+        },
+        "si": {
+            "title": "Information Systems",
+            "description": "As a bachelor program that produces quality graduates in the field of Information Systems through education, research, and community service, at the national and international levels in 2021."
+        },
+        "ti": {
+            "title": "Information Technology",
+            "description": "As a bachelor program that produces quality graduates in the field of information technology, especially cloud technology and security through education, research, and community service, at the national and international levels in 2021."
+        },
+        "mn": {
+            "title": "Management",
+            "description": "As an internationally standardized Management Bachelor Program in producing graduates who have leadership and entrepreneurship spirits, are competent in the fields of industrial relations, corporate finance, business to consumer marketing, and are responsive in anticipating dynamic global changes."
+        },
+        "ak": {
+            "title": "Accounting",
+            "description": "As a study program that produces professional graduates in the field of financial accounting in accordance with international standards with leadership and entrepreneurship spirits and able to follow dynamic global changes."
+        },
+        "pr": {
+            "title": "Tourism",
+            "description": "Become a tourism study program with international quality standards that produces science and technology and graduates who are able to follow the dynamics of tourism changes at the national and international levels."
+        },
+        "mm": {
+            "title": "Master of Management",
+            "description": "As a study program with international quality standards that produces quality graduates with leadership and entrepreneurship spirits and competence in international management at the managerial level."
+        },
+        "ih": {
+            "title": "Law",
+            "description": "As a Study Program with international quality standards that produces law graduates who can meet the dynamic changes of business law in national and international contexts."
+        },
+        "mh": {
+            "title": "Master of Law",
+            "description": "As a study program with international quality standards that produces quality graduates who are able to follow the dynamics of business law changes at the national and international levels."
+        },
+        "pbi": {
+            "title": "English Education",
+            "description": "Become a bachelor program that produces graduates with superior competence in the field of dynamic English education based on Edutechnopreneur (education, technology, and entrepreneurship) in accordance with international quality standards."
+        },
+        "bio": {
+            "title": "Biology",
+            "description": "Biology study program produces graduates who master life sciences, are research-oriented, and are able to contribute in the fields of biotechnology, conservation, and management of biological natural resources at the national and international levels."
+        },
+        "giz": {
+            "title": "Nutrition",
+            "description": "Nutrition study program aims to produce graduates who are competent in nutrition science, able to design and manage community and clinical nutrition programs, and play an active role in improving nutrition status at the national and international levels."
+        },
+        "ked": {
+            "title": "Medicine",
+            "description": "Medicine study program produces professional, ethical, and global-minded doctors, able to provide excellent health services and contribute to the development of medical science and public health."
+        }
     }
 }

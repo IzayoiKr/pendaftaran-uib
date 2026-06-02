@@ -39,6 +39,6 @@ func (r *UpdateProfileRequest) Sanitize() {
 	r.FullName = html.EscapeString(strings.TrimSpace(r.FullName))
 }
 
-func (r *UpdateProfileRequest) Validate() error {
-	return utils.ValidateStruct(r)
+func (r *UpdateProfileRequest) Validate(lang string) error {
+	return utils.ValidateStruct(r, lang)
 }

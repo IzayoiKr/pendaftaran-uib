@@ -104,6 +104,25 @@ $color-danger-hover: #c0392b;
           text-decoration: underline;
         }
       }
+
+      .buktiLink {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3em;
+        background: form.$primary;
+        color: global.$white;
+        border-radius: 0.25em;
+        padding: 0.2em 0.5em;
+        font-size: var(--step--2);
+        font-weight: 600;
+        transition: background 0.2s;
+        text-decoration: none;
+        &:hover {
+          background: form.$primary-hover;
+          text-decoration: none;
+          color: global.$white;
+        }
+      }
     }
   }
 

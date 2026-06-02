@@ -30,7 +30,7 @@ interface RegistrationInitData {
     batch_name: string;
     degree: "S1" | "S2";
     batch_type: "Reguler" | "Beasiswa";
-    programs: Array<{ title: string; title_en: string }>;
+    programs: Array<{ code: string; title: string }>;
     registration_fee: {
         bank_name: string;
         account_holder: string;
@@ -56,11 +56,13 @@ async function fetchRegistrationInit(
 }
 
 export default async function RegistrationPage({ params }: PageProps) {
-    const { batchKey } = await params;
+    const { batchKey, locale } = await params;
     const init = await fetchRegistrationInit(batchKey);
     if (!init) {
         return <NotFound />;
     }
+
+    const t = await getTranslations({ locale, namespace: "program" });
 
     const programType =
         init.degree === "S1" ? "Program Sarjana" : "Program Magister";
@@ -71,8 +73,8 @@ export default async function RegistrationPage({ params }: PageProps) {
     };
 
     const programOptions = init.programs.map((opt) => ({
-        value: opt.title,
-        label: `${opt.title} (${opt.title_en})`,
+        value: opt.code,
+        label: t(`${opt.code.toLowerCase()}.title`),
     }));
 
     const paymentConfig = {

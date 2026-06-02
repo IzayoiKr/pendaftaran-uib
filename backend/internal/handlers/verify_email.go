@@ -9,6 +9,7 @@ import (
 
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 
@@ -18,8 +19,9 @@ import (
 func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
+		lang := utils.Lang(r)
 
-		const vagueMsg = "link verifikasi tidak valid atau sudah kadaluwarsa"
+		vagueMsg := i18n.T("auth.vague_verify_msg", lang)
 
 		var req models.VerifyEmailRequest
 		if err := utils.DecodeJSON(r, &req); err != nil {
@@ -27,7 +29,7 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			return
 		}
 
-		if err := req.Validate(); err != nil {
+		if err := req.Validate(lang); err != nil {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
@@ -39,13 +41,13 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 				UserAgent: base.UserAgent,
 				RequestID: base.RequestID,
 			})
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("verifikasi CAPTCHA diperlukan"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.T("auth.captcha_required", lang)))
 			return
 		}
 
 		ok, err := auth.VerifyTurnstile(req.TurnstileToken, utils.RealIP(r))
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 		if !ok {
@@ -55,7 +57,7 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 				UserAgent: base.UserAgent,
 				RequestID: base.RequestID,
 			})
-			utils.WriteJSON(w, http.StatusForbidden, utils.ErrJSON("verifikasi CAPTCHA gagal, coba lagi"))
+			utils.WriteJSON(w, http.StatusForbidden, utils.ErrJSON(i18n.T("auth.captcha_failed", lang)))
 			return
 		}
 
@@ -77,7 +79,7 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			return
 		}
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -108,7 +110,7 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 
 		tx, err := db.BeginTx(r.Context(), nil)
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 		committed := false
@@ -125,7 +127,7 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			recordID,
 		); err != nil {
 			slog.Error("verify_email: mark token used", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -134,13 +136,13 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			userID[:],
 		); err != nil {
 			slog.Error("verify_email: mark user verified", "user_id", userID.String(), "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
 		if err = tx.Commit(); err != nil {
 			slog.Error("verify_email: commit", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 		committed = true
@@ -154,7 +156,7 @@ func VerifyEmail(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 		})
 
 		utils.WriteJSON(w, http.StatusOK, map[string]string{
-			"message": "Email berhasil diverifikasi! Silahkan login.",
+			"message": i18n.T("auth.verify_success", lang),
 		})
 	}
 }

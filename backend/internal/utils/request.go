@@ -21,3 +21,11 @@ func RealIP(r *http.Request) string {
 	}
 	return host
 }
+
+func Lang(r *http.Request) string {
+	lang := r.Header.Get("Accept-Language")
+	if len(lang) >= 2 && lang[:2] == "en" {
+		return "en"
+	}
+	return "id"
+}

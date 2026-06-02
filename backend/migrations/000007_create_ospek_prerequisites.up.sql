@@ -1,0 +1,12 @@
+CREATE TABLE ospek_prerequisite (
+    registration_id BINARY(16) PRIMARY KEY,
+    pas_foto_path VARCHAR(255) DEFAULT NULL,
+    pas_foto_name VARCHAR(150) DEFAULT NULL,
+    ijazah_path VARCHAR(255) DEFAULT NULL,
+    ijazah_name VARCHAR(150) DEFAULT NULL,
+    status ENUM('PENDING', 'VERIFIED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
+    notes TEXT DEFAULT NULL,
+    uploaded_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    verified_at DATETIME DEFAULT NULL,
+    CONSTRAINT fk_ospek_prerequisite FOREIGN KEY (registration_id) REFERENCES registration(id) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

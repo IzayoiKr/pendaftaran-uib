@@ -14,6 +14,7 @@ import (
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/clamav"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 
@@ -35,23 +36,24 @@ func RegistrationSubmit(db *sql.DB, storageDir string, scanner *clamav.Client, a
 func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, al *audit.Logger, isSubmit bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
+		lang := utils.Lang(r)
 
 		claims := auth.GetClaims(r)
 		if claims == nil {
-			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("unauthorized"))
+			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON(i18n.T("common.unauthorized", lang)))
 			return
 		}
 
 		batchKey := chi.URLParam(r, "batchKey")
 		if batchKey == "" {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("permintaan tidak valid"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.T("common.invalid_request", lang)))
 			return
 		}
 
 		userID, err := uuid.Parse(claims.UserID)
 		if err != nil {
 			slog.Error("registration_upsert: parse uuid from claims", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -77,17 +79,17 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 		).Scan(&gelombangID, &degree, &batchType, &existingRegID, &currentStatus)
 
 		if errors.Is(err, sql.ErrNoRows) {
-			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON("pendaftaran tidak ditemukan atau sudah ditutup"))
+			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON(i18n.T("registration.not_found", lang)))
 			return
 		}
 		if err != nil {
 			slog.Error("registration_upsert: fetch batch and registration status", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 		if existingRegID != nil {
 			if currentStatus != nil && (*currentStatus == "SUBMITTED" || *currentStatus == "VERIFIED") {
-				utils.WriteJSON(w, http.StatusConflict, utils.ErrJSON("pendaftaran sudah dikirimkan dan tidak dapat diubah"))
+				utils.WriteJSON(w, http.StatusConflict, utils.ErrJSON(i18n.T("registration.already_submitted", lang)))
 				return
 			}
 		}
@@ -111,10 +113,10 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 		r.Body = http.MaxBytesReader(w, r.Body, maxPayloadSize)
 		if err := r.ParseMultipartForm(memoryBufferSize); err != nil {
 			if strings.Contains(err.Error(), "request body too large") {
-				utils.WriteJSON(w, http.StatusRequestEntityTooLarge, utils.ErrJSON("ukuran data terlalu besar"))
+				utils.WriteJSON(w, http.StatusRequestEntityTooLarge, utils.ErrJSON(i18n.TF("registration.file_too_large", lang, "", "2MB")))
 				return
 			}
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("gagal memproses data form"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.T("common.invalid_request", lang)))
 			return
 		}
 		defer func() {
@@ -125,7 +127,7 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 
 		formStr := r.FormValue("formData")
 		if formStr == "" {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("data form tidak ditemukan"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.T("common.invalid_request", lang)))
 			return
 		}
 
@@ -134,7 +136,7 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 		dec.DisallowUnknownFields()
 		if err := dec.Decode(&form); err != nil {
 			slog.Debug("registration_upsert: json decoding mismatch", "error", err)
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("data form tidak valid"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.T("common.invalid_request", lang)))
 			return
 		}
 
@@ -143,7 +145,7 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 		newStatus := "DRAFT"
 		if isSubmit {
 			newStatus = "SUBMITTED"
-			if err := validateFinalSubmission(r, &form, degree, batchType); err != nil {
+			if err := validateFinalSubmission(r, &form, degree, batchType, lang); err != nil {
 				utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 				return
 			}
@@ -151,7 +153,7 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 
 		targetDir := filepath.Join(storageDir, "registrations", claims.UserID, regID.String())
 
-		processedFiles, paymentProof, err := processUploadedFiles(r, targetDir, scanner, al, base, claims.UserID, &form)
+		processedFiles, paymentProof, err := processUploadedFiles(r, targetDir, scanner, al, base, claims.UserID, &form, lang)
 		if err != nil {
 			if errors.Is(err, utils.ErrMalwareDetected) {
 				slog.Warn("SECURITY: File upload blocked due to malware signature", 
@@ -159,19 +161,19 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 					"reg_id", regID,
 					"error", err,
 				)
-				utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("dokumen gagal diupload"))
+				utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.T("registration.upload_failed", lang)))
 				return
 			}
 			if errors.Is(err, utils.ErrFileTooLarge) {
-				utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
+				utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.TF("registration.file_too_large", lang, "", "2MB")))
 				return
 			}
 			if errors.Is(err, utils.ErrInvalidType) {
-				utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
+				utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.T("registration.invalid_file_type", lang)))
 				return
 			}
 			slog.Error("registration_upsert: file extraction layer broken", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -194,7 +196,7 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 
 		tx, err := db.BeginTx(r.Context(), nil)
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 		defer func() {
@@ -212,7 +214,7 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 				regID[:], userID[:], gelombangID[:], newStatus,
 			); err != nil {
 				slog.Error("registration_upsert: insert new registration", "error", err)
-				utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+				utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 				return
 			}
 		} else {
@@ -222,7 +224,7 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 				newStatus, regID[:],
 			); err != nil {
 				slog.Error("registration_upsert: update registration status", "error", err)
-				utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+				utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 				return
 			}
 		}
@@ -234,7 +236,7 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 		}
 		if err != nil {
 			slog.Error("registration_upsert: detail hydration failed", "degree", degree, "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -253,14 +255,14 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 		oldPaymentPath, err := upsertPayment(r, tx, regID, &form, paymentFilePath, paymentFileName, paymentFileSize)
 		if err != nil {
 			slog.Error("registration_upsert: upsert payment", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
 		orphanPaths, err := cleanOrphanDocs(r, tx, regID, &form, processedFiles)
 		if err != nil {
 			slog.Error("registration_upsert: orphan files cleanup", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -287,14 +289,14 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 				regID[:], docType, meta.finalPath, filename, meta.sizeBytes,
 			); err != nil {
 				slog.Error("registration_upsert: upsert document row", "doc_type", docType, "error", err)
-				utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+				utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 				return
 			}
 		}
 
 		if err := tx.Commit(); err != nil {
 			slog.Error("registration_upsert: commit", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 		committed = true
@@ -322,85 +324,85 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 		})
 
 		utils.WriteJSON(w, http.StatusOK, map[string]string{
-			"message": "berhasil disimpan",
+			"message": i18n.T("common.saved", lang),
 			"status": newStatus,
 		})
 	}
 }
 
-func validateFinalSubmission(r *http.Request, form *models.RegistrationForm, degree string, batchType string) error {
-	if isBlank(form.Citizenship)   { return errors.New("kewarganegaraan wajib diisi") }
-	if isBlank(form.BirthPlace)    { return errors.New("tempat lahir wajib diisi") }
-	if isBlank(form.BirthDate)     { return errors.New("tanggal lahir wajib diisi") }
-	if isBlank(form.MajorChoice)   { return errors.New("pilihan program studi wajib diisi") }
-	if isBlank(form.AccountHolder) { return errors.New("nama pemilik rekening wajib diisi") }
+func validateFinalSubmission(r *http.Request, form *models.RegistrationForm, degree string, batchType string, lang string) error {
+	if isBlank(form.Citizenship)   { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("Citizenship", lang))) }
+	if isBlank(form.BirthPlace)    { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("BirthPlace", lang))) }
+	if isBlank(form.BirthDate)     { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("BirthDate", lang))) }
+	if isBlank(form.MajorChoice)   { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("MajorChoice", lang))) }
+	if isBlank(form.AccountHolder) { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("AccountHolder", lang))) }
 	if !isDocProvided(form.PaymentProof, r, "paymentProof") { 
-		return errors.New("dokumen bukti pembayaran wajib diunggah") 
+		return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("PaymentProof", lang))) 
 	}
-	
+
 	if !form.Pernyataan {
-		return errors.New("pernyataan keabsahan data pendaftaran wajib dicentang")
+		return errors.New(i18n.T("registration.declaration_required", lang))
 	}
 
 	if degree == "S1" {
-		if isBlank(form.Gender)         { return errors.New("jenis kelamin wajib diisi") }
-		if isBlank(form.PhoneNumber)    { return errors.New("nomor hp wajib diisi") }
-		if isBlank(form.WhatsappNumber) { return errors.New("nomor whatsapp wajib diisi") }
-		if isBlank(form.JenisDaftar)    { return errors.New("jenis pendaftaran wajib diisi") }
-		if isBlank(form.SchoolOrigin)   { return errors.New("asal sekolah wajib diisi") }
-		if isBlank(form.WaktuKuliah)    { return errors.New("waktu kuliah wajib diisi") }
-		if isBlank(form.Bank)           { return errors.New("nama bank wajib diisi") }
+		if isBlank(form.Gender)         { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("Gender", lang))) }
+		if isBlank(form.PhoneNumber)    { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("PhoneNumber", lang))) }
+		if isBlank(form.WhatsappNumber) { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("WhatsappNumber", lang))) }
+		if isBlank(form.JenisDaftar)    { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("JenisDaftar", lang))) }
+		if isBlank(form.SchoolOrigin)   { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("SchoolOrigin", lang))) }
+		if isBlank(form.WaktuKuliah)    { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("WaktuKuliah", lang))) }
+		if isBlank(form.Bank)           { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("Bank", lang))) }
 
-		if !isDocProvided(form.Pp, r, "pp")   { return errors.New("pasfoto wajib diunggah") }
-		if !isDocProvided(form.Ktp, r, "ktp") { return errors.New("ktp / sim / passport wajib diunggah") }
-		if !isDocProvided(form.Kk, r, "kk")   { return errors.New("kartu keluarga wajib diunggah") }
+		if !isDocProvided(form.Pp, r, "pp")   { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("Pp", lang))) }
+		if !isDocProvided(form.Ktp, r, "ktp") { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("Ktp", lang))) }
+		if !isDocProvided(form.Kk, r, "kk")   { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("Kk", lang))) }
 
 		if form.JenisDaftar == "TRANSFER" || form.JenisDaftar == "ALIH_JENJANG" {
-			if isBlank(form.PreviousUniversity) { return errors.New("universitas asal wajib diisi untuk jalur transfer/alih jenjang") }
-			if isBlank(form.PreviousMajor)      { return errors.New("program studi asal wajib diisi untuk jalur transfer/alih jenjang") }
-			if isBlank(form.Gpa)                { return errors.New("ipk wajib diisi untuk jalur transfer/alih jenjang") }
-			if isBlank(form.HighestEducation)   { return errors.New("jenjang pendidikan terakhir wajib diisi untuk jalur transfer/alih jenjang") }
-			if !isDocProvided(form.TranskripNilai, r, "transkripNilai") { return errors.New("dokumen transkrip nilai wajib diunggah untuk jalur transfer/alih jenjang") }
-			if !isDocProvided(form.IjazahDok, r, "ijazahDok")           { return errors.New("dokumen ijazah wajib diunggah untuk jalur transfer/alih jenjang") }
+			if isBlank(form.PreviousUniversity) { return errors.New(i18n.T("registration.transfer_university_required", lang)) }
+			if isBlank(form.PreviousMajor)      { return errors.New(i18n.T("registration.transfer_major_required", lang)) }
+			if isBlank(form.Gpa)                { return errors.New(i18n.T("registration.transfer_gpa_required", lang)) }
+			if isBlank(form.HighestEducation)   { return errors.New(i18n.T("registration.transfer_education_required", lang)) }
+			if !isDocProvided(form.TranskripNilai, r, "transkripNilai") { return errors.New(i18n.T("registration.transfer_transcript_required", lang)) }
+			if !isDocProvided(form.IjazahDok, r, "ijazahDok")           { return errors.New(i18n.T("registration.transfer_diploma_required", lang)) }
 		}
 
 		if form.JenisDaftar == "BARU" {
 			if !form.Confirmation {
-				return errors.New("konfirmasi belum pernah kuliah wajib dicentang")
+				return errors.New(i18n.T("registration.fresh_grad_required", lang))
 			}
 		}
 
 		if batchType == "Beasiswa" {
-			if isBlank(form.HighschoolGpa)          { return errors.New("nilai rata-rata rapor sma wajib diisi untuk pendaftaran beasiswa") }
-			if isBlank(form.HighschoolGraduateYear) { return errors.New("tahun lulus sma wajib diisi untuk pendaftaran beasiswa") }
+			if isBlank(form.HighschoolGpa)          { return errors.New(i18n.T("registration.scholarship_gpa_required", lang)) }
+			if isBlank(form.HighschoolGraduateYear) { return errors.New(i18n.T("registration.scholarship_year_required", lang)) }
 		}
 	}
 
 	if degree == "S2" {
-		if isBlank(form.ContactEmail) { return errors.New("email kontak wajib diisi") }
-		if isBlank(form.PhoneNumber)  { return errors.New("nomor telepon wajib diisi") }
-		if isBlank(form.Religion)     { return errors.New("agama wajib diisi") }
-		if isBlank(form.FundingSource){ return errors.New("sumber biaya wajib diisi") }
-		if isBlank(form.Address)      { return errors.New("alamat tempat tinggal wajib diisi") }
-		if isBlank(form.SubDistrict)  { return errors.New("kecamatan wajib diisi") }
-		if isBlank(form.District)     { return errors.New("kelurahan wajib diisi") }
+		if isBlank(form.ContactEmail) { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("ContactEmail", lang))) }
+		if isBlank(form.PhoneNumber)  { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("PhoneNumber", lang))) }
+		if isBlank(form.Religion)     { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("Religion", lang))) }
+		if isBlank(form.FundingSource){ return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("FundingSource", lang))) }
+		if isBlank(form.Address)      { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("Address", lang))) }
+		if isBlank(form.SubDistrict)  { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("SubDistrict", lang))) }
+		if isBlank(form.District)     { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("District", lang))) }
 
-		if isBlank(form.PreviousMajor)      { return errors.New("jurusan asal s1 wajib diisi") }
-		if isBlank(form.Gpa)                { return errors.New("ipk s1 wajib diisi") }
-		if isBlank(form.Degree)             { return errors.New("gelar sarjana s1 wajib diisi") }
-		if isBlank(form.PreviousUniversity) { return errors.New("nama universitas asal s1 wajib diisi") }
+		if isBlank(form.PreviousMajor)      { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("PreviousMajor", lang))) }
+		if isBlank(form.Gpa)                { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("Gpa", lang))) }
+		if isBlank(form.Degree)             { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("Degree", lang))) }
+		if isBlank(form.PreviousUniversity) { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("PreviousUniversity", lang))) }
 
-		if isBlank(form.FatherName)  { return errors.New("nama ayah wajib diisi") }
-		if isBlank(form.FatherPhone) { return errors.New("nomor telepon ayah wajib diisi") }
-		if isBlank(form.MotherName)  { return errors.New("nama ibu wajib diisi") }
-		if isBlank(form.MotherPhone) { return errors.New("nomor telepon ibu wajib diisi") }
+		if isBlank(form.FatherName)  { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("FatherName", lang))) }
+		if isBlank(form.FatherPhone) { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("FatherPhone", lang))) }
+		if isBlank(form.MotherName)  { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("MotherName", lang))) }
+		if isBlank(form.MotherPhone) { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("MotherPhone", lang))) }
 
-		if !isDocProvided(form.Al, r, "al")   { return errors.New("dokumen akta lahir wajib diunggah") }
-		if !isDocProvided(form.Kk, r, "kk")   { return errors.New("kartu keluarga wajib diunggah") }
-		if !isDocProvided(form.Pp, r, "pp")   { return errors.New("pasfoto wajib diunggah") }
-		if !isDocProvided(form.Ktp, r, "ktp") { return errors.New("ktp wajib diunggah") }
-		if !isDocProvided(form.R1, r, "r1")   { return errors.New("dokumen ijazah sarjana wajib diunggah") }
-		if !isDocProvided(form.R2, r, "r2")   { return errors.New("dokumen transkrip nilai sarjana wajib diunggah") }
+		if !isDocProvided(form.Al, r, "al")   { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("Al", lang))) }
+		if !isDocProvided(form.Kk, r, "kk")   { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("Kk", lang))) }
+		if !isDocProvided(form.Pp, r, "pp")   { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("Pp", lang))) }
+		if !isDocProvided(form.Ktp, r, "ktp") { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("Ktp", lang))) }
+		if !isDocProvided(form.R1, r, "r1")   { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("R1", lang))) }
+		if !isDocProvided(form.R2, r, "r2")   { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("R2", lang))) }
 	}
 
 	return nil

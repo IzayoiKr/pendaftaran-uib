@@ -10,6 +10,7 @@ import (
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/crypto"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 
@@ -28,7 +29,8 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 			return
 		}
 
-		if err := req.Validate(); err != nil {
+		lang := utils.Lang(r)
+		if err := req.Validate(lang); err != nil {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
@@ -51,7 +53,7 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 			return
 		}
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -82,13 +84,13 @@ func ResetPassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Handl
 
 		newHash, err := crypto.HashPassword(req.NewPassword)
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
 		tx, err := db.BeginTx(r.Context(), nil)
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 		committed := false

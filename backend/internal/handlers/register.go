@@ -10,6 +10,7 @@ import (
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/email"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/models"
 	nikCrypto "pendaftaran-uib/backend/internal/crypto"
 	"pendaftaran-uib/backend/internal/utils"
@@ -20,6 +21,7 @@ import (
 func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
+		lang := utils.Lang(r)
 
 		var req models.RegisterRequest
 		if err := utils.DecodeJSON(r, &req); err != nil {
@@ -28,7 +30,7 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 		}
 
 		req.Sanitize()
-		if err := req.Validate(); err != nil {
+		if err := req.Validate(lang); err != nil {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
@@ -65,21 +67,21 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 		encryptedNIK, err := nikCrypto.Encrypt([]byte(req.NIK))
 		if err != nil {
 			slog.Error("register: encrypt NIK", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
 		blindNIK, err := nikCrypto.NIKBlindIndex(req.NIK)
 		if err != nil {
 			slog.Error("register: NIK blind index", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
 		hash, err := nikCrypto.HashPassword(req.Password)
 		if err != nil {
 			slog.Error("register: encrypt password", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -101,12 +103,12 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 					Meta: map[string]any{"reason": "email_already_exists"},
 				})
 				utils.WriteJSON(w, http.StatusCreated, map[string]string{
-					"message": "Registrasi berhasil! Silahkan cek email anda untuk verifikasi",
+					"message": i18n.T("auth.register_success", lang),
 				})
 				return
 			}
 			slog.Error("register: insert user", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 

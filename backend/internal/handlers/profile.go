@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"pendaftaran-uib/backend/internal/auth"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 
@@ -14,16 +15,17 @@ import (
 
 func Profile(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		lang := utils.Lang(r)
 		claims := auth.GetClaims(r)
 		if claims == nil {
-			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("unauthorized"))
+			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON(i18n.T("common.unauthorized", lang)))
 			return
 		}
 
 		id, err := uuid.Parse(claims.UserID)
 		if err != nil {
 			slog.Error("profile: parse uuid", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -56,7 +58,7 @@ func Profile(db *sql.DB) http.HandlerFunc {
 		)
 		if err != nil {
 			slog.Error("profile: database query execution", "user_id", claims.UserID, "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 		defer rows.Close()
@@ -69,7 +71,7 @@ func Profile(db *sql.DB) http.HandlerFunc {
 
 		for rows.Next() {
 			isUserFound = true
-			
+
 			var (
 				regID            *uuid.UUID
 				status           sql.NullString
@@ -95,7 +97,7 @@ func Profile(db *sql.DB) http.HandlerFunc {
 			)
 			if err != nil {
 				slog.Error("profile: scanning rows failed", "error", err)
-				utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+				utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 				return
 			}
 			if regID == nil {
@@ -128,14 +130,14 @@ func Profile(db *sql.DB) http.HandlerFunc {
 		}
 
 		if !isUserFound {
-			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON("user tidak ditemukan"))
+			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON(i18n.T("common.user_not_found", lang)))
 			return
 		}
 
 		maskedNIK := decryptAndMask(user.NIK)
 
 		utils.WriteJSON(w, http.StatusOK, models.ProfileDTO{
-			UserDTO: user.ToDTO(maskedNIK),
+			UserDTO:       user.ToDTO(maskedNIK),
 			Registrations: cards,
 		})
 	}

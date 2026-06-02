@@ -1,7 +1,7 @@
 CREATE TABLE program_studi (
     id BINARY(16) PRIMARY KEY,
-    title VARCHAR(50) NOT NULL,
-    code VARCHAR(10) NOT NULL,
+    title VARCHAR(50) NOT NULL UNIQUE,
+    code VARCHAR(10) NOT NULL UNIQUE,
     faculty VARCHAR(10) NOT NULL,
     degree ENUM('S1', 'S2') NOT NULL,
     description TEXT NOT NULL,

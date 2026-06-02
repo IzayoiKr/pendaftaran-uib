@@ -9,6 +9,7 @@ import (
 
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/email"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 )
@@ -16,8 +17,9 @@ import (
 func ResendVerification(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
+		lang := utils.Lang(r)
 
-		const vagueMsg = "link verifikasi telah dikirim"
+		vagueMsg := i18n.T("auth.vague_verify_msg", lang)
 
 		var req models.ResendVerifyEmailRequest
 		if err := utils.DecodeJSON(r, &req); err != nil {
@@ -26,7 +28,7 @@ func ResendVerification(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http
 		}
 
 		req.Sanitize()
-		if err := req.Validate(); err != nil {
+		if err := req.Validate(lang); err != nil {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
@@ -42,7 +44,7 @@ func ResendVerification(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http
 			return
 		}
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 		if user.EmailVerified {
@@ -52,7 +54,7 @@ func ResendVerification(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http
 
 		rawToken, tokenHash, err := generateVerificationToken()
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -68,7 +70,7 @@ func ResendVerification(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http
 			user.ID[:], tokenHash, time.Now().Add(verifyTokenTTL),
 		); err != nil {
 			slog.Error("resend_verification: store token", "user_id", user.ID.String(), "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 

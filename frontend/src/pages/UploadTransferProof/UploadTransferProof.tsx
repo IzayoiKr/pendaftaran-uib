@@ -6,11 +6,13 @@ import {
     useEffect,
     useRef,
     useState,
+    type ReactNode,
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { downloadStaticPdf } from "@/utils/downloadPdf";
 import { toast } from "sonner";
 import { api } from "@/api";
+import NIKReveal from "@/components/NIKReveal/NIKReveal";
 import styles from "./UploadTransferProof.module.scss";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -22,19 +24,21 @@ interface BiodataPendaftaran {
     jurusan: string;
     namaLengkap: string;
     alamatEmail: string;
-    nomorNIK: string;
+    nomorNIK: string | ReactNode;
 }
 
 interface TambahBuktiTransferForm {
     pemilikRekening: string;
     bank: string;
+    amount: string;
+    paymentDate: string;
     file: File | null;
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function BiodataSection({ data }: { data: BiodataPendaftaran }) {
-    const rows: [string, string][] = [
+    const rows: [string, string | ReactNode][] = [
         ["Nomor Daftar (Registration Number)", data.nomorDaftar],
         ["Periode (Period)", data.periode],
         ["Gelombang (Group)", data.gelombang],
@@ -46,7 +50,7 @@ function BiodataSection({ data }: { data: BiodataPendaftaran }) {
     return (
         <div className={styles.biodataInfo}>
             {rows.map(([label, value]) => (
-                <div key={label} className={styles.infoRow}>
+                <div key={label.toString()} className={styles.infoRow}>
                     <span className={styles.infoLabel}>{label}</span>
                     <span className={styles.infoValue}>: {value || "-"}</span>
                 </div>
@@ -60,6 +64,7 @@ function FormTextInput({
     label,
     placeholder,
     value,
+    type = "text",
     autoComplete,
     onChange,
 }: {
@@ -67,6 +72,7 @@ function FormTextInput({
     label: string;
     placeholder: string;
     value: string;
+    type?: string;
     autoComplete?: string;
     onChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
@@ -78,7 +84,7 @@ function FormTextInput({
             </label>
             <input
                 id={id}
-                type="text"
+                type={type}
                 placeholder={`${placeholder}*`}
                 value={value}
                 autoComplete={autoComplete}
@@ -177,60 +183,58 @@ function ActionRow({
 export default function UploadBuktiTransferPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const nomorDaftar = searchParams.get("nomorDaftar");
+    const regID = searchParams.get("regID");
 
     const [form, setForm] = useState<TambahBuktiTransferForm>({
         pemilikRekening: "",
         bank: "",
+        amount: "",
+        paymentDate: "",
         file: null,
     });
     const [isLoading, setIsLoading] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
-    const [isFetchingData, setIsFetchingData] = useState(false);
+    const [isFetching, setIsFetching] = useState(false);
 
     const [biodata, setBiodata] = useState<BiodataPendaftaran>({
-        nomorDaftar: nomorDaftar || "",
-        periode: "",
-        gelombang: "",
-        jurusan: "",
-        namaLengkap: "",
-        alamatEmail: "",
-        nomorNIK: "",
+        nomorDaftar: "-",
+        periode: "-",
+        gelombang: "-",
+        jurusan: "-",
+        namaLengkap: "-",
+        alamatEmail: "-",
+        nomorNIK: "-",
     });
 
     useEffect(() => {
-        if (!nomorDaftar) return;
+        if (!regID) return;
 
         const fetchData = async () => {
-            setIsFetchingData(true);
+            setIsFetching(true);
             try {
-                const data = await api.profile.getRegistration(nomorDaftar);
-                if (data) {
+                const res = await api.profile.getRegistration(regID);
+                if (res) {
+                    const { registration, user, current_prodi } = res;
                     setBiodata({
-                        nomorDaftar: nomorDaftar,
-                        periode: new Date(data.created_at || Date.now())
-                            .getFullYear()
-                            .toString(),
-                        gelombang: data.batchName || "-",
-                        jurusan:
-                            data.type === "S1"
-                                ? data.prodi_pil_name || data.prodi_pil || "-"
-                                : data.jurusan || "-",
-                        namaLengkap: data.nama || "-",
-                        alamatEmail: data.email || "-",
-                        nomorNIK: data.nik || "-",
+                        nomorDaftar: registration.examinee_id || registration.registration_id.slice(0, 8),
+                        periode: registration.academic_year || "-",
+                        gelombang: registration.batch_name || "-",
+                        jurusan: current_prodi || "-",
+                        namaLengkap: user.full_name || "-",
+                        alamatEmail: user.email || "-",
+                        nomorNIK: <NIKReveal masked={user.nik} /> || "-",
                     });
                 }
             } catch (err) {
                 console.error("Failed to fetch registration details", err);
                 toast.error("Gagal mengambil data pendaftaran.");
             } finally {
-                setIsFetchingData(false);
+                setIsFetching(false);
             }
         };
 
         fetchData();
-    }, [nomorDaftar]);
+    }, [regID]);
 
     // ── Download Panduan VA via protected route ───────────────────────────────
     const handleDownloadVA = async () => {
@@ -252,7 +256,7 @@ export default function UploadBuktiTransferPage() {
         (
             field: keyof Pick<
                 TambahBuktiTransferForm,
-                "pemilikRekening" | "bank"
+                "pemilikRekening" | "bank" | "amount" | "paymentDate"
             >,
         ) =>
         (e: ChangeEvent<HTMLInputElement>) =>
@@ -260,23 +264,27 @@ export default function UploadBuktiTransferPage() {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!nomorDaftar) {
-            toast.error("Nomor daftar tidak ditemukan.");
-            return;
-        }
         if (!form.file) {
             toast.error("Pilih file bukti transfer terlebih dahulu.");
+            return;
+        }
+        if (!regID) {
+            toast.error("Registration ID tidak ditemukan.");
             return;
         }
         setIsLoading(true);
         try {
             const formData = new FormData();
-            formData.append("pemilikRekening", form.pemilikRekening);
-            formData.append("bank", form.bank);
+            formData.append("registrationID", regID);
+            formData.append("accountHolder", form.pemilikRekening);
+            formData.append("bankName", form.bank);
+            formData.append("amount", form.amount);
+            formData.append("paymentDate", form.paymentDate);
             formData.append("file", form.file);
-            await api.transfer.uploadBukti(nomorDaftar, formData);
+
+            await api.transferProof.upload(formData);
             toast.success("Bukti transfer berhasil diupload!");
-            router.back();
+            router.replace(`/account/transfer-proof?regID=${regID}`);
         } catch (err) {
             toast.error(
                 err instanceof Error ? err.message : "Terjadi kesalahan",
@@ -286,18 +294,16 @@ export default function UploadBuktiTransferPage() {
         }
     };
 
+    if (isFetching) return <p>Loading...</p>;
+
     return (
         <main className={styles.page}>
             <div className={styles.container}>
                 <h2 className={styles.sectionTitle}>Biodata Pendaftaran</h2>
-                {isFetchingData ? (
-                    <p>Loading biodata...</p>
-                ) : (
-                    <BiodataSection data={biodata} />
-                )}
+                <BiodataSection data={biodata} />
 
                 <h3 className={styles.tableTitle}>
-                    Daftar Bukti Transfer (List of Receipt Payment)
+                    Tambah Bukti Transfer (Add Receipt Payment)
                 </h3>
 
                 {/* Download Panduan VA */}
@@ -331,6 +337,22 @@ export default function UploadBuktiTransferPage() {
                             placeholder="Bank"
                             value={form.bank}
                             onChange={handleTextChange("bank")}
+                        />
+                        <FormTextInput
+                            id="amount"
+                            label="Nominal (Amount)"
+                            placeholder="Nominal"
+                            type="number"
+                            value={form.amount}
+                            onChange={handleTextChange("amount")}
+                        />
+                        <FormTextInput
+                            id="paymentDate"
+                            label="Tanggal Pembayaran (Payment Date)"
+                            placeholder="Tanggal Pembayaran"
+                            type="date"
+                            value={form.paymentDate}
+                            onChange={handleTextChange("paymentDate")}
                         />
                         <FileInputField
                             id="buktiTransfer"

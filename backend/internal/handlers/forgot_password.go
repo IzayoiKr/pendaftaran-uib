@@ -12,6 +12,7 @@ import (
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/email"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 
@@ -30,8 +31,9 @@ func ForgotPassword(db *sql.DB, mailer *email.Mailer, emailLimiter *auth.RateLim
 			return
 		}
 
+		lang := utils.Lang(r)
 		req.Sanitize()
-		if err := req.Validate(); err != nil {
+		if err := req.Validate(lang); err != nil {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
@@ -104,13 +106,13 @@ func ForgotPassword(db *sql.DB, mailer *email.Mailer, emailLimiter *auth.RateLim
 			return
 		}
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
 		rawToken, tokenHash, err := generateVerificationToken()
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -120,7 +122,7 @@ func ForgotPassword(db *sql.DB, mailer *email.Mailer, emailLimiter *auth.RateLim
 			id[:], tokenHash, expiry,
 		); err != nil {
 			slog.Error("forgot_password: store token hash", "user_id", id.String(), "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 

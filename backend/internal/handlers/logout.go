@@ -6,6 +6,7 @@ import (
 
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/utils"
 )
 
@@ -40,6 +41,7 @@ func Logout(ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc {
 		}
 
 		clearRefreshCookie(w)
+		lang := utils.Lang(r)
 
 		al.Log(audit.Entry{
 			Event: audit.EventLogoutSuccess,
@@ -51,7 +53,7 @@ func Logout(ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc {
 		})
 
 		utils.WriteJSON(w, http.StatusOK, map[string]string{
-			"message": "logout berhasil",
+			"message": i18n.T("auth.logout_success", lang),
 		})
 	}
 }

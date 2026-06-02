@@ -73,7 +73,7 @@ func loadS1Detail(r *http.Request, db *sql.DB, regID uuid.UUID, form *models.Reg
 			d.previous_highschool,
 			CAST(d.highschool_gpa AS CHAR),
 			CAST(d.highschool_graduate_year AS CHAR),
-			ps.title,
+			ps.code,
 			d.class_session,
 			d.is_fresh_graduate_declared,
 			d.is_final_declaration_agreed
@@ -193,7 +193,7 @@ func loadS2Detail(r *http.Request, db *sql.DB, regID uuid.UUID, form *models.Reg
 			d.company_status,
 			CAST(d.company_start_year AS CHAR),
 			d.parent_address,
-			ps.title,
+			ps.code,
 			d.is_final_declaration_agreed
 		FROM registration_s2_detail d
 		LEFT JOIN program_studi ps ON ps.id = d.program_studi_id

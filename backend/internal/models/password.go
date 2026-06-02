@@ -12,8 +12,8 @@ type  ChangePasswordRequest struct {
 	NewPassword string `json:"new_password" validate:"required,min=8,max=128,nefield=OldPassword"`
 }
 
-func (r *ChangePasswordRequest) Validate() error {
-	return utils.ValidateStruct(r)
+func (r *ChangePasswordRequest) Validate(lang string) error {
+	return utils.ValidateStruct(r, lang)
 }
 
 type ForgotPasswordRequest struct {
@@ -25,8 +25,8 @@ func (r *ForgotPasswordRequest) Sanitize() {
 	r.Email = strings.ToLower(strings.TrimSpace(r.Email))
 }
 
-func (r *ForgotPasswordRequest) Validate() error {
-	return utils.ValidateStruct(r)
+func (r *ForgotPasswordRequest) Validate(lang string) error {
+	return utils.ValidateStruct(r, lang)
 }
 
 // ResetPasswordRequest — Token uses a deliberate vague message for security
@@ -35,9 +35,9 @@ type ResetPasswordRequest struct {
 	NewPassword string `json:"new_password" validate:"required,min=8,max=128"`
 }
 
-func (r *ResetPasswordRequest) Validate() error {
+func (r *ResetPasswordRequest) Validate(lang string) error {
 	if r.Token == "" {
 		return errors.New("link sudah tidak valid atau sudah kedaluwarsa")
 	}
-	return utils.ValidateStruct(r)
+	return utils.ValidateStruct(r, lang)
 }

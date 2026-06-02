@@ -6,6 +6,7 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 
@@ -15,6 +16,7 @@ import (
 func RegistrationInit(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		batchKey := chi.URLParam(r, "batchKey")
+		lang := utils.Lang(r)
 
 		var (
 			batchName, degree, batchType string
@@ -28,7 +30,7 @@ func RegistrationInit(db *sql.DB) http.HandlerFunc {
 				g.batch_type,
 				(
 					SELECT JSON_ARRAYAGG(
-						JSON_OBJECT('title', ps.title, 'title_en', ps.title_en)
+						JSON_OBJECT('code', ps.code, 'title', ps.title)
 					)
 					FROM program_studi ps
 					WHERE ps.is_active = 1 AND ps.degree = g.degree
@@ -53,12 +55,12 @@ func RegistrationInit(db *sql.DB) http.HandlerFunc {
 		).Scan(&batchName, &degree, &batchType, &programsJSON, &feeJSON)
 
 		if errors.Is(err, sql.ErrNoRows) {
-			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON("pendaftaran tidak ditemukan atau sudah ditutup"))
+			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON(i18n.T("registration.not_found", lang)))
 			return
 		}
 		if err != nil {
 			slog.Error("registration_init: query error", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 

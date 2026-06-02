@@ -8,6 +8,7 @@ import (
 
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 
@@ -17,10 +18,11 @@ import (
 func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
+		lang := utils.Lang(r)
 
 		claims := auth.GetClaims(r)
 		if claims == nil {
-			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("unauthorized"))
+			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON(i18n.T("common.unauthorized", lang)))
 			return
 		}
 
@@ -31,7 +33,7 @@ func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 		}
 
 		req.Sanitize()
-		if err := req.Validate(); err != nil {
+		if err := req.Validate(lang); err != nil {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
@@ -39,7 +41,7 @@ func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 		id, err := uuid.Parse(claims.UserID)
 		if err != nil {
 			slog.Error("reveal_nik: parse uuid from claims", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
@@ -50,16 +52,16 @@ func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 		).Scan(&oldFullname)
 
 		if errors.Is(err, sql.ErrNoRows) {
-			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON("user tidak ditemukan"))
+			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON(i18n.T("common.user_not_found", lang)))
 			return
 		}
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
 		if oldFullname == req.FullName {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("nama baru harus berbeda dari nama lama!"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.T("auth.new_name_same", lang)))
 			return
 		}
 
@@ -68,7 +70,7 @@ func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			req.FullName, id[:],
 		); err != nil {
 			slog.Error("update_profile: exec", "user_id", claims.UserID, "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 

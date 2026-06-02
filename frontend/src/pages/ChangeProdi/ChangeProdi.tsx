@@ -1,15 +1,14 @@
 "use client";
 
-import { type ChangeEvent, type FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
+import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-// import { api } from "@/api";
+import { api } from "@/api";
 import styles from "./ChangeProdi.module.scss";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface BiodataPendaftaran {
-    nomorDaftar: string;
     periode: string;
     gelombang: string;
     jurusan: string;
@@ -24,23 +23,13 @@ interface RequestPindahForm {
     waktuKuliahBaru: string;
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+interface ProgramStudiOption {
+    id: string;
+    title: string;
+    degree: string;
+}
 
-const PRODI_OPTIONS = [
-    "Akuntansi (Accounting)",
-    "Arsitektur (Architecture)",
-    "Biologi (Biology)",
-    "Gizi (Nutrition)",
-    "Ilmu Hukum (Law Science)",
-    "Kedokteran (Medicine)",
-    "Manajemen (Management)",
-    "Pariwisata (Tourism)",
-    "Pendidikan Bahasa Inggris (English Language Education)",
-    "Profesi Kedokteran (Medicine)",
-    "Sistem Informasi (Information System)",
-    "Teknik Sipil (Civil Engineering)",
-    "Teknologi Informasi (Information Technology)",
-] as const;
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const WAKTU_KULIAH_OPTIONS = [
     { value: "pagi", label: "Pagi (Morning Class)" },
@@ -51,7 +40,6 @@ const WAKTU_KULIAH_OPTIONS = [
 
 function BiodataSection({ data }: { data: BiodataPendaftaran }) {
     const rows: [string, string][] = [
-        ["Nomor Daftar", data.nomorDaftar],
         ["Periode", data.periode],
         ["Gelombang", data.gelombang],
         ["Jurusan", data.jurusan],
@@ -80,9 +68,9 @@ function ReadonlySelect({ label, value }: { label: string; value: string }) {
                 disabled
                 tabIndex={-1}
                 aria-readonly="true"
-                defaultValue={value}
+                value={value}
             >
-                <option>{value}</option>
+                <option value={value}>{value}</option>
             </select>
         </div>
     );
@@ -162,30 +150,79 @@ function ActionRow({
     );
 }
 
-// ─── Mock data — ganti dengan data dari backend / props / context ─────────────
-
-const MOCK_BIODATA: BiodataPendaftaran = {
-    nomorDaftar: "-",
-    periode: "-",
-    gelombang: "-",
-    jurusan: "-",
-    namaLengkap: "-",
-    alamatEmail: "-",
-    nomorNIK: "-",
-};
-
-const WAKTU_KULIAH_SEBELUMNYA = "Malam (Night Class)";
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ChangeProdi() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const regID = searchParams.get("regID");
+
+    const [biodata, setBiodata] = useState<BiodataPendaftaran>({
+        periode: "-",
+        gelombang: "-",
+        jurusan: "-",
+        namaLengkap: "-",
+        alamatEmail: "-",
+        nomorNIK: "-",
+    });
+
     const [form, setForm] = useState<RequestPindahForm>({
         prodiTujuan: "",
-        waktuKuliahSebelumnya: WAKTU_KULIAH_SEBELUMNYA,
+        waktuKuliahSebelumnya: "-",
         waktuKuliahBaru: "",
     });
+
+    const [prodiOptions, setProdiOptions] = useState<ProgramStudiOption[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isFetching, setIsFetching] = useState(false);
+
+    useEffect(() => {
+        if (!regID) return;
+
+        const fetchData = async () => {
+            setIsFetching(true);
+            try {
+                const res = await api.profile.getRegistration(regID);
+                let degree = null;
+                if (res) {
+                    const { registration, user, current_prodi, current_session } = res;
+                    degree = registration.degree;
+                    setBiodata({
+                        periode: registration.academic_year || "-",
+                        gelombang: registration.batch_name || "-",
+                        jurusan: current_prodi || "-",
+                        namaLengkap: user.full_name || "-",
+                        alamatEmail: user.email || "-",
+                        nomorNIK: user.nik || "-",
+                    });
+                    setForm((prev) => ({
+                        ...prev,
+                        waktuKuliahSebelumnya: current_session || "-",
+                    }));
+                }
+
+                const prodis = await api.programStudi.getAll();
+                if (Array.isArray(prodis)) {
+                    setProdiOptions(
+                        prodis
+                            .filter((p) => !degree || p.degree === degree)
+                            .map((p) => ({
+                                id: p.id,
+                                title: p.title,
+                                degree: p.degree,
+                            })),
+                    );
+                }
+            } catch (err) {
+                console.error("Failed to fetch data", err);
+                toast.error("Gagal mengambil data.");
+            } finally {
+                setIsFetching(false);
+            }
+        };
+
+        fetchData();
+    }, [regID]);
 
     const handleSelectChange =
         (field: keyof RequestPindahForm) =>
@@ -194,9 +231,15 @@ export default function ChangeProdi() {
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (!regID) return;
+
         setIsLoading(true);
         try {
-            // await api.prodi.requestPindah(form); // TODO: pastikan endpoint ini ada
+            await api.prodiChange.create({
+                registration_id: regID,
+                new_program_studi_id: form.prodiTujuan,
+                new_class_session: form.waktuKuliahBaru,
+            });
             toast.success("Request perpindahan prodi berhasil dikirim!");
             router.back();
         } catch (err) {
@@ -208,11 +251,13 @@ export default function ChangeProdi() {
         }
     };
 
+    if (isFetching) return <p>Loading...</p>;
+
     return (
         <main className={styles.page}>
             <div className={styles.container}>
                 <h2 className={styles.sectionTitle}>Biodata Pendaftaran</h2>
-                <BiodataSection data={MOCK_BIODATA} />
+                <BiodataSection data={biodata} />
 
                 <h3 className={styles.formTitle}>
                     Form Request Pindah Program Studi
@@ -222,7 +267,7 @@ export default function ChangeProdi() {
                     <div className={styles.formGrid}>
                         <ReadonlySelect
                             label="Program Studi Sebelumnya (Previous Major)"
-                            value={`${MOCK_BIODATA.jurusan} (Information Technology)`}
+                            value={biodata.jurusan}
                         />
                         <EditableSelect
                             id="prodiTujuan"
@@ -234,16 +279,16 @@ export default function ChangeProdi() {
                             <option value="" disabled>
                                 Program Studi Pilihan (Selected Study Program) *
                             </option>
-                            {PRODI_OPTIONS.map((p) => (
-                                <option key={p} value={p}>
-                                    {p}
+                            {prodiOptions.map((p) => (
+                                <option key={p.id} value={p.id}>
+                                    {p.title}
                                 </option>
                             ))}
                         </EditableSelect>
 
                         <ReadonlySelect
                             label="Waktu Kuliah Sebelumnya (Previous Shift)"
-                            value={WAKTU_KULIAH_SEBELUMNYA}
+                            value={form.waktuKuliahSebelumnya}
                         />
                         <EditableSelect
                             id="waktuKuliahBaru"

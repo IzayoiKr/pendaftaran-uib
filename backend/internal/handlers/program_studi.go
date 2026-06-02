@@ -11,7 +11,7 @@ import (
 func ProgramStudi(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rows, err := db.QueryContext(r.Context(),
-			`SELECT id, title, faculty, degree, description, image_path, link
+			`SELECT id, code, title, faculty, degree, description, image_path, link
 			FROM program_studi
 			WHERE is_active = 1
 			ORDER BY sort_order ASC`,
@@ -27,7 +27,7 @@ func ProgramStudi(db *sql.DB) http.HandlerFunc {
 		for rows.Next() {
 			var p models.ProgramStudiDTO
 			if err := rows.Scan(
-				&p.ID, &p.Title, &p.Faculty,
+				&p.ID, &p.Code, &p.Title, &p.Faculty,
 				&p.Degree, &p.Description, &p.ImagePath, &p.Link,
 			); err != nil {
 				slog.Error("program_studi: scan error", "error", err)

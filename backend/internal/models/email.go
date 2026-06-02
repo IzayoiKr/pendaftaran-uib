@@ -13,7 +13,7 @@ type VerifyEmailRequest struct {
 	TurnstileToken string `json:"cf_turnstile_token" validate:"-"`
 }
 
-func (r *VerifyEmailRequest) Validate() error {
+func (r *VerifyEmailRequest) Validate(lang string) error {
 	if r.Token == "" {
 		return errors.New("link verifikasi tidak valid atau sudah kedaluwarsa")
 	}
@@ -28,6 +28,6 @@ func (r *ResendVerifyEmailRequest) Sanitize() {
 	r.Email = strings.ToLower(strings.TrimSpace(r.Email))
 }
 
-func (r *ResendVerifyEmailRequest) Validate() error {
-	return utils.ValidateStruct(r)
+func (r *ResendVerifyEmailRequest) Validate(lang string) error {
+	return utils.ValidateStruct(r, lang)
 }

@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/clamav"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 	"strings"
@@ -32,6 +33,7 @@ func processUploadedFiles(
 	base audit.Entry,
 	userID string,
 	formData *models.RegistrationForm,
+	lang string,
 ) (map[string]processedFileMeta, *processedFileMeta, error) {
 	processedFiles := make(map[string]processedFileMeta)
 	var paymentProof *processedFileMeta
@@ -80,7 +82,7 @@ func processUploadedFiles(
 			dt := models.DocType(docType)
 			if !formData.IsValidDocumentField(dt) {
 				slog.Warn("Upload rejected: invalid document form key", "key", docType, "user_id", userID)
-				return errors.New("tipe dokumen '" + docType + "' tidak valid")
+				return errors.New(i18n.TF("registration.invalid_doc_type", lang, "", docType))
 			}
 
 			finalPath, size, pipeErr := runFilePipeline(r, file, header, targetDir, docType, scanner, al, base, userID)

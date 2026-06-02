@@ -1,8 +1,8 @@
 // Use snake case to match json type
 export interface Program {
     id: string;
+    code: string;
     title: string;
-    title_en: string;
     faculty: string;
     degree: "S1" | "S2";
     description: string;

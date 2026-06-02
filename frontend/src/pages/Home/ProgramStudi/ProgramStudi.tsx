@@ -4,6 +4,7 @@ import { memo, useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Autoplay from "embla-carousel-autoplay";
 import useEmblaCarousel from "embla-carousel-react";
+import { useTranslations } from "next-intl";
 import type { Program } from "@/types/api";
 import styles from "./ProgramStudi.module.scss";
 
@@ -71,6 +72,7 @@ function DotButton({
 }
 
 export default function ProgramStudi({ programs }: ProgramStudiProps) {
+    const t = useTranslations("program");
     const autoplay = useRef(
         Autoplay({
             delay: 4000,
@@ -139,10 +141,10 @@ export default function ProgramStudi({ programs }: ProgramStudiProps) {
                             {programs.map((program) => (
                                 <div className={styles.slide} key={program.id}>
                                     <ProgramCard
-                                        title={program.title}
+                                        title={t(`${program.code.toLowerCase()}.title`)}
                                         faculty={program.faculty}
                                         degree={program.degree}
-                                        description={program.description}
+                                        description={t(`${program.code.toLowerCase()}.description`)}
                                         image={program.image_path}
                                         link={program.link}
                                     />

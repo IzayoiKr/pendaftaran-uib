@@ -35,7 +35,7 @@ func upsertS1Detail(r *http.Request, tx *sql.Tx, regID uuid.UUID, form *models.R
 			is_final_declaration_agreed
 		) VALUES (
 			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-			(SELECT id FROM program_studi WHERE title = ? AND is_active = 1 LIMIT 1), 
+			(SELECT id FROM program_studi WHERE code = ? AND is_active = 1 LIMIT 1), 
 			?, ?, ?
 		) AS new_data
 		ON DUPLICATE KEY UPDATE
@@ -117,7 +117,7 @@ func upsertS2Detail(r *http.Request, tx *sql.Tx, regID uuid.UUID, form *models.R
 			is_final_declaration_agreed
 		) VALUES (
 			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-			(SELECT id FROM program_studi WHERE title = ? AND is_active = 1 LIMIT 1), 
+			(SELECT id FROM program_studi WHERE code = ? AND is_active = 1 LIMIT 1), 
 			?
 		) AS new_data
 		ON DUPLICATE KEY UPDATE

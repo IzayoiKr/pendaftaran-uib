@@ -9,6 +9,7 @@ import (
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
 	"pendaftaran-uib/backend/internal/crypto"
+	"pendaftaran-uib/backend/internal/i18n"
 	"pendaftaran-uib/backend/internal/models"
 	"pendaftaran-uib/backend/internal/utils"
 
@@ -18,10 +19,11 @@ import (
 func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
+		lang := utils.Lang(r)
 
 		claims := auth.GetClaims(r)
 		if claims == nil {
-			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("unauthorized"))
+			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON(i18n.T("common.unauthorized", lang)))
 			return
 		}
 
@@ -31,7 +33,7 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 			return
 		}
 
-		if err := req.Validate(); err != nil {
+		if err := req.Validate(lang); err != nil {
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 			return
 		}
@@ -39,9 +41,10 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 		id, err := uuid.Parse(claims.UserID)
 		if err != nil {
 			slog.Error("change_password: parse uuid from claims", "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
+
 
 		var currentHash string
 		err = db.QueryRowContext(r.Context(),
@@ -50,16 +53,16 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 		).Scan(&currentHash)
 
 		if errors.Is(err, sql.ErrNoRows) {
-			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON("user tidak ditemukan"))
+			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON(i18n.T("common.user_not_found", lang)))
 			return
 		}
 		if err != nil {
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
 		if err := crypto.VerifyPassword(currentHash, req.OldPassword); err != nil {
-			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON("password lama tidak sesuai"))
+			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.T("auth.old_password_mismatch", lang)))
 			return
 		}
 
@@ -74,7 +77,7 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 			string(newHash), id[:],
 		); err != nil {
 			slog.Error("change_password: exec", "user_id", claims.UserID, "error", err)
-			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
