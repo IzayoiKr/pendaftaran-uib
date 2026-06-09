@@ -20,14 +20,14 @@ export interface ContactInfo {
     line: string;
 }
 
-interface SocialLinks {
+export interface SocialLink {
     name: string;
     url: string;
 }
 
 export interface ExternalLinks {
     mapEmbedUrl: string;
-    socials: SocialLinks[];
+    socials: SocialLink[];
 }
 
 export interface Guide {

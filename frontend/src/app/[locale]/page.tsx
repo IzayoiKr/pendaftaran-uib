@@ -24,9 +24,16 @@ export async function generateMetadata({
 
 export const revalidate = 3600;
 
-async function fetchProgramStudi(): Promise<Program[]> {
+async function fetchProgramStudi(locale: "id" | "en"): Promise<Program[]> {
     try {
-        const res = await fetch(`${process.env.BACKEND_URL}/api/program_studi`);
+        const res = await fetch(
+            `${process.env.BACKEND_URL}/api/program_studi`,
+            {
+                headers: {
+                    "Accept-Language": locale,
+                },
+            },
+        );
         if (!res.ok) return [];
         return res.json();
     } catch {
@@ -44,8 +51,8 @@ async function fetchGelombang(): Promise<Event[]> {
     }
 }
 
-async function ProgramStudiSection() {
-    const programs = await fetchProgramStudi();
+async function ProgramStudiSection({ locale }: { locale: "id" | "en" }) {
+    const programs = await fetchProgramStudi(locale);
     return <ProgramStudi programs={programs} />;
 }
 
@@ -65,7 +72,7 @@ export default async function HomePage({
         <main>
             <Hero />
             <Suspense fallback={<ProgramStudiSkeleton />}>
-                <ProgramStudiSection />
+                <ProgramStudiSection locale={locale} />
             </Suspense>
             <Suspense fallback={<GelombangSkeleton />}>
                 <GelombangSection />

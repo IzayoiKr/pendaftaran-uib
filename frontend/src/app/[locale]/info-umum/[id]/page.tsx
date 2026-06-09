@@ -26,15 +26,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     return {
-        title: `${post.titleId} | Universitas Internasional Batam`,
-
-        description: post.excerpt,
+        title: "Universitas Internasional Batam",
 
         openGraph: {
-            title: post.titleId,
-
-            description: post.excerpt,
-
             images: [
                 {
                     url: post.image,
@@ -44,7 +38,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
 }
 
-/* STATIC CONTENT REGISTRY */
 function loadContent(id: string) {
     return infoDetailModules[id as keyof typeof infoDetailModules] || null;
 }
@@ -64,7 +57,5 @@ export default async function InfoDetailPage({ params }: Props) {
         notFound();
     }
 
-    return (
-        <InfoDetail post={meta} Content={content.Content} toc={content.toc} />
-    );
+    return <InfoDetail post={meta} Content={content.Content} />;
 }

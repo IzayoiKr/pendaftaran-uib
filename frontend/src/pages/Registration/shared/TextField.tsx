@@ -105,6 +105,7 @@ export default function TextField({
                 step={step}
                 min={min}
                 max={max}
+                disabled={readOnly}
                 readOnly={readOnly}
                 inputMode={inputMode}
                 pattern={effectivePattern}

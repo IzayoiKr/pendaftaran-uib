@@ -50,7 +50,7 @@ export default function proxy(request: NextRequest) {
         "/favicon",
         "/images",
         "/docs",
-        "/manifest.json",
+        "/manifest.webmanifest",
     ];
     const shouldBypass = bypassPaths.some((path) => pathname.startsWith(path));
 
@@ -74,6 +74,6 @@ export default function proxy(request: NextRequest) {
 
 export const config = {
     matcher: [
-        "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)",
+        "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|manifest.webmanifest).*)",
     ],
 };

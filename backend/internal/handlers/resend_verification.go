@@ -14,7 +14,7 @@ import (
 	"pendaftaran-uib/backend/internal/utils"
 )
 
-func ResendVerification(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFunc {
+func ResendVerification(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
 		lang := utils.Lang(r)
@@ -75,7 +75,7 @@ func ResendVerification(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http
 		}
 
 		go func() {
-			if err := mailer.SendVerificationEmail(user.Email, user.FullName, rawToken); err != nil {
+			if err := email.SendVerificationEmail(user.Email, user.FullName, rawToken); err != nil {
 				slog.Error("resend_verification: send email", "user_id", user.ID.String(), "error", err)
 			}
 		}()

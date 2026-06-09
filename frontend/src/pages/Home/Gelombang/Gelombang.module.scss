@@ -1,204 +1,495 @@
 @use "@/styles/config.scss" as global;
-@use "sass:map";
 
-.gelombang {
+.section {
+  padding: var(--space-2xl) 0 calc(var(--space-2xl) + 1rem);
   background: global.$tertiary-color;
   color: global.$white;
-  padding: var(--space-2xl) 0;
-
-  .container {
-    @include global.container;
-  }
 }
 
-.title {
-  text-align: center;
+.sectionInner {
+  @include global.container;
+}
+
+.sectionHeader {
   margin-bottom: var(--space-xl);
+  text-align: center;
+}
 
-  h2 {
-    font-weight: 600;
-    line-height: 1.2;
-    color: global.$white;
-  }
+.sectionTitle {
+  margin: 0 0 var(--space-2xs);
+  color: global.$white;
+  font-size: var(--step-3);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
 
-  .subTitle {
-    color: global.$primary-color;
-    margin-bottom: var(--space-s);
-    font-weight: 500;
-  }
+.sectionSubtitle {
+  margin: 0 0 var(--space-s);
+  color: global.$primary-color;
+  font-size: var(--step-0);
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
 
-  p {
-    color: rgba(255, 255, 255, 0.8);
-    line-height: 1.5;
+.sectionDescription {
+  margin: 0;
+  color: global.$white-mid;
+  font-size: var(--step-0);
+  line-height: 1.65;
+
+  i {
+    display: block;
+    margin-top: 0.2rem;
+    color: global.$white-low;
+    font-size: var(--step--1);
+    font-style: italic;
   }
 }
 
-.stack {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-l);
+.carouselOuter {
+  position: relative;
+  width: 100%;
+  max-width: 780px;
+  margin-inline: auto;
+
+  @include global.down(sm) {
+    padding-inline: 0.35rem;
+  }
 }
 
-@media (max-width: map.get(global.$breakpoints, lg)) {
-  .stack {
-    grid-template-columns: 1fr;
+.carouselViewport {
+  overflow: hidden;
+  padding-block: 0.75rem;
+}
+
+.carouselTrack {
+  display: flex;
+
+  cursor: grab;
+  touch-action: pan-y pinch-zoom;
+  will-change: transform;
+
+  &:active {
+    cursor: grabbing;
   }
+}
+
+.carouselSlide {
+  flex: 0 0 50%;
+  min-width: 0;
+  padding-inline: 0.5rem;
+  box-sizing: border-box;
+
+  @include global.down(xl) {
+    flex-basis: 58%;
+  }
+
+  @include global.down(lg) {
+    flex-basis: 72%;
+  }
+
+  @include global.down(md) {
+    flex-basis: 84%;
+  }
+
+  @include global.down(sm) {
+    flex-basis: 90%;
+    padding-inline: 0.4rem;
+  }
+}
+
+.navButton {
+  --_btn-size: 3.25rem;
+  --_scale: 1;
+
+  position: absolute;
+  top: 50%;
+  z-index: global.$z-dropdown;
+  display: none;
+  width: var(--_btn-size);
+  height: var(--_btn-size);
+  border: 1px solid global.$border-subtle;
+  border-radius: global.$radius-pill;
+  background: global.$navy-alpha-80;
+  color: global.$white;
+  font-size: 1.6rem;
+  font-weight: 700;
+  transform: translateY(-50%) scale(var(--_scale));
+
+  @include global.interactive;
+  @include global.transition-colors;
+
+  @include global.up(lg) {
+    @include global.flex-center;
+  }
+
+  @include global.hover-supported {
+    --_scale: 1.06;
+
+    background: global.$navy-alpha-96;
+    border-color: global.$border-accent;
+  }
+}
+
+.navButtonPrev {
+  left: calc(-1 * var(--_btn-size) - 1.25rem);
+}
+
+.navButtonNext {
+  right: calc(-1 * var(--_btn-size) - 1.25rem);
+}
+
+.dotList {
+  @include global.flex-center(0.55rem);
+
+  margin-top: 1.75rem;
+}
+
+.dotItem {
+  width: 0.65rem;
+  max-width: 0.65rem;
+  height: 0.65rem;
+  border: none;
+  border-radius: global.$radius-pill;
+  background: global.$white-faint;
+
+  @include global.interactive;
+
+  transition:
+    max-width global.$transition-medium,
+    background global.$transition-medium,
+    transform global.$transition-medium;
+
+  @include global.hover-supported {
+    background: global.$white-low;
+  }
+}
+
+.dotItemActive {
+  width: 1.8rem;
+  max-width: 1.8rem;
+  background: global.$primary-color;
 }
 
 .card {
-  display: flex;
-  flex-direction: column;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  @include global.flex-column;
+  @include global.glass-card;
+
+  position: relative;
   overflow: hidden;
+  isolation: isolate;
+  height: 100%;
+  border-radius: global.$radius-xl;
+  background: rgb(255 255 255 / 5%);
+
   transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease,
-    background 0.3s ease;
+    transform global.$transition-medium,
+    background global.$transition-medium,
+    border-color global.$transition-medium,
+    box-shadow global.$transition-medium;
 
-  &:hover {
-    transform: translateY(-4px);
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+  @include global.down(sm) {
+    border-radius: global.$radius-lg;
+  }
 
-    .image {
-      transform: scale(1.05);
+  @include global.hover-supported {
+    transform: translate3d(0, -4px, 0);
+    background: rgb(255 255 255 / 9%);
+    border-color: rgb(255 255 255 / 14%);
+    box-shadow:
+      0 18px 40px rgb(0 0 0 / 30%),
+      0 2px 10px rgb(0 0 0 / 18%);
+
+    .cardImage {
+      transform: scale3d(1.05, 1.05, 1);
+    }
+
+    .ctaButton {
+      background: global.$primary-color-light;
+    }
+
+    .ctaArrow {
+      transform: translateX(5px);
     }
   }
 }
 
-.media {
+.cardImageWrapper {
   position: relative;
-  aspect-ratio: 2 / 1;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+  aspect-ratio: 16 / 9;
+  background: global.$navy-bg;
+
+  @include global.down(sm) {
+    aspect-ratio: 16 / 10;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 -2px;
+    height: 3px;
+    background: global.$navy-bg;
+    z-index: 2;
+    pointer-events: none;
+  }
 }
 
-.image {
+.cardImage {
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: center;
-  transition: transform 0.5s ease;
+
+  @include global.transition-transform;
+
+  transition-duration: 0.55s;
 }
 
-.body {
+.cardImageOverlay {
+  @include global.absolute-fill;
+
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    global.$navy-alpha-96 0%,
+    rgb(5 15 35 / 78%) 24%,
+    rgb(5 15 35 / 28%) 56%,
+    transparent 100%
+  );
+}
+
+.cardImageTitle {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: global.$z-dropdown;
+
+  @include global.flex-column(0.25rem);
+
+  padding: 1rem 1.15rem;
+}
+
+.cardBatchName {
+  margin: 0;
+  color: global.$primary-color;
+  font-size: clamp(1.1rem, 2.2vw, 1.65rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
   display: flex;
   flex-direction: column;
-  flex: 1;
-  padding: var(--space-m);
-  gap: calc(var(--space-2xs) / 2);
+  gap: 0.15rem;
+
+  @include global.down(sm) {
+    font-size: clamp(1rem, 4.5vw, 1.35rem);
+  }
 }
 
-.batch {
-  font-size: var(--step-1);
-  font-weight: 700;
-  color: global.$primary-color;
-  text-transform: uppercase;
-  line-height: 1.2;
-}
-
-.program {
+.cardProgramName {
+  margin: 0;
+  color: global.$white-high;
   font-size: var(--step-0);
-  font-weight: 500;
-  color: global.$white;
-  line-height: 1.4;
+  font-weight: 600;
+  line-height: 1.35;
 
   i {
-    color: rgba(255, 255, 255, 0.7);
+    display: block;
+    margin-top: 0.1rem;
+    color: global.$white-mid;
+    font-size: var(--step--1);
+    font-style: italic;
     font-weight: 400;
   }
 }
 
-.year {
-  font-size: var(--step--1);
-  color: rgba(255, 255, 255, 0.6);
+.cardBody {
+  @include global.flex-column(var(--space-s));
+
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  padding: var(--space-m);
+  background: transparent;
+
+  @include global.down(sm) {
+    gap: 0.85rem;
+    padding: 1rem;
+  }
+}
+
+.cardDivider {
+  margin: 0;
+  border: none;
+  border-top: 1px solid global.$border-subtle;
+}
+
+.examSection,
+.registrationSection {
+  @include global.flex-column(var(--space-2xs));
+}
+
+.examSectionLabel,
+.registrationSectionLabel {
+  @include global.section-label;
+}
+
+.examDateRow {
+  @include global.flex-row(0.85rem, center);
+
+  align-items: center;
+}
+
+.examCalendarBadge {
+  @include global.flex-column;
+
+  overflow: hidden;
+  flex-shrink: 0;
+  width: 4.5rem;
+  border: 2px solid global.$primary-color;
+  border-radius: global.$radius-lg;
+  background: global.$white;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 22%);
+
+  @include global.down(sm) {
+    width: 4rem;
+  }
+}
+
+.examCalendarMonth,
+.examCalendarDay,
+.examCalendarDow {
+  display: block;
+  text-align: center;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: var(--space-2xs);
 }
 
-.meta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2xs);
-  padding: var(--space-xs) 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.calendar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 3rem;
-  padding-right: var(--space-xs);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.calendarDay {
-  font-size: var(--step-1);
-  font-weight: 700;
-  color: global.$primary-color;
-  line-height: 1;
-}
-
-.calendarMonth {
-  font-size: var(--step--2);
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.8);
-  letter-spacing: 0.1em;
-}
-
-.info {
-  display: flex;
-  flex-direction: column;
-  font-size: var(--step--1);
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.infoRow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: var(--step--1);
-  line-height: 1.5;
-}
-
-.registration {
-  font-size: var(--step--1);
-  color: rgba(255, 255, 255, 0.85);
-  line-height: 1.5;
-  margin: var(--space-2xs) 0;
-}
-
-.registrationLabel {
-  color: global.$primary-color;
-  font-weight: 500;
-}
-
-.registerBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  margin-top: auto;
-  padding: var(--space-xs) var(--space-m);
+.examCalendarMonth {
+  padding: 0.38rem 0 0.32rem;
   background: global.$primary-color;
-  color: global.$tertiary-color;
+  color: global.$navy-bg;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.14em;
+
+  @include global.down(sm) {
+    font-size: 0.6rem;
+  }
+}
+
+.examCalendarDay {
+  padding-top: 0.35rem;
+  color: global.$navy-bg;
+  font-size: 1.85rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.05em;
+
+  @include global.down(sm) {
+    font-size: 1.6rem;
+  }
+}
+
+.examCalendarDow {
+  padding: 0.18rem 0 0.48rem;
+  color: global.$navy-alpha-50;
+  font-size: 0.63rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.1em;
+
+  @include global.down(sm) {
+    font-size: 0.56rem;
+  }
+}
+
+.examDetails {
+  @include global.flex-column(0.3rem);
+
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+  transform: translateY(1px);
+}
+
+.examDetailRow {
+  @include global.flex-row(6px, flex-start);
+
+  margin: 0;
+  color: global.$white-high;
+  font-size: var(--step--1);
+  line-height: 1.5;
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 0.18rem;
+  }
+}
+
+.registrationDateRange {
+  margin: 0;
+  color: global.$white-high;
   font-size: var(--step--1);
   font-weight: 600;
-  text-transform: uppercase;
-  border-radius: 6px;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease;
+  line-height: 1.65;
 
-  &:hover {
-    background: global.$white;
-    color: global.$tertiary-color;
+  span {
+    margin-inline: 0.2em;
+    color: global.$white-low;
+    font-weight: 400;
   }
+
+  @include global.down(sm) {
+    font-size: 0.9rem;
+  }
+}
+
+.ctaButton {
+  @include global.flex-center(var(--space-2xs));
+  @include global.interactive;
+
+  width: 100%;
+  margin-top: auto;
+  padding: 1rem 1.25rem;
+  border: none;
+  border-radius: global.$radius-md;
+  background: global.$primary-color;
+  color: global.$navy-bg;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+
+  transition:
+    background global.$transition-fast,
+    transform global.$transition-fast;
+
+  @include global.down(sm) {
+    padding: 0.9rem 1rem;
+    font-size: 0.76rem;
+  }
+
+  @include global.hover-supported {
+    background: global.$primary-color-light;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.ctaArrow {
+  display: inline-block;
+  font-style: normal;
+
+  @include global.transition-transform;
 }

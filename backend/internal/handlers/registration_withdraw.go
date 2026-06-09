@@ -32,7 +32,7 @@ func RegistrationWithdraw(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			return
 		}
 
-		userID, err := uuid.Parse(claims.UserID)
+		userID, err := uuid.Parse(claims.Subject)
 		if err != nil {
 			slog.Error("registration_withdraw: parse uuid", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
@@ -80,7 +80,7 @@ func RegistrationWithdraw(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 
 		al.Log(audit.Entry{
 			Event:     audit.EventRegistrationWithdrawn,
-			UserID:    claims.UserID,
+			UserID:    claims.Subject,
 			IP:        base.IP,
 			UserAgent: base.UserAgent,
 			RequestID: base.RequestID,

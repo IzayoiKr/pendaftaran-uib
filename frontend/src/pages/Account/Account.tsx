@@ -7,6 +7,8 @@ import GetInitials from "@/utils/GetInitials";
 import { toast } from "sonner";
 import { api } from "@/api";
 import useAuthStore from "@/store/useAuthStore";
+import ConfirmDialog from "@/components/ConfirmDialog/ConfirmDialog";
+import { useConfirm } from "@/components/ConfirmDialog/useConfirm";
 import {
     CancelIcon,
     CheckIcon,
@@ -26,8 +28,6 @@ import {
 } from "@/components/Icons/Icons";
 import NIKReveal from "@/components/NIKReveal/NIKReveal";
 import type { RegistrationCard, User } from "@/types/api";
-import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
-import { useConfirm } from "../../components/ConfirmDialog/useConfirm";
 import AccountSkeleton from "./Account.skeleton";
 import styles from "./Account.module.scss";
 
@@ -51,13 +51,13 @@ function getStatusConfig(
     t: (key: string) => string,
 ) {
     const map: Record<RegistrationStatus, { label?: string; color?: string }> =
-    {
-        DRAFT: { label: t("statusDraft"), color: "draft" },
-        SUBMITTED: { label: t("statusSubmitted"), color: "submitted" },
-        REJECTED: { label: t("statusRejected"), color: "rejected" },
-        VERIFIED: { label: t("statusVerified"), color: "examinee" },
-        NONE: {},
-    };
+        {
+            DRAFT: { label: t("statusDraft"), color: "draft" },
+            SUBMITTED: { label: t("statusSubmitted"), color: "submitted" },
+            REJECTED: { label: t("statusRejected"), color: "rejected" },
+            VERIFIED: { label: t("statusVerified"), color: "examinee" },
+            NONE: {},
+        };
     return map[status];
 }
 
@@ -192,7 +192,8 @@ function RegistrationCardItem({
 
             toast.dismiss(toastId);
         } catch (err) {
-            const message = err instanceof Error ? err.message : "Terjadi kesalahan";
+            const message =
+                err instanceof Error ? err.message : "Terjadi kesalahan";
             toast.error(message, { id: toastId });
         } finally {
             setIsLoading(null);
@@ -204,6 +205,7 @@ function RegistrationCardItem({
             title: t("deleteDraft"),
             message: t("confirmDelete"),
             confirmLabel: t("deleteDraft"),
+            cancelLabel: t("cancel"),
             variant: "danger",
         });
 
@@ -231,6 +233,7 @@ function RegistrationCardItem({
             title: t("withdraw"),
             message: t("confirmWithdraw"),
             confirmLabel: t("withdraw"),
+            cancelLabel: t("cancel"),
             variant: "warning",
         });
 
@@ -351,7 +354,7 @@ function RegistrationCardItem({
                                     </span>
                                     <span
                                         className={styles.infoItemValue}
-                                        data-status="incomplete"
+                                        data-status="unpaid"
                                     >
                                         {reg.feedback_payment}
                                     </span>
@@ -369,7 +372,7 @@ function RegistrationCardItem({
                             onClick={handleEdit}
                             disabled={isActionDisabled}
                         >
-                            <EditIcon /> {t("continueDraft")}
+                            <EditIcon /> {t("editDraft")}
                         </button>
                         <button
                             className={`${styles.btn} ${styles.btnDangerOutline}`}
@@ -384,11 +387,11 @@ function RegistrationCardItem({
                 {reg.status === "SUBMITTED" && (
                     <>
                         <button
-                            className={`${styles.btn} ${styles.btnSecondaryOutline}`}
+                            className={`${styles.btn} ${styles.btnPrimary}`}
                             onClick={handleView}
                             disabled={isActionDisabled}
                         >
-                            <EyeIcon /> {t("viewSubmission")}
+                            <EyeIcon /> {t("viewForm")}
                         </button>
                         <button
                             className={`${styles.btn} ${styles.btnWarningOutline}`}
@@ -431,7 +434,9 @@ function RegistrationCardItem({
                         <button
                             className={`${styles.btn} ${styles.btnSecondaryOutline}`}
                             onClick={() =>
-                                router.push(`/account/transfer-proof?regID=${reg.registration_id}`)
+                                router.push(
+                                    `/account/transfer-proof/${reg.registration_id}`,
+                                )
                             }
                             disabled={isActionDisabled}
                         >
@@ -439,7 +444,11 @@ function RegistrationCardItem({
                         </button>
                         <button
                             className={`${styles.btn} ${styles.btnSecondaryOutline}`}
-                            onClick={() => router.push(`/account/prodi?regID=${reg.registration_id}`)}
+                            onClick={() =>
+                                router.push(
+                                    `/account/prodi/${reg.registration_id}`,
+                                )
+                            }
                             disabled={isActionDisabled}
                         >
                             <EditIcon /> {t("changeProdi")}
@@ -450,14 +459,18 @@ function RegistrationCardItem({
                             className={`${styles.btn} ${styles.btnDangerOutline}`}
                             style={{ textDecoration: "none" }}
                             aria-disabled={isActionDisabled}
-                            onClick={(e) => isActionDisabled && e.preventDefault()}
+                            onClick={(e) =>
+                                isActionDisabled && e.preventDefault()
+                            }
                         >
                             <CancelIcon /> {t("resignation")}
                         </a>
                         <button
                             className={`${styles.btn} ${styles.btnSecondaryOutline}`}
                             onClick={() =>
-                                router.push(`/account/prasyarat-ospek?regID=${reg.registration_id}`)
+                                router.push(
+                                    `/account/prasyarat-ospek/${reg.registration_id}`,
+                                )
                             }
                             disabled={isActionDisabled}
                         >
@@ -483,7 +496,7 @@ function EmptyRegistration({ onRegister }: { onRegister: () => void }) {
                     className={`${styles.btn} ${styles.btnPrimary} ${styles.btnLg}`}
                     onClick={onRegister}
                 >
-                    <LightningIcon /> {t("registerNow")}
+                    {t("registerNow")}
                 </button>
             </div>
         </section>
@@ -491,19 +504,23 @@ function EmptyRegistration({ onRegister }: { onRegister: () => void }) {
 }
 
 function QuickActions({ isLoggingOut }: { isLoggingOut: boolean }) {
-    const t = useTranslations("account");
     const router = useRouter();
-    const { logout } = useAuthStore();
+    const logout = useAuthStore((s) => s.logout);
+    const setIsLoggingOut = useAuthStore((s) => s.setIsLoggingOut);
+    const t = useTranslations("account");
 
     const handleLogout = async () => {
+        setIsLoggingOut(true);
         const toastId = toast.loading(t("loggingOut"));
         try {
             await api.auth.logout();
             logout();
             toast.success(t("logoutSuccess"), { id: toastId });
             router.push("/login");
-        } catch {
-            toast.error(t("logoutError"), { id: toastId });
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : t("logoutError"), {
+                id: toastId,
+            });
         }
     };
 
@@ -515,14 +532,16 @@ function QuickActions({ isLoggingOut }: { isLoggingOut: boolean }) {
             </div>
             <div className={styles.actionsList}>
                 <button
-                    className={`${styles.btn} ${styles.btnSecondaryOutline} ${styles.btnFull}`}
+                    className={`${styles.btn} ${styles.btnSecondaryOutline}`}
                     onClick={() => router.push("/account/change-password")}
+                    disabled={isLoggingOut}
                 >
                     <LockIcon /> {t("quickChangePassword")}
                 </button>
                 <button
                     className={`${styles.btn} ${styles.btnSecondaryOutline} ${styles.btnFull}`}
                     onClick={() => router.push("/account/update-profile")}
+                    disabled={isLoggingOut}
                 >
                     <ProfileIcon /> {t("quickUpdateProfile")}
                 </button>
@@ -530,6 +549,7 @@ function QuickActions({ isLoggingOut }: { isLoggingOut: boolean }) {
                     className={`${styles.btn} ${styles.btnDangerOutline} ${styles.btnFull}`}
                     onClick={handleLogout}
                     disabled={isLoggingOut}
+                    aria-busy={isLoggingOut}
                 >
                     <LogoutIcon /> {t("logout")}
                 </button>

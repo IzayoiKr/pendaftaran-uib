@@ -22,7 +22,7 @@ func Profile(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		id, err := uuid.Parse(claims.UserID)
+		id, err := uuid.Parse(claims.Subject)
 		if err != nil {
 			slog.Error("profile: parse uuid", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
@@ -30,9 +30,9 @@ func Profile(db *sql.DB) http.HandlerFunc {
 		}
 
 		rows, err := db.QueryContext(r.Context(), `
-			SELECT 
-				u.full_name, 
-				u.nik, 
+			SELECT
+				u.full_name,
+				u.nik,
 				u.email,
 				reg.id,
 				reg.status,
@@ -57,7 +57,7 @@ func Profile(db *sql.DB) http.HandlerFunc {
 			id[:],
 		)
 		if err != nil {
-			slog.Error("profile: database query execution", "user_id", claims.UserID, "error", err)
+			slog.Error("profile: database query execution", "user_id", claims.Subject, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}

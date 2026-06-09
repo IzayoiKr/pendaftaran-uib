@@ -28,7 +28,7 @@ func RegistrationLoA(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		userID, err := uuid.Parse(claims.UserID)
+		userID, err := uuid.Parse(claims.Subject)
 		if err != nil {
 			slog.Error("registration_loa: parse user uuid", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))

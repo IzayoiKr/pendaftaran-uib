@@ -27,7 +27,7 @@ $header-height: var(--space-2xl);
 .layoutGrid {
   @include global.container;
   display: grid;
-  grid-template-columns: 1fr 380px;
+  grid-template-columns: minmax(0, 1fr) 380px;
   gap: var(--space-l);
   align-items: start;
 
@@ -40,6 +40,7 @@ $header-height: var(--space-2xl);
   display: flex;
   flex-direction: column;
   gap: var(--space-l);
+  min-width: 0;
 }
 
 .sideColumn {
@@ -48,6 +49,7 @@ $header-height: var(--space-2xl);
   gap: var(--space-l);
   position: sticky;
   top: calc(#{$header-height} + var(--space-m));
+  min-width: 0;
 
   @media (max-width: map.get(global.$breakpoints, lg)) {
     position: static;
@@ -184,7 +186,7 @@ $header-height: var(--space-2xl);
 
 .detailValue {
   font-size: var(--step-0);
-  color: global.$text-color2;
+  color: global.$text-color-dark;
   font-weight: 500;
   word-break: break-word;
 }
@@ -217,7 +219,7 @@ $header-height: var(--space-2xl);
 
 .infoItemValue {
   font-size: var(--step-0);
-  color: global.$text-color2;
+  color: global.$text-color-dark;
   font-weight: 500;
 
   &[data-mono] {
@@ -322,39 +324,19 @@ $header-height: var(--space-2xl);
   }
 }
 
-.examineeInfo {
-  padding: var(--space-s);
-  border-radius: 0.75rem;
-  background: #f0f9ff;
-  border: 1px solid #bae6fd;
-  margin-bottom: var(--space-m);
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-m);
-
-  @media (max-width: map.get(global.$breakpoints, sm)) {
-    grid-template-columns: 1fr;
-  }
-}
-
 // ─── Action Bars ─────────────────────────────────────────────────────────────
-
-.actionBar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-s);
-  padding-top: var(--space-m);
-  border-top: 1px solid #e2e8f0;
-  align-items: center;
-}
 
 .actionGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   gap: var(--space-s);
   width: 100%;
-  
+
   @media (min-width: map.get(global.$breakpoints, xl)) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: map.get(global.$breakpoints, xxl)) {
     grid-template-columns: repeat(3, 1fr);
   }
 }
@@ -447,89 +429,17 @@ $header-height: var(--space-2xl);
 
 // ─── Quick Actions (Sidebar) ──────────────────────────────────────────────────
 
-.quickGrid {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
 .actionsList {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
-}
 
-.quickBtn {
-  display: flex;
-  align-items: center;
-  gap: var(--space-s);
-  width: 100%;
-  padding: var(--space-xs) var(--space-s);
-  border-radius: 0.5rem;
-  border: 1px solid #e2e8f0;
-  background: global.$white;
-  color: global.$text-color2;
-  font-size: var(--step--1);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
-
-  svg {
-    width: 1.2em;
-    height: 1.2em;
-    color: $color-grey;
-    flex-shrink: 0;
-    transition: color 0.2s ease;
-  }
-
-  &:hover:not(:disabled) {
-    background: #f8fafc;
-    border-color: #cbd5e1;
-    color: global.$secondary-color;
-
-    svg {
-      color: $color-primary;
-    }
-  }
-
-  &Danger {
-    color: $color-danger;
-    border-color: #fecaca;
-
-    svg {
-      color: $color-danger;
-    }
-
-    &:hover:not(:disabled) {
-      background: #fef2f2;
-      border-color: #fca5a5;
-      color: #991b1b;
-
-      svg {
-        color: #991b1b;
-      }
-    }
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+  .btn {
+    justify-content: flex-start;
   }
 }
 
 // ─── Empty State ──────────────────────────────────────────────────────────────
-
-.emptyVisual {
-  color: #cbd5e1;
-  margin-bottom: var(--space-s);
-  line-height: 1;
-
-  svg {
-    width: var(--step-4);
-    height: var(--step-4);
-  }
-}
 
 .emptyTitle {
   font-size: var(--step-1);

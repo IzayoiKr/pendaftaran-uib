@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import Registration from "@/pages/Registration/Registration";
 import Loading from "@/components/Loading/Loading";
 import NotFound from "@/components/NotFound/NotFound";
+import type { ProgramChoice } from "@/types/api";
 
 export async function generateMetadata({
     params,
@@ -30,7 +31,7 @@ interface RegistrationInitData {
     batch_name: string;
     degree: "S1" | "S2";
     batch_type: "Reguler" | "Beasiswa";
-    programs: Array<{ code: string; title: string }>;
+    programs: Array<ProgramChoice>;
     registration_fee: {
         bank_name: string;
         account_holder: string;
@@ -41,11 +42,17 @@ interface RegistrationInitData {
 
 async function fetchRegistrationInit(
     batchKey: string,
+    locale: string,
 ): Promise<RegistrationInitData | null> {
     try {
         const res = await fetch(
             `${process.env.BACKEND_URL}/api/registrations/${batchKey}/init`,
-            { cache: "no-store" },
+            {
+                headers: {
+                    "Accept-Language": locale,
+                },
+                cache: "no-store",
+            },
         );
         if (res.status === 404) return null;
         if (!res.ok) throw new Error("Gagal memuat form pendaftaran");
@@ -57,12 +64,10 @@ async function fetchRegistrationInit(
 
 export default async function RegistrationPage({ params }: PageProps) {
     const { batchKey, locale } = await params;
-    const init = await fetchRegistrationInit(batchKey);
+    const init = await fetchRegistrationInit(batchKey, locale);
     if (!init) {
         return <NotFound />;
     }
-
-    const t = await getTranslations({ locale, namespace: "program" });
 
     const programType =
         init.degree === "S1" ? "Program Sarjana" : "Program Magister";
@@ -74,7 +79,7 @@ export default async function RegistrationPage({ params }: PageProps) {
 
     const programOptions = init.programs.map((opt) => ({
         value: opt.code,
-        label: t(`${opt.code.toLowerCase()}.title`),
+        label: opt.title,
     }));
 
     const paymentConfig = {

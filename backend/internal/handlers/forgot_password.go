@@ -19,7 +19,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func ForgotPassword(db *sql.DB, mailer *email.Mailer, emailLimiter *auth.RateLimiter, al *audit.Logger) http.HandlerFunc {
+func ForgotPassword(db *sql.DB, emailLimiter *auth.RateLimiter, al *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
 
@@ -127,7 +127,7 @@ func ForgotPassword(db *sql.DB, mailer *email.Mailer, emailLimiter *auth.RateLim
 		}
 
 		go func() {
-			if err := mailer.SendPasswordResetEmail(req.Email, fullName, rawToken); err != nil {
+			if err := email.SendPasswordResetEmail(req.Email, fullName, rawToken); err != nil {
 				slog.Error("forgot_password: send reset password email", "user_id", id.String, "error", err)
 			}
 		}()

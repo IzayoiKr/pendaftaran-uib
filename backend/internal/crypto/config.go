@@ -3,6 +3,8 @@ package crypto
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/hmac"
+	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
 	"os"
@@ -12,11 +14,14 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+const pbkdf2Iterations = 100_000
+
 var (
 	bcryptCost int
 	pepperKey []byte
 	encKey []byte
 	blindKey []byte
+	blindSalt []byte
 	gcmAEAD   cipher.AEAD
 	initOnce  sync.Once
 	initErr   error
@@ -50,6 +55,10 @@ func InitCrypto() error {
 		if initErr != nil {
 			return
 		}
+
+		mac := hmac.New(sha256.New, blindKey)
+		_, _ = mac.Write([]byte("nik-blind-index-v1"))
+		blindSalt = mac.Sum(nil)
 
 		block, err := aes.NewCipher(encKey)
 		if err != nil {

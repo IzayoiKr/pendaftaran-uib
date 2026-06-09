@@ -22,7 +22,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const maxPayloadSize = 30 << 20
+const maxPayloadSize = 28 << 20
 const memoryBufferSize = 256 << 10
 
 func RegistrationDraft(db *sql.DB, storageDir string, scanner *clamav.Client, al *audit.Logger) http.HandlerFunc {
@@ -50,7 +50,7 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 			return
 		}
 
-		userID, err := uuid.Parse(claims.UserID)
+		userID, err := uuid.Parse(claims.Subject)
 		if err != nil {
 			slog.Error("registration_upsert: parse uuid from claims", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
@@ -66,7 +66,7 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 		)
 
 		err = db.QueryRowContext(r.Context(), `
-			SELECT 
+			SELECT
 				g.id, g.degree, g.batch_type,
 				r.id, r.status
 			FROM gelombang g
@@ -113,7 +113,7 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 		r.Body = http.MaxBytesReader(w, r.Body, maxPayloadSize)
 		if err := r.ParseMultipartForm(memoryBufferSize); err != nil {
 			if strings.Contains(err.Error(), "request body too large") {
-				utils.WriteJSON(w, http.StatusRequestEntityTooLarge, utils.ErrJSON(i18n.TF("registration.file_too_large", lang, "", "2MB")))
+				utils.WriteJSON(w, http.StatusRequestEntityTooLarge, utils.ErrJSON(i18n.T("registration.file_too_large", lang, "{param}", "2MB")))
 				return
 			}
 			utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.T("common.invalid_request", lang)))
@@ -149,15 +149,15 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 				utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(err.Error()))
 				return
 			}
-		} 
+		}
 
-		targetDir := filepath.Join(storageDir, "registrations", claims.UserID, regID.String())
+		targetDir := filepath.Join(storageDir, "registrations", claims.Subject, regID.String())
 
-		processedFiles, paymentProof, err := processUploadedFiles(r, targetDir, scanner, al, base, claims.UserID, &form, lang)
+		processedFiles, paymentProof, err := processUploadedFiles(r, targetDir, scanner, al, base, claims.Subject, &form, lang)
 		if err != nil {
 			if errors.Is(err, utils.ErrMalwareDetected) {
-				slog.Warn("SECURITY: File upload blocked due to malware signature", 
-					"user_id", claims.UserID, 
+				slog.Warn("SECURITY: File upload blocked due to malware signature",
+					"user_id", claims.Subject,
 					"reg_id", regID,
 					"error", err,
 				)
@@ -165,7 +165,7 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 				return
 			}
 			if errors.Is(err, utils.ErrFileTooLarge) {
-				utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.TF("registration.file_too_large", lang, "", "2MB")))
+				utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.T("registration.file_too_large", lang, "{param}", "2MB")))
 				return
 			}
 			if errors.Is(err, utils.ErrInvalidType) {
@@ -181,11 +181,11 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 		var physicalFilesToDeleteLater []string
 		defer func() {
 			if !committed {
-				for _, meta := range processedFiles { 
-					_ = os.Remove(meta.finalPath) 
+				for _, meta := range processedFiles {
+					_ = os.Remove(meta.finalPath)
 				}
 				if paymentProof != nil {
-					_ = os.Remove(paymentProof.finalPath) 
+					_ = os.Remove(paymentProof.finalPath)
 				}
 			} else {
 				for _, path := range physicalFilesToDeleteLater {
@@ -275,10 +275,10 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 
 			if _, err := tx.ExecContext(r.Context(), `
 				INSERT INTO registration_document (
-					registration_id, 
-					document_type, 
-					file_path, 
-					file_name, 
+					registration_id,
+					document_type,
+					file_path,
+					file_name,
 					file_size_bytes
 				) VALUES (?, ?, ?, ?, ?) AS new_data
 				ON DUPLICATE KEY UPDATE
@@ -312,7 +312,7 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 
 		al.Log(audit.Entry{
 			Event: event,
-			UserID: claims.UserID,
+			UserID: claims.Subject,
 			IP: base.IP,
 			UserAgent: base.UserAgent,
 			RequestID: base.RequestID,
@@ -331,13 +331,13 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 }
 
 func validateFinalSubmission(r *http.Request, form *models.RegistrationForm, degree string, batchType string, lang string) error {
-	if isBlank(form.Citizenship)   { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("Citizenship", lang))) }
-	if isBlank(form.BirthPlace)    { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("BirthPlace", lang))) }
-	if isBlank(form.BirthDate)     { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("BirthDate", lang))) }
-	if isBlank(form.MajorChoice)   { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("MajorChoice", lang))) }
-	if isBlank(form.AccountHolder) { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("AccountHolder", lang))) }
-	if !isDocProvided(form.PaymentProof, r, "paymentProof") { 
-		return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("PaymentProof", lang))) 
+	if isBlank(form.Citizenship)   { return errors.New(i18n.T("registration.field_required", lang, "{field}", "Citizenship")) }
+	if isBlank(form.BirthPlace)    { return errors.New(i18n.T("registration.field_required", lang, "{field}", "BirthPlace")) }
+	if isBlank(form.BirthDate)     { return errors.New(i18n.T("registration.field_required", lang, "{field}", "BirthDate")) }
+	if isBlank(form.MajorChoice)   { return errors.New(i18n.T("registration.field_required", lang, "{field}", "MajorChoice")) }
+	if isBlank(form.AccountHolder) { return errors.New(i18n.T("registration.field_required", lang, "{field}", "AccountHolder")) }
+	if !isDocProvided(form.PaymentProof, r, "paymentProof") {
+		return errors.New(i18n.T("registration.doc_required", lang, "{field}", "PaymentProof"))
 	}
 
 	if !form.Pernyataan {
@@ -345,17 +345,17 @@ func validateFinalSubmission(r *http.Request, form *models.RegistrationForm, deg
 	}
 
 	if degree == "S1" {
-		if isBlank(form.Gender)         { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("Gender", lang))) }
-		if isBlank(form.PhoneNumber)    { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("PhoneNumber", lang))) }
-		if isBlank(form.WhatsappNumber) { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("WhatsappNumber", lang))) }
-		if isBlank(form.JenisDaftar)    { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("JenisDaftar", lang))) }
-		if isBlank(form.SchoolOrigin)   { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("SchoolOrigin", lang))) }
-		if isBlank(form.WaktuKuliah)    { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("WaktuKuliah", lang))) }
-		if isBlank(form.Bank)           { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("Bank", lang))) }
+		if isBlank(form.Gender)         { return errors.New(i18n.T("registration.field_required", lang, "{field}", "Gender")) }
+		if isBlank(form.PhoneNumber)    { return errors.New(i18n.T("registration.field_required", lang, "{field}", "PhoneNumber")) }
+		if isBlank(form.WhatsappNumber) { return errors.New(i18n.T("registration.field_required", lang, "{field}", "WhatsappNumber")) }
+		if isBlank(form.JenisDaftar)    { return errors.New(i18n.T("registration.field_required", lang, "{field}", "JenisDaftar")) }
+		if isBlank(form.SchoolOrigin)   { return errors.New(i18n.T("registration.field_required", lang, "{field}", "SchoolOrigin")) }
+		if isBlank(form.WaktuKuliah)    { return errors.New(i18n.T("registration.field_required", lang, "{field}", "WaktuKuliah")) }
+		if isBlank(form.Bank)           { return errors.New(i18n.T("registration.field_required", lang, "{field}", "Bank")) }
 
-		if !isDocProvided(form.Pp, r, "pp")   { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("Pp", lang))) }
-		if !isDocProvided(form.Ktp, r, "ktp") { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("Ktp", lang))) }
-		if !isDocProvided(form.Kk, r, "kk")   { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("Kk", lang))) }
+		if !isDocProvided(form.Pp, r, "pp")   { return errors.New(i18n.T("registration.doc_required", lang, "{field}", "Pp")) }
+		if !isDocProvided(form.Ktp, r, "ktp") { return errors.New(i18n.T("registration.doc_required", lang, "{field}", "Ktp")) }
+		if !isDocProvided(form.Kk, r, "kk")   { return errors.New(i18n.T("registration.doc_required", lang, "{field}", "Kk")) }
 
 		if form.JenisDaftar == "TRANSFER" || form.JenisDaftar == "ALIH_JENJANG" {
 			if isBlank(form.PreviousUniversity) { return errors.New(i18n.T("registration.transfer_university_required", lang)) }
@@ -379,30 +379,30 @@ func validateFinalSubmission(r *http.Request, form *models.RegistrationForm, deg
 	}
 
 	if degree == "S2" {
-		if isBlank(form.ContactEmail) { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("ContactEmail", lang))) }
-		if isBlank(form.PhoneNumber)  { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("PhoneNumber", lang))) }
-		if isBlank(form.Religion)     { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("Religion", lang))) }
-		if isBlank(form.FundingSource){ return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("FundingSource", lang))) }
-		if isBlank(form.Address)      { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("Address", lang))) }
-		if isBlank(form.SubDistrict)  { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("SubDistrict", lang))) }
-		if isBlank(form.District)     { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("District", lang))) }
+		if isBlank(form.ContactEmail) { return errors.New(i18n.T("registration.field_required", lang, "{field}", "ContactEmail")) }
+		if isBlank(form.PhoneNumber)  { return errors.New(i18n.T("registration.field_required", lang, "{field}", "PhoneNumber")) }
+		if isBlank(form.Religion)     { return errors.New(i18n.T("registration.field_required", lang, "{field}", "Religion")) }
+		if isBlank(form.FundingSource){ return errors.New(i18n.T("registration.field_required", lang, "{field}", "FundingSource")) }
+		if isBlank(form.Address)      { return errors.New(i18n.T("registration.field_required", lang, "{field}", "Address")) }
+		if isBlank(form.SubDistrict)  { return errors.New(i18n.T("registration.field_required", lang, "{field}", "SubDistrict")) }
+		if isBlank(form.District)     { return errors.New(i18n.T("registration.field_required", lang, "{field}", "District")) }
 
-		if isBlank(form.PreviousMajor)      { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("PreviousMajor", lang))) }
-		if isBlank(form.Gpa)                { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("Gpa", lang))) }
-		if isBlank(form.Degree)             { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("Degree", lang))) }
-		if isBlank(form.PreviousUniversity) { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("PreviousUniversity", lang))) }
+		if isBlank(form.PreviousMajor)      { return errors.New(i18n.T("registration.field_required", lang, "{field}", "PreviousMajor")) }
+		if isBlank(form.Gpa)                { return errors.New(i18n.T("registration.field_required", lang, "{field}", "Gpa")) }
+		if isBlank(form.Degree)             { return errors.New(i18n.T("registration.field_required", lang, "{field}", "Degree")) }
+		if isBlank(form.PreviousUniversity) { return errors.New(i18n.T("registration.field_required", lang, "{field}", "PreviousUniversity")) }
 
-		if isBlank(form.FatherName)  { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("FatherName", lang))) }
-		if isBlank(form.FatherPhone) { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("FatherPhone", lang))) }
-		if isBlank(form.MotherName)  { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("MotherName", lang))) }
-		if isBlank(form.MotherPhone) { return errors.New(i18n.TF("registration.field_required", lang, i18n.FieldLabel("MotherPhone", lang))) }
+		if isBlank(form.FatherName)  { return errors.New(i18n.T("registration.field_required", lang, "{field}", "FatherName")) }
+		if isBlank(form.FatherPhone) { return errors.New(i18n.T("registration.field_required", lang, "{field}", "FatherPhone")) }
+		if isBlank(form.MotherName)  { return errors.New(i18n.T("registration.field_required", lang, "{field}", "MotherName")) }
+		if isBlank(form.MotherPhone) { return errors.New(i18n.T("registration.field_required", lang, "{field}", "MotherPhone")) }
 
-		if !isDocProvided(form.Al, r, "al")   { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("Al", lang))) }
-		if !isDocProvided(form.Kk, r, "kk")   { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("Kk", lang))) }
-		if !isDocProvided(form.Pp, r, "pp")   { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("Pp", lang))) }
-		if !isDocProvided(form.Ktp, r, "ktp") { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("Ktp", lang))) }
-		if !isDocProvided(form.R1, r, "r1")   { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("R1", lang))) }
-		if !isDocProvided(form.R2, r, "r2")   { return errors.New(i18n.TF("registration.doc_required", lang, i18n.FieldLabel("R2", lang))) }
+		if !isDocProvided(form.Al, r, "al")   { return errors.New(i18n.T("registration.doc_required", lang, "{field}", "Al")) }
+		if !isDocProvided(form.Kk, r, "kk")   { return errors.New(i18n.T("registration.doc_required", lang, "{field}", "Kk")) }
+		if !isDocProvided(form.Pp, r, "pp")   { return errors.New(i18n.T("registration.doc_required", lang, "{field}", "Pp")) }
+		if !isDocProvided(form.Ktp, r, "ktp") { return errors.New(i18n.T("registration.doc_required", lang, "{field}", "Ktp")) }
+		if !isDocProvided(form.R1, r, "r1")   { return errors.New(i18n.T("registration.doc_required", lang, "{field}", "R1")) }
+		if !isDocProvided(form.R2, r, "r2")   { return errors.New(i18n.T("registration.doc_required", lang, "{field}", "R2")) }
 	}
 
 	return nil

@@ -45,18 +45,17 @@ function PengumumanIcon() {
     );
 }
 
-export function ClockIcon({ className }: { className?: string }) {
+function LineIcon() {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="13"
-            height="13"
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
             fill="currentColor"
             aria-hidden="true"
-            className={className}
         >
-            <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm.5-13H11v6l4.25 2.55.75-1.23-3.5-2.07V7z" />
+            <path d="M19.365 9.969c0-3.859-3.869-6.998-8.626-6.998s-8.626 3.139-8.626 6.998c0 3.459 3.07 6.356 7.215 6.904.281.061.663.187.76.429.087.219.057.562.028.784 0 0-.101.609-.123.739-.038.219-.174.857.751.467.926-.39 4.995-2.94 6.815-5.034h-.001c1.258-1.379 1.807-2.779 1.807-4.289zm-11.38 1.98h-1.71a.463.463 0 0 1-.463-.463V8.452a.463.463 0 1 1 .926 0v2.571h1.247a.463.463 0 1 1 0 .926zm1.818-.463a.463.463 0 1 1-.926 0V8.452a.463.463 0 1 1 .926 0zm3.604 0a.463.463 0 0 1-.833.277l-1.797-2.454v2.177a.463.463 0 1 1-.926 0V8.452a.463.463 0 0 1 .833-.277l1.797 2.454V8.452a.463.463 0 1 1 .926 0zm2.892-2.571h-1.247v.741h1.247a.463.463 0 1 1 0 .926h-1.247v.741h1.247a.463.463 0 1 1 0 .926h-1.71a.463.463 0 0 1-.463-.463V8.452a.463.463 0 0 1 .463-.463h1.71a.463.463 0 1 1 0 .926z" />
         </svg>
     );
 }
@@ -76,15 +75,32 @@ function PinIcon() {
     );
 }
 
-export function RightArrowIcon() {
+export function ClockIcon({ className }: { className?: string }) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="800"
-            height="800"
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+            className={className}
+        >
+            <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm.5-13H11v6l4.25 2.55.75-1.23-3.5-2.07V7z" />
+        </svg>
+    );
+}
+
+export function RightArrowIcon({ className }: { className?: string }) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
             viewBox="0 0 512 512"
             fill="currentColor"
             aria-hidden="true"
+            className={className}
         >
             <path d="M505.183,239.544L388.819,123.179c-6.654-6.658-16.668-8.645-25.363-5.046c-8.696,3.603-14.367,12.089-14.367,21.501v93.092H23.273C10.42,232.727,0,243.147,0,256s10.42,23.273,23.273,23.273h325.818v93.091c0,9.413,5.669,17.9,14.367,21.501c2.878,1.193,5.904,1.773,8.901,1.773c6.056,0,12.009-2.365,16.46-6.819l116.364-116.364C514.273,263.368,514.273,248.633,505.183,239.544z" />
         </svg>
@@ -627,9 +643,180 @@ export function ClipboardIcon({ className }: { className?: string }) {
     );
 }
 
+export function GuideUserPlusIcon() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+        >
+            <circle cx="9" cy="7" r="4" />
+            <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
+            <path d="M16 11h6m-3-3v6" />
+        </svg>
+    );
+}
+
+export function GuideFileTextIcon() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+        >
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+            <polyline points="10 9 9 9 8 9" />
+        </svg>
+    );
+}
+
+export function GuideEditIcon() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+        >
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+        </svg>
+    );
+}
+
+export function GuideUploadIcon() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+        >
+            <polyline points="16 16 12 12 8 16" />
+            <line x1="12" y1="12" x2="12" y2="21" />
+            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" />
+        </svg>
+    );
+}
+
+export function GuideCircleCheckIcon() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+        >
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="9 12 11 14 15 10" />
+        </svg>
+    );
+}
+
+export function GuideRefreshIcon() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+        >
+            <polyline points="23 4 23 10 17 10" />
+            <polyline points="1 20 1 14 7 14" />
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+        </svg>
+    );
+}
+
+export function GuideClipboardListIcon() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+        >
+            <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+            <rect x="9" y="3" width="6" height="4" rx="2" />
+            <line x1="9" y1="12" x2="15" y2="12" />
+            <line x1="9" y1="16" x2="13" y2="16" />
+        </svg>
+    );
+}
+
+export function GuideSwitchHorizontalIcon() {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+        >
+            <polyline points="16 3 20 7 16 11" />
+            <line x1="4" y1="7" x2="20" y2="7" />
+            <polyline points="8 13 4 17 8 21" />
+            <line x1="4" y1="17" x2="20" y2="17" />
+        </svg>
+    );
+}
+
 export const socialIconMap: Record<string, React.ReactNode> = {
     Instagram: <InstagramIcon />,
-    Youtube: <YoutubeIcon />,
+    YouTube: <YoutubeIcon />,
+    LINE: <LineIcon />,
     Pengumuman: <PengumumanIcon />,
 };
 

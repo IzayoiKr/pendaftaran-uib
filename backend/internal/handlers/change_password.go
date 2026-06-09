@@ -38,7 +38,7 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 			return
 		}
 
-		id, err := uuid.Parse(claims.UserID)
+		id, err := uuid.Parse(claims.Subject)
 		if err != nil {
 			slog.Error("change_password: parse uuid from claims", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
@@ -76,7 +76,7 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 			"UPDATE users SET password_hash = ? WHERE id = ?",
 			string(newHash), id[:],
 		); err != nil {
-			slog.Error("change_password: exec", "user_id", claims.UserID, "error", err)
+			slog.Error("change_password: exec", "user_id", claims.Subject, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
@@ -85,9 +85,9 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 			slog.Error("change_password: revoke access token", "jti", claims.ID, "error", err)
 		}
 
-		if err := ts.RevokeAllUserSessions(r.Context(), claims.UserID); err != nil {
+		if err := ts.RevokeAllUserSessions(r.Context(), claims.Subject); err != nil {
 			slog.Error("change_password: revoke all sessions",
-				"user_id", claims.UserID,
+				"user_id", claims.Subject,
 				"error", err,
 			)
 		}
@@ -96,7 +96,7 @@ func ChangePassword(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.Hand
 
 		al.Log(audit.Entry{
 			Event: audit.EventPasswordChanged,
-			UserID: claims.UserID,
+			UserID: claims.Subject,
 			IP: base.IP,
 			UserAgent: base.UserAgent,
 			RequestID: base.RequestID,

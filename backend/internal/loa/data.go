@@ -94,14 +94,14 @@ func LoadLoaData(ctx context.Context, db *sql.DB, regID uuid.UUID) (*LoaData, er
 }
 
 func loadS1Fields(ctx context.Context, db *sql.DB, regID uuid.UUID, d *LoaData) error {
-	var prodiTitle string
+	var prodiCode string
 	var classSession sql.NullString
 	var prevHighschool sql.NullString
 	var scholarshipName sql.NullString
 
 	err := db.QueryRowContext(ctx, `
 		SELECT
-			ps.title,
+			ps.code,
 			s1.class_session,
 			s1.previous_highschool,
 			sch.name
@@ -111,13 +111,13 @@ func loadS1Fields(ctx context.Context, db *sql.DB, regID uuid.UUID, d *LoaData) 
 		LEFT  JOIN master_s1_scholarship sch ON sch.id = a.scholarship_id
 		WHERE s1.registration_id = ?`,
 		regID[:],
-	).Scan(&prodiTitle, &classSession, &prevHighschool, &scholarshipName)
+	).Scan(&prodiCode, &classSession, &prevHighschool, &scholarshipName)
 
 	if err != nil {
 		return fmt.Errorf("load s1 fields: %w", err)
 	}
 
-	d.Prodi = prodiTitle
+	d.Prodi = prodiCode
 	d.KelasKuliah = classSession.String
 	d.NamaSekolah = prevHighschool.String
 	d.NamaBeasiswa = scholarshipName.String
@@ -125,24 +125,24 @@ func loadS1Fields(ctx context.Context, db *sql.DB, regID uuid.UUID, d *LoaData) 
 }
 
 func loadS2Fields(ctx context.Context, db *sql.DB, regID uuid.UUID, d *LoaData) error {
-	var prodiTitle string
+	var prodiCode string
 	var prevUniversity sql.NullString
 
 	err := db.QueryRowContext(ctx, `
 		SELECT
-			ps.title,
+			ps.code,
 			s2.previous_university
 		FROM registration_s2_detail s2
 		INNER JOIN program_studi ps ON ps.id = s2.program_studi_id
 		WHERE s2.registration_id = ?`,
 		regID[:],
-	).Scan(&prodiTitle, &prevUniversity)
+	).Scan(&prodiCode, &prevUniversity)
 
 	if err != nil {
 		return fmt.Errorf("load s2 fields: %w", err)
 	}
 
-	d.Prodi = prodiTitle
+	d.Prodi = prodiCode
 	d.KelasKuliah = ""
 	d.NamaSekolah = prevUniversity.String
 	d.NamaBeasiswa = ""

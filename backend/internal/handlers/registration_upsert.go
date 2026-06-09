@@ -14,28 +14,28 @@ func upsertS1Detail(r *http.Request, tx *sql.Tx, regID uuid.UUID, form *models.R
 
 	_, err := tx.ExecContext(r.Context(), `
 		INSERT INTO registration_s1_detail (
-			registration_id, 
-			gender, 
-			nationality, 
-			birth_place, 
+			registration_id,
+			gender,
+			nationality,
+			birth_place,
 			birth_date,
-			phone_number, 
-			whatsapp_number, 
+			phone_number,
+			whatsapp_number,
 			registration_type,
-			previous_university, 
-			previous_major, 
-			gpa, 
+			previous_university,
+			previous_major,
+			gpa,
 			last_education,
-			previous_highschool, 
-			highschool_gpa, 
+			previous_highschool,
+			highschool_gpa,
 			highschool_graduate_year,
-			program_studi_id, 
+			program_studi_id,
 			class_session,
-			is_fresh_graduate_declared, 
+			is_fresh_graduate_declared,
 			is_final_declaration_agreed
 		) VALUES (
-			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-			(SELECT id FROM program_studi WHERE code = ? AND is_active = 1 LIMIT 1), 
+			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+			(SELECT id FROM program_studi WHERE code = ? AND is_active = 1 LIMIT 1),
 			?, ?, ?
 		) AS new_data
 		ON DUPLICATE KEY UPDATE
@@ -85,39 +85,39 @@ func upsertS2Detail(r *http.Request, tx *sql.Tx, regID uuid.UUID, form *models.R
 
 	_, err := tx.ExecContext(r.Context(), `
 		INSERT INTO registration_s2_detail (
-			registration_id, 
-			nationality, 
-			birth_place, 
-			birth_date, 
+			registration_id,
+			nationality,
+			birth_place,
+			birth_date,
 			contact_email,
-			phone_number, 
-			religion, 
-			funding_source, 
-			tax_number, 
+			phone_number,
+			religion,
+			funding_source,
+			tax_number,
 			reference_source,
-			field_of_expertise, 
-			address, 
-			sub_district, 
-			district, 
-			hamlet, 
+			field_of_expertise,
+			address,
+			sub_district,
+			district,
+			hamlet,
 			postal_code,
-			rt, 
-			rw, 
-			previous_major, 
-			gpa, 
-			academic_degree, 
+			rt,
+			rw,
+			previous_major,
+			gpa,
+			academic_degree,
 			previous_university,
-			company_name, 
-			company_address, 
-			job_position, 
+			company_name,
+			company_address,
+			job_position,
 			company_status,
-			company_start_year, 
-			parent_address, 
+			company_start_year,
+			parent_address,
 			program_studi_id,
 			is_final_declaration_agreed
 		) VALUES (
-			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-			(SELECT id FROM program_studi WHERE code = ? AND is_active = 1 LIMIT 1), 
+			?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+			(SELECT id FROM program_studi WHERE code = ? AND is_active = 1 LIMIT 1),
 			?
 		) AS new_data
 		ON DUPLICATE KEY UPDATE
@@ -191,17 +191,17 @@ func upsertS2Detail(r *http.Request, tx *sql.Tx, regID uuid.UUID, form *models.R
 func upsertS2Parents(r *http.Request, tx *sql.Tx, regID uuid.UUID, form *models.RegistrationForm) error {
 	_, err := tx.ExecContext(r.Context(), `
 		INSERT INTO registration_s2_parent_detail (
-			registration_s2_id, 
-			parent_type, 
-			name, 
-			phone_number, 
-			nik, 
+			registration_s2_id,
+			parent_type,
+			name,
+			phone_number,
+			nik,
 			birth_date,
-			last_education, 
-			occupation, 
-			income, 
+			last_education,
+			occupation,
+			income,
 			status
-		) VALUES 
+		) VALUES
 			(?, 'FATHER', ?, ?, ?, ?, ?, ?, ?, ?),
 			(?, 'MOTHER', ?, ?, ?, ?, ?, ?, ?, ?)
 		AS new_data
@@ -238,28 +238,28 @@ func upsertS2Parents(r *http.Request, tx *sql.Tx, regID uuid.UUID, form *models.
 }
 
 func upsertPayment(
-	r *http.Request, 
-	tx *sql.Tx, 
-	regID uuid.UUID, 
-	form *models.RegistrationForm, 
+	r *http.Request,
+	tx *sql.Tx,
+	regID uuid.UUID,
+	form *models.RegistrationForm,
 	filepath string,
 	fileName *string,
 	fileSizeBytes *int64,
 ) (string, error) {
 	var oldPath sql.NullString
-	err := tx.QueryRowContext(r.Context(), 
-		"SELECT file_path FROM registration_payment WHERE registration_id = ? FOR UPDATE", 
+	err := tx.QueryRowContext(r.Context(),
+		"SELECT file_path FROM registration_payment WHERE registration_id = ? FOR UPDATE",
 		regID[:],
 	).Scan(&oldPath)
-	
+
 	if err != nil && err != sql.ErrNoRows {
 		return "", err
 	}
 
 	_, err = tx.ExecContext(r.Context(), `
 		INSERT INTO registration_payment (
-			registration_id, 
-			account_holder, 
+			registration_id,
+			account_holder,
 			bank_name,
 			file_name,
 			file_size_bytes,

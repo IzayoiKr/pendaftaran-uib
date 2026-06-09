@@ -36,11 +36,11 @@ export function useRegistrationStatus(batchKey: string | undefined) {
             const res = await api.registrations.status(batchKey);
             return res as unknown as {
                 status:
-                | "NONE"
-                | "DRAFT"
-                | "SUBMITTED"
-                | "VERIFIED"
-                | "REJECTED";
+                    | "NONE"
+                    | "DRAFT"
+                    | "SUBMITTED"
+                    | "VERIFIED"
+                    | "REJECTED";
                 draft_data?: Partial<RegistrationFormValues>;
             };
         },
@@ -80,32 +80,32 @@ export function useRegistrationStatus(batchKey: string | undefined) {
     const transformedDraftData: Partial<RegistrationFormValues> | undefined =
         data?.draft_data
             ? {
-                ...data.draft_data,
-                pp: parseFileField(data.draft_data.pp),
-                ktp: parseFileField(data.draft_data.ktp),
-                kk: parseFileField(data.draft_data.kk),
-                transkripNilai: parseFileField(
-                    data.draft_data.transkripNilai,
-                ),
-                ijazahDok: parseFileField(data.draft_data.ijazahDok),
-                sktmKip: parseFileField(data.draft_data.sktmKip),
-                fotoRumah: parseFileField(data.draft_data.fotoRumah),
-                tagihanListrik: parseFileField(
-                    data.draft_data.tagihanListrik,
-                ),
-                tagihanAir: parseFileField(data.draft_data.tagihanAir),
-                sertifikatPrestasi: parseFileField(
-                    data.draft_data.sertifikatPrestasi,
-                ),
-                rapot1: parseFileField(data.draft_data.rapot1),
-                rapot2: parseFileField(data.draft_data.rapot2),
-                rapot3: parseFileField(data.draft_data.rapot3),
-                rapot4: parseFileField(data.draft_data.rapot4),
-                al: parseFileField(data.draft_data.al),
-                r1: parseFileField(data.draft_data.r1),
-                r2: parseFileField(data.draft_data.r2),
-                paymentProof: parseFileField(data.draft_data.paymentProof),
-            }
+                  ...data.draft_data,
+                  pp: parseFileField(data.draft_data.pp),
+                  ktp: parseFileField(data.draft_data.ktp),
+                  kk: parseFileField(data.draft_data.kk),
+                  transkripNilai: parseFileField(
+                      data.draft_data.transkripNilai,
+                  ),
+                  ijazahDok: parseFileField(data.draft_data.ijazahDok),
+                  sktmKip: parseFileField(data.draft_data.sktmKip),
+                  fotoRumah: parseFileField(data.draft_data.fotoRumah),
+                  tagihanListrik: parseFileField(
+                      data.draft_data.tagihanListrik,
+                  ),
+                  tagihanAir: parseFileField(data.draft_data.tagihanAir),
+                  sertifikatPrestasi: parseFileField(
+                      data.draft_data.sertifikatPrestasi,
+                  ),
+                  rapot1: parseFileField(data.draft_data.rapot1),
+                  rapot2: parseFileField(data.draft_data.rapot2),
+                  rapot3: parseFileField(data.draft_data.rapot3),
+                  rapot4: parseFileField(data.draft_data.rapot4),
+                  al: parseFileField(data.draft_data.al),
+                  r1: parseFileField(data.draft_data.r1),
+                  r2: parseFileField(data.draft_data.r2),
+                  paymentProof: parseFileField(data.draft_data.paymentProof),
+              }
             : undefined;
 
     return {

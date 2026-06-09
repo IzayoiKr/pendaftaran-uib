@@ -1,166 +1,138 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import scrollToId from "@/utils/ScrollToId";
-import useAuthStore from "@/store/useAuthStore";
 import { socialIconMap } from "@/components/Icons/Icons";
-import { contactInfo, externalLinks, footerNavLinks } from "./data";
+import { contactInfo, socialLinks } from "./data";
 import styles from "./Footer.module.scss";
 
-function FooterMenu() {
-    const pathname = usePathname();
-    const t = useTranslations("footer");
-    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
-    const handleClick = (
-        e: React.MouseEvent<HTMLAnchorElement>,
-        to: string,
-    ) => {
-        const hashMatch = to.match(/^\/#(.+)/);
-        if (hashMatch && pathname === "/") {
-            e.preventDefault();
-            scrollToId(hashMatch[1]);
-        }
-    };
-
+function FooterLogo() {
     return (
-        <div className={styles.widget}>
-            <h2>{t("menuTitle")}</h2>
-            <ul className={styles.widgetList}>
-                {footerNavLinks.map((link) => {
-                    const isLoginLink = link.labelKey === "login";
-                    const displayTo =
-                        isLoginLink && isAuthenticated ? "/account" : link.to;
-                    const labelKey =
-                        isLoginLink && isAuthenticated
-                            ? "myAccount"
-                            : `nav.${link.labelKey}`;
-                    const isExternal = link.to.startsWith("http");
-
-                    return (
-                        <li key={link.to}>
-                            {isExternal ? (
-                                <a
-                                    href={link.to}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    {t(labelKey)}
-                                </a>
-                            ) : (
-                                <Link
-                                    href={displayTo}
-                                    onClick={(e) => handleClick(e, displayTo)}
-                                >
-                                    {t(labelKey)}
-                                </Link>
-                            )}
-                        </li>
-                    );
-                })}
-            </ul>
+        <div className={styles.logoBlock}>
+            <div className={styles.logoMark}>
+                <Image
+                    src="/favicon/uib-76.svg"
+                    alt="UIB Logo"
+                    width={40}
+                    height={40}
+                    priority
+                />
+            </div>
+            <div className={styles.logoText}>
+                <p className={styles.logoName}>
+                    Universitas Internasional Batam
+                </p>
+                <p className={styles.logoSub}>
+                    Batam, Kepulauan Riau, Indonesia
+                </p>
+            </div>
         </div>
     );
 }
 
-function FooterContact() {
-    const t = useTranslations("footer");
-
+function FooterContacts() {
     return (
-        <div className={styles.widget} id="kontak">
-            <h2>{t("contactTitle")}</h2>
-            <address>
-                <strong>{contactInfo.university}</strong>
-                <br />
-                {contactInfo.address}
-                <br />
-                {t("phone")}: {contactInfo.phone} / {t("fax")}:{" "}
-                {contactInfo.fax}
-                <br />
-                {t("email")}:{" "}
-                <a href={`mailto:${contactInfo.email}`}>{contactInfo.email}</a>
-                <br />
-                {t("lineOfficial")}:{" "}
-                <a
-                    href={contactInfo.line}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    {t("infoLine")}
-                </a>
-            </address>
-        </div>
-    );
-}
+        <div className={styles.contacts}>
+            <div className={styles.contactItem}>
+                <i
+                    className={`ti ti-map-pin ${styles.contactIcon}`}
+                    aria-hidden="true"
+                />
+                <p className={styles.contactText}>{contactInfo.address}</p>
+            </div>
 
-function FooterMap() {
-    const t = useTranslations("footer");
+            <div className={styles.contactItem}>
+                <i
+                    className={`ti ti-phone ${styles.contactIcon}`}
+                    aria-hidden="true"
+                />
+                <p className={styles.contactText}>
+                    {contactInfo.phone} · Fax {contactInfo.fax}
+                </p>
+            </div>
 
-    return (
-        <div className={styles.widget}>
-            <h2>{t("locationTitle")}</h2>
-            <iframe
-                src={externalLinks.mapEmbedUrl}
-                width="100%"
-                height="200"
-                allowFullScreen
-                loading="lazy"
-                title={t("mapTitle")}
-            ></iframe>
-        </div>
-    );
-}
+            <div className={styles.contactItem}>
+                <i
+                    className={`ti ti-mail ${styles.contactIcon}`}
+                    aria-hidden="true"
+                />
+                <p className={styles.contactText}>
+                    <a href={`mailto:${contactInfo.email}`}>
+                        {contactInfo.email}
+                    </a>
+                </p>
+            </div>
 
-function FooterSocial() {
-    return (
-        <div className={styles.footerSocial}>
-            {externalLinks.socials.map((social) => {
-                return (
+            <div className={styles.contactItem}>
+                <i
+                    className={`ti ti-brand-line ${styles.contactIcon}`}
+                    aria-hidden="true"
+                />
+                <p className={styles.contactText}>
                     <a
-                        key={social.name}
-                        href={social.url}
+                        href={contactInfo.line}
                         target="_blank"
                         rel="noopener noreferrer"
-                        aria-label={social.name}
-                        className={styles.socialIcon}
                     >
-                        {socialIconMap[social.name] ?? social.name}
+                        LINE Official UIB
                     </a>
-                );
-            })}
+                </p>
+            </div>
         </div>
     );
 }
 
-function FooterTop() {
+function FooterSocials() {
     return (
-        <div className={styles.footerTop}>
-            <FooterMenu />
-            <FooterContact />
-            <FooterMap />
-        </div>
-    );
-}
-
-function FooterBottom() {
-    const t = useTranslations("footer");
-
-    return (
-        <div className={styles.footerBottom}>
-            <p>{t("copyright", { year: new Date().getFullYear() })}</p>
-            <FooterSocial />
+        <div className={styles.right}>
+            {socialLinks.map((social) => (
+                <a
+                    key={social.name}
+                    href={social.url}
+                    className={styles.socialLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.name}
+                    title={social.name}
+                >
+                    {socialIconMap[social.name]}
+                </a>
+            ))}
         </div>
     );
 }
 
 export default function Footer() {
+    const t = useTranslations("footer");
+
     return (
         <footer className={styles.footer}>
-            <div className={styles.container}>
-                <FooterTop />
-                <FooterBottom />
+            <div id="contact" className={styles.stripe} />
+
+            <div className={styles.inner}>
+                <div className={styles.main}>
+                    <div className={styles.left}>
+                        <FooterLogo />
+                        <div className={styles.divider} aria-hidden="true" />
+                        <FooterContacts />
+                    </div>
+
+                    <FooterSocials />
+                </div>
+
+                <div className={styles.bottom}>
+                    <p className={styles.copyright}>
+                        {t("copyright", {
+                            year: new Date().getFullYear(),
+                        })}
+                    </p>
+
+                    <div className={styles.legalLinks}>
+                        <Link href="/kebijakan-privasi">{t("privacy")}</Link>
+                        <Link href="/syarat-ketentuan">{t("terms")}</Link>
+                    </div>
+                </div>
             </div>
         </footer>
     );

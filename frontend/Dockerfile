@@ -1,21 +1,22 @@
 FROM node:22-alpine AS base
 WORKDIR /app
-COPY package*.json ./
+RUN corepack enable && corepack prepare pnpm@latest --activate
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY
 ENV NEXT_PUBLIC_TURNSTILE_SITE_KEY=$NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
 FROM base AS development
-RUN --mount=type=cache,target=/home/node/.npm npm install --legacy-peer-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY . .
 EXPOSE 8989
-CMD [ "npm", "run", "dev", "--", "--webpack", "-H", "0.0.0.0" ]
+CMD [ "pnpm", "dev", "-H", "0.0.0.0" ]
 
 FROM base AS builder
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN --mount=type=cache,target=/home/node/.npm npm ci
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY . .
-RUN npm run build
+RUN pnpm build
 
 FROM node:22-alpine AS production
 WORKDIR /app

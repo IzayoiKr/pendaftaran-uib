@@ -26,7 +26,7 @@ func RevealNIK(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			return
 		}
 
-		id, err := uuid.Parse(claims.UserID)
+		id, err := uuid.Parse(claims.Subject)
 		if err != nil {
 			slog.Error("reveal_nik: parse uuid from claims", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
@@ -59,7 +59,7 @@ func RevealNIK(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 
 		al.Log(audit.Entry{
 			Event: audit.EventNIKRevealed,
-			UserID: claims.UserID,
+			UserID: claims.Subject,
 			IP: base.IP,
 			UserAgent: base.UserAgent,
 			RequestID: base.RequestID,

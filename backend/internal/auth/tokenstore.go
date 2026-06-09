@@ -135,7 +135,7 @@ func (ts *TokenStore) RevokeAllUserSessions(ctx context.Context, userID string) 
 func (ts *TokenStore) Revoke(ctx context.Context, claims *Claims) error {
 	_, err := ts.revokedTokens.InsertOne(ctx, revokedToken{
 		JTI: claims.ID,
-		UserID: claims.UserID,
+		UserID: claims.Subject,
 		ExpiresAt: claims.ExpiresAt.Time,
 	})
 	return err

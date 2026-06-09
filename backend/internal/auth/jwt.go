@@ -19,19 +19,17 @@ const (
 )
 
 type Claims struct {
-	UserID string `json:"user_id"`
-	Email string `json:"email"`
 	SessionID string `json:"session_id"`
 	TokenType TokenType `json:"token_type"`
 	jwt.RegisteredClaims
 }
 
-func GenerateAccessToken(userID, sessionID, email string) (string, error) {
-	return generateToken(userID, sessionID, email, TokenTypeAccess, AccessTokenTTL)
+func GenerateAccessToken(userID, sessionID string) (string, error) {
+	return generateToken(userID, sessionID, TokenTypeAccess, AccessTokenTTL)
 }
 
-func GenerateRefreshToken(userID, sessionID, email string) (string, error) {
-	return generateToken(userID, sessionID, email, TokenTypeRefresh, RefreshTokenTTL)
+func GenerateRefreshToken(userID, sessionID string) (string, error) {
+	return generateToken(userID, sessionID, TokenTypeRefresh, RefreshTokenTTL)
 }
 
 func ValidateToken(raw string) (*Claims, error) {
@@ -59,10 +57,8 @@ func ValidateToken(raw string) (*Claims, error) {
 	return claims, nil
 }
 
-func generateToken(userID, sessionID, email string, tokenType TokenType, ttl time.Duration) (string , error) {
+func generateToken(userID, sessionID string, tokenType TokenType, ttl time.Duration) (string , error) {
 	claims := Claims{
-		UserID: userID,
-		Email: email,
 		SessionID: sessionID,
 		TokenType: tokenType,
 		RegisteredClaims: jwt.RegisteredClaims{

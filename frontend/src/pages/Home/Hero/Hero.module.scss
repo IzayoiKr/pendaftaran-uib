@@ -1,107 +1,352 @@
 @use "@/styles/config.scss" as global;
-@use "sass:map";
+
+$_z-image: 0;
+$_z-overlay: 1;
+$_z-content: 2;
 
 .hero {
   position: relative;
-  height: clamp(600px, 80vh, 900px);
-  overflow: hidden;
-  text-align: center;
   width: 100%;
-  z-index: 1;
+  min-height: clamp(540px, 75vh, 800px);
+  overflow: hidden;
+  z-index: global.$z-base;
+  padding-top: var(--space-2xl);
 
   img {
-    position: absolute;
-    top: 0;
-    left: 0;
+    @include global.absolute-fill;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: center;
-    z-index: -1;
+    object-position: center right;
+    z-index: $_z-image;
+  }
+
+  &::after {
+    content: "";
+    @include global.absolute-fill;
+    z-index: $_z-overlay;
+
+    background: linear-gradient(
+      105deg,
+      global.$navy-alpha-96 0%,
+      global.$navy-alpha-80 45%,
+      global.$tertiary-alpha-20 68%,
+      transparent 100%
+    );
   }
 
   .container {
     @include global.container;
+
     position: relative;
+    z-index: $_z-content;
+
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 100%;
+    justify-content: flex-start;
+
+    min-height: inherit;
+
+    padding-inline: var(--space-xl);
   }
 }
 
-.content {
-  text-align: center;
-  text-shadow:
-    0 0 15px rgba(255, 255, 255, 0.7),
-    0 0 5px rgba(255, 255, 255, 0.5);
+.heroCenter {
+  width: 100%;
+  max-width: 560px;
 
-  h1 {
-    color: global.$tertiary-color;
-    font-size: var(--step-4);
-    font-weight: 500;
-    text-transform: uppercase;
-    margin-top: var(--space-xs);
-    margin-bottom: var(--space-2xs);
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 
-  p {
-    color: global.$tertiary-color;
-    font-weight: 500;
-    margin-top: var(--space-xs);
-    margin-bottom: var(--space-xl);
+  padding-block: var(--space-3xl) var(--space-2xl);
+}
+
+.eyebrow {
+  @include global.section-label;
+
+  display: inline-flex;
+  align-items: center;
+  gap: global.$space-sm;
+
+  margin-bottom: global.$space-md;
+
+  &::before {
+    content: "";
+
+    width: 2rem;
+    height: 2px;
+
+    border-radius: global.$radius-pill;
+
+    background: global.$primary-color;
+
+    flex-shrink: 0;
   }
+}
+
+.heroHeading {
+  margin: 0 0 global.$space-md;
+
+  font-size: clamp(1.9rem, 4.2vw, 2.9rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+
+  color: global.$white;
+
+  em {
+    font-style: italic;
+    font-weight: 400;
+    color: global.$primary-color;
+  }
+}
+
+.heroDivider {
+  width: 3rem;
+  height: 2px;
+
+  margin: 0 0 global.$space-md;
+
+  border-radius: global.$radius-pill;
+
+  background: global.$primary-color;
+  opacity: 0.5;
+}
+
+.heroDesc {
+  max-width: 44ch;
+
+  margin: 0 0 global.$space-xl;
+
+  font-size: 0.875rem;
+  font-weight: 300;
+  line-height: 1.85;
+
+  color: global.$white-mid;
 }
 
 .heroButtons {
   display: flex;
-  gap: var(--space-xs);
-  justify-content: center;
+  align-items: center;
+  gap: global.$space-sm;
+
   flex-wrap: wrap;
 
-  a {
-    display: inline-block;
-    font-size: var(--step--2);
-    font-weight: 500;
-    padding: 0 var(--space-xl);
-    border-radius: 5px;
-    text-transform: uppercase;
-    text-align: center;
-    outline: none;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: all 0.3s ease;
+  width: 100%;
+}
+
+.btnPrimary,
+.btnSecondary {
+  @include global.interactive;
+  @include global.focus-ring(global.$primary-color, 3px, global.$radius-md);
+  @include global.transition-standard;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 3rem;
+  padding: 0 1.75rem;
+
+  border-radius: global.$radius-md;
+
+  font-family: global.$font-family;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+
+  white-space: nowrap;
+}
+
+.btnPrimary {
+  gap: global.$space-xs;
+
+  background: global.$primary-color;
+  color: global.$tertiary-color;
+
+  border: 1.5px solid global.$primary-color;
+
+  font-weight: 700;
+
+  svg {
+    flex-shrink: 0;
+    transition: transform global.$transition-fast;
   }
 
-  .btnPrimary {
-    display: inline-flex;
-    align-items: center;
-    background: global.$tertiary-color;
-    color: global.$primary-color;
-    min-height: 3rem;
-    &:hover {
-      background: transparent;
-      color: global.$tertiary-color;
-      border-color: global.$tertiary-color;
-    }
-  }
+  @include global.hover-supported {
+    background: global.$primary-color-light;
+    border-color: global.$primary-color-light;
 
-  .btnSecondary {
-    display: inline-flex;
-    align-items: center;
-    background: global.$primary-color;
-    color: global.$tertiary-color;
-    min-height: 3rem;
-    &:hover {
-      background: global.$tertiary-color;
-      color: global.$primary-color;
+    transform: translateY(-2px);
+
+    box-shadow: 0 8px 24px global.$primary-color-glow;
+
+    svg {
+      transform: translateX(3px);
     }
   }
 }
 
-@media (max-width: map.get(global.$breakpoints, sm)) {
+.btnSecondary {
+  background: transparent;
+  color: global.$white-high;
+
+  border: 1.5px solid global.$white-low;
+
+  font-weight: 600;
+
+  @include global.hover-supported {
+    border-color: global.$white-mid;
+    background: global.$white-faint;
+  }
+}
+
+.heroStats {
+  display: flex;
+  gap: global.$space-xl;
+
+  width: 100%;
+
+  margin-top: global.$space-xl;
+  padding-top: global.$space-lg;
+
+  border-top: 1px solid global.$border-subtle;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: global.$space-2xs;
+}
+
+.statNum {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+
+  color: global.$white;
+}
+
+.statLabel {
+  font-size: 0.67rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: global.$white-mid;
+}
+
+@include global.down(md) {
   .hero {
-    padding-top: var(--space-xl);
+    min-height: 600px;
+    padding-top: var(--navbar-height, 4rem);
+
+    &::after {
+      background: linear-gradient(
+        180deg,
+        global.$navy-alpha-28 0%,
+        global.$navy-alpha-58 48%,
+        global.$navy-overlay 100%
+      );
+    }
+
+    img {
+      object-position: center;
+    }
+
+    .container {
+      justify-content: center;
+      align-items: center;
+
+      padding-block: var(--space-2xl) var(--space-2xl);
+      padding-inline: var(--space-lg);
+    }
+  }
+
+  .heroCenter {
+    align-items: center;
+    text-align: center;
+
+    max-width: 640px;
+
+    padding-block: 0;
+  }
+
+  .eyebrow {
+    justify-content: center;
+  }
+
+  .heroDivider {
+    margin-inline: auto;
+  }
+
+  .heroDesc {
+    max-width: 50ch;
+  }
+
+  .heroButtons,
+  .heroStats {
+    justify-content: center;
+  }
+
+  .heroHeading {
+    font-size: clamp(2.2rem, 7vw, 3rem);
+  }
+}
+
+@include global.down(sm) {
+  .hero {
+    min-height: 560px;
+
+    img {
+      object-position: 60% center;
+    }
+
+    .container {
+      padding-block: var(--space-xl) var(--space-xl);
+      padding-inline: max(var(--space-lg), 1.25rem);
+    }
+  }
+
+  .heroCenter {
+    max-width: 100%;
+  }
+
+  .heroHeading {
+    font-size: 2rem;
+    line-height: 1.08;
+  }
+
+  .heroDesc {
+    max-width: 100%;
+
+    font-size: 0.9rem;
+    line-height: 1.75;
+  }
+
+  .heroButtons {
+    flex-direction: column;
+    align-items: stretch;
+    padding-inline: global.$space-lg;
+  }
+
+  .btnPrimary,
+  .btnSecondary {
+    width: 100%;
+  }
+
+  .heroStats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: global.$space-md global.$space-md;
+
+    text-align: center;
+  }
+
+  .statItem {
+    align-items: center;
   }
 }

@@ -1,7 +1,6 @@
 package models
 
 import (
-	"encoding/json"
 	"html"
 	"strings"
 )
@@ -10,8 +9,20 @@ type RegistrationInitDTO struct {
 	BatchName       string          `json:"batch_name"`
 	Degree          string          `json:"degree"`
 	BatchType       string          `json:"batch_type"`
-	Programs        json.RawMessage `json:"programs"`
-	RegistrationFee json.RawMessage `json:"registration_fee"`
+	Programs        []ProgramChoice `json:"programs"`
+	RegistrationFee RegistrationFee `json:"registration_fee"`
+}
+
+type ProgramChoice struct {
+	Code string `json:"code"`
+	Title string `json:"title"`
+}
+
+type RegistrationFee struct {
+	BankName      string `json:"bank_name"`
+	AccountHolder string `json:"account_holder"`
+	AccountNumber string `json:"account_number"`
+	Amount        int    `json:"amount"`
 }
 
 type RegistrationForm struct {

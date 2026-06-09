@@ -109,39 +109,28 @@ func ValidateStruct(s any, lang string) error {
 }
 
 func translateFieldError(fe validator.FieldError, lang string) string {
-	f := i18n.FieldLabel(fe.Field(), lang)
-	p := fe.Param()
+	key := "validation." + fe.Tag()
 
-	switch fe.Tag() {
-	case "required":
-		return i18n.TF("validation.required", lang, f)
-	case "email":
-		return i18n.TF("validation.email", lang, f)
-	case "min":
-		return i18n.TF("validation.min", lang, f, p)
-	case "max":
-		return i18n.TF("validation.max", lang, f, p)
-	case "oneof":
-		return i18n.TF("validation.oneof", lang, f)
-	case "datetime":
-		return i18n.TF("validation.datetime", lang, f)
-	case "e164":
-		return i18n.TF("validation.e164", lang, f)
-	case "numeric":
-		return i18n.TF("validation.numeric", lang, f)
-	case "len":
-		return i18n.TF("validation.len", lang, f, p)
-	case "nefield":
-		return i18n.TFN("validation.nefield", lang, f, i18n.FieldLabel(p, lang))
-	case "alphanum_ascii":
-		return i18n.TF("validation.alphanum_ascii", lang, f)
-	case "gpa":
-		return i18n.TF("validation.gpa", lang, f)
-	case "highschool_gpa":
-		return i18n.TF("validation.highschool_gpa", lang, f)
-	default:
-		return fmt.Sprintf("%s tidak valid (%s)", f, fe.Tag())
+	replacements := []string{
+		"{field}", fe.Field(),
 	}
+
+	if fe.Param() != "" {
+		replacements = append(replacements, "{param}", fe.Param())
+
+		if fe.Tag() == "nefield" {
+			replacements = append(replacements, "{target}", fe.Param())
+		}
+	}
+
+	msg := i18n.T(key, lang, replacements...)
+
+	if msg == key {
+		friendlyField := i18n.T("field."+fe.Field(), lang)
+		return fmt.Sprintf("%s tidak valid (%s)", friendlyField, fe.Tag())
+	}
+
+	return msg
 }
 
 // INFO: This is reserved in case to split concern between NIK and passport

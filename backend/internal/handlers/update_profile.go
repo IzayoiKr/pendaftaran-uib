@@ -38,7 +38,7 @@ func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			return
 		}
 
-		id, err := uuid.Parse(claims.UserID)
+		id, err := uuid.Parse(claims.Subject)
 		if err != nil {
 			slog.Error("reveal_nik: parse uuid from claims", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
@@ -69,14 +69,14 @@ func UpdateProfile(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 			"UPDATE users SET full_name = ? WHERE id = ?",
 			req.FullName, id[:],
 		); err != nil {
-			slog.Error("update_profile: exec", "user_id", claims.UserID, "error", err)
+			slog.Error("update_profile: exec", "user_id", claims.Subject, "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
 		al.Log(audit.Entry{
 			Event: audit.EventProfileUpdated,
-			UserID: claims.UserID,
+			UserID: claims.Subject,
 			IP: base.IP,
 			UserAgent: base.UserAgent,
 			RequestID: base.RequestID,

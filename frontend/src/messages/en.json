@@ -101,31 +101,36 @@
         "registration": "Batch Registration"
     },
     "footer": {
-        "menuTitle": "Menu",
-        "contactTitle": "Contact",
-        "locationTitle": "Campus Location",
-        "phone": "Phone",
-        "fax": "Fax",
-        "email": "Email",
-        "lineOfficial": "Line Official",
-        "infoLine": "UIB Information Center",
-        "mapTitle": "Universitas Internasional Batam Location",
-        "myAccount": "My Account",
-        "copyright": "Copyright © {year} | Universitas Internasional Batam",
-        "nav": {
-            "home": "Home",
-            "gelombang": "Batch",
-            "infoUmum": "General Information",
-            "pengumuman": "Announcements",
-            "login": "Register/Login"
-        }
+        "privacy": "Privacy Policy",
+        "terms": "Terms & Conditions",
+        "copyright": "Copyright © {year} | Universitas Internasional Batam"
     },
     "hero": {
-        "heading": "WELCOME TO UNIVERSITAS INTERNASIONAL BATAM",
-        "description": "University with international quality standard that produces graduates, science, technology and arts that can meet global dynamic changes.",
-        "buttonRegistration": "REGISTRATION",
-        "buttonAcademic": "ACADEMIC",
-        "imageAlt": "A group of international students gathering"
+        "eyebrow": "Batam International University",
+        "heading": "Shape Your Global Future With Us",
+        "headingLine1": "Shape Your",
+        "headingLine2": "Global",
+        "headingAccent": "Future",
+        "headingLine3": "With Us",
+        "description": "A university with international quality standards producing graduates, knowledge, technology and arts that meet the dynamic changes of a global world.",
+        "buttonRegistration": "Enrollment",
+        "buttonAcademic": "Academic",
+        "imageAlt": "A group of international students gathered together",
+        "badge": "Internationally Accredited",
+        "stats": {
+            "programs": {
+                "value": "14",
+                "label": "Study Programs"
+            },
+            "alumni": {
+                "value": "10K+",
+                "label": "Alumni"
+            },
+            "ranking": {
+                "value": "Top 5",
+                "label": "Universities in Kepri"
+            }
+        }
     },
     "guides": {
         "title": "Guides",
@@ -139,6 +144,66 @@
                 "description": "Please follow the video below."
             }
         }
+    },
+    "programStudi": {
+        "title": "Study Programs",
+        "subtitle": "Bachelor's and Master's Programs",
+        "toggleDetail": "Detail",
+        "toggleClose": "Close",
+        "degreeLabel": "Level {degree}"
+    },
+    "gelombang": {
+        "title": "Registration Batches",
+        "description": "New Student Admission Schedule Information",
+        "registerNow": "Register Now",
+        "yearLabel": "YEAR",
+        "examLabel": "Exam Schedule",
+        "examAriaLabel": "Exam date {day} {month}",
+        "registrationLabel": "Registration Period",
+        "dateSeparator": "to"
+    },
+    "prodi": {
+        "backToAccount": "Back to Account",
+        "requestHistory": "Request History",
+        "emptyTitle": "No requests yet",
+        "emptyText": "You haven't submitted any study program change requests.",
+        "statusPending": "Pending",
+        "statusApproved": "Approved",
+        "statusRejected": "Rejected",
+        "cancelRequest": "Cancel Request",
+        "cancelDialogTitle": "Cancel Request",
+        "cancelDialogMessage": "Are you sure you want to cancel this request?",
+        "cancelDialogConfirm": "Yes, Cancel",
+        "cancelDialogDeny": "No",
+        "routeFrom": "From",
+        "routeTo": "To",
+        "formTitle": "New Request Form",
+        "pendingWarningTitle": "Pending Request",
+        "pendingWarningText": "You have a pending change request that is still being processed. Please wait for validation before submitting a new one.",
+        "currentProgram": "Current Study Program",
+        "currentSchedule": "Current Class Schedule",
+        "newProgram": "New Study Program *",
+        "newSchedule": "New Class Schedule *",
+        "selectProgram": "Select Study Program",
+        "selectSchedule": "Select Class Schedule",
+        "submit": "Submit Request",
+        "cancel": "Cancel",
+        "infoTitle": "Registration Information",
+        "infoBatch": "Batch",
+        "infoAcademicYear": "Academic Year",
+        "infoCurrentProgram": "Current Study Program",
+        "infoCurrentSchedule": "Current Class Schedule",
+        "shiftMorning": "Morning",
+        "shiftEvening": "Evening",
+        "toastLoadError": "Failed to load data",
+        "toastFillFields": "Please fill in all fields",
+        "toastNoChange": "New study program and schedule must be different from your current selection",
+        "toastSubmitting": "Submitting...",
+        "toastSubmitSuccess": "Change request submitted successfully",
+        "toastSubmitError": "Failed to submit request",
+        "toastCancelling": "Cancelling...",
+        "toastCancelSuccess": "Request cancelled successfully",
+        "toastCancelError": "Failed to cancel request"
     },
     "login": {
         "heading": "LOGIN",
@@ -284,6 +349,7 @@
         "resignation": "Resignation",
         "ospekPrerequisites": "Ospek Prerequisites",
         "noRegistration": "No Registration Yet",
+        "noRegistrationSub": "You haven't registered for any batch yet. Browse available batches to get started.",
         "noRegistrationDesc": "You haven't registered for any batch yet. Browse available batches to get started.",
         "registerNow": "Register Now",
         "quickActions": "Quick Actions",
@@ -303,10 +369,7 @@
         "withdrawError": "An error occurred",
         "loadProfileError": "Failed to load profile",
         "wib": " WIB",
-        "cancel": "Cancel",
-        "continueDraft": "Continue Draft",
-        "viewSubmission": "View Submission",
-        "noRegistrationSub": "You haven't registered for any batch yet. Browse available batches to get started."
+        "cancel": "Cancel"
     },
     "registration": {
         "pageTitle": "Registration {programType}",
@@ -734,62 +797,725 @@
         "incomePlaceholder": "Income",
         "statusPlaceholder": "Status"
     },
-    "program": {
-        "ts": {
-            "title": "Civil Engineering",
-            "description": "A study program that produces internationally standard graduates who are competent in applying science in the development of technology in the field of civil engineering and are able to apply it in sustainable development in archipelagic regions to face the demands and dynamic global changes of the world."
+    "infoDetails": {
+        "aboutBatam": {
+            "heading": "About Batam",
+            "paragraphs": [
+                "Batam City is one of the islands in the Riau Islands Province, which is located between the Malacca Strait and Singapore which as a whole form the Batam region.",
+                "Batam City is a tropical area, with average temperatures ranging from 24 to 35 degrees Celsius (77 to 95 degrees Fahrenheit).",
+                "The humidity in this region ranges from 73% to 96%. In general, the rainy season starts from November to April and the dry season from May to October.",
+                "The average annual rainfall is around 2600 mm."
+            ],
+            "sections": {
+                "cultureLanguage": {
+                    "heading": "Culture & Language",
+                    "paragraphs": [
+                        "The population of Batam City consists of diverse cultures and ethnicities, and Malay Culture is the dominant culture in the city of Batam.",
+                        "Despite the diversity of cultures and languages, Indonesian as the national language is still used, and English is taught in schools and is more commonly used among business and multinational companies."
+                    ]
+                },
+                "religion": {
+                    "heading": "Religion",
+                    "paragraphs": [
+                        "The six major religions that are most widely practiced in Indonesia are Islam, Christianity (Protestantism) and Catholicism, Hinduism, Buddhism, and Confucianism.",
+                        "However, this does not mean that other religions and beliefs cannot grow and develop in Indonesia.",
+                        "The government is even obliged to encourage and support the development of these religions.",
+                        "Islam is the majority religion in Batam City. As a symbol of the religious diversity of Batam society, the government built the Batam Grand Mosque located in the city center near the public square.",
+                        "Christianity and Catholicism are also practiced by the people of Batam, especially those from the Batak and Flores ethnic groups.",
+                        "Buddhism is the religion most widely practiced by Chinese Indonesians.",
+                        "Batam City has a monastery which is the largest monastery in Southeast Asia, namely Vihara Duta Maitreya."
+                    ]
+                },
+                "publicFacilities": {
+                    "heading": "Public Facilities",
+                    "description": "Batam City also has public and social facilities that can be used by the community, such as:",
+                    "alt": "Public and social facilities in Batam City",
+                    "source": {
+                        "label": "BP Batam",
+                        "url": "https://bpbatam.go.id/pages/read/414-fasilitas-umum-dan-sosial"
+                    }
+                }
+            }
         },
-        "ar": {
-            "title": "Architecture",
-            "description": "Become a maritime architecture study program based on local wisdom with global competitiveness that supports sustainable coastal area development."
+        "scholarship": {
+            "heading": "UIB Scholarship Program",
+            "items": [
+                {
+                    "id": "cemerlang",
+                    "heading": "Cemerlang Scholarship",
+                    "specialRequirementsHeading": "Special Requirements",
+                    "specialRequirements": [
+                        "Minimum average report card score of 80.0;",
+                        "USM (University Entrance Selection Test) score ≥ 80;",
+                        "Have academic and/or non-academic achievements at least at the provincial level;"
+                    ],
+                    "benefitsHeading": "Scholarship Benefits",
+                    "benefits": [
+                        "100% discount (free) on Admission and Building Fees;",
+                        "100% discount (free) on Tuition Fees (Main Tuition and Credit Fees);",
+                        "100% discount (free) on Laboratory Fees (special for S-1 Tourism only 50% free);"
+                    ]
+                },
+                {
+                    "id": "insan-mandiri",
+                    "heading": "Insan Mandiri Scholarship",
+                    "specialRequirementsHeading": "Special Requirements",
+                    "specialRequirements": [
+                        "Minimum average report card score of 75.0;",
+                        "USM (University Entrance Selection Test) score ≥ 65;",
+                        "Comes from a financially disadvantaged family proven by a Certificate of Financial Hardship (SKTM) or Indonesia Smart Card (KIP);"
+                    ],
+                    "benefitsHeading": "Scholarship Benefits",
+                    "benefits": [
+                        "100% discount (free) on Admission and Building Fees;",
+                        "100% discount (free) on Tuition Fees (Main Tuition and Credit Fees);",
+                        "100% discount (free) on Laboratory Fees (special for S-1 Tourism only 50% free);"
+                    ]
+                },
+                {
+                    "id": "prestasi-1",
+                    "heading": "Prestasi 1 Scholarship",
+                    "specialRequirementsHeading": "Special Requirements",
+                    "specialRequirements": [
+                        "Minimum average report card score of 80.0;",
+                        "USM (University Entrance Selection Test) score ≥ 80;"
+                    ],
+                    "benefitsHeading": "Scholarship Benefits",
+                    "benefits": [
+                        "100% discount (free) on Admission and Building Fees;",
+                        "50% discount on Tuition Fees (Main Tuition and Credit Fees) for up to 6 semesters;"
+                    ]
+                },
+                {
+                    "id": "prestasi-2",
+                    "heading": "Prestasi 2 Scholarship",
+                    "specialRequirementsHeading": "Special Requirements",
+                    "specialRequirements": [
+                        "Minimum average report card score of 75.0;",
+                        "USM (University Entrance Selection Test) score ≥ 70;"
+                    ],
+                    "benefitsHeading": "Scholarship Benefits",
+                    "benefits": [
+                        "100% discount (free) on Admission and Building Fees;",
+                        "25% discount on Tuition Fees (Main Tuition and Credit Fees) for up to 6 semesters;"
+                    ]
+                },
+                {
+                    "id": "prestasi-3",
+                    "heading": "Prestasi 3 Scholarship",
+                    "specialRequirementsHeading": "Special Requirements",
+                    "specialRequirements": [
+                        "Minimum average report card score of 75.0;",
+                        "USM (University Entrance Selection Test) score ≥ 60;"
+                    ],
+                    "benefitsHeading": "Scholarship Benefits",
+                    "benefits": [
+                        "100% discount (free) on Admission and Building Fees;"
+                    ]
+                },
+                {
+                    "id": "prestasi-4",
+                    "heading": "Prestasi 4 Scholarship",
+                    "specialRequirementsHeading": "Special Requirements",
+                    "specialRequirements": [
+                        "Minimum average report card score of 70.0;",
+                        "USM (University Entrance Selection Test) score ≥ 50;"
+                    ],
+                    "benefitsHeading": "Scholarship Benefits",
+                    "benefits": [
+                        "75% discount on Admission and Building Fees;"
+                    ]
+                }
+            ]
         },
-        "si": {
-            "title": "Information Systems",
-            "description": "As a bachelor program that produces quality graduates in the field of Information Systems through education, research, and community service, at the national and international levels in 2021."
+        "tuitionFee": {
+            "heading": "Tuition Fee Information for New Undergraduate Students Academic Year 2024/2025",
+            "sections": [
+                {
+                    "id": "summary",
+                    "heading": "UIB Tuition Fee Summary",
+                    "paragraphs": [
+                        "The tuition fees for UIB students consist of:"
+                    ],
+                    "items": [
+                        "New student fees. These fees are paid only once during re-registration. The new student fees consist of building fees (SPP) and PPL fees.",
+                        "Active student fees (per semester fees). These fees are paid every semester as tuition fees. The semester fees consist of BPP Pokok, credit fees, and laboratory fees (if applicable)."
+                    ],
+                    "table": {
+                        "headers": [
+                            "Fee Details",
+                            "Fee Amount"
+                        ],
+                        "rows": [
+                            [
+                                "A. New Student Fees\n1. Building Fee\n2. Administration Fee",
+                                "Rp 10.500.000,-\nRp 3.000.000,-"
+                            ],
+                            [
+                                "B. Semester Fees\n1. BPP Pokok\n2. Credit Fees (21 Credits × Rp 175.000,-)\n3. Laboratory Fees",
+                                "Rp 5.500.000,-\nRp 3.675.000,-\nRp 750.000,-"
+                            ],
+                            [
+                                "Total",
+                                "Rp 23.425.000,-"
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "id": "building-fee",
+                    "heading": "Building Fee (SPP) Table",
+                    "paragraphs": [
+                        "The building fee or SPP fee varies depending on the registration wave selected.",
+                        "In addition to the registration wave, the building fee (SPP) is also influenced by the USM ranking.",
+                        "The USM ranking is a classification based on the entrance examination results."
+                    ],
+                    "table": {
+                        "headers": [
+                            "Period",
+                            "Rank I",
+                            "Rank II",
+                            "Rank III",
+                            "Rank IV",
+                            "Rank V"
+                        ],
+                        "rows": [
+                            [
+                                "Wave 1",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-"
+                            ],
+                            [
+                                "Wave 2",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-"
+                            ],
+                            [
+                                "Wave 3",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-"
+                            ],
+                            [
+                                "Wave 4",
+                                "Rp 5.500.000,-",
+                                "Rp 6.000.000,-",
+                                "Rp 6.500.000,-",
+                                "Rp 7.000.000,-",
+                                "Rp 7.500.000,-"
+                            ],
+                            [
+                                "Wave 5",
+                                "Rp 6.000.000,-",
+                                "Rp 6.500.000,-",
+                                "Rp 7.000.000,-",
+                                "Rp 7.500.000,-",
+                                "Rp 8.000.000,-"
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "id": "semester-1",
+                    "heading": "Estimated Tuition Fees for Semester 1",
+                    "paragraphs": [
+                        "The estimated tuition fees for UIB semester 1 are as follows:"
+                    ],
+                    "table": {
+                        "headers": [
+                            "Study Program",
+                            "SPP",
+                            "PPL",
+                            "BPP",
+                            "Credits",
+                            "Total"
+                        ],
+                        "rows": [
+                            [
+                                "Civil Engineering",
+                                "Rp 10.500.000,-",
+                                "Rp 3.000.000,-",
+                                "Rp 5.500.000,-",
+                                "Rp 3.500.000,-",
+                                "Rp 22.500.000,-"
+                            ],
+                            [
+                                "Architecture",
+                                "Rp 10.500.000,-",
+                                "Rp 3.000.000,-",
+                                "Rp 5.500.000,-",
+                                "Rp 3.325.000,-",
+                                "Rp 22.325.000,-"
+                            ],
+                            [
+                                "Information Systems",
+                                "Rp 10.500.000,-",
+                                "Rp 3.000.000,-",
+                                "Rp 5.500.000,-",
+                                "Rp 3.325.000,-",
+                                "Rp 22.325.000,-"
+                            ],
+                            [
+                                "Information Technology",
+                                "Rp 10.500.000,-",
+                                "Rp 3.000.000,-",
+                                "Rp 5.500.000,-",
+                                "Rp 3.325.000,-",
+                                "Rp 22.325.000,-"
+                            ]
+                        ]
+                    },
+                    "callout": {
+                        "heading": "Notes",
+                        "items": [
+                            "Semester 1 does not yet include laboratory classes, therefore laboratory fees have not been charged.",
+                            "The Tourism Study Program PPL fee includes an additional Rp 2.000.000,- for additional uniform fees."
+                        ]
+                    }
+                },
+                {
+                    "id": "scholarship-program",
+                    "heading": "Estimated Tuition Fees for Scholarship Programs",
+                    "paragraphs": [
+                        "Recipients of UIB scholarships will receive tuition fee reductions according to the scholarship program received."
+                    ],
+                    "table": {
+                        "headers": [
+                            "Program",
+                            "Total Estimate"
+                        ],
+                        "rows": [
+                            [
+                                "Cemerlang",
+                                "Rp 3.000.000,-"
+                            ],
+                            [
+                                "Bidikmisi",
+                                "Free"
+                            ],
+                            [
+                                "Insan Mandiri",
+                                "Rp 3.000.000,-"
+                            ],
+                            [
+                                "Prestasi 1",
+                                "Rp 7.500.000,-"
+                            ],
+                            [
+                                "Prestasi 2",
+                                "Rp 9.750.000,-"
+                            ],
+                            [
+                                "Prestasi 3",
+                                "Rp 12.000.000,-"
+                            ],
+                            [
+                                "Prestasi 4",
+                                "Rp 14.500.000,-"
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "id": "8-semesters",
+                    "heading": "Estimated Tuition Fees for 8 Semesters",
+                    "paragraphs": [
+                        "Below is the estimated total tuition fee for 8 semesters at UIB:"
+                    ],
+                    "table": {
+                        "headers": [
+                            "Component",
+                            "Total"
+                        ],
+                        "rows": [
+                            [
+                                "BPP Pokok",
+                                "Rp 5.500.000,-"
+                            ],
+                            [
+                                "Credits (20 × Rp 175.000,-)",
+                                "Rp 3.500.000,-"
+                            ],
+                            [
+                                "Laboratory",
+                                "Rp 750.000,-"
+                            ],
+                            [
+                                "Estimated per Semester",
+                                "Rp 9.750.000,-"
+                            ],
+                            [
+                                "Estimated Total for 8 Semesters",
+                                "Rp 78.500.000,-"
+                            ]
+                        ]
+                    }
+                }
+            ]
         },
-        "ti": {
-            "title": "Information Technology",
-            "description": "As a bachelor program that produces quality graduates in the field of information technology, especially cloud technology and security through education, research, and community service, at the national and international levels in 2021."
+        "examComposition": {
+            "heading": "Entrance Examination Question Composition for New Undergraduate Students",
+            "paragraphs": [
+                "The composition of the Entrance Examination for all participants who register as new undergraduate students is the same and is conducted simultaneously.",
+                "The examination consists of a total of 100 questions divided into:"
+            ],
+            "table": {
+                "headers": [
+                    "No.",
+                    "Test Subject",
+                    "Total Questions"
+                ],
+                "rows": [
+                    [
+                        "1",
+                        "Indonesian",
+                        "35"
+                    ],
+                    [
+                        "2",
+                        "English",
+                        "35"
+                    ],
+                    [
+                        "3",
+                        "Mathematics",
+                        "30"
+                    ],
+                    [
+                        "",
+                        "Total",
+                        "100"
+                    ]
+                ]
+            }
         },
-        "mn": {
-            "title": "Management",
-            "description": "As an internationally standardized Management Bachelor Program in producing graduates who have leadership and entrepreneurship spirits, are competent in the fields of industrial relations, corporate finance, business to consumer marketing, and are responsive in anticipating dynamic global changes."
+        "registrationRequirements": {
+            "heading": "New Undergraduate Student Registration Requirements Academic Year 2024/2025",
+            "sections": [
+                {
+                    "id": "regular",
+                    "heading": "Regular Admission Registration Requirements",
+                    "description": "The requirements or conditions for registering as a new student candidate are as follows:",
+                    "items": [
+                        {
+                            "text": "Fill out the registration form;"
+                        },
+                        {
+                            "text": "Copy of Family Card and Identity Card (ID Card/Student Card/Passport), scanned in PDF format with a maximum size of 2 MB."
+                        },
+                        {
+                            "text": "2×3 softcopy photograph with blue background and wearing a white shirt;"
+                        },
+                        {
+                            "text": "Pay the registration fee amounting to:",
+                            "subItems": [
+                                "Rp 250.000,- for Regular Admission",
+                                "Rp 150.000,- for Scholarship Admission"
+                            ],
+                            "callout": "For Scholarship Admission registration, complete requirements can be found in the Scholarship menu."
+                        },
+                        {
+                            "text": "All documents above must be completed during registration in the available registration wave in the registration account."
+                        }
+                    ]
+                },
+                {
+                    "id": "scholarship",
+                    "heading": "Scholarship Admission Registration Requirements",
+                    "items": [
+                        {
+                            "text": "Indonesian citizen;"
+                        },
+                        {
+                            "text": "Maximum age of 21 years old;"
+                        },
+                        {
+                            "text": "Graduated from SMA/SMK/MA/equivalent in 2022 or 2023;"
+                        },
+                        {
+                            "text": "Applying for S-1 (Bachelor Degree) level;"
+                        },
+                        {
+                            "text": "Softcopy scan of Family Card in PDF format with maximum size of 2 MB;"
+                        },
+                        {
+                            "text": "Softcopy scan of ID Card/Student Card/Passport in PDF format with maximum size of 2 MB;"
+                        },
+                        {
+                            "text": "2×3 blue background passport photo in PDF format with maximum size of 2 MB;"
+                        },
+                        {
+                            "text": "Fill in the average report card scores from semester 1 to semester 4;"
+                        },
+                        {
+                            "text": "Fill out the registration form in the scholarship registration wave."
+                        }
+                    ]
+                },
+                {
+                    "id": "transfer",
+                    "heading": "Transfer Student Registration Requirements",
+                    "description": "The following are the registration requirements as a transfer student at Universitas Internasional Batam:",
+                    "items": [
+                        {
+                            "text": "Submit academic transcripts from previous education.",
+                            "emailInfo": {
+                                "label": "Documents should be sent via email:",
+                                "emails": [
+                                    "humas@uib.ac.id",
+                                    "CC: humas.uib@gmail.com"
+                                ]
+                            },
+                            "includeLabel": "Include:",
+                            "includeItems": [
+                                "Full name",
+                                "Contactable phone number",
+                                "Destination study program"
+                            ]
+                        },
+                        {
+                            "text": "The university will conduct transcript equalization to the selected study program;"
+                        },
+                        {
+                            "text": "The equalization form signed by Vice Rector I will be sent to the applicant via email, then the applicant may continue the registration process and UIB Entrance Examination."
+                        }
+                    ]
+                },
+                {
+                    "id": "overseas",
+                    "heading": "Registration Requirements for Overseas Graduates (High School or Diploma)",
+                    "paragraphs": [
+                        "Diploma and Bachelor Degree (S1) certificates originating from overseas must be equalized at KEMENRISTEKDIKTI Jakarta.",
+                        "Meanwhile, high school certificates must be equalized at the Ministry of Education and Culture Jakarta.",
+                        "Applicants may also attach Paket C certificates and SKHU that have already been issued.",
+                        "Documents should be sent via email: humas@uib.ac.id"
+                    ],
+                    "callout": {
+                        "heading": "Note:",
+                        "description": "The equalization process is carried out online through the official website of the related institution."
+                    }
+                }
+            ]
         },
-        "ak": {
-            "title": "Accounting",
-            "description": "As a study program that produces professional graduates in the field of financial accounting in accordance with international standards with leadership and entrepreneurship spirits and able to follow dynamic global changes."
+        "studentAssistance": {
+            "paragraphs": [
+                "Prospective new students who come from outside the Batam area will be facilitated with pick-up, transportation, and preparation for accommodation in Batam City.",
+                "The student pick-up service is carried out when prospective students arrive at the airport or port and are transported to the UIB campus.",
+                "Afterward, students will also be assisted with transportation for shopping accommodation necessities and going to their residence, either at the UIB dormitory or nearby boarding houses around the UIB campus.",
+                "This student assistance service is available for all prospective UIB students who are interested or willing to use the service.",
+                "Students will also continue to be accompanied by Public Relations staff for their comfort and safety."
+            ],
+            "contact": {
+                "heading": "Contact",
+                "description": "For prospective students from outside Batam who would like to receive this service, please contact humas@uib.ac.id."
+            }
         },
-        "pr": {
-            "title": "Tourism",
-            "description": "Become a tourism study program with international quality standards that produces science and technology and graduates who are able to follow the dynamics of tourism changes at the national and international levels."
+        "residence": {
+            "heading": "Nearest Residence Information for Universitas Internasional Batam Students",
+            "dormitoryInfo": {
+                "heading": "UIB Dormitory Information",
+                "paragraphs": [
+                    "The Universitas Internasional Batam Dormitory has been operating since 2019 with one main building and a residential capacity of 96 female students and 104 male students.",
+                    "The dormitory is designed to provide a safe, comfortable, and supportive living environment for students during their academic journey at UIB.",
+                    "Prospective students who are interested in staying at the UIB dormitory may contact the UIB Public Relations WhatsApp number at 0812-7526-2369."
+                ]
+            },
+            "gallery": {
+                "heading": "Dormitory Gallery",
+                "items": [
+                    {
+                        "image": "/images/infoumum/asrama2.png",
+                        "title": "Dormitory Room",
+                        "description": "The room facilities include bunk beds, study desks, chairs, and storage cabinets to support student comfort.",
+                        "alt": "Universitas Internasional Batam Dormitory Room"
+                    },
+                    {
+                        "image": "/images/infoumum/asrama1.png",
+                        "title": "Dormitory Environment",
+                        "description": "The dormitory area has a clean and organized environment that supports student activities and interactions while living in Batam.",
+                        "alt": "Universitas Internasional Batam Dormitory Environment"
+                    }
+                ]
+            }
         },
-        "mm": {
-            "title": "Master of Management",
-            "description": "As a study program with international quality standards that produces quality graduates with leadership and entrepreneurship spirits and competence in international management at the managerial level."
+        "entranceExam": {
+            "heading": "Entrance Examination for New Undergraduate Students",
+            "paragraphs": [
+                "Every prospective applicant for the Scholarship and Regular Admission pathways is required to take the Entrance Examination held by Universitas Internasional Batam.",
+                "The stages, requirements, and procedures for the Entrance Examination are as follows:"
+            ],
+            "examStages": {
+                "heading": "Entrance Examination Stages",
+                "description": "The Universitas Internasional Batam Entrance Examination consists of:",
+                "items": [
+                    {
+                        "title": "Computer Based Test or Academic Potential Test (Mathematics, Indonesian, and English).",
+                        "description": "The test duration is 90 – 120 minutes."
+                    },
+                    {
+                        "title": "Interview or Interview Test with Universitas Internasional Batam lecturers.",
+                        "description": "The interview is conducted within 5 – 10 minutes."
+                    }
+                ]
+            },
+            "offlineConditions": {
+                "heading": "Conditions for Taking the Offline Entrance Examination",
+                "items": [
+                    {
+                        "text": "Wear a white shirt, black pants (non-jeans material), and shoes;"
+                    },
+                    {
+                        "text": "Bring a personal identity card such as ID Card/Student Card/Passport/Driver's License."
+                    },
+                    {
+                        "text": "The Entrance Examination results will be announced 2 days after the examination and can be viewed on the official website and social media of Universitas Internasional Batam."
+                    }
+                ]
+            },
+            "onlineConditions": {
+                "heading": "Conditions for Taking the Online Entrance Examination",
+                "items": [
+                    {
+                        "text": "Wear appropriate and polite clothing;"
+                    },
+                    {
+                        "text": "Follow the procedures for conducting the online examination (system trial, online interview, and online written test).",
+                        "description": "The procedure guide will be provided by the committee one day before the online examination."
+                    },
+                    {
+                        "text": "The Entrance Examination results will be announced 2 days after the examination and can be viewed on the official website and social media of Universitas Internasional Batam."
+                    }
+                ]
+            }
         },
-        "ih": {
-            "title": "Law",
-            "description": "As a Study Program with international quality standards that produces law graduates who can meet the dynamic changes of business law in national and international contexts."
+        "videoTutorial": {
+            "heading": "Online Registration Tutorial for Prospective Batam International University Students",
+            "description": "For online registration guidelines, potential participants can access the video below.",
+            "video": {
+                "title": "Online Registration Tutorial for Prospective Batam International University Students",
+                "url": "https://www.youtube-nocookie.com/embed/E3ez3tOA_D4",
+                "link": "https://youtu.be/E3ez3tOA_D4",
+                "linkLabel": "Online Registration Tutorial for Prospective Batam International University Students"
+            },
+            "callout": {
+                "heading": "Video Link"
+            }
+        }
+    },
+    "common": {
+        "home": "Home",
+        "readMore": "Read More",
+        "generalInformation": "General Information",
+        "relatedInformation": "Related Information",
+        "backToGeneralInformation": "Back to General Information"
+    },
+    "infoUmum": {
+        "empty": "No information is currently available."
+    },
+    "infoCards": {
+        "dormitory": {
+            "title": "Nearest Accommodation Information for Batam International University Students",
+            "excerpt": "Information about Batam International University dormitories, occupancy quotas, and nearby accommodation options for new students."
         },
-        "mh": {
-            "title": "Master of Law",
-            "description": "As a study program with international quality standards that produces quality graduates who are able to follow the dynamics of business law changes at the national and international levels."
+        "examComposition": {
+            "title": "Entrance Examination Question Composition for New Undergraduate Students",
+            "excerpt": "The entrance examination consists of 100 questions: Indonesian Language (35), English (35), and Mathematics (30)."
         },
-        "pbi": {
-            "title": "English Education",
-            "description": "Become a bachelor program that produces graduates with superior competence in the field of dynamic English education based on Edutechnopreneur (education, technology, and entrepreneurship) in accordance with international quality standards."
+        "registrationRequirements": {
+            "title": "New Undergraduate Student Registration Requirements Academic Year 2024/2025",
+            "excerpt": "Requirements and registration provisions for new students through Regular, Scholarship, Transfer, and International Graduate pathways."
         },
-        "bio": {
-            "title": "Biology",
-            "description": "Biology study program produces graduates who master life sciences, are research-oriented, and are able to contribute in the fields of biotechnology, conservation, and management of biological natural resources at the national and international levels."
+        "tuitionFee": {
+            "title": "Tuition Fee Information for New Undergraduate Students Academic Year 2024/2025",
+            "excerpt": "Details of new student fees, semester tuition fees, building fees (SPP), and estimated study costs at UIB."
         },
-        "giz": {
-            "title": "Nutrition",
-            "description": "Nutrition study program aims to produce graduates who are competent in nutrition science, able to design and manage community and clinical nutrition programs, and play an active role in improving nutrition status at the national and international levels."
+        "entranceExam": {
+            "title": "Entrance Examination for New Undergraduate Students",
+            "excerpt": "Stages, requirements, and procedures for the UIB Entrance Examination, including Computer Based Tests and interviews."
         },
-        "ked": {
-            "title": "Medicine",
-            "description": "Medicine study program produces professional, ethical, and global-minded doctors, able to provide excellent health services and contribute to the development of medical science and public health."
+        "scholarship": {
+            "title": "UIB Scholarship Program",
+            "excerpt": "The UIB Scholarship Program includes Outstanding Scholarships, Independent Student Scholarships, Achievement Scholarships 1–4, and tuition fee discounts."
+        },
+        "studentAssistance": {
+            "title": "New Student Assistance Service",
+            "excerpt": "Pickup, drop-off, and accommodation assistance services for new students from outside Batam."
+        },
+        "videoTutorial": {
+            "title": "Online Registration Video Tutorial for Prospective Batam International University Students",
+            "excerpt": "Video tutorial guide for the online registration process for prospective Batam International University students."
+        },
+        "aboutBatam": {
+            "title": "About Batam City",
+            "excerpt": "Information about Batam City, including culture, religion, climate, language, and public facilities in the Batam area."
+        }
+    },
+    "panduan": {
+        "nav": {
+            "heading": "Admission Stages",
+            "ariaLabel": "Admission stage navigation"
+        },
+        "card": {
+            "cta": "Open Guide"
+        },
+        "infoBanner": {
+            "title": "Need help?",
+            "body": "Contact the UIB admissions team via the official website or visit the Academic Administration Bureau of Universitas Internasional Batam in person."
+        },
+        "phase1": {
+            "label": "Phase 1",
+            "title": "Registration",
+            "subtitle": "Start your journey by creating an account, completing the registration form, and updating your personal information."
+        },
+        "phase2": {
+            "label": "Phase 2",
+            "title": "Payment",
+            "subtitle": "Complete the payment process and wait for verification confirmation from the admissions team."
+        },
+        "phase3": {
+            "label": "Phase 3",
+            "title": "Finalisation",
+            "subtitle": "Complete the final steps of the new student admission process before orientation begins."
+        },
+        "accountCreation": {
+            "title": "Account Creation",
+            "description": "Create a new account on the UIB admissions system to begin the new student registration process."
+        },
+        "registration": {
+            "title": "Registration",
+            "description": "Fill out the registration form completely and upload all required supporting documents."
+        },
+        "profileUpdate": {
+            "title": "Update Profile",
+            "description": "Update and complete your personal information to ensure it matches your official records."
+        },
+        "uploadTransferProof": {
+            "title": "Upload Transfer Proof",
+            "description": "Upload your registration fee payment proof through the system for verification by the admissions team."
+        },
+        "paymentVerification": {
+            "title": "Payment Verification",
+            "description": "Await payment verification by the admissions team and check your confirmation status in your account."
+        },
+        "reRegistration": {
+            "title": "Re-Registration",
+            "description": "Complete re-registration to confirm your place as a new student at UIB."
+        },
+        "orientationRequirement": {
+            "title": "Orientation Requirements",
+            "description": "Fulfil all requirements needed to participate in the new student orientation programme."
+        },
+        "studyProgramTransfer": {
+            "title": "Study Programme Transfer",
+            "description": "Submit a study programme transfer request if required, following the applicable procedures."
         }
     }
 }

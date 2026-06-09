@@ -1,52 +1,110 @@
-.gelombangTitle {
-  width: 14rem;
-  height: var(--step-3);
-  margin: 0 auto var(--space-s);
+.sectionTitle {
+  width: 13rem;
+  max-width: 70%;
+  height: clamp(2.2rem, 4vw, 3rem);
+  margin: 0 auto 0.85rem;
+  border-radius: 999px;
 }
 
-.gelombangSubtitle {
-  width: 20rem;
-  height: var(--step-0);
+.sectionSubtitle {
+  width: 11rem;
+  max-width: 55%;
+  height: 1rem;
+  margin: 0 auto 1rem;
+  border-radius: 999px;
+}
+
+.sectionDescription {
+  width: min(26rem, 82%);
+  height: 1rem;
   margin: 0 auto;
+  border-radius: 999px;
 }
 
-.media {
+.cardImage {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  aspect-ratio: 2 / 1;
+  height: 100%;
+  opacity: 0.16;
 }
 
-.batch {
-  width: 60%;
-  height: var(--step-1);
+.imageOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    rgb(5 15 35 / 88%) 0%,
+    rgb(5 15 35 / 48%) 45%,
+    transparent 100%
+  );
 }
 
-.program {
-  width: 80%;
-  height: var(--step-0);
+.calendarMonth,
+.calendarDay,
+.calendarDow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100% !important;
+  min-width: 0;
+  margin: 0 !important;
+  border-radius: 0;
+  line-height: 1;
 }
 
-.year {
-  width: 40%;
-  height: var(--step--1);
+.calendarMonth {
+  height: 1.1rem;
 }
 
-.calendar {
-  width: 3rem;
-  height: 2.5rem;
+.calendarDay {
+  height: 1.6rem;
 }
 
-.info {
-  width: 60%;
-  height: 2.5rem;
+.calendarDow {
+  height: 0.8rem;
 }
 
-.registration {
+.batchName {
+  height: 1.35rem;
+  border-radius: 999px;
+}
+
+.programName {
+  height: 1rem;
+  margin-top: 0.45rem;
+  border-radius: 999px;
+}
+
+.label {
+  height: 0.8rem;
+  border-radius: 999px;
+}
+
+.scheduleRow {
+  height: 0.9rem;
+  border-radius: 999px;
+
+  &:not(:last-child) {
+    margin-bottom: 0.55rem;
+  }
+}
+
+.registrationDates {
+  height: 0.95rem;
+  border-radius: 999px;
+}
+
+.cta {
   width: 100%;
-  height: var(--step--1);
-}
-
-.registerBtn {
-  width: 100%;
-  height: 2.5rem;
+  height: 2.85rem;
   margin-top: auto;
+  border-radius: 0.9rem;
+}
+
+.dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
 }

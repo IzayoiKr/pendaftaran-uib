@@ -50,6 +50,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err := email.InitMailer(); err != nil {
+		slog.Error("mailer init error", "error", err)
+		os.Exit(1)
+	}
+
 	if err := utils.InitValidator(); err != nil {
 		slog.Error("validator init error", "error", err)
 		os.Exit(1)
@@ -97,12 +102,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	mailer, err := email.NewMailer()
-	if err != nil {
-		slog.Error("mailer init failed", "error", err)
-		os.Exit(1)
-	}
-
 	auditLogger := audit.NewLogger()
 
 	r := chi.NewRouter()
@@ -131,7 +130,7 @@ func main() {
 		)
 		r.Post("/api/auth/register",
 			rl.register.RateLimit(
-				handlers.Register(provider.MySQL, mailer, auditLogger),
+				handlers.Register(provider.MySQL, auditLogger),
 			),
 		)
 		r.Post("/api/auth/refresh",
@@ -143,7 +142,7 @@ func main() {
 		)
 		r.Post("/api/auth/forgot-password",
 			rl.forgotPassword.RateLimit(
-				handlers.ForgotPassword(provider.MySQL, mailer, rl.forgotPasswordEmail, auditLogger),
+				handlers.ForgotPassword(provider.MySQL, rl.forgotPasswordEmail, auditLogger),
 			),
 		)
 		r.Post("/api/auth/reset-password",
@@ -158,7 +157,7 @@ func main() {
 		)
 		r.Post("/api/auth/resend-verification",
 			rl.resendVerify.RateLimit(
-				handlers.ResendVerification(provider.MySQL, mailer, auditLogger),
+				handlers.ResendVerification(provider.MySQL, auditLogger),
 			),
 		)
 		r.Get("/api/registrations/{batchKey}/init",
@@ -197,29 +196,17 @@ func main() {
 		r.Post("/api/registrations/{batchKey}/withdraw",
 			rl.registrationWithdraw.RateLimitUser(handlers.RegistrationWithdraw(provider.MySQL, auditLogger)),
 		)
-		r.Get("/api/prodi-change",
-			rl.profile.RateLimitUser(handlers.GetProdiChangeRequests(provider.MySQL)),
-		)
-		r.Post("/api/prodi-change",
-			rl.profile.RateLimitUser(handlers.CreateProdiChangeRequest(provider.MySQL)),
-		)
-		r.Get("/api/transfer-proof",
-			rl.transferProofGet.RateLimitUser(handlers.GetTransferProof(provider.MySQL)),
-		)
-		r.Get("/api/transfer-proof/file/{regID}",
-			rl.transferProofGet.RateLimitUser(handlers.ServeTransferProof(provider.MySQL)),
-		)
-		r.Get("/api/ospek/prasyarat",
-			rl.ospekGet.RateLimitUser(handlers.GetOspekPrerequisite(provider.MySQL)),
-		)
-		r.Get("/api/ospek/prasyarat/file/{regID}/pasphoto",
-			rl.ospekGet.RateLimitUser(handlers.ServeOspekPrerequisite(provider.MySQL, "pasphoto")),
-		)
-		r.Get("/api/ospek/prasyarat/file/{regID}/ijazah",
-			rl.ospekGet.RateLimitUser(handlers.ServeOspekPrerequisite(provider.MySQL, "ijazah")),
-		)
 		r.Get("/api/registrations/{batchKey}/loa",
 			rl.registrationLoa.RateLimitUser(handlers.RegistrationLoA(provider.MySQL)),
+		)
+		r.Get("/api/prodi/{regID}",
+			rl.prodiRequestHistory.RateLimitUser(handlers.GetProdiRequests(provider.MySQL)),
+		)
+		r.Post("/api/prodi/{regID}",
+			rl.prodiRequestChange.RateLimitUser(handlers.CreateProdiRequest(provider.MySQL)),
+		)
+		r.Delete("/api/prodi/{regID}/{requestID}",
+			rl.prodiRequestDelete.RateLimitUser(handlers.DeleteProdiRequest(provider.MySQL)),
 		)
 	})
 
@@ -232,12 +219,6 @@ func main() {
 		)
 		r.Post("/api/registrations/{batchKey}/submit",
 			rl.registrationSubmit.RateLimitUser(handlers.RegistrationSubmit(provider.MySQL, storageDir, scanner, auditLogger)),
-		)
-		r.Post("/api/transfer-proof",
-			rl.transferProofUpload.RateLimitUser(handlers.UploadTransferProof(provider.MySQL, scanner, storageDir)),
-		)
-		r.Post("/api/ospek/prasyarat",
-			rl.ospekUpload.RateLimitUser(handlers.UploadOspekPrerequisite(provider.MySQL, scanner, storageDir)),
 		)
 	})
 
@@ -295,11 +276,10 @@ type rateLimiters struct {
 	registrationSubmit  *auth.RateLimiter
 	registrationDelete  *auth.RateLimiter
 	registrationWithdraw *auth.RateLimiter
-	transferProofGet    *auth.RateLimiter
-	transferProofUpload *auth.RateLimiter
-	ospekGet            *auth.RateLimiter
-	ospekUpload         *auth.RateLimiter
 	registrationLoa		*auth.RateLimiter
+	prodiRequestHistory *auth.RateLimiter
+	prodiRequestChange	*auth.RateLimiter
+	prodiRequestDelete	*auth.RateLimiter
 }
 
 func newRateLimiters() rateLimiters {
@@ -325,10 +305,9 @@ func newRateLimiters() rateLimiters {
 		registrationSubmit:  auth.NewRateLimiter(5, 15*time.Minute),
 		registrationDelete:  auth.NewRateLimiter(5, 5*time.Minute),
 		registrationWithdraw: auth.NewRateLimiter(3, 15*time.Minute),
-		transferProofGet:    auth.NewRateLimiter(60, 1*time.Minute),
-		transferProofUpload: auth.NewRateLimiter(10, 5*time.Minute),
-		ospekGet:            auth.NewRateLimiter(60, 1*time.Minute),
-		ospekUpload:         auth.NewRateLimiter(10, 5*time.Minute),
 		registrationLoa: 	 auth.NewRateLimiter(10, 5*time.Minute),
+		prodiRequestHistory: auth.NewRateLimiter(60, 1*time.Minute),
+		prodiRequestChange:  auth.NewRateLimiter(5, 5*time.Minute),
+		prodiRequestDelete:  auth.NewRateLimiter(5, 5*time.Minute),
 	}
 }

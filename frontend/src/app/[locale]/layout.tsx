@@ -40,7 +40,7 @@ export async function generateMetadata({
             icon: "/favicon/uib-76.svg",
             apple: "/favicon/uib-180.png",
         },
-        manifest: "/manifest.json",
+        manifest: "/manifest.webmanifest",
         metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL as string),
         alternates: {
             canonical: "./",
@@ -51,6 +51,11 @@ export async function generateMetadata({
             siteName: t("siteName"),
             locale: locale === "en" ? "en_US" : "id_ID",
             type: "website",
+            images: "/images/hero-bg.jpg",
+        },
+        twitter: {
+            card: "summary_large_image",
+            images: "/images/hero-bg.jpg",
         },
     };
 }

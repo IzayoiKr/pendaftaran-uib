@@ -3,6 +3,9 @@
 # dependencies
 /node_modules
 /.pnp
+/.pnpm-store
+/.pnpm-home
+.pnpm-debug.log
 .pnp.*
 .yarn/*
 !.yarn/patches

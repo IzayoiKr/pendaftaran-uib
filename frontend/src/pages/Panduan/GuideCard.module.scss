@@ -1,199 +1,123 @@
-// ─── Design tokens (matching original UIB panduan theme) ─────────────────────
-$accent: #1a3fa8;
-$accent-lt: #e8edf8;
-$text-hi: #111218;
-$text-md: #3d3f4f;
-$text-lo: #8a8c9a;
-$border: #e4e2db;
-$surface: #ffffff;
-$radius-card: 16px;
+@use "@/styles/config" as global;
 
-// ─── Per-step gradient icon colours (from App.tsx) ───────────────────────────
-$gradients: (
-  blue: (
-    start: #3b82f6,
-    end: #2563eb,
-  ),
-  purple: (
-    start: #a855f7,
-    end: #9333ea,
-  ),
-  green: (
-    start: #22c55e,
-    end: #16a34a,
-  ),
-  orange: (
-    start: #f97316,
-    end: #ea580c,
-  ),
-  teal: (
-    start: #14b8a6,
-    end: #0d9488,
-  ),
-  pink: (
-    start: #ec4899,
-    end: #db2777,
-  ),
-  indigo: (
-    start: #6366f1,
-    end: #4f46e5,
-  ),
-);
-
-// ─── Card ────────────────────────────────────────────────────────────────────
 .card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  background: $surface;
-  border: 1px solid $border;
-  border-radius: $radius-card;
-  padding: 1.5rem;
-  text-decoration: none;
+  @include global.flex-column;
+  @include global.interactive;
+
+  height: 100%;
+  padding: 1rem;
+  border: 1px solid global.$border-light;
+  border-left: 3px solid transparent;
+  border-radius: global.$radius-md;
+  background: global.$card-bg;
   color: inherit;
+  text-decoration: none;
+
   transition:
-    border-color 0.25s ease,
-    box-shadow 0.25s ease,
-    transform 0.25s ease;
+    border-color global.$transition-fast,
+    box-shadow global.$transition-fast,
+    transform global.$transition-fast,
+    background global.$transition-fast;
 
-  &:hover {
-    border-color: rgba($accent, 0.45);
-    box-shadow: 0 10px 32px rgba($accent, 0.12);
-    transform: translateY(-3px);
+  @include global.hover-supported {
+    background: global.$white;
+    border-color: global.$primary-color-light;
+    border-left-color: global.$primary-color;
+    transform: translateY(-2px);
 
-    .cardFooter {
-      opacity: 1;
+    box-shadow:
+      0 6px 20px global.$primary-color-glow,
+      global.$shadow-sm;
+
+    .iconWrap {
+      background: global.$primary-color;
+      color: global.$tertiary-color;
     }
-    .iconBox {
-      transform: scale(1.08);
+
+    .stepNum,
+    .title,
+    .cta {
+      color: global.$tertiary-color;
     }
-    .titleId {
-      color: $accent;
-    }
-    .pdfBadge {
-      color: $accent;
+
+    .cta svg {
+      transform: translateX(4px);
     }
   }
 }
 
-// ─── Top row ─────────────────────────────────────────────────────────────────
-.cardTop {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+.top {
+  @include global.flex-row(0.5rem);
+
+  margin-bottom: 0.85rem;
 }
 
-.iconBox {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.iconWrap {
+  @include global.flex-center;
+
+  width: 36px;
+  height: 36px;
   flex-shrink: 0;
-  transition: transform 0.25s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: global.$radius-sm;
+  background: global.$border-light;
+  color: global.$secondary-color;
+
+  @include global.transition-colors;
 
   svg {
-    width: 26px;
-    height: 26px;
-    color: #fff;
+    display: block;
+    flex-shrink: 0;
   }
-}
-
-// ─── Generate icon gradient per step ─────────────────────────────────────────
-@each $key, $colors in $gradients {
-  .#{$key} .iconBox {
-    background: linear-gradient(
-      135deg,
-      map-get($colors, start),
-      map-get($colors, end)
-    );
-  }
-}
-
-// ─── PDF badge ───────────────────────────────────────────────────────────────
-.pdfBadge {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: $text-lo;
-  transition: color 0.2s;
-}
-
-.extIcon {
-  width: 14px;
-  height: 14px;
-}
-
-// ─── Body ────────────────────────────────────────────────────────────────────
-.cardBody {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  flex: 1;
-}
-
-.stepRow {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
 }
 
 .stepNum {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: $text-hi;
-  line-height: 1;
-  letter-spacing: -0.03em;
-}
-
-.titleId {
-  font-size: 1.05rem;
+  color: global.$text-color;
+  font-size: var(--step--2);
   font-weight: 700;
-  color: $text-hi;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
-  transition: color 0.2s;
+  line-height: 1;
+  letter-spacing: 0.06em;
+
+  transition: color global.$transition-fast;
 }
 
-.titleEn {
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: $text-lo;
-  letter-spacing: 0.01em;
-  margin-top: 0.1rem;
+.body {
+  @include global.flex-column(0.3rem);
+
+  flex: 1;
+  margin-bottom: 0.875rem;
+}
+
+.title {
+  margin: 0;
+  color: global.$secondary-color;
+  font-size: var(--step--1);
+  font-weight: 600;
+  line-height: 1.3;
+
+  transition: color global.$transition-fast;
 }
 
 .desc {
-  font-size: 0.875rem;
-  color: $text-md;
+  margin: 0;
+  color: global.$text-color;
+  font-size: var(--step--2);
   line-height: 1.6;
-  margin-top: 0.35rem;
 }
 
-// ─── Hover-reveal footer ──────────────────────────────────────────────────────
-.cardFooter {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding-top: 0.85rem;
-  border-top: 1px solid $border;
-  font-size: 0.82rem;
+.cta {
+  @include global.flex-row(0.3rem);
+
+  margin-top: auto;
+  color: global.$link-color;
+  font-size: var(--step--2);
   font-weight: 600;
-  color: $accent;
-  opacity: 0;
-  transition: opacity 0.25s ease;
+  letter-spacing: 0.02em;
+
+  transition: color global.$transition-fast;
 
   svg {
-    width: 14px;
-    height: 14px;
-  }
-}
+    flex-shrink: 0;
 
-.arrowIcon {
-  width: 14px;
-  height: 14px;
+    @include global.transition-transform;
+  }
 }

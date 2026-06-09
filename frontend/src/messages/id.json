@@ -101,31 +101,36 @@
         "registration": "Pendaftaran Gelombang"
     },
     "footer": {
-        "menuTitle": "Menu",
-        "contactTitle": "Kontak",
-        "locationTitle": "Lokasi Kampus",
-        "phone": "Phone",
-        "fax": "Fax",
-        "email": "Email",
-        "lineOfficial": "Line Official",
-        "infoLine": "Pusat Informasi UIB",
-        "mapTitle": "Lokasi Universitas Internasional Batam",
-        "myAccount": "Akun Saya",
-        "copyright": "Copyright © {year} | Universitas Internasional Batam",
-        "nav": {
-            "home": "Beranda",
-            "gelombang": "Gelombang",
-            "infoUmum": "Info Umum",
-            "pengumuman": "Pengumuman",
-            "login": "Daftar/Login"
-        }
+        "privacy": "Kebijakan Privasi",
+        "terms": "Syarat & Ketentuan",
+        "copyright": "Hak Cipta © {year} | Universitas Internasional Batam"
     },
     "hero": {
-        "heading": "SELAMAT DATANG DI UNIVERSITAS INTERNASIONAL BATAM",
+        "eyebrow": "Universitas Internasional Batam",
+        "heading": "Wujudkan Masa Depan Globalmu Bersama Kami",
+        "headingLine1": "Wujudkan Masa",
+        "headingLine2": "Depan",
+        "headingAccent": "Globalmu",
+        "headingLine3": "Bersama Kami",
         "description": "Universitas dengan standar kualitas internasional yang menghasilkan lulusan, ilmu pengetahuan, teknologi dan seni yang dapat memenuhi perubahan dinamis global.",
-        "buttonRegistration": "PENDAFTARAN",
-        "buttonAcademic": "AKADEMIK",
-        "imageAlt": "Sekelompok mahasiswa internasional berkumpul"
+        "buttonRegistration": "Pendaftaran",
+        "buttonAcademic": "Akademik",
+        "imageAlt": "Sekelompok mahasiswa internasional berkumpul",
+        "badge": "Terakreditasi Internasional",
+        "stats": {
+            "programs": {
+                "value": "14",
+                "label": "Program Studi"
+            },
+            "alumni": {
+                "value": "10K+",
+                "label": "Alumni"
+            },
+            "ranking": {
+                "value": "Top 5",
+                "label": "Kampus di Kepri"
+            }
+        }
     },
     "guides": {
         "title": "Panduan",
@@ -139,6 +144,66 @@
                 "description": "Silahkan ikuti video di bawah ini."
             }
         }
+    },
+    "programStudi": {
+        "title": "Program Studi",
+        "subtitle": "Program Sarjana dan Program Pasca Sarjana",
+        "toggleDetail": "Detail",
+        "toggleClose": "Tutup",
+        "degreeLabel": "Jenjang {degree}"
+    },
+    "gelombang": {
+        "title": "Gelombang Pendaftaran",
+        "description": "Informasi Jadwal Penerimaan Mahasiswa Baru",
+        "registerNow": "Daftar Sekarang",
+        "yearLabel": "TAHUN",
+        "examLabel": "Jadwal Ujian",
+        "examAriaLabel": "Tanggal ujian {day} {month}",
+        "registrationLabel": "Masa Pendaftaran",
+        "dateSeparator": "s.d."
+    },
+    "prodi": {
+        "backToAccount": "Kembali ke Akun",
+        "requestHistory": "Riwayat Permintaan",
+        "emptyTitle": "Belum ada permintaan",
+        "emptyText": "Anda belum pernah mengajukan perubahan program studi.",
+        "statusPending": "MENUNGGU",
+        "statusApproved": "DISETUJUI",
+        "statusRejected": "DITOLAK",
+        "cancelRequest": "Batalkan Permintaan",
+        "cancelDialogTitle": "Batalkan Permintaan",
+        "cancelDialogMessage": "Apakah Anda yakin ingin membatalkan permintaan ini?",
+        "cancelDialogConfirm": "Ya, Batalkan",
+        "cancelDialogDeny": "Tidak",
+        "routeFrom": "Dari",
+        "routeTo": "Ke",
+        "formTitle": "Formulir Permintaan Baru",
+        "pendingWarningTitle": "Permintaan Tertunda",
+        "pendingWarningText": "Anda memiliki permintaan perubahan yang sedang diproses. Mohon tunggu validasi sebelum mengajukan permintaan baru.",
+        "currentProgram": "Program Studi Sebelumnya",
+        "currentSchedule": "Waktu Kuliah Sebelumnya",
+        "newProgram": "Program Studi Baru *",
+        "newSchedule": "Waktu Kuliah Baru *",
+        "selectProgram": "Pilih Program Studi",
+        "selectSchedule": "Pilih Waktu Kuliah",
+        "submit": "Ajukan Permintaan",
+        "cancel": "Batal",
+        "infoTitle": "Informasi Pendaftaran",
+        "infoBatch": "Gelombang",
+        "infoAcademicYear": "Tahun Akademik",
+        "infoCurrentProgram": "Program Studi Saat Ini",
+        "infoCurrentSchedule": "Waktu Kuliah Saat Ini",
+        "shiftMorning": "Pagi",
+        "shiftEvening": "Malam",
+        "toastLoadError": "Gagal memuat data",
+        "toastFillFields": "Mohon lengkapi semua field",
+        "toastNoChange": "Program studi dan waktu kuliah baru tidak boleh sama dengan saat ini",
+        "toastSubmitting": "Mengajukan...",
+        "toastSubmitSuccess": "Permintaan berhasil diajukan",
+        "toastSubmitError": "Gagal mengajukan permintaan",
+        "toastCancelling": "Membatalkan...",
+        "toastCancelSuccess": "Permintaan berhasil dibatalkan",
+        "toastCancelError": "Gagal membatalkan permintaan"
     },
     "login": {
         "heading": "LOGIN",
@@ -284,6 +349,7 @@
         "resignation": "Pengunduran Diri",
         "ospekPrerequisites": "Prasyarat Ospek",
         "noRegistration": "Belum Ada Pendaftaran",
+        "noRegistrationSub": "Anda belum mendaftar gelombang manapun. Lihat gelombang yang tersedia untuk memulai.",
         "noRegistrationDesc": "Anda belum mendaftar gelombang manapun. Lihat gelombang yang tersedia untuk memulai.",
         "registerNow": "Daftar Sekarang",
         "quickActions": "Aksi Cepat",
@@ -303,10 +369,7 @@
         "withdrawError": "Terjadi kesalahan",
         "loadProfileError": "Gagal memuat profil",
         "wib": " WIB",
-        "cancel": "Batal",
-        "continueDraft": "Lanjutkan Draft",
-        "viewSubmission": "Lihat Pengiriman",
-        "noRegistrationSub": "Anda belum mendaftar gelombang manapun. Lihat gelombang yang tersedia untuk memulai."
+        "cancel": "Batal"
     },
     "registration": {
         "pageTitle": "Pendaftaran {programType}",
@@ -459,7 +522,9 @@
         },
         "validation": {
             "phoneInvalid": "Nomor telepon tidak valid. Gunakan format E.164 seperti +628123456789",
-            "phoneAmbiguous": "Nomor telepon ambigu. Mohon sertakan kode negara (+62 untuk Indonesia)."
+            "phoneAmbiguous": "Nomor telepon ambigu. Mohon sertakan kode negara (+62 untuk Indonesia).",
+            "required": "Wajib diisi",
+            "emailInvalid": "Format email tidak valid"
         }
     },
     "validation": {
@@ -732,62 +797,725 @@
         "incomePlaceholder": "Pendapatan",
         "statusPlaceholder": "Status"
     },
-    "program": {
-        "ts": {
-            "title": "Teknik Sipil",
-            "description": "Sebagai program study yang menghasilkan lulusan berstandar internasional yang berkompeten dalam menerapkan keilmuan dalam pengembangan teknologi di bidang rekayasa sipil serta mampu mengaplikasikan dalam pembangunan berkelanjutan (sustainable development) di wilayah kepulauan untuk menghadapi tuntutan dan perubahan global dunia yang bersifat dinamis."
+    "infoDetails": {
+        "aboutBatam": {
+            "heading": "Tentang Kota Batam",
+            "paragraphs": [
+                "Kota Batam adalah salah satu pulau di Provinsi Kepulauan Riau, yang terletak antara Selat Malaka dan Singapura yang secara keseluruhan membentuk wilayah Batam.",
+                "Kota Batam merupakan daerah tropis, dengan suhu rata-rata berkisar antara 24 hingga 35 derajat Celcius (77 sampai 95 derajat Fahrenheit).",
+                "Kelembaban di wilayah ini berkisar dari 73% hingga 96%. Secara umum musim hujan dimulai dari November hingga April dan musim kering dari Mei hingga Oktober.",
+                "Rata-rata curah hujan tahunan sekitar 2600 mm."
+            ],
+            "sections": {
+                "cultureLanguage": {
+                    "heading": "Budaya & Bahasa",
+                    "paragraphs": [
+                        "Penduduk Kota Batam terdiri dari budaya dan etnis yang beragam, dan Budaya Melayu merupakan budaya yang dominan di Kota Batam.",
+                        "Meskipun dalam keragaman budaya dan bahasa, Bahasa Indonesia sebagai bahasa nasional tetap digunakan, serta Bahasa Inggris diajarkan di sekolah dan lebih umum digunakan di kalangan bisnis/perusahaan multinasional."
+                    ]
+                },
+                "religion": {
+                    "heading": "Agama",
+                    "paragraphs": [
+                        "Enam agama besar yang paling banyak dianut di Indonesia, yaitu: Agama Islam, Kristen (Protestan) dan Katolik, Hindu, Buddha, dan Konghucu.",
+                        "Meskipun demikian bukan berarti agama-agama dan kepercayaan lain tidak boleh tumbuh dan berkembang di Indonesia.",
+                        "Bahkan pemerintah berkewajiban mendorong dan membantu perkembangan agama-agama tersebut.",
+                        "Islam adalah agama mayoritas di Kota Batam. Sebagai simbol dari masyarakat Kota Batam yang menganut beragam agama, pemerintah membangun Masjid Raya Batam yang berada di tengah kota berdekatan dengan alun-alun.",
+                        "Agama Kristen dan Katolik juga dianut oleh masyarakat Batam, terutama yang berasal dari suku Batak dan Flores.",
+                        "Agama Buddha adalah agama yang paling banyak dianut oleh warga Tionghoa.",
+                        "Kota Batam memiliki vihara yang merupakan vihara terbesar di Asia Tenggara, yaitu Vihara Duta Maitreya."
+                    ]
+                },
+                "publicFacilities": {
+                    "heading": "Fasilitas Umum",
+                    "description": "Kota Batam juga memiliki fasilitas umum dan fasilitas sosial yang dapat digunakan oleh masyarakat seperti:",
+                    "alt": "Fasilitas umum dan fasilitas sosial di Kota Batam",
+                    "source": {
+                        "label": "BP Batam",
+                        "url": "https://bpbatam.go.id/pages/read/414-fasilitas-umum-dan-sosial"
+                    }
+                }
+            }
         },
-        "ar": {
-            "title": "Arsitektur",
-            "description": "Menjadi program studi arsitektur maritim berbasis kearifan lokal dengan daya saing global yang mendukung pembangunan wilayah pesisir berkelanjutan."
+        "scholarship": {
+            "heading": "Program Beasiswa UIB",
+            "items": [
+                {
+                    "id": "cemerlang",
+                    "heading": "Beasiswa Cemerlang",
+                    "specialRequirementsHeading": "Syarat Khusus",
+                    "specialRequirements": [
+                        "Nilai rata-rata rapor minimal 80.0;",
+                        "Nilai USM (Ujian Saringan Masuk) ≥ 80;",
+                        "Memiliki prestasi akademik dan/atau non-akademik minimal tingkat provinsi;"
+                    ],
+                    "benefitsHeading": "Fasilitas Beasiswa",
+                    "benefits": [
+                        "100% potongan (gratis) Uang SPP/Uang Gedung;",
+                        "100% potongan (gratis) Biaya Kuliah (BPP Pokok dan SKS);",
+                        "100% potongan (gratis) Biaya Laboratorium (khusus S-1 Pariwisata gratis 50%);"
+                    ]
+                },
+                {
+                    "id": "insan-mandiri",
+                    "heading": "Beasiswa Insan Mandiri",
+                    "specialRequirementsHeading": "Syarat Khusus",
+                    "specialRequirements": [
+                        "Nilai rata-rata rapor minimal 75.0;",
+                        "Nilai USM (Ujian Saringan Masuk) ≥ 65;",
+                        "Berasal dari keluarga tidak mampu dibuktikan dengan Surat Keterangan Tidak Mampu (SKTM) atau Kartu Indonesia Pintar (KIP);"
+                    ],
+                    "benefitsHeading": "Fasilitas Beasiswa",
+                    "benefits": [
+                        "100% potongan (gratis) Uang SPP/Uang Gedung;",
+                        "100% potongan (gratis) Biaya Kuliah (BPP Pokok dan SKS);",
+                        "100% potongan (gratis) Biaya Laboratorium (khusus S-1 Pariwisata gratis 50%);"
+                    ]
+                },
+                {
+                    "id": "prestasi-1",
+                    "heading": "Beasiswa Prestasi 1",
+                    "specialRequirementsHeading": "Syarat Khusus",
+                    "specialRequirements": [
+                        "Nilai rata-rata rapor minimal 80.0;",
+                        "Nilai USM (Ujian Saringan Masuk) ≥ 80;"
+                    ],
+                    "benefitsHeading": "Fasilitas Beasiswa",
+                    "benefits": [
+                        "100% potongan (gratis) Uang SPP/Uang Gedung;",
+                        "50% potongan Biaya Kuliah (BPP Pokok dan SKS) hingga 6 semester;"
+                    ]
+                },
+                {
+                    "id": "prestasi-2",
+                    "heading": "Beasiswa Prestasi 2",
+                    "specialRequirementsHeading": "Syarat Khusus",
+                    "specialRequirements": [
+                        "Nilai rata-rata rapor minimal 75.0;",
+                        "Nilai USM (Ujian Saringan Masuk) ≥ 70;"
+                    ],
+                    "benefitsHeading": "Fasilitas Beasiswa",
+                    "benefits": [
+                        "100% potongan (gratis) Uang SPP/Uang Gedung;",
+                        "25% potongan Biaya Kuliah (BPP Pokok dan SKS) hingga 6 semester;"
+                    ]
+                },
+                {
+                    "id": "prestasi-3",
+                    "heading": "Beasiswa Prestasi 3",
+                    "specialRequirementsHeading": "Syarat Khusus",
+                    "specialRequirements": [
+                        "Nilai rata-rata rapor minimal 75.0;",
+                        "Nilai USM (Ujian Saringan Masuk) ≥ 60;"
+                    ],
+                    "benefitsHeading": "Fasilitas Beasiswa",
+                    "benefits": [
+                        "100% potongan (gratis) Uang SPP/Uang Gedung;"
+                    ]
+                },
+                {
+                    "id": "prestasi-4",
+                    "heading": "Beasiswa Prestasi 4",
+                    "specialRequirementsHeading": "Syarat Khusus",
+                    "specialRequirements": [
+                        "Nilai rata-rata rapor minimal 70.0;",
+                        "Nilai USM (Ujian Saringan Masuk) ≥ 50;"
+                    ],
+                    "benefitsHeading": "Fasilitas Beasiswa",
+                    "benefits": [
+                        "75% potongan Uang SPP/Uang Gedung;"
+                    ]
+                }
+            ]
         },
-        "si": {
-            "title": "Sistem Informasi",
-            "description": "Sebagai program sarjana yang menghasilkan lulusan berkualitas di bidang Sistem Informasi melalui pendidikan, penelitian, dan pengabdian kepada masyarakat, pada tingkat nasional dan internasional di tahun 2021."
+        "tuitionFee": {
+            "heading": "Informasi Biaya Kuliah Mahasiswa Baru Program Sarjana Tahun Akademik 2024/2025",
+            "sections": [
+                {
+                    "id": "summary",
+                    "heading": "Ringkasan Biaya Kuliah UIB",
+                    "paragraphs": [
+                        "Biaya kuliah mahasiswa UIB terdiri dari:"
+                    ],
+                    "items": [
+                        "Biaya mahasiswa baru. Biaya ini hanya dibayarkan satu kali pada saat daftar ulang. Biaya mahasiswa baru terdiri dari biaya gedung (SPP) dan biaya PPL.",
+                        "Biaya mahasiswa aktif (biaya per semester). Biaya ini dibayarkan setiap semester sebagai biaya kuliah. Biaya per semester terdiri dari BPP Pokok, biaya SKS, dan biaya laboratorium (jika berlaku)."
+                    ],
+                    "table": {
+                        "headers": [
+                            "Rincian Biaya",
+                            "Jumlah"
+                        ],
+                        "rows": [
+                            [
+                                "A. Biaya Mahasiswa Baru\n1. Uang Gedung (SPP)\n2. Biaya Administrasi (PPL)",
+                                "Rp 10.500.000,-\nRp 3.000.000,-"
+                            ],
+                            [
+                                "B. Biaya Per Semester\n1. BPP Pokok\n2. Biaya SKS (21 SKS × Rp 175.000,-)\n3. Biaya Laboratorium",
+                                "Rp 5.500.000,-\nRp 3.675.000,-\nRp 750.000,-"
+                            ],
+                            [
+                                "Total",
+                                "Rp 23.425.000,-"
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "id": "building-fee",
+                    "heading": "Tabel Biaya Gedung (SPP)",
+                    "paragraphs": [
+                        "Biaya gedung atau biaya SPP bervariasi tergantung gelombang pendaftaran yang dipilih.",
+                        "Selain gelombang pendaftaran, biaya gedung (SPP) juga dipengaruhi oleh peringkat USM.",
+                        "Peringkat USM adalah pengelompokan berdasarkan hasil ujian saringan masuk."
+                    ],
+                    "table": {
+                        "headers": [
+                            "Periode",
+                            "Peringkat I",
+                            "Peringkat II",
+                            "Peringkat III",
+                            "Peringkat IV",
+                            "Peringkat V"
+                        ],
+                        "rows": [
+                            [
+                                "Gelombang 1",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-"
+                            ],
+                            [
+                                "Gelombang 2",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-"
+                            ],
+                            [
+                                "Gelombang 3",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-",
+                                "Rp 5.000.000,-"
+                            ],
+                            [
+                                "Gelombang 4",
+                                "Rp 5.500.000,-",
+                                "Rp 6.000.000,-",
+                                "Rp 6.500.000,-",
+                                "Rp 7.000.000,-",
+                                "Rp 7.500.000,-"
+                            ],
+                            [
+                                "Gelombang 5",
+                                "Rp 6.000.000,-",
+                                "Rp 6.500.000,-",
+                                "Rp 7.000.000,-",
+                                "Rp 7.500.000,-",
+                                "Rp 8.000.000,-"
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "id": "semester-1",
+                    "heading": "Estimasi Biaya Kuliah Semester 1",
+                    "paragraphs": [
+                        "Estimasi biaya kuliah semester 1 UIB adalah sebagai berikut:"
+                    ],
+                    "table": {
+                        "headers": [
+                            "Program Studi",
+                            "SPP",
+                            "PPL",
+                            "BPP",
+                            "SKS",
+                            "Total"
+                        ],
+                        "rows": [
+                            [
+                                "Teknik Sipil",
+                                "Rp 10.500.000,-",
+                                "Rp 3.000.000,-",
+                                "Rp 5.500.000,-",
+                                "Rp 3.500.000,-",
+                                "Rp 22.500.000,-"
+                            ],
+                            [
+                                "Arsitektur",
+                                "Rp 10.500.000,-",
+                                "Rp 3.000.000,-",
+                                "Rp 5.500.000,-",
+                                "Rp 3.325.000,-",
+                                "Rp 22.325.000,-"
+                            ],
+                            [
+                                "Sistem Informasi",
+                                "Rp 10.500.000,-",
+                                "Rp 3.000.000,-",
+                                "Rp 5.500.000,-",
+                                "Rp 3.325.000,-",
+                                "Rp 22.325.000,-"
+                            ],
+                            [
+                                "Teknologi Informasi",
+                                "Rp 10.500.000,-",
+                                "Rp 3.000.000,-",
+                                "Rp 5.500.000,-",
+                                "Rp 3.325.000,-",
+                                "Rp 22.325.000,-"
+                            ]
+                        ]
+                    },
+                    "callout": {
+                        "heading": "Catatan",
+                        "items": [
+                            "Semester 1 belum terdapat mata kuliah laboratorium, sehingga biaya laboratorium belum dikenakan.",
+                            "Biaya PPL Program Studi Pariwisata sudah termasuk tambahan Rp 2.000.000,- untuk biaya seragam tambahan."
+                        ]
+                    }
+                },
+                {
+                    "id": "scholarship-program",
+                    "heading": "Estimasi Biaya Kuliah Program Beasiswa",
+                    "paragraphs": [
+                        "Penerima beasiswa UIB akan mendapatkan potongan biaya kuliah sesuai program beasiswa yang diterima."
+                    ],
+                    "table": {
+                        "headers": [
+                            "Program",
+                            "Total Estimasi"
+                        ],
+                        "rows": [
+                            [
+                                "Cemerlang",
+                                "Rp 3.000.000,-"
+                            ],
+                            [
+                                "Bidikmisi",
+                                "Gratis"
+                            ],
+                            [
+                                "Insan Mandiri",
+                                "Rp 3.000.000,-"
+                            ],
+                            [
+                                "Prestasi 1",
+                                "Rp 7.500.000,-"
+                            ],
+                            [
+                                "Prestasi 2",
+                                "Rp 9.750.000,-"
+                            ],
+                            [
+                                "Prestasi 3",
+                                "Rp 12.000.000,-"
+                            ],
+                            [
+                                "Prestasi 4",
+                                "Rp 14.500.000,-"
+                            ]
+                        ]
+                    }
+                },
+                {
+                    "id": "8-semesters",
+                    "heading": "Estimasi Biaya Kuliah 8 Semester",
+                    "paragraphs": [
+                        "Berikut adalah estimasi total biaya kuliah selama 8 semester di UIB:"
+                    ],
+                    "table": {
+                        "headers": [
+                            "Komponen",
+                            "Total"
+                        ],
+                        "rows": [
+                            [
+                                "BPP Pokok",
+                                "Rp 5.500.000,-"
+                            ],
+                            [
+                                "SKS (20 × Rp 175.000,-)",
+                                "Rp 3.500.000,-"
+                            ],
+                            [
+                                "Laboratorium",
+                                "Rp 750.000,-"
+                            ],
+                            [
+                                "Estimasi per Semester",
+                                "Rp 9.750.000,-"
+                            ],
+                            [
+                                "Estimasi Total 8 Semester",
+                                "Rp 78.500.000,-"
+                            ]
+                        ]
+                    }
+                }
+            ]
         },
-        "ti": {
-            "title": "Teknologi Informasi",
-            "description": "Sebagai program sarjana yang menghasilkan lulusan berkualitas dalam bidang teknologi informasi khususnya teknologi cloud dan keamanan melalui pendidikan, penelitian, dan pengabdian masyarakat, pada tingkat nasional dan internasional di tahun 2021."
+        "examComposition": {
+            "heading": "Komposisi Soal Ujian Saringan Masuk Mahasiswa Baru Program Sarjana",
+            "paragraphs": [
+                "Komposisi Ujian Saringan Masuk bagi seluruh peserta yang mendaftar sebagai mahasiswa baru program Sarjana adalah sama dan dilaksanakan secara bersamaan.",
+                "Total ujian terdiri dari 100 soal yang terbagi menjadi:"
+            ],
+            "table": {
+                "headers": [
+                    "No.",
+                    "Mata Ujian",
+                    "Jumlah Soal"
+                ],
+                "rows": [
+                    [
+                        "1",
+                        "Bahasa Indonesia",
+                        "35"
+                    ],
+                    [
+                        "2",
+                        "Bahasa Inggris",
+                        "35"
+                    ],
+                    [
+                        "3",
+                        "Matematika",
+                        "30"
+                    ],
+                    [
+                        "",
+                        "Total",
+                        "100"
+                    ]
+                ]
+            }
         },
-        "mn": {
-            "title": "Manajemen",
-            "description": "Sebagai Program Sarjana Manajemen berstandar internasional dalam menghasilkan lulusan yang memiliki jiwa kepemimpinan dan kewirausahaan, berkompeten dalam bidang hubungan industri, keuangan perusahaan, pemasaran business to consumer, serta tanggap dalam mengantisipasi perubahan global yang dinamis."
+        "registrationRequirements": {
+            "heading": "Persyaratan Pendaftaran Mahasiswa Baru Program Sarjana TA 2024/2025",
+            "sections": [
+                {
+                    "id": "regular",
+                    "heading": "Persyaratan Pendaftaran Mahasiswa Baru Jalur Reguler",
+                    "description": "Persyaratan atau ketentuan melakukan pendaftaran Calon Mahasiswa Baru adalah sebagai berikut:",
+                    "items": [
+                        {
+                            "text": "Mengisi formulir pendaftaran;"
+                        },
+                        {
+                            "text": "Salinan Kartu Keluarga dan Kartu Identitas (KTP/Kartu Pelajar/Paspor), di-scan dalam bentuk PDF maksimal 2 MB."
+                        },
+                        {
+                            "text": "Foto soft copy ukuran 2×3, background biru dan mengenakan kemeja putih;"
+                        },
+                        {
+                            "text": "Membayar biaya pendaftaran sebesar:",
+                            "subItems": [
+                                "Rp 250.000,- untuk Jalur Reguler",
+                                "Rp 150.000,- untuk Jalur Beasiswa"
+                            ],
+                            "callout": "Khusus pendaftaran Jalur Beasiswa, persyaratan lengkap dapat dilihat pada menu Beasiswa."
+                        },
+                        {
+                            "text": "Semua dokumen di atas dilengkapi pada saat mendaftar pada gelombang yang dibuka di akun pendaftaran."
+                        }
+                    ]
+                },
+                {
+                    "id": "scholarship",
+                    "heading": "Persyaratan Pendaftaran Mahasiswa Baru Jalur Beasiswa",
+                    "items": [
+                        {
+                            "text": "Warga Negara Indonesia;"
+                        },
+                        {
+                            "text": "Usia maksimal 21 tahun;"
+                        },
+                        {
+                            "text": "Lulus SMA/SMK/MA/Sederajat tahun 2022 dan 2023;"
+                        },
+                        {
+                            "text": "Menempuh jenjang S-1 (Sarjana);"
+                        },
+                        {
+                            "text": "Softcopy scan Kartu Keluarga dalam format PDF maksimal 2 MB;"
+                        },
+                        {
+                            "text": "Softcopy scan KTP/Kartu Pelajar/Paspor dalam format PDF maksimal 2 MB;"
+                        },
+                        {
+                            "text": "Pas foto softcopy background biru ukuran 2×3 dalam format PDF maksimal 2 MB;"
+                        },
+                        {
+                            "text": "Mengisi nilai rata-rata rapor dari semester 1 sampai semester 4;"
+                        },
+                        {
+                            "text": "Mengisi formulir pendaftaran di gelombang pendaftaran beasiswa."
+                        }
+                    ]
+                },
+                {
+                    "id": "transfer",
+                    "heading": "Persyaratan Pendaftaran Sebagai Mahasiswa Transfer",
+                    "description": "Berikut ini ketentuan pendaftaran sebagai mahasiswa transfer di Universitas Internasional Batam:",
+                    "items": [
+                        {
+                            "text": "Mengumpulkan Transkrip Nilai dari pendidikan sebelumnya.",
+                            "emailInfo": {
+                                "label": "Dokumen dikirim melalui email:",
+                                "emails": [
+                                    "humas@uib.ac.id",
+                                    "CC: humas.uib@gmail.com"
+                                ]
+                            },
+                            "includeLabel": "Sertakan:",
+                            "includeItems": [
+                                "Nama lengkap",
+                                "Nomor handphone yang bisa dihubungi",
+                                "Program studi yang dituju"
+                            ]
+                        },
+                        {
+                            "text": "Pihak universitas akan melakukan penyetaraan Transkrip Nilai ke program studi yang dipilih;"
+                        },
+                        {
+                            "text": "Form penyetaraan yang sudah ditandatangani Wakil Rektor I akan diserahkan ke pendaftar melalui email, kemudian melanjutkan proses pendaftaran dan Ujian Saringan Masuk UIB."
+                        }
+                    ]
+                },
+                {
+                    "id": "overseas",
+                    "heading": "Persyaratan Pendaftaran Mahasiswa Lulusan Luar Negeri (SMA atau Diploma)",
+                    "paragraphs": [
+                        "Dokumen Ijazah Diploma dan Sarjana (S1) yang berasal dari luar negeri wajib disetarakan di KEMENRISTEKDIKTI Jakarta.",
+                        "Sedangkan Ijazah SMA wajib disetarakan di Kemendikbud Jakarta.",
+                        "Pendaftar juga dapat melampirkan Ijazah dan SKHU Paket C yang sudah terbit.",
+                        "Dokumen dikirimkan melalui email: humas@uib.ac.id"
+                    ],
+                    "callout": {
+                        "heading": "Catatan:",
+                        "description": "Proses penyetaraan dilakukan secara online di website lembaga terkait."
+                    }
+                }
+            ]
         },
-        "ak": {
-            "title": "Akuntansi",
-            "description": "Sebagai program studi yang menghasilkan lulusan profesional di bidang akuntansi keuangan sesuai standar internasional dengan jiwa kepemimpinan dan kewirausahaan serta mampu mengikuti perubahan global yang dinamis."
+        "studentAssistance": {
+            "paragraphs": [
+                "Calon mahasiswa baru yang berasal dari luar daerah Batam akan difasilitasi penjemputan, pengantaran, dan persiapan tempat tinggal di Kota Batam.",
+                "Penjemputan mahasiswa baru dilakukan pada saat kedatangan calon mahasiswa di Bandara/Pelabuhan menuju kampus UIB.",
+                "Kemudian akan difasilitasi pengantaran untuk berbelanja keperluan akomodasi, hingga menuju tempat tinggal di asrama UIB ataupun kos terdekat dari kampus UIB.",
+                "Fasilitas layanan mahasiswa baru ini berlaku untuk seluruh calon mahasiswa UIB yang berminat ataupun bersedia.",
+                "Mahasiswa juga tetap akan didampingi oleh staf Humas demi kenyamanan dan keselamatan siswa."
+            ],
+            "contact": {
+                "heading": "Kontak",
+                "description": "Bagi calon mahasiswa baru dari luar Batam yang ingin mendapatkan fasilitas ini, silakan menghubungi humas@uib.ac.id."
+            }
         },
-        "pr": {
-            "title": "Pariwisata",
-            "description": "Menjadi program studi pariwisata dengan standar mutu internasional yang menghasilkan IPTEKS dan lulusan yang mampu mengikuti dinamika perubahan pariwisata di tingkat nasional dan internasional."
+        "residence": {
+            "heading": "Informasi Tempat Tinggal Terdekat Mahasiswa Universitas Internasional Batam",
+            "dormitoryInfo": {
+                "heading": "Informasi Asrama UIB",
+                "paragraphs": [
+                    "Asrama Universitas Internasional Batam mulai beroperasi sejak tahun 2019 dengan 1 (satu) gedung utama dan kapasitas hunian sebanyak 96 mahasiswa perempuan dan 104 mahasiswa laki-laki.",
+                    "Asrama dirancang untuk memberikan lingkungan tempat tinggal yang aman, nyaman, dan mendukung aktivitas akademik mahasiswa selama menempuh pendidikan di UIB.",
+                    "Bagi calon mahasiswa yang berminat untuk menempati dormitori UIB, silakan menghubungi WhatsApp Humas UIB di 0812-7526-2369."
+                ]
+            },
+            "gallery": {
+                "heading": "Galeri Asrama",
+                "items": [
+                    {
+                        "image": "/images/infoumum/asrama2.png",
+                        "title": "Kamar Asrama",
+                        "description": "Fasilitas kamar dilengkapi tempat tidur bertingkat, meja belajar, kursi, dan lemari penyimpanan untuk mendukung kenyamanan mahasiswa.",
+                        "alt": "Kamar Asrama Universitas Internasional Batam"
+                    },
+                    {
+                        "image": "/images/infoumum/asrama1.png",
+                        "title": "Lingkungan Asrama",
+                        "description": "Area asrama memiliki lingkungan yang bersih, tertata, serta mendukung aktivitas dan interaksi mahasiswa selama tinggal di Batam.",
+                        "alt": "Lingkungan Asrama Universitas Internasional Batam"
+                    }
+                ]
+            }
         },
-        "mm": {
-            "title": "Magister Manajemen",
-            "description": "Sebagai program studi dengan standar kualitas internasional yang menghasilkan lulusan berkualitas dengan kepemimpinan dan kewirausahaan bersemangat dan kompetensi dalam manajemen internasional di tingkat manajerial."
+        "entranceExam": {
+            "heading": "Ujian Saringan Masuk Mahasiswa Baru Program Sarjana",
+            "paragraphs": [
+                "Setiap calon pendaftar Jalur Beasiswa dan Reguler wajib mengikuti tes Ujian Saringan Masuk yang diselenggarakan oleh Universitas Internasional Batam.",
+                "Adapun tahapan, ketentuan, serta prosedur Ujian Saringan Masuk adalah sebagai berikut:"
+            ],
+            "examStages": {
+                "heading": "Tahapan Ujian Saringan Masuk",
+                "description": "Ujian Saringan Masuk Universitas Internasional Batam terdiri dari:",
+                "items": [
+                    {
+                        "title": "Computer Based Test atau Ujian Tes Potensi Akademik (Matematika, Bahasa Indonesia, dan Bahasa Inggris).",
+                        "description": "Waktu pengerjaan adalah 90 – 120 menit."
+                    },
+                    {
+                        "title": "Interview atau Tes Wawancara dengan Dosen Universitas Internasional Batam.",
+                        "description": "Wawancara dilakukan dalam waktu 5 – 10 menit."
+                    }
+                ]
+            },
+            "offlineConditions": {
+                "heading": "Ketentuan Mengikuti Ujian Saringan Masuk Secara Offline",
+                "items": [
+                    {
+                        "text": "Memakai kemeja putih, celana hitam (selain bahan jeans) dan sepatu;"
+                    },
+                    {
+                        "text": "Membawa Kartu Identitas Diri seperti: KTP/Kartu Pelajar/Paspor/SIM."
+                    },
+                    {
+                        "text": "Pengumuman hasil Ujian Saringan Masuk adalah 2 hari setelah pelaksanaan ujian dan dapat dilihat pada website resmi dan media sosial Universitas Internasional Batam."
+                    }
+                ]
+            },
+            "onlineConditions": {
+                "heading": "Ketentuan Mengikuti Ujian Saringan Masuk Secara Online",
+                "items": [
+                    {
+                        "text": "Mengenakan pakaian yang sopan;"
+                    },
+                    {
+                        "text": "Mengikuti prosedur pelaksanaan ujian online (uji coba sistem, wawancara online, dan tes tertulis online).",
+                        "description": "Panduan prosedur akan diberikan oleh panitia pada H-1 pelaksanaan ujian online."
+                    },
+                    {
+                        "text": "Pengumuman hasil Ujian Saringan Masuk adalah 2 hari setelah pelaksanaan ujian dan dapat dilihat pada website resmi dan media sosial Universitas Internasional Batam."
+                    }
+                ]
+            }
         },
-        "ih": {
-            "title": "Ilmu Hukum",
-            "description": "Sebagai Program Studi dengan standar kualitas internasional yang menghasilkan lulusan hukum yang dapat memenuhi perubahan dinamis hukum bisnis dalam konteks nasional dan internasional."
+        "videoTutorial": {
+            "heading": "Video Tutorial Pendaftaran Online Bagi Calon Mahasiswa Universitas Internasional Batam",
+            "description": "Untuk panduan pendaftaran online, calon peserta dapat mengakses video di bawah ini.",
+            "video": {
+                "title": "Tutorial Pendaftaran Online Universitas Internasional Batam",
+                "url": "https://www.youtube-nocookie.com/embed/E3ez3tOA_D4",
+                "link": "https://youtu.be/E3ez3tOA_D4",
+                "linkLabel": "Tutorial Pendaftaran Online Bagi Calon Mahasiswa Universitas Internasional Batam"
+            },
+            "callout": {
+                "heading": "Tautan Video"
+            }
+        }
+    },
+    "common": {
+        "home": "Beranda",
+        "readMore": "Baca Selengkapnya",
+        "generalInformation": "Informasi Umum",
+        "relatedInformation": "Informasi Lainnya",
+        "backToGeneralInformation": "Kembali ke Informasi Umum"
+    },
+    "infoUmum": {
+        "empty": "Belum ada informasi yang tersedia."
+    },
+    "infoCards": {
+        "dormitory": {
+            "title": "Informasi Tempat Tinggal Terdekat Mahasiswa Universitas Internasional Batam",
+            "excerpt": "Informasi asrama Universitas Internasional Batam, kuota penghuni, serta tempat tinggal terdekat bagi mahasiswa baru."
         },
-        "mh": {
-            "title": "Magister Hukum",
-            "description": "Sebagai program studi dengan standar mutu internasional yang menghasilkan lulusan berkualitas yang mampu mengikuti dinamika perubahan hukum bisnis di tingkat nasional dan internasional."
+        "examComposition": {
+            "title": "Komposisi Soal Ujian Saringan Masuk Mahasiswa Baru Program Sarjana",
+            "excerpt": "Ujian Saringan Masuk terdiri dari 100 soal: Bahasa Indonesia (35), Bahasa Inggris (35), dan Matematika (30)."
         },
-        "pbi": {
-            "title": "Pendidikan Bahasa Inggris",
-            "description": "Menjadi program sarjana yang menghasilkan lulusan dengan kompetensi unggul dalam bidang pendidikan bahasa Inggris yang dinamis berbasis Edutechnopreneur (education, technology, and entrepreneurship) sesuai dengan standar kualitas internasional."
+        "registrationRequirements": {
+            "title": "Persyaratan Pendaftaran Mahasiswa Baru Program Sarjana TA 2024/2025",
+            "excerpt": "Persyaratan dan ketentuan pendaftaran mahasiswa baru jalur Reguler, Beasiswa, Transfer, dan Lulusan Luar Negeri."
         },
-        "bio": {
-            "title": "Biologi",
-            "description": "Program studi Biologi menghasilkan lulusan yang menguasai ilmu hayati, berorientasi pada penelitian, dan mampu berkontribusi dalam bidang bioteknologi, konservasi, dan pengelolaan sumber daya alam hayati di tingkat nasional maupun internasional."
+        "tuitionFee": {
+            "title": "Informasi Biaya Kuliah Mahasiswa Baru Program Sarjana TA 2024/2025",
+            "excerpt": "Rincian biaya mahasiswa baru, biaya per semester, biaya gedung (SPP), serta estimasi biaya kuliah mahasiswa UIB."
         },
-        "giz": {
-            "title": "Gizi",
-            "description": "Program studi Gizi bertujuan menghasilkan lulusan yang kompeten dalam ilmu gizi, mampu merancang dan mengelola program gizi masyarakat serta klinis, dan berperan aktif dalam peningkatan status gizi di tingkat nasional dan internasional."
+        "entranceExam": {
+            "title": "Ujian Saringan Masuk Mahasiswa Baru Program Sarjana",
+            "excerpt": "Tahapan, ketentuan, dan prosedur Ujian Saringan Masuk UIB, termasuk Computer Based Test dan tes wawancara."
         },
-        "ked": {
-            "title": "Kedokteran",
-            "description": "Program studi Kedokteran menghasilkan dokter yang profesional, beretika, dan berwawasan global, mampu memberikan pelayanan kesehatan prima serta berkontribusi dalam pengembangan ilmu kedokteran dan kesehatan masyarakat."
+        "scholarship": {
+            "title": "Program Beasiswa UIB",
+            "excerpt": "Program Beasiswa UIB meliputi Beasiswa Cemerlang, Insan Mandiri, Prestasi 1–4, dan fasilitas potongan biaya kuliah."
+        },
+        "studentAssistance": {
+            "title": "Layanan Bantuan Mahasiswa Baru",
+            "excerpt": "Layanan penjemputan, pengantaran, dan bantuan tempat tinggal bagi mahasiswa baru dari luar daerah Batam."
+        },
+        "videoTutorial": {
+            "title": "Video Tutorial Pendaftaran Online Bagi Calon Mahasiswa Universitas Internasional Batam",
+            "excerpt": "Panduan video tutorial proses pendaftaran online bagi calon mahasiswa Universitas Internasional Batam."
+        },
+        "aboutBatam": {
+            "title": "Tentang Kota Batam",
+            "excerpt": "Informasi mengenai Kota Batam, budaya, agama, iklim, bahasa, dan fasilitas umum di wilayah Batam."
+        }
+    },
+    "panduan": {
+        "nav": {
+            "heading": "Tahapan Panduan",
+            "ariaLabel": "Navigasi tahapan Panduan"
+        },
+        "card": {
+            "cta": "Buka Panduan"
+        },
+        "infoBanner": {
+            "title": "Butuh bantuan?",
+            "body": "Hubungi tim PMB UIB melalui laman resmi atau datang langsung ke Biro Administrasi Akademik Universitas Internasional Batam."
+        },
+        "phase1": {
+            "label": "Tahap Pertama",
+            "title": "Registrasi Awal",
+            "subtitle": "Buat akun, daftarkan diri, dan lengkapi data pribadi"
+        },
+        "phase2": {
+            "label": "Tahap Kedua",
+            "title": "Pembayaran & Verifikasi",
+            "subtitle": "Selesaikan pembayaran dan unggah bukti transfer"
+        },
+        "phase3": {
+            "label": "Tahap Ketiga",
+            "title": "Finalisasi Pendaftaran",
+            "subtitle": "Daftar ulang, ospek, dan pengajuan pindah prodi"
+        },
+        "accountCreation": {
+            "title": "Pembuatan Akun",
+            "description": "Buat akun untuk memulai proses pendaftaran mahasiswa baru."
+        },
+        "registration": {
+            "title": "Pendaftaran",
+            "description": "Isi formulir dan lengkapi seluruh data pendaftaran kamu."
+        },
+        "profileUpdate": {
+            "title": "Perubahan Biodata",
+            "description": "Perbaiki atau perbarui data pribadi setelah pendaftaran dilakukan."
+        },
+        "uploadTransferProof": {
+            "title": "Upload Bukti Transfer",
+            "description": "Unggah bukti pembayaran biaya pendaftaran ke sistem PMB."
+        },
+        "paymentVerification": {
+            "title": "Verifikasi Pembayaran",
+            "description": "Pantau status verifikasi pembayaran yang telah diunggah."
+        },
+        "reRegistration": {
+            "title": "Daftar Ulang",
+            "description": "Selesaikan proses daftar ulang setelah dinyatakan lulus seleksi."
+        },
+        "orientationRequirement": {
+            "title": "Pengisian Syarat Ospek",
+            "description": "Lengkapi persyaratan untuk mengikuti orientasi mahasiswa baru."
+        },
+        "studyProgramTransfer": {
+            "title": "Permintaan Pindah Prodi",
+            "description": "Ajukan permintaan untuk berpindah program studi yang diinginkan."
         }
     }
 }

@@ -5,17 +5,17 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"unsafe"
+
+	"golang.org/x/crypto/pbkdf2"
 )
 
 func NIKBlindIndex(plain string) (string, error) {
-	if blindKey == nil {
+	if blindKey == nil || blindSalt == nil {
 		return "", fmt.Errorf("NIK crypto not initialized")
 	}
 
-	mac := hmac.New(sha256.New, blindKey)
-	_, _ = mac.Write([]byte(plain))
-	return hex.EncodeToString(mac.Sum(nil)), nil
+	dk := pbkdf2.Key([]byte(plain), blindSalt, pbkdf2Iterations, 32, sha256.New)
+	return hex.EncodeToString(dk), nil
 }
 
 func MaskNIK(b []byte) string {
@@ -23,15 +23,7 @@ func MaskNIK(b []byte) string {
 	if n == 0 {
 		return ""
 	}
-	if n <= 6 {
-		return string(b)
-	}
-
-	for i := 6; i < n; i++ {
-		b[i] = '*'
-	}
-
-	return unsafe.String(&b[0], len(b))
+	return "********************"[:n]
 }
 
 func CompareBlindIndex(a, b string) bool {

@@ -65,12 +65,12 @@ func processUploadedFiles(
 			if openErr != nil {
 				return openErr
 			}
-			defer file.Close() 
+			defer file.Close()
 
 			if docType == "paymentProof" {
 				finalPath, size, err := runFilePipeline(r, file, header, targetDir, "payment_proof", scanner, al, base, userID)
-				if err != nil { 
-					return err 
+				if err != nil {
+					return err
 				}
 				paymentProof = &processedFileMeta{
 					finalPath: finalPath,
@@ -82,7 +82,7 @@ func processUploadedFiles(
 			dt := models.DocType(docType)
 			if !formData.IsValidDocumentField(dt) {
 				slog.Warn("Upload rejected: invalid document form key", "key", docType, "user_id", userID)
-				return errors.New(i18n.TF("registration.invalid_doc_type", lang, "", docType))
+				return errors.New(i18n.T("registration.invalid_doc_type", lang, "{param}", docType))
 			}
 
 			finalPath, size, pipeErr := runFilePipeline(r, file, header, targetDir, docType, scanner, al, base, userID)
@@ -194,7 +194,7 @@ func cleanOrphanDocs(
 	}
 
 	if len(docTypesToDelete) > 0 {
-		query := `DELETE FROM registration_document 
+		query := `DELETE FROM registration_document
 			WHERE registration_id = ? AND document_type IN (`
 		args := make([]any, 1+len(docTypesToDelete))
 		args[0] = regID[:]

@@ -1,36 +1,34 @@
 import type { ComponentType } from "react";
+import { useTranslations } from "next-intl";
+import Image from "next/image";
 import Link from "next/link";
 import type { InfoMeta } from "@/constants/infoUmum";
 import { infoList } from "@/constants/infoUmum";
 import BreadcrumbNav from "@/components/Breadcrumb/BreadcrumbNav";
-import TocNav from "./TocNav";
 import styles from "./InfoDetail.module.scss";
-
-interface TocItem {
-    id: string;
-    label: string;
-}
 
 interface InfoDetailProps {
     post: InfoMeta;
     Content: ComponentType;
-    toc?: TocItem[];
 }
 
-export default function InfoDetail({
-    post,
-    Content,
-    toc = [],
-}: InfoDetailProps) {
-    const related = infoList.filter((p) => p.id !== post.id).slice(0, 3);
+export default function InfoDetail({ post, Content }: InfoDetailProps) {
+    const t = useTranslations();
+
+    const related = infoList.filter((item) => item.id !== post.id).slice(0, 3);
 
     const breadcrumbs = [
-        { label: "Beranda", href: "/" },
         {
-            label: "Informasi Umum",
+            label: t("common.home"),
+            href: "/",
+        },
+        {
+            label: t("common.generalInformation"),
             href: "/info-umum",
         },
-        { label: post.titleId },
+        {
+            label: t(post.titleKey),
+        },
     ];
 
     return (
@@ -41,13 +39,13 @@ export default function InfoDetail({
                     className={styles.breadcrumb}
                 />
 
-                <div className={styles.badge}>Informasi Umum</div>
+                <div className={styles.badge}>
+                    {t("common.generalInformation")}
+                </div>
 
-                <h1 className={styles.title}>{post.titleId}</h1>
+                <h1 className={styles.title}>{t(post.titleKey)}</h1>
 
-                <p className={styles.excerpt}>{post.excerpt}</p>
-
-                {toc.length > 0 && <TocNav toc={toc} />}
+                <p className={styles.excerpt}>{t(post.excerptKey)}</p>
             </section>
 
             <article className={styles.article}>
@@ -56,11 +54,11 @@ export default function InfoDetail({
                 </div>
             </article>
 
-            {related.length > 0 && (
+            {!!related.length && (
                 <section className={styles.related}>
                     <div className={styles.relatedInner}>
                         <h2 className={styles.relatedHeading}>
-                            Informasi Lainnya
+                            {t("common.relatedInformation")}
                         </h2>
 
                         <div className={styles.relatedGrid}>
@@ -71,21 +69,23 @@ export default function InfoDetail({
                                     className={styles.relatedCard}
                                 >
                                     <div className={styles.relatedImageWrap}>
-                                        <img
+                                        <Image
                                             src={item.image}
-                                            alt={item.titleId}
+                                            alt={t(item.titleKey)}
+                                            width={800}
+                                            height={500}
                                             className={styles.relatedImage}
-                                            loading="lazy"
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                         />
                                     </div>
 
                                     <div className={styles.relatedContent}>
                                         <p className={styles.relatedTitle}>
-                                            {item.titleId}
+                                            {t(item.titleKey)}
                                         </p>
 
                                         <span className={styles.relatedCta}>
-                                            Baca Selengkapnya →
+                                            {t("common.readMore")} →
                                         </span>
                                     </div>
                                 </Link>
@@ -97,7 +97,7 @@ export default function InfoDetail({
                                 href="/info-umum"
                                 className={styles.backToInfoBtn}
                             >
-                                ← Kembali ke Informasi Umum
+                                ← {t("common.backToGeneralInformation")}
                             </Link>
                         </div>
                     </div>

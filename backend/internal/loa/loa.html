@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surat Hasil USM - {{nomorDaftar}}</title>
+    <style>
+        {{__CSS__}}
+    </style>
+</head>
+
+<body>
+
+    <div class="letter">
+
+        <div class="header">
+            <div class="logo">
+                <img src="{{__LOGO_BASE64__}}" alt="Logo UIB" onerror="this.style.display='none'" />
+            </div>
+            <div class="school-info">
+                <strong>Universitas Internasional Batam</strong>
+                Jl. Gajah Mada, Baloi-Sei Ladi, Tiban Indah, Kec. Sekupang<br />
+                Kota Batam, Kepulauan Riau 29426 &nbsp;|&nbsp; www.uib.ac.id<br />
+                Tel +62 778 743 7111 &nbsp;|&nbsp; humas@uib.ac.id
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="meta-info">
+            <div class="meta-row">
+                <span class="meta-label">Nomor</span>
+                <span class="meta-value">: {{nomorSurat}}</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Perihal</span>
+                <span class="meta-value">: Hasil Ujian Saringan Masuk Mahasiswa Baru TA {{tahunAkademik}}</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Lampiran</span>
+                <span class="meta-value">: 1 bundel</span>
+            </div>
+        </div>
+
+        <div class="addressee">
+            <p>Yth. Sdr/i <strong>{{namaLengkap}}</strong> / No Pendaftaran: <strong>{{nomorDaftar}}</strong></p>
+            <p>Siswa/i {{namaSekolah}}</p>
+        </div>
+
+        <p class="salutation">Dengan Hormat,</p>
+
+        <div class="congrats">
+            <div class="congrats-line">SELAMAT, Saudara/i dinyatakan</div>
+            <div class="congrats-lulus">LULUS</div>
+            <div class="exam-detail">
+                Ujian Saringan Masuk Universitas Internasional Batam<br />
+                <strong>{{gelombang}}</strong> &#8212; TA {{tahunAkademik}}<br />
+                Di <strong>{{tempatUjian}}</strong> pada <strong>{{tanggalUjian}}</strong>
+            </div>
+        </div>
+
+        <p>Untuk terdaftar sebagai mahasiswa/i <strong>{{namaBeasiswa}}</strong>
+            Program Studi <strong>{{prodi}}, {{kelasKuliah}}</strong>, mohon cermati informasi berikut:</p>
+
+        <div class="section-title">1. Rincian Biaya</div>
+        <table class="biaya">
+            <thead>
+                <tr>
+                    <th>KETERANGAN KOMPONEN BIAYA</th>
+                    <th>JUMLAH</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{__BIAYA_ROWS__}}
+            </tbody>
+            <tfoot>
+                <tr class="tot">
+                    <td>TOTAL POTONGAN BEASISWA</td>
+                    <td>{{totalPotongan}}</td>
+                </tr>
+                <tr class="tot tot-highlight">
+                    <td>TOTAL YANG HARUS DIBAYAR</td>
+                    <td>{{totalBayar}}</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="section-title">2. Petunjuk Daftar Ulang</div>
+        <ol class="payment-instruction">
+            <li>
+                Lakukan pembayaran paling lambat <strong>{{tanggalDeadline}}</strong> melalui:<br /><br />
+                Bank: <strong>{{namaBank}}</strong> &nbsp;|&nbsp;
+                No. Rekening: <strong>{{noRekening}}</strong> &nbsp;|&nbsp;
+                Atas Nama: <strong>{{atasNama}}</strong>
+            </li>
+            <li>
+                Pembayaran minimal sebesar <strong>{{cicilanMinimal}},-</strong>.
+                Sisa tagihan dapat dicicil per bulan hingga <strong>{{cicilanDeadline}}</strong>
+                dengan mengisi Surat Pernyataan Cicilan Biaya Kuliah (Lampiran-3).
+            </li>
+            <li>
+                Lengkapi dan unggah dokumen daftar ulang di laman
+                <strong>pendaftaran.uib.ac.id</strong> (pedoman pada Lampiran-2).
+            </li>
+            <li>
+                Ketentuan pengunduran diri dan pengembalian pembayaran, silakan baca Lampiran-2.
+            </li>
+        </ol>
+
+        <div class="note-box">
+            <strong>CATATAN PENTING:</strong> Bagi calon mahasiswa peraih Beasiswa I, II, III, IV, serta
+            program reguler, apabila melakukan pelunasan pembayaran pada periode daftar ulang, maka akan
+            mendapat potongan tambahan sebesar <strong>Rp 1.000.000,-</strong> (satu juta rupiah).
+        </div>
+
+        <div class="contact-info">
+            Informasi lebih lanjut, silakan menghubungi <strong>Humas UIB (0778-7437111)</strong>
+            atau <strong>WA 0821 7484 6764</strong>.<br />
+            Atas perhatian dan kerjasama Saudara/i, kami ucapkan terima kasih.
+        </div>
+
+        <div class="signature">
+            <div>
+                <p>Batam, {{tanggalSurat}}</p>
+                <div class="position">
+                    <p>Panitia PMB Universitas Internasional Batam</p>
+                    <p>TA {{tahunAkademik}}</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

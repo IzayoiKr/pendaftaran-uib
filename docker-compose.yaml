@@ -31,7 +31,7 @@ services:
       retries: 10
 
   phpmyadmin:
-    image: phpmyadmin:latest
+    image: phpmyadmin:5.2
     container_name: phpmyadmin-pendaftaran-uib-dev
     depends_on:
       mysql:
@@ -74,7 +74,7 @@ services:
       retries: 10
 
   mongo-express:
-    image: mongo-express:latest
+    image: mongo-express:1.0
     container_name: mongo-express-pendaftaran-uib-dev
     depends_on:
       mongodb:
@@ -90,7 +90,7 @@ services:
       - "8082:8081"
 
   mailpit:
-    image: axllent/mailpit:latest
+    image: axllent/mailpit:v1.30
     container_name: mailpit-pendaftaran-uib-db
     restart: unless-stopped
     environment:
@@ -109,7 +109,7 @@ services:
       retries: 5
 
   clamav:
-    image: clamav/clamav:1.4
+    image: clamav/clamav:stable
     container_name: clamav-pendaftaran-uib-dev
     restart: unless-stopped
     environment:
@@ -120,6 +120,9 @@ services:
       CLAMD_CONF_ReadTimeout: ${CLAMD_CONF_ReadTimeout}
       CLAMD_CONF_MaxFileSize: ${CLAMD_CONF_MaxFileSize}
       CLAMD_CONF_MaxScanSize: ${CLAMD_CONF_MaxScanSize}
+      CLAMD_CONF_StreamMaxLength: ${CLAMD_CONF_StreamMaxLength}
+      CLAMD_CONF_ScanPDF: ${CLAMD_CONF_ScanPDF}
+      CLAMD_CONF_AlertExceedsMax: ${CLAMD_CONF_AlertExceedsMax}
       FRESHCLAM_CONF_Checks: ${FRESHCLAM_CONF_Checks}
     ports:
       - ${CLAM_PORTS}
@@ -300,7 +303,6 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - /app/.next
-      - /dev/null:/app/.env
       - /dev/null:/app/.env.local
 
 volumes:

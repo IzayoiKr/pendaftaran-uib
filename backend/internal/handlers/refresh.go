@@ -56,7 +56,7 @@ func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc
 			clearRefreshCookie(w)
 			al.Log(audit.Entry{
 				Event: audit.EventRefreshFailure,
-				UserID: claims.UserID,
+				UserID: claims.Subject,
 				SessionID: claims.SessionID,
 				IP: base.IP,
 				UserAgent: base.UserAgent,
@@ -76,7 +76,7 @@ func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc
 			clearRefreshCookie(w)
 			al.Log(audit.Entry{
 				Event: audit.EventRefreshReuseDetected,
-				UserID: claims.UserID,
+				UserID: claims.Subject,
 				SessionID: claims.SessionID,
 				IP: base.IP,
 				UserAgent: base.UserAgent,
@@ -85,12 +85,12 @@ func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc
 			})
 			slog.Warn("SECURITY: refresh on missing/expired session - possible token reuse",
 				"session_id", sessionID,
-				"user_id", claims.UserID)
+				"user_id", claims.Subject)
 			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON(i18n.T("auth.session_invalid", lang)))
 			return
 		}
 
-		id, err := uuid.Parse(claims.UserID)
+		id, err := uuid.Parse(claims.Subject)
 		if err != nil {
 			slog.Error("refresh: parse uuid from claims", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
@@ -115,18 +115,18 @@ func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc
 
 		newSessionID := utils.GenerateUUIDString()
 
-		if err := ts.StoreSession(r.Context(), newSessionID, claims.UserID, time.Now().Add(auth.RefreshTokenTTL)); err != nil {
+		if err := ts.StoreSession(r.Context(), newSessionID, claims.Subject, time.Now().Add(auth.RefreshTokenTTL)); err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
-		newAccessToken, err := auth.GenerateAccessToken(claims.UserID, newSessionID, user.Email)
+		newAccessToken, err := auth.GenerateAccessToken(claims.Subject, newSessionID)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
 		}
 
-		newRefreshToken, err := auth.GenerateRefreshToken(claims.UserID, newSessionID, user.Email)
+		newRefreshToken, err := auth.GenerateRefreshToken(claims.Subject, newSessionID)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON("server error"))
 			return
@@ -142,7 +142,7 @@ func Refresh(db *sql.DB, ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc
 
 		al.Log(audit.Entry{
 			Event: audit.EventRefreshSuccess,
-			UserID: claims.UserID,
+			UserID: claims.Subject,
 			SessionID: newSessionID,
 			IP: base.IP,
 			UserAgent: base.UserAgent,

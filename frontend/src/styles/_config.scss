@@ -1,16 +1,120 @@
 @use "sass:map";
 
 $primary-color: #fdc632;
+$primary-color-light: #ffd65c;
+$primary-color-muted: rgb(253 198 50 / 70%);
+$primary-color-glow: rgb(253 198 50 / 18%);
+
 $secondary-color: #333;
 $tertiary-color: #002347;
+
 $background-color: #ffffff;
+$background-muted: #f7f8fc;
 $card-bg: #f9f9ff;
+
 $link-color: #4a76ee;
+
 $text-color: #666;
-$text-color2: #1a1c20;
+$text-color-dark: #1a1c20;
+$text-color-soft: #8b90a0;
+
 $white: #fff;
+$white-high: rgb(255 255 255 / 92%);
+$white-mid: rgb(255 255 255 / 65%);
+$white-low: rgb(255 255 255 / 35%);
+$white-faint: rgb(255 255 255 / 8%);
+
+$border-light: #e8eaf0;
+$border-medium: #d8dde8;
+$border-subtle: rgb(255 255 255 / 10%);
+$border-accent: rgb(253 198 50 / 30%);
+
+$tertiary-alpha-4: rgb(0 35 71 / 4%);
+$tertiary-alpha-6: rgb(0 35 71 / 6%);
+$tertiary-alpha-8: rgb(0 35 71 / 8%);
+$tertiary-alpha-10: rgb(0 35 71 / 10%);
+$tertiary-alpha-14: rgb(0 35 71 / 14%);
+$tertiary-alpha-16: rgb(0 35 71 / 16%);
+$tertiary-alpha-20: rgb(0 35 71 / 20%);
+
 $error-color: #ff0033;
+$success-color: #00b67a;
+$warning-color: #ffb200;
+
+$navy-bg: rgb(5 15 35);
+$navy-overlay: rgb(5 15 35 / 88%);
+$navy-alpha-28: rgb(5 15 35 / 28%);
+$navy-alpha-50: rgb(5 15 35 / 50%);
+$navy-alpha-58: rgb(5 15 35 / 58%);
+$navy-alpha-80: rgb(5 15 35 / 80%);
+$navy-alpha-96: rgb(5 15 35 / 96%);
+
+$badge-s1-from: #ffd54a;
+$badge-s1-to: #f59e0b;
+$badge-s1-text: #1e293b;
+$badge-s1-border: rgb(255 255 255 / 28%);
+
+$badge-s2-from: #1e3a8a;
+$badge-s2-to: #0f172a;
+$badge-s2-text: #fff;
+$badge-s2-border: rgb(255 255 255 / 14%);
+
+$tag-from: #163b65;
+$tag-to: #0a1f38;
+
+$image-overlay-from: rgb(0 35 71 / 0%);
+$image-overlay-to: rgb(0 35 71 / 20%);
+
+$radius-xs: 6px;
+$radius-sm: 8px;
+$radius-md: 10px;
+$radius-lg: 14px;
+$radius-xl: 20px;
+$radius-2xl: 28px;
+$radius-pill: 999px;
+
+$shadow-xs: 0 1px 2px $tertiary-alpha-4;
+$shadow-sm: 0 2px 8px $tertiary-alpha-6;
+$shadow-md: 0 6px 20px $tertiary-alpha-10;
+$shadow-lg: 0 12px 32px $tertiary-alpha-14;
+$shadow-xl: 0 18px 42px rgb(0 0 0 / 24%);
+
+$shadow-card-hover:
+  0 8px 24px $tertiary-alpha-8,
+  0 20px 44px $tertiary-alpha-10;
+
+$shadow-badge:
+  0 10px 24px rgb(0 0 0 / 14%),
+  0 4px 10px rgb(0 0 0 / 8%);
+
+$shadow-tag:
+  0 4px 10px $tertiary-alpha-16,
+  inset 0 1px 0 $white-faint;
+
+$z-base: 1;
+$z-dropdown: 100;
+$z-sticky: 200;
+$z-overlay: 500;
+$z-modal: 800;
+$z-toast: 1000;
+
 $font-family: "Rubik Variable", "Poppins", sans-serif;
+
+$transition-fast: 0.2s ease;
+$transition-medium: 0.25s ease;
+$transition-slow: 0.55s ease;
+
+$transition-card: 0.35s ease;
+$transition-image: 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+$space-2xs: 0.25rem;
+$space-xs: 0.5rem;
+$space-sm: 0.75rem;
+$space-md: 1rem;
+$space-lg: 1.5rem;
+$space-xl: 2rem;
+$space-2xl: 3rem;
+$space-3xl: 5rem;
 
 $breakpoints: (
   sm: 576px,
@@ -30,21 +134,194 @@ $container-max-widths: (
   xxxl: 1520px,
 );
 
-@mixin main-layout {
+@mixin down($breakpoint) {
+  $bp: map.get($breakpoints, $breakpoint);
+  @if $bp == null {
+    @error "Unknown breakpoint: #{$breakpoint}";
+  }
+  @media (max-width: calc(#{$bp} - 0.02px)) {
+    @content;
+  }
+}
+
+@mixin up($breakpoint) {
+  $bp: map.get($breakpoints, $breakpoint);
+  @if $bp == null {
+    @error "Unknown breakpoint: #{$breakpoint}";
+  }
+  @media (min-width: $bp) {
+    @content;
+  }
+}
+
+@mixin hover-supported {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @content;
+    }
+  }
+}
+
+@mixin flex-column($gap: null) {
+  display: flex;
+  flex-direction: column;
+  @if $gap != null {
+    gap: $gap;
+  }
+}
+
+@mixin flex-row($gap: null, $align: center, $justify: null) {
+  display: flex;
+  align-items: $align;
+  @if $justify != null {
+    justify-content: $justify;
+  }
+  @if $gap != null {
+    gap: $gap;
+  }
+}
+
+@mixin flex-center($gap: null) {
   display: flex;
   align-items: center;
   justify-content: center;
+  @if $gap != null {
+    gap: $gap;
+  }
+}
+
+@mixin flex-between($gap: null) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  @if $gap != null {
+    gap: $gap;
+  }
+}
+
+@mixin absolute-fill {
+  position: absolute;
+  inset: 0;
+}
+
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin line-clamp($lines) {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+}
+
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@mixin scrollbar-hidden {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@mixin interactive {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@mixin focus-ring($color: $primary-color, $offset: 2px, $radius: $radius-xs) {
+  &:focus-visible {
+    outline: 2px solid $color;
+    outline-offset: $offset;
+    border-radius: $radius;
+  }
+}
+
+@mixin glass-card($bg: rgb(255 255 255 / 8%)) {
+  background: $bg;
+  border: 1px solid $border-subtle;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@mixin warning-surface {
+  background: rgb(253 198 50 / 10%);
+  border: 1px solid rgb(253 198 50 / 24%);
+}
+
+@mixin card-surface {
+  background: $background-color;
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+}
+
+@mixin section-spacing {
+  padding-block: clamp(3rem, 6vw, 5rem);
+}
+
+@mixin main-layout {
+  @include flex-center;
   margin: calc(var(--space-2xl) + var(--space-xl)) 0 var(--space-2xl);
 }
 
-@mixin container {
+@mixin container($padding: 1rem) {
   width: 100%;
-  margin: 0 auto;
-  padding: 0 15px;
+  margin-inline: auto;
+  padding-inline: $padding;
 
   @each $name, $container-width in $container-max-widths {
     @media (min-width: map.get($breakpoints, $name)) {
       max-width: $container-width;
     }
   }
+}
+
+@mixin section-label {
+  margin: 0;
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: $primary-color;
+
+  i {
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: $primary-color-muted;
+  }
+}
+
+@mixin transition-standard {
+  transition:
+    transform $transition-medium,
+    background $transition-medium,
+    border-color $transition-medium,
+    box-shadow $transition-medium,
+    color $transition-medium;
+}
+
+@mixin transition-colors {
+  transition:
+    background $transition-fast,
+    border-color $transition-fast,
+    color $transition-fast;
+}
+
+@mixin transition-transform {
+  transition: transform $transition-fast;
 }

@@ -1,213 +1,590 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/api";
+import ConfirmDialog from "@/components/ConfirmDialog/ConfirmDialog";
+import { useConfirm } from "@/components/ConfirmDialog/useConfirm";
+import {
+    CheckIcon,
+    ClockIcon,
+    FileIcon,
+    TrashIcon,
+    WarningIcon,
+} from "@/components/Icons/Icons";
+import type {
+    ProdiInfoResponse,
+    ProdiRequestItem,
+    ProgramChoice,
+} from "@/types/api";
+import ProdiSkeleton from "./Prodi.skeleton";
 import styles from "./Prodi.module.scss";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface BiodataPendaftaran {
-    periode: string;
-    gelombang: string;
-    jurusan: string;
-    namaLengkap: string;
-    alamatEmail: string;
-    nomorNIK: string;
+interface ProdiProps {
+    regID: string;
 }
 
-interface RequestPerpindahan {
-    id: string;
-    createdAt: string;
-    previousProgramStudi: string;
-    newProgramStudi: string;
-    previousClassSession: string;
-    newClassSession: string;
-    status: string;
-    updatedAt: string;
-    notes?: string;
+function StatusBadge({
+    status,
+    t,
+}: {
+    status: ProdiRequestItem["status"];
+    t: (key: string, opts?: Record<string, string | number | Date>) => string;
+}) {
+    const config = {
+        PENDING: {
+            label: t("statusPending"),
+            color: "pending",
+            icon: <ClockIcon className={styles.statusIconSvg} />,
+        },
+        APPROVED: {
+            label: t("statusApproved"),
+            color: "approved",
+            icon: <CheckIcon className={styles.statusIconSvg} />,
+        },
+        REJECTED: {
+            label: t("statusRejected"),
+            color: "rejected",
+            icon: <WarningIcon className={styles.statusIconSvg} />,
+        },
+    };
+    const c = config[status as keyof typeof config];
+    return (
+        <span className={styles.statusBadge} data-status={c.color}>
+            {c.icon}
+            {c.label}
+        </span>
+    );
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function BiodataSection({ data }: { data: BiodataPendaftaran }) {
-    const rows: [string, string][] = [
-        ["Periode (Period)", data.periode],
-        ["Gelombang (Group)", data.gelombang],
-        ["Jurusan (Study Program)", data.jurusan],
-        ["Nama Lengkap (Full Name)", data.namaLengkap],
-        ["Alamat Email (Email)", data.alamatEmail],
-        ["Nomor NIK (National Identification Number)", data.nomorNIK],
+export default function Prodi({ regID }: ProdiProps) {
+    const router = useRouter();
+    const locale = useLocale();
+    const t = useTranslations("prodi");
+    const shiftLabel = useCallback(
+        (shift: string) =>
+            shift === "PAGI" ? t("shiftMorning") : t("shiftEvening"),
+        [t],
+    );
+    const shiftOptions = [
+        { value: "PAGI", label: t("shiftMorning") },
+        { value: "MALAM", label: t("shiftEvening") },
     ];
 
-    return (
-        <div className={styles.biodataInfo}>
-            {rows.map(([label, value]) => (
-                <div key={label} className={styles.infoRow}>
-                    <span className={styles.infoLabel}>{label}</span>
-                    <span className={styles.infoValue}>: {value || "-"}</span>
-                </div>
-            ))}
-        </div>
+    const [data, setData] = useState<ProdiInfoResponse | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isCancelling, setIsCancelling] = useState<string | null>(null);
+    const [newProdi, setNewProdi] = useState("");
+    const [newShift, setNewShift] = useState("");
+
+    const { confirm, dialogProps, setLoading } = useConfirm();
+
+    const hasPending = useMemo(
+        () => data?.requests.some((r) => r.status === "PENDING") ?? false,
+        [data],
     );
-}
 
-const TABLE_HEADERS = [
-    "Tanggal Request (Request Date)",
-    "Program Studi Sebelumnya (Previous Major)",
-    "Program Studi Perpindahan (New Major)",
-    "Waktu Kuliah Sebelumnya (Previous Shift)",
-    "Waktu Kuliah Perpindahan (New Shift)",
-    "Status Validasi (Validation Status)",
-    "Tanggal Validasi (Validation Date)",
-    "Catatan (Notes)",
-];
-
-function RequestTable({ requests }: { requests: RequestPerpindahan[] }) {
-    return (
-        <div className={styles.tableWrapper}>
-            <table>
-                <thead>
-                    <tr>
-                        {TABLE_HEADERS.map((h) => (
-                            <th key={h}>{h}</th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {requests.length === 0 ? (
-                        <tr>
-                            <td
-                                className={styles.emptyRow}
-                                colSpan={TABLE_HEADERS.length}
-                            >
-                                Belum ada request perpindahan prodi. (No major
-                                change requests yet.)
-                            </td>
-                        </tr>
-                    ) : (
-                        requests.map((req) => (
-                            <tr key={req.id}>
-                                <td>{req.createdAt.split(" ")[0]}</td>
-                                <td>{req.previousProgramStudi}</td>
-                                <td>{req.newProgramStudi}</td>
-                                <td>{req.previousClassSession}</td>
-                                <td>{req.newClassSession}</td>
-                                <td>{req.status}</td>
-                                <td>{req.updatedAt.split(" ")[0]}</td>
-                                <td>{req.notes || "-"}</td>
-                            </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
-        </div>
-    );
-}
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
-export default function PerubahanProdiPage() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const regID = searchParams.get("regID");
-
-    const [isFetchingData, setIsFetchingData] = useState(false);
-    const [biodata, setBiodata] = useState<BiodataPendaftaran>({
-        periode: "",
-        gelombang: "",
-        jurusan: "",
-        namaLengkap: "",
-        alamatEmail: "",
-        nomorNIK: "",
-    });
-
-    const [requests, setRequests] = useState<RequestPerpindahan[]>([]);
+    const refresh = async () => {
+        setIsLoading(true);
+        try {
+            const res = await api.prodi.get(regID, locale);
+            setData(res);
+            setNewProdi("");
+            setNewShift("");
+        } catch (err) {
+            toast.error(
+                err instanceof Error ? err.message : t("toastLoadError"),
+            );
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        if (!regID) return;
+        let active = true;
 
-        const fetchData = async () => {
-            setIsFetchingData(true);
+        async function init() {
+            setIsLoading(true);
             try {
-                const res = await api.profile.getRegistration(regID);
-                if (res) {
-                    const { registration, user, current_prodi } = res;
-                    setBiodata({
-                        periode: registration.academic_year || "-",
-                        gelombang: registration.batch_name || "-",
-                        jurusan: current_prodi || "-",
-                        namaLengkap: user.full_name || "-",
-                        alamatEmail: user.email || "-",
-                        nomorNIK: user.nik || "-",
-                    });
-                }
-
-                const history = await api.prodiChange.getHistory();
-                setRequests(
-                    history
-                        .filter((r) => r.registration_id === regID)
-                        .map((r) => ({
-                            id: r.id,
-                            createdAt: r.created_at,
-                            previousProgramStudi: r.previous_program_studi,
-                            newProgramStudi: r.new_program_studi,
-                            previousClassSession: r.previous_class_session,
-                            newClassSession: r.new_class_session,
-                            status: r.status,
-                            updatedAt: r.updated_at,
-                            notes: r.notes,
-                        })),
-                );
+                const res = await api.prodi.get(regID, locale);
+                if (!active) return;
+                setData(res);
+                setNewProdi("");
+                setNewShift("");
             } catch (err) {
-                console.error("Failed to fetch registration details", err);
-                toast.error("Gagal mengambil data pendaftaran.");
+                if (!active) return;
+                toast.error(
+                    err instanceof Error ? err.message : t("toastLoadError"),
+                );
             } finally {
-                setIsFetchingData(false);
+                if (active) setIsLoading(false);
             }
-        };
+        }
 
-        fetchData();
-    }, [regID]);
+        init();
+
+        return () => {
+            active = false;
+        };
+    }, [regID, locale, t]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newProdi || !newShift) {
+            toast.error(t("toastFillFields"));
+            return;
+        }
+        if (
+            newProdi === data?.current_prodi &&
+            newShift === data?.current_shift
+        ) {
+            toast.error(t("toastNoChange"));
+            return;
+        }
+
+        setIsSubmitting(true);
+        const toastId = toast.loading(t("toastSubmitting"));
+        try {
+            await api.prodi.post(regID, newProdi, newShift, locale);
+            toast.success(t("toastSubmitSuccess"), { id: toastId });
+            await refresh();
+        } catch (err) {
+            toast.error(
+                err instanceof Error ? err.message : t("toastSubmitError"),
+                { id: toastId },
+            );
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleCancel = async (requestId: string) => {
+        const confirmed = await confirm({
+            title: t("cancelDialogTitle"),
+            message: t("cancelDialogMessage"),
+            confirmLabel: t("cancelDialogConfirm"),
+            cancelLabel: t("cancelDialogDeny"),
+            variant: "danger",
+        });
+        if (!confirmed) return;
+
+        setIsCancelling(requestId);
+        setLoading(true);
+        const toastId = toast.loading(t("toastCancelling"));
+        try {
+            await api.prodi.delete(regID, requestId, locale);
+            toast.success(t("toastCancelSuccess"), { id: toastId });
+            await refresh();
+        } catch (err) {
+            toast.error(
+                err instanceof Error ? err.message : t("toastCancelError"),
+                { id: toastId },
+            );
+        } finally {
+            setIsCancelling(null);
+            setLoading(false);
+        }
+    };
+
+    if (isLoading) return <ProdiSkeleton />;
+    if (!data) return null;
 
     return (
-        <main className={styles.page}>
-            <div className={styles.container}>
-                <h2 className={styles.sectionTitle}>
-                    Biodata Pendaftaran (Registration Data)
-                </h2>
-                {isFetchingData ? (
-                    <p>Loading...</p>
-                ) : (
-                    <BiodataSection data={biodata} />
-                )}
-
-                <h3 className={styles.tableTitle}>
-                    Daftar Request Pemindahan Prodi (List of Major Change
-                    Requests)
-                </h3>
-                <RequestTable requests={requests} />
-
-                <div className={styles.bottomActions}>
+        <section className={styles.prodi}>
+            <div className={styles.prodiContent}>
+                <div className={styles.pageHeader}>
                     <button
-                        className={styles.btnWarning}
-                        onClick={() => router.back()}
+                        type="button"
+                        className={styles.backLink}
+                        onClick={() => router.push("/account")}
                     >
-                        ← Kembali (Back)
-                    </button>
-                    <button
-                        className={styles.btnSuccess}
-                        onClick={() =>
-                            router.push(
-                                `/account/prodi/change-prodi?regID=${regID}`,
-                            )
-                        }
-                    >
-                        + Request Perpindahan Prodi (Request Major Change)
+                        <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                        >
+                            <path d="M19 12H5M12 19l-7-7 7-7" />
+                        </svg>
+                        {t("backToAccount")}
                     </button>
                 </div>
+
+                <div className={styles.layoutGrid}>
+                    <div className={styles.mainColumn}>
+                        <div className={styles.card}>
+                            <div className={styles.cardHeader}>
+                                <ClockIcon className={styles.cardHeaderIcon} />
+                                <h2 className={styles.cardTitle}>
+                                    {t("requestHistory")}
+                                </h2>
+                            </div>
+
+                            {data.requests.length === 0 ? (
+                                <div className={styles.emptyState}>
+                                    <FileIcon className={styles.emptyIcon} />
+                                    <h3 className={styles.emptyTitle}>
+                                        {t("emptyTitle")}
+                                    </h3>
+                                    <p className={styles.emptyText}>
+                                        {t("emptyText")}
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className={styles.historyList}>
+                                    {data.requests.map((req) => (
+                                        <div
+                                            key={req.id}
+                                            className={styles.historyItem}
+                                        >
+                                            <div className={styles.itemHeader}>
+                                                <div
+                                                    className={styles.itemDate}
+                                                >
+                                                    <span
+                                                        className={
+                                                            styles.dateDay
+                                                        }
+                                                    >
+                                                        {new Date(
+                                                            req.request_date,
+                                                        ).getDate()}
+                                                    </span>
+                                                    <span
+                                                        className={
+                                                            styles.dateMonth
+                                                        }
+                                                    >
+                                                        {new Date(
+                                                            req.request_date,
+                                                        ).toLocaleDateString(
+                                                            "id-ID",
+                                                            {
+                                                                month: "short",
+                                                            },
+                                                        )}
+                                                    </span>
+                                                    <span
+                                                        className={
+                                                            styles.dateYear
+                                                        }
+                                                    >
+                                                        {new Date(
+                                                            req.request_date,
+                                                        ).getFullYear()}
+                                                    </span>
+                                                </div>
+
+                                                <div
+                                                    className={
+                                                        styles.itemControls
+                                                    }
+                                                >
+                                                    <StatusBadge
+                                                        status={
+                                                            req.status as ProdiRequestItem["status"]
+                                                        }
+                                                        t={t}
+                                                    />
+                                                    {req.status ===
+                                                        "PENDING" && (
+                                                            <button
+                                                                type="button"
+                                                                className={`${styles.btnIcon} ${styles.btnIconDanger}`}
+                                                                onClick={() =>
+                                                                    handleCancel(
+                                                                        req.id,
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    isCancelling ===
+                                                                    req.id
+                                                                }
+                                                                aria-label={t(
+                                                                    "cancelRequest",
+                                                                )}
+                                                                title={t(
+                                                                    "cancelRequest",
+                                                                )}
+                                                            >
+                                                                <TrashIcon />
+                                                            </button>
+                                                        )}
+                                                </div>
+                                            </div>
+
+                                            <div className={styles.itemRoute}>
+                                                <div
+                                                    className={
+                                                        styles.routeOrigin
+                                                    }
+                                                >
+                                                    <span
+                                                        className={
+                                                            styles.routeLabel
+                                                        }
+                                                    >
+                                                        {t("routeFrom")}
+                                                    </span>
+                                                    <span
+                                                        className={
+                                                            styles.routeValue
+                                                        }
+                                                    >
+                                                        {req.previous_prodi}{" "}
+                                                        <span
+                                                            className={
+                                                                styles.routeShift
+                                                            }
+                                                        >
+                                                            (
+                                                            {shiftLabel(
+                                                                req.previous_shift,
+                                                            )}
+                                                            )
+                                                        </span>
+                                                    </span>
+                                                </div>
+
+                                                <svg
+                                                    width="14"
+                                                    height="14"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    strokeWidth="2"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    className={
+                                                        styles.routeArrow
+                                                    }
+                                                >
+                                                    <path d="M5 12h14M12 5l7 7-7 7" />
+                                                </svg>
+
+                                                <div
+                                                    className={
+                                                        styles.routeTarget
+                                                    }
+                                                >
+                                                    <span
+                                                        className={
+                                                            styles.routeLabel
+                                                        }
+                                                    >
+                                                        {t("routeTo")}
+                                                    </span>
+                                                    <span
+                                                        className={
+                                                            styles.routeValue
+                                                        }
+                                                    >
+                                                        {req.new_prodi}{" "}
+                                                        <span
+                                                            className={
+                                                                styles.routeShift
+                                                            }
+                                                        >
+                                                            (
+                                                            {shiftLabel(
+                                                                req.new_shift,
+                                                            )}
+                                                            )
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className={styles.card}>
+                            <div className={styles.cardHeader}>
+                                <FileIcon className={styles.cardHeaderIcon} />
+                                <h2 className={styles.cardTitle}>
+                                    {t("formTitle")}
+                                </h2>
+                            </div>
+
+                            {hasPending ? (
+                                <div className={styles.warningBlock}>
+                                    <WarningIcon />
+                                    <div>
+                                        <div className={styles.warningTitle}>
+                                            {t("pendingWarningTitle")}
+                                        </div>
+                                        <p className={styles.warningText}>
+                                            {t("pendingWarningText")}
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <form onSubmit={handleSubmit}>
+                                    <div className={styles.formGrid}>
+                                        <div className={styles.formGroup}>
+                                            <label className={styles.formLabel}>
+                                                {t("currentProgram")}
+                                            </label>
+                                            <div
+                                                className={styles.readOnlyValue}
+                                            >
+                                                {data.current_prodi}
+                                            </div>
+                                        </div>
+                                        <div className={styles.formGroup}>
+                                            <label className={styles.formLabel}>
+                                                {t("currentSchedule")}
+                                            </label>
+                                            <div
+                                                className={styles.readOnlyValue}
+                                            >
+                                                {shiftLabel(data.current_shift)}
+                                            </div>
+                                        </div>
+                                        <div className={styles.formGroup}>
+                                            <label
+                                                className={styles.formLabel}
+                                                htmlFor="newProdi"
+                                            >
+                                                {t("newProgram")}
+                                            </label>
+                                            <select
+                                                id="newProdi"
+                                                className={styles.select}
+                                                value={newProdi}
+                                                onChange={(e) =>
+                                                    setNewProdi(e.target.value)
+                                                }
+                                                required
+                                            >
+                                                <option value="">
+                                                    {t("selectProgram")}
+                                                </option>
+                                                {data.available_programs.map(
+                                                    (opt: ProgramChoice) => (
+                                                        <option
+                                                            key={opt.code}
+                                                            value={opt.code}
+                                                        >
+                                                            {opt.title}
+                                                        </option>
+                                                    ),
+                                                )}
+                                            </select>
+                                        </div>
+                                        <div className={styles.formGroup}>
+                                            <label
+                                                className={styles.formLabel}
+                                                htmlFor="newShift"
+                                            >
+                                                {t("newSchedule")}
+                                            </label>
+                                            <select
+                                                id="newShift"
+                                                className={styles.select}
+                                                value={newShift}
+                                                onChange={(e) =>
+                                                    setNewShift(e.target.value)
+                                                }
+                                                required
+                                            >
+                                                <option value="">
+                                                    {t("selectSchedule")}
+                                                </option>
+                                                {shiftOptions.map((opt) => (
+                                                    <option
+                                                        key={opt.value}
+                                                        value={opt.value}
+                                                    >
+                                                        {opt.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className={styles.formActions}>
+                                        <button
+                                            type="button"
+                                            className={`${styles.btn} ${styles.btnSecondaryOutline}`}
+                                            onClick={() =>
+                                                router.push("/account")
+                                            }
+                                            disabled={isSubmitting}
+                                        >
+                                            {t("cancel")}
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className={`${styles.btn} ${styles.btnPrimary}`}
+                                            disabled={isSubmitting}
+                                        >
+                                            {t("submit")}
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+                        </div>
+                    </div>
+
+                    <aside className={styles.sideColumn}>
+                        <div className={styles.card}>
+                            <div className={styles.cardHeader}>
+                                <FileIcon className={styles.cardHeaderIcon} />
+                                <h2 className={styles.cardTitle}>
+                                    {t("infoTitle")}
+                                </h2>
+                            </div>
+                            <div className={styles.detailsGrid}>
+                                <div className={styles.infoItem}>
+                                    <span className={styles.infoLabel}>
+                                        {t("infoBatch")}
+                                    </span>
+                                    <span className={styles.infoValue}>
+                                        {data.batch_name}
+                                    </span>
+                                </div>
+                                <div className={styles.infoItem}>
+                                    <span className={styles.infoLabel}>
+                                        {t("infoAcademicYear")}
+                                    </span>
+                                    <span className={styles.infoValue}>
+                                        {data.academic_year}/
+                                        {Number(data.academic_year) + 1}
+                                    </span>
+                                </div>
+                                <div className={styles.infoItem}>
+                                    <span className={styles.infoLabel}>
+                                        {t("infoCurrentProgram")}
+                                    </span>
+                                    <span className={styles.infoValue}>
+                                        {data.current_prodi}
+                                    </span>
+                                </div>
+                                <div className={styles.infoItem}>
+                                    <span className={styles.infoLabel}>
+                                        {t("infoCurrentSchedule")}
+                                    </span>
+                                    <span className={styles.infoValue}>
+                                        {shiftLabel(data.current_shift)}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
             </div>
-        </main>
+
+            <ConfirmDialog {...dialogProps} />
+        </section>
     );
 }

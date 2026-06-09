@@ -154,13 +154,13 @@ func Login(db *sql.DB, ts *auth.TokenStore, emailLimiter *auth.RateLimiter, al *
 
 		sessionID := utils.GenerateUUIDString()
 
-		accessToken, err := auth.GenerateAccessToken(user.ID.String(), sessionID, user.Email)
+		accessToken, err := auth.GenerateAccessToken(user.ID.String(), sessionID)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
-		refreshToken, err := auth.GenerateRefreshToken(user.ID.String(), sessionID, user.Email)
+		refreshToken, err := auth.GenerateRefreshToken(user.ID.String(), sessionID)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return

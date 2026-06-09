@@ -1,0 +1,96 @@
+// ─── Back Link ──────────────────────────────────────────────────────────────
+
+.backLink {
+  color: transparent;
+  background: #ebebeb;
+  border-color: #ebebeb;
+  cursor: default;
+  pointer-events: none;
+
+  span {
+    display: inline-block;
+  }
+}
+
+// ─── Card Header ──────────────────────────────────────────────────────────
+
+.headerIcon {
+  color: transparent;
+
+  span {
+    display: block;
+  }
+}
+
+.cardTitle {
+  margin: 0;
+  flex: 1;
+
+  span {
+    display: inline-block;
+  }
+}
+
+// ─── Info Items ─────────────────────────────────────────────────────────────
+
+.infoLabel {
+  display: block;
+  margin-bottom: 0.35em;
+
+  span {
+    display: inline-block;
+  }
+}
+
+.infoValue {
+  display: block;
+
+  span {
+    display: inline-block;
+  }
+}
+
+// ─── Form Groups ────────────────────────────────────────────────────────────
+
+.formLabel {
+  display: block;
+  margin-bottom: 0.35em;
+
+  span {
+    display: inline-block;
+  }
+}
+
+.readOnlyValue {
+  background: #ebebeb;
+  color: transparent;
+  border-color: #ebebeb;
+
+  span {
+    display: inline-block;
+  }
+}
+
+// ─── History Item ───────────────────────────────────────────────────────────
+
+.dateDay,
+.dateMonth,
+.dateYear {
+  span {
+    display: inline-block;
+  }
+}
+
+.routeValue {
+  span {
+    display: inline-block;
+  }
+}
+
+// ─── Form Actions ─────────────────────────────────────────────────────────
+
+.formActions {
+  span {
+    display: inline-block;
+  }
+}

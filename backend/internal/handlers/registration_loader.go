@@ -412,11 +412,11 @@ func loadPaymentData(r *http.Request, db *sql.DB, regID uuid.UUID, form *models.
 func formatDelimitedValue(fileName string, sizeBytes uint64) string {
 	var buf [24]byte
 	b := strconv.AppendUint(buf[:0], sizeBytes, 10)
-	
+
 	res := make([]byte, len(fileName)+1+len(b))
 	copy(res, fileName)
 	res[len(fileName)] = '|'
 	copy(res[len(fileName)+1:], b)
-	
+
 	return string(res)
 }

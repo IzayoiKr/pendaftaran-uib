@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -18,58 +17,75 @@ func RegistrationInit(db *sql.DB) http.HandlerFunc {
 		batchKey := chi.URLParam(r, "batchKey")
 		lang := utils.Lang(r)
 
-		var (
-			batchName, degree, batchType string
-			programsJSON, feeJSON json.RawMessage
-		)
+		var batchName, degree, batchType string
+		var bankName, accountHolder, accountNumber string
+		var amount int
 
 		err := db.QueryRowContext(r.Context(),
 			`SELECT
-				g.batch_name,
-				g.degree,
-				g.batch_type,
-				(
-					SELECT JSON_ARRAYAGG(
-						JSON_OBJECT('code', ps.code, 'title', ps.title)
-					)
-					FROM program_studi ps
-					WHERE ps.is_active = 1 AND ps.degree = g.degree
-					ORDER BY ps.sort_order ASC
-				) as programs,
-				(
-					SELECT JSON_OBJECT(
-						'bank_name', COALESCE(rf.bank_name, 'OCBC NISP'),
-						'account_holder', COALESCE(rf.account_holder, 'Universitas Internasional Batam'),
-						'account_number', COALESCE(rf.account_number, '-'),
-						'amount', COALESCE(rf.amount, 0)
-					)
-					FROM (SELECT 1) d
-					LEFT JOIN registration_fee rf ON rf.degree = g.degree AND rf.batch_type = g.batch_type
-				) as fee
+				g.batch_name, g.degree, g.batch_type,
+				rf.bank_name,
+				rf.account_holder,
+				rf.account_number,
+				rf.amount
 			 FROM gelombang g
 			 INNER JOIN gelombang_detail gd ON gd.gelombang_id = g.id
+			 LEFT JOIN registration_fee rf ON rf.degree = g.degree AND rf.batch_type = g.batch_type
 			 WHERE g.batch_key = ?
 			   AND gd.registration_start <= CURRENT_DATE()
-			   AND gd.registration_end >= CURRENT_DATE()`,
+			   AND gd.registration_end >= CURRENT_DATE()
+			 LIMIT 1`,
 			batchKey,
-		).Scan(&batchName, &degree, &batchType, &programsJSON, &feeJSON)
+		).Scan(&batchName, &degree, &batchType, &bankName, &accountHolder, &accountNumber, &amount)
 
 		if errors.Is(err, sql.ErrNoRows) {
 			utils.WriteJSON(w, http.StatusNotFound, utils.ErrJSON(i18n.T("registration.not_found", lang)))
 			return
 		}
 		if err != nil {
-			slog.Error("registration_init: query error", "error", err)
+			slog.Error("registration_init: batch query error", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
 		}
 
+		rows, err := db.QueryContext(r.Context(),
+			`SELECT code FROM program_studi
+			 WHERE is_active = 1 AND degree = ?
+			 ORDER BY sort_order ASC`,
+			degree,
+		)
+		if err != nil {
+			slog.Error("registration_init: programs query error", "error", err)
+			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
+			return
+		}
+		defer rows.Close()
+
+		programs := make([]models.ProgramChoice, 0, 20)
+		for rows.Next() {
+			var code string
+			if err := rows.Scan(&code); err != nil {
+				slog.Error("registration_init: program scan error", "error", err)
+				utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
+				return
+			}
+			programs = append(programs, models.ProgramChoice{
+				Code:  code,
+				Title: i18n.T("program."+code+".title", lang),
+			})
+		}
+
 		utils.WriteJSON(w, http.StatusOK, models.RegistrationInitDTO{
-			BatchName:       batchName,
-			Degree:          degree,
-			BatchType:       batchType,
-			Programs:        programsJSON,
-			RegistrationFee: feeJSON,
+			BatchName: batchName,
+			Degree:    degree,
+			BatchType: batchType,
+			Programs:  programs,
+			RegistrationFee: models.RegistrationFee{
+				BankName:      bankName,
+				AccountHolder: accountHolder,
+				AccountNumber: accountNumber,
+				Amount:        amount,
+			},
 		})
 	}
 }

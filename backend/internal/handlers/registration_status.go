@@ -31,7 +31,7 @@ func RegistrationStatus(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		userID, err := uuid.Parse(claims.UserID)
+		userID, err := uuid.Parse(claims.Subject)
 		if err != nil {
 			slog.Error("registration_status: parse uuid from claims", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
@@ -41,7 +41,7 @@ func RegistrationStatus(db *sql.DB) http.HandlerFunc {
 		var (
 			regID uuid.UUID
 			status string
-			degree string 
+			degree string
 		)
 
 		err = db.QueryRowContext(r.Context(), `

@@ -42,7 +42,7 @@ $bg-light: #f9fafb;
 @mixin input-template {
   font-size: var(--step--1);
   font-family: global.$font-family;
-  color: global.$text-color2;
+  color: global.$text-color-dark;
   width: 100%;
   height: auto;
   min-height: 48px;

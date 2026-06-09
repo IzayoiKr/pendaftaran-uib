@@ -1,3 +1,5 @@
+@use "@/styles/config.scss" as global;
+
 .sectionTitle {
   width: 10rem;
   height: var(--step-3);
@@ -7,37 +9,78 @@
 .sectionSubtitle {
   width: 16rem;
   height: var(--step-0);
-  margin: 0 auto var(--space-l);
+  margin: 0 auto;
 }
 
 .cardImage {
   width: 100%;
   aspect-ratio: 1080 / 849;
-  height: auto;
+  display: block;
+  border-radius: inherit;
 }
 
 .badge {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
-  position: absolute;
-  top: -2rem;
-  right: 1rem;
+  width: clamp(3rem, 2.7344rem + 1.3281vw, 4.0625rem);
+  height: clamp(3rem, 2.7344rem + 1.3281vw, 4.0625rem);
+  border-radius: global.$radius-pill;
+  align-self: flex-end;
+  margin-top: calc(clamp(3rem, 2.7344rem + 1.3281vw, 4.0625rem) / -2);
+  margin-right: clamp(0.75rem, 0.625rem + 0.4vw, 1rem);
+  flex-shrink: 0;
 }
 
 .tag {
-  display: inline-block;
-  width: 6rem;
-  height: 1.5rem;
+  width: 7rem;
+  height: 1.75rem;
+  border-radius: global.$radius-sm;
+  margin-bottom: var(--space-xs);
 }
 
 .cardTitle {
-  width: 80%;
-  height: var(--step-1);
-  margin: var(--space-xs) 0;
+  width: 85%;
+  height: var(--step-0);
+  margin-bottom: var(--space-xs);
+}
+
+.descriptionClamp {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-xs) / 2);
+  min-height: 5.5rem;
+  margin-bottom: var(--space-sm);
 }
 
 .cardText {
   width: 100%;
-  height: var(--step--1);
+  height: 0.875rem;
+  line-height: 1.7;
+
+  &:last-child {
+    width: 65%;
+  }
+}
+
+.toggleBtn {
+  width: 5.5rem;
+  height: 2.5rem;
+  border-radius: global.$radius-pill;
+}
+
+.navBtnSkeleton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.navCircle {
+  width: 100%;
+  height: 100%;
+  line-height: 1;
+}
+
+.dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  flex-shrink: 0;
 }

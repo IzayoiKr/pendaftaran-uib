@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 import type { InfoMeta } from "@/constants/infoUmum";
@@ -10,35 +11,38 @@ interface InfoCardProps {
 }
 
 export default function InfoCard({ post }: InfoCardProps) {
+    const t = useTranslations();
+
     return (
         <Link
             href={post.detailLink}
             className={styles.card}
-            aria-label={post.titleId}
+            aria-label={t(post.titleKey)}
         >
             <div className={styles.imageWrap}>
                 <Image
                     src={post.image}
-                    alt={post.titleId}
+                    alt={t(post.titleKey)}
                     fill
                     className={styles.image}
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
             </div>
 
             <div className={styles.body}>
-                <h2 className={styles.title}>{post.titleId}</h2>
+                <h2 className={styles.title}>{t(post.titleKey)}</h2>
 
-                <p className={styles.description}>{post.excerpt}</p>
+                <p className={styles.description}>{t(post.excerptKey)}</p>
 
                 <span className={styles.cta} aria-hidden="true">
-                    Baca Selengkapnya
+                    {t("common.readMore")}
+
                     <svg
                         className={styles.arrow}
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="2"
+                        strokeWidth={2}
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     >

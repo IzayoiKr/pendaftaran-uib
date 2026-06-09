@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
-	"regexp"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -112,7 +110,7 @@ func (rl *RateLimiter) RateLimitUser(next http.Handler) http.HandlerFunc {
 			utils.WriteJSON(w, http.StatusUnauthorized, utils.ErrJSON("unauthorized"))
 			return
 		}
-		allowed, retryAfter := rl.Allow(claims.UserID)
+		allowed, retryAfter := rl.Allow(claims.Subject)
 		if !allowed {
 			rateLimitResponse(w, retryAfter)
 			return
@@ -129,8 +127,8 @@ func RateLimitRefresh(ipLimiter, userLimiter *RateLimiter, next http.Handler) ht
 		}
 
 		if cookie, err := r.Cookie("refresh_token"); err == nil {
-			if claims, err := ValidateToken(cookie.Value); err == nil && claims.UserID != "" {
-				if allowed, retry := userLimiter.Allow(claims.UserID); !allowed {
+			if claims, err := ValidateToken(cookie.Value); err == nil && claims.Subject != "" {
+				if allowed, retry := userLimiter.Allow(claims.Subject); !allowed {
 					rateLimitResponse(w, retry)
 					return
 				}
@@ -147,23 +145,6 @@ func rateLimitResponse(w http.ResponseWriter, retryAfter time.Duration) {
 	utils.WriteJSON(w, http.StatusTooManyRequests, utils.ErrJSON(
 		fmt.Sprintf("terlalu banyak percobaan, coba lagi dalam %d detik", secs),
 	))
-}
-
-func deviceKey(r *http.Request) string {
-	ip := utils.RealIP(r)
-	deviceID := r.Header.Get("X-Device-ID")
-	if isValidDeviceID(deviceID) {
-		return ip + ":" + deviceID
-	}
-	return ip
-}
-
-var uuidPattern = regexp.MustCompile(
-	`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`,
-)
-
-func isValidDeviceID(s string) bool {
-	return uuidPattern.MatchString(strings.ToLower(s))
 }
 
 func (rl *RateLimiter) periodicCleanup() {

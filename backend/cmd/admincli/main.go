@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"flag"
 	"fmt"
 	"log/slog"
@@ -10,7 +11,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/joho/godotenv"
+	// Uncomment this if you are not using docker/podman
+	// "github.com/joho/godotenv"
 	"pendaftaran-uib/backend/internal/db"
 	"pendaftaran-uib/backend/internal/loa"
 
@@ -25,7 +27,11 @@ func main() {
 	}))
 	slog.SetDefault(logger)
 
-	_ = godotenv.Load() // Ignore error if .env doesn't exist
+	// Uncomment this if you are not using docker/podman
+	// if err := godotenv.Load(); err != nil {
+	// 	slog.Error("error loading .env file", "error", err)
+	// 	os.Exit(1)
+	// }
 
 	provider, err := db.NewProvider(ctx)
 	if err != nil {
@@ -68,6 +74,23 @@ func main() {
 		}
 		cmdLoaSetAssessment(ctx, provider.MySQL, os.Args[2:])
 
+	case "prodi-list":
+		cmdProdiList(ctx, provider.MySQL, os.Args[2:])
+	case "prodi-approve":
+		if len(os.Args) < 3 {
+			slog.Error("missing required request_id positional argument", "command", commandVerb)
+			printUsage()
+			os.Exit(1)
+		}
+		cmdProdiApprove(ctx, provider.MySQL, os.Args[2:])
+	case "prodi-reject":
+		if len(os.Args) < 3 {
+			slog.Error("missing required request_id positional argument", "command", commandVerb)
+			printUsage()
+			os.Exit(1)
+		}
+		cmdProdiReject(ctx, provider.MySQL, os.Args[2:])
+
 	default:
 		slog.Error("unrecognized or invalid administration tool instruction", "input", commandVerb)
 		printUsage()
@@ -104,7 +127,16 @@ Commands:
             --s2-package=<1-3>        S2 package ID (1=Umum, 2=Sivitas/Alumni, 3=FastTrack)
             --no-matriculation        Waive the matriculation fee (default: required)
 
-          The command detects degree (S1 or S2) automatically from the registration.`)
+          The command detects degree (S1 or S2) automatically from the registration.
+
+  prodi-list  [--status=PENDING|APPROVED|REJECTED] [--limit=20]
+		  List major change requests with applicant details.
+
+  prodi-approve  <request_id>
+		  Approve a pending major change request. Updates registration_s1_detail.
+
+  prodi-reject   <request_id>
+  		  Reject a pending major change request with optional reason.`)
 }
 
 func cmdList(ctx context.Context, dbConn *sql.DB, args []string) {
@@ -118,7 +150,7 @@ func cmdList(ctx context.Context, dbConn *sql.DB, args []string) {
 	}
 
 	query := `
-		SELECT 
+		SELECT
 			r.id,
 			u.email,
 			u.full_name,
@@ -252,7 +284,7 @@ func cmdVerify(ctx context.Context, dbConn *sql.DB, args []string) {
 	examineeID := generateExamineeID(ctx, tx, regID)
 
 	res, err := tx.ExecContext(ctx, `
-		UPDATE registration 
+		UPDATE registration
 		SET status = 'VERIFIED', examinee_id = ?, updated_at = NOW()
 		WHERE id = ? AND status = 'SUBMITTED'`,
 		examineeID, regID[:],
@@ -425,7 +457,7 @@ func cmdReject(ctx context.Context, dbConn *sql.DB, args []string) {
 	}
 
 	res, err := tx.ExecContext(ctx, `
-		UPDATE registration 
+		UPDATE registration
 		SET status = 'REJECTED',
 		    feedback_document = ?,
 		    feedback_payment = ?,
@@ -473,8 +505,8 @@ func cmdReset(ctx context.Context, dbConn *sql.DB, args []string) {
 	regID := parseRegID(positionalArgs[0])
 
 	res, err := dbConn.ExecContext(ctx, `
-		UPDATE registration 
-		SET status = 'DRAFT', 
+		UPDATE registration
+		SET status = 'DRAFT',
 		    examinee_id = NULL,
 		    feedback_document = NULL,
 		    feedback_payment = NULL,
@@ -681,7 +713,7 @@ func generateExamineeID(ctx context.Context, tx *sql.Tx, regID uuid.UUID) string
 	var assignedSequence int
 
 	_, err = tx.ExecContext(ctx, `
-		INSERT INTO examinee_sequence (gelombang_id, prefix_key, next_value) 
+		INSERT INTO examinee_sequence (gelombang_id, prefix_key, next_value)
 		VALUES (?, ?, 1)
 		ON DUPLICATE KEY UPDATE next_value = LAST_INSERT_ID(next_value + 1)`,
 		gelombangID[:], prefixKey,
@@ -702,4 +734,188 @@ func generateExamineeID(ctx context.Context, tx *sql.Tx, regID uuid.UUID) string
 	}
 
 	return fmt.Sprintf("%s%04d", prefixKey, assignedSequence)
+}
+
+func cmdProdiList(ctx context.Context, dbConn *sql.DB, args []string) {
+	fs := flag.NewFlagSet("prodi-list", flag.ContinueOnError)
+	statusFlag := fs.String("status", "", "Filter by status (PENDING, APPROVED, REJECTED)")
+	limitFlag := fs.Int("limit", 20, "Maximum rows")
+
+	if err := fs.Parse(args); err != nil {
+		os.Exit(1)
+	}
+
+	query := `
+		SELECT
+			mcr.id,
+			u.email,
+			u.full_name,
+			g.batch_name,
+			old_ps.code,
+			mcr.old_session,
+			new_ps.code,
+			mcr.new_session,
+			mcr.status,
+			mcr.requested_at
+		FROM major_change_request mcr
+		INNER JOIN registration reg ON reg.id = mcr.registration_id
+		INNER JOIN users u ON u.id = reg.user_id
+		INNER JOIN gelombang g ON g.id = reg.gelombang_id
+		LEFT  JOIN program_studi old_ps ON old_ps.id = mcr.old_program_studi_id
+		LEFT  JOIN program_studi new_ps ON new_ps.id = mcr.new_program_studi_id
+		WHERE 1=1`
+	var params []any
+
+	if *statusFlag != "" {
+		query += " AND mcr.status = ?"
+		params = append(params, strings.ToUpper(*statusFlag))
+	}
+
+	query += " ORDER BY mcr.requested_at DESC LIMIT ?"
+	params = append(params, *limitFlag)
+
+	rows, err := dbConn.QueryContext(ctx, query, params...)
+	if err != nil {
+		slog.Error("prodi-list query failed", "error", err)
+		os.Exit(1)
+	}
+	defer rows.Close()
+
+	fmt.Printf("%-6s %-30s %-25s %-20s %-20s %-8s %-20s %-8s %-10s %s\n",
+		"ID", "EMAIL", "NAME", "BATCH", "OLD_PRODI", "OLD_SES", "NEW_PRODI", "NEW_SES", "STATUS", "REQUESTED")
+	fmt.Println(strings.Repeat("-", 170))
+
+	for rows.Next() {
+		var id int64
+		var email, fullName, batchName, oldProdi, oldSession, newProdi, newSession, status, requestedAt string
+
+		if err := rows.Scan(&id, &email, &fullName, &batchName, &oldProdi, &oldSession,
+			&newProdi, &newSession, &status, &requestedAt); err != nil {
+			slog.Error("prodi-list scan failed", "error", err)
+			os.Exit(1)
+		}
+
+		cleanTime := requestedAt
+		if len(cleanTime) > 19 {
+			cleanTime = cleanTime[:19]
+		}
+
+		fmt.Printf("%-6d %-30s %-25s %-20s %-20s %-8s %-20s %-8s %-10s %s\n",
+			id, email, truncate(fullName, 23), truncate(batchName, 18),
+			truncate(oldProdi, 18), oldSession, truncate(newProdi, 18), newSession,
+			status, cleanTime)
+	}
+
+	if err := rows.Err(); err != nil {
+		slog.Error("prodi-list rows error", "error", err)
+		os.Exit(1)
+	}
+}
+
+func cmdProdiApprove(ctx context.Context, dbConn *sql.DB, args []string) {
+	requestID, err := strconv.ParseInt(args[0], 10, 64)
+	if err != nil {
+		slog.Error("invalid request_id", "error", err)
+		os.Exit(1)
+	}
+
+	tx, err := dbConn.BeginTx(ctx, nil)
+	if err != nil {
+		slog.Error("begin tx failed", "error", err)
+		os.Exit(1)
+	}
+	committed := false
+	defer func() {
+		if !committed {
+			_ = tx.Rollback()
+		}
+	}()
+
+	var regID uuid.UUID
+	var newProdiID uuid.UUID
+	var newSession string
+	var status string
+
+	err = tx.QueryRowContext(ctx, `
+		SELECT registration_id, new_program_studi_id, new_session, status
+		FROM major_change_request WHERE id = ? FOR UPDATE`,
+		requestID,
+	).Scan(&regID, &newProdiID, &newSession, &status)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		fmt.Println("Error: request not found.")
+		os.Exit(1)
+	}
+	if err != nil {
+		slog.Error("lookup request failed", "error", err)
+		os.Exit(1)
+	}
+
+	if status != "PENDING" {
+		fmt.Printf("Action aborted: request is already %s.\n", status)
+		os.Exit(1)
+	}
+
+	_, err = tx.ExecContext(ctx, `
+		UPDATE registration_s1_detail
+		SET program_studi_id = ?, class_session = ?
+		WHERE registration_id = ?`,
+		newProdiID[:], newSession, regID[:],
+	)
+	if err != nil {
+		slog.Error("update registration_s1_detail failed", "error", err)
+		os.Exit(1)
+	}
+
+	_, err = tx.ExecContext(ctx, `
+		UPDATE major_change_request
+		SET status = 'APPROVED', updated_at = NOW()
+		WHERE id = ?`,
+		requestID,
+	)
+	if err != nil {
+		slog.Error("update request status failed", "error", err)
+		os.Exit(1)
+	}
+
+	if err := tx.Commit(); err != nil {
+		slog.Error("commit failed", "error", err)
+		os.Exit(1)
+	}
+	committed = true
+
+	fmt.Printf("Request #%d approved. Registration %s updated to new program studi.\n",
+		requestID, regID.String())
+}
+
+func cmdProdiReject(ctx context.Context, dbConn *sql.DB, args []string) {
+	if len(args) < 1 {
+		fmt.Println("Usage: prodi-reject <request_id>")
+		os.Exit(1)
+	}
+
+	requestID, err := strconv.ParseInt(args[0], 10, 64)
+	if err != nil {
+		slog.Error("invalid request_id", "error", err)
+		os.Exit(1)
+	}
+
+	res, err := dbConn.ExecContext(ctx, `
+		UPDATE major_change_request
+		SET status = 'REJECTED', updated_at = NOW()
+		WHERE id = ? AND status = 'PENDING'`,
+		requestID,
+	)
+	if err != nil {
+		slog.Error("reject request failed", "error", err)
+		os.Exit(1)
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 0 {
+		fmt.Println("Action aborted: request not found or already processed.")
+		os.Exit(1)
+	}
+
+	fmt.Printf("Request #%d rejected.\n", requestID)
 }

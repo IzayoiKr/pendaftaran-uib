@@ -1,11 +1,16 @@
 @use "@/styles/config.scss" as global;
-@use "sass:map";
 
 $badge-size: clamp(3rem, 2.7344rem + 1.3281vw, 4.0625rem);
 $badge-font: var(--step-0);
 $navBtn-size: var(--step-4);
 $navBtn-arrow: var(--step-2);
 $dot-size: var(--step--2);
+
+$card-quantity: (
+  xxl: 33.333%,
+  lg: 50%,
+  md: 100%,
+);
 
 .programStudi {
   margin: var(--space-2xl) 0;
@@ -17,11 +22,12 @@ $dot-size: var(--step--2);
 
 .sectionHeader {
   text-align: center;
+  margin-bottom: var(--space-s);
 
   h2 {
+    margin-bottom: var(--space-2xs);
     font-weight: 600;
     color: global.$tertiary-color;
-    margin-bottom: var(--space-2xs);
   }
 
   p {
@@ -34,7 +40,7 @@ $dot-size: var(--step--2);
   position: relative;
   padding-inline: var(--space-2xl);
 
-  @media (max-width: map.get(global.$breakpoints, sm)) {
+  @include global.down(sm) {
     padding-inline: 0;
   }
 }
@@ -42,7 +48,6 @@ $dot-size: var(--step--2);
 .viewport {
   overflow: hidden;
   margin: var(--space-l) 0;
-  transition: cursor 0.2s ease;
 
   &:active {
     cursor: grabbing;
@@ -59,52 +64,44 @@ $dot-size: var(--step--2);
   min-width: 0;
   padding-inline: calc(var(--space-s) / 2);
 
-  $card-quantity: (
-    xxl: 33%,
-    lg: 50%,
-    md: 100%,
-  );
-
   @each $bp, $width in $card-quantity {
-    @media (max-width: map.get(global.$breakpoints, $bp)) {
+    @include global.down($bp) {
       flex: 0 0 $width;
     }
   }
 }
 
 .card {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: global.$card-bg;
-  border: 1px solid rgba(0, 35, 71, 0.06);
-  border-radius: 6px;
-  overflow: hidden;
-  transition:
-    box-shadow 0.4s ease,
-    transform 0.4s ease;
+  @include global.flex-column;
 
-  &:hover {
-    box-shadow:
-      0 2px 8px rgba(0, 35, 71, 0.03),
-      0 8px 24px rgba(0, 35, 71, 0.05);
-    transform: translateY(-2px);
+  height: 100%;
+
+  background: global.$card-bg;
+  border: 1px solid global.$tertiary-alpha-8;
+  border-radius: global.$radius-lg;
+
+  overflow: hidden;
+
+  transition:
+    transform global.$transition-card,
+    border-color global.$transition-card,
+    box-shadow global.$transition-card;
+
+  @include global.hover-supported {
+    transform: translateY(-6px);
+    border-color: global.$tertiary-alpha-14;
+    box-shadow: global.$shadow-card-hover;
 
     .courseHead img {
-      transform: scale(1.2);
+      transform: scale(1.05);
     }
 
-    .courseContent {
-      background: global.$background-color;
+    .imageOverlay {
+      opacity: 1;
     }
 
     .badge {
-      background: global.$tertiary-color;
-      color: global.$primary-color;
-    }
-
-    .courseContent h3 a {
-      color: global.$primary-color;
+      transform: translateY(-50%) scale(1.04);
     }
   }
 }
@@ -112,135 +109,282 @@ $dot-size: var(--step--2);
 .courseHead {
   position: relative;
   overflow: hidden;
+  aspect-ratio: 16 / 10;
+  flex-shrink: 0;
 
   img {
     width: 100%;
-    height: auto;
-    object-fit: contain;
+    height: 100%;
+    object-fit: cover;
     object-position: center;
     display: block;
-    transition: transform 0.3s ease;
+    transition: transform global.$transition-image;
   }
 }
 
+.imageOverlay {
+  @include global.absolute-fill;
+
+  background: linear-gradient(
+    160deg,
+    global.$image-overlay-from 40%,
+    global.$image-overlay-to 100%
+  );
+
+  opacity: 0;
+  transition: opacity global.$transition-card;
+  pointer-events: none;
+}
+
 .courseContent {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  padding: var(--space-m) var(--space-s);
-  background: global.$card-bg;
+  @include global.flex-column;
+
   position: relative;
-  transition: background 0.3s ease;
+  flex: 1;
+
+  padding: clamp(2.2rem, 2rem + 0.8vw, 2.8rem) var(--space-s) var(--space-s);
+
+  background: global.$card-bg;
 
   h3 {
-    font-weight: 500;
-    margin-bottom: var(--space-xs);
-
-    a {
-      color: global.$tertiary-color;
-      transition: color 0.3s ease;
-    }
-  }
-
-  p {
-    font-size: var(--step--1);
-    color: global.$text-color;
-    text-align: left;
-    line-height: 1.6;
-    text-wrap: pretty;
-    overflow: hidden;
+    margin: 0 0 var(--space-xs);
+    font-size: var(--step-0);
+    font-weight: 600;
+    line-height: 1.35;
   }
 }
 
 .badge {
+  @include global.flex-center;
+
   position: absolute;
-  top: clamp(-2rem, -1.5161rem + -0.4839vw, -1.625rem);
-  right: clamp(0.625rem, 0.5469rem + 0.3906vw, 0.9375rem);
+  top: 0;
+  right: clamp(0.75rem, 0.625rem + 0.4vw, 1rem);
+  transform: translateY(-50%);
+
   width: $badge-size;
   height: $badge-size;
-  line-height: $badge-size;
+  border-radius: global.$radius-pill;
+
   text-align: center;
-  border-radius: 50%;
-  background: global.$primary-color;
-  color: global.$tertiary-color;
   font-size: $badge-font;
-  font-weight: 500;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+
+  z-index: global.$z-base;
+
+  box-shadow: global.$shadow-badge;
+
   transition:
-    background 0.3s ease,
-    color 0.3s ease;
+    transform global.$transition-card,
+    box-shadow global.$transition-card,
+    background global.$transition-card,
+    color global.$transition-card;
+
+  pointer-events: none;
+}
+
+.badgeS1 {
+  background: linear-gradient(
+    135deg,
+    global.$badge-s1-from 0%,
+    global.$badge-s1-to 100%
+  );
+  color: global.$badge-s1-text;
+  border: 1px solid global.$badge-s1-border;
+}
+
+.badgeS2 {
+  background: linear-gradient(
+    135deg,
+    global.$badge-s2-from 0%,
+    global.$badge-s2-to 100%
+  );
+  color: global.$badge-s2-text;
+  border: 1px solid global.$badge-s2-border;
 }
 
 .tag {
-  display: inline-block;
-  padding: 2px clamp(0.875rem, 0.7656rem + 0.5469vw, 1.3125rem);
-  font-size: clamp(0.6875rem, 0.6563rem + 0.1563vw, 0.8125rem);
-  color: global.$card-bg;
-  background: global.$tertiary-color;
-  text-transform: uppercase;
-  margin-bottom: var(--space-xs);
+  @include global.flex-row;
+
   width: fit-content;
+  margin-bottom: var(--space-xs);
+
+  padding: clamp(0.32rem, 0.28rem + 0.16vw, 0.45rem)
+    clamp(0.8rem, 0.72rem + 0.32vw, 1rem);
+
+  border-radius: global.$radius-sm;
+
+  background: linear-gradient(135deg, global.$tag-from 0%, global.$tag-to 100%);
+
+  color: global.$white;
+  font-size: clamp(0.68rem, 0.65rem + 0.15vw, 0.8rem);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+
+  box-shadow: global.$shadow-tag;
+}
+
+.titleLink {
+  color: global.$tertiary-color;
+  text-decoration: none;
+  transition: color global.$transition-medium;
+
+  &:hover {
+    color: global.$primary-color;
+  }
+
+  @include global.focus-ring(global.$tertiary-color, 3px);
+}
+
+.description {
+  position: relative;
+  margin: 0;
+  font-size: var(--step--1);
+  line-height: 1.7;
+  color: global.$text-color;
+  text-wrap: pretty;
+}
+
+.descriptionClamp {
+  position: relative;
+
+  @include global.line-clamp(3);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 32px;
+    background: linear-gradient(
+      to bottom,
+      rgb(from global.$card-bg r g b / 0%),
+      global.$card-bg
+    );
+    pointer-events: none;
+  }
+}
+
+.descriptionFull {
+  display: block;
+}
+
+.toggleBtn {
+  margin-top: var(--space-xs);
+  align-self: flex-start;
+
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  background: none;
+
+  font-size: var(--step--2);
+  font-weight: 600;
+  line-height: 1.4;
+  color: global.$primary-color;
+
+  @include global.interactive;
+
+  transition: color global.$transition-fast;
+
+  &:hover {
+    color: global.$tertiary-color;
+    text-decoration: underline;
+  }
+
+  @include global.focus-ring(global.$tertiary-color, 2px);
+}
+
+@include global.up(md) {
+  .descriptionClamp {
+    overflow: visible;
+    display: block;
+    line-clamp: unset;
+    -webkit-line-clamp: unset;
+    -webkit-box-orient: unset;
+
+    &::after {
+      display: none;
+    }
+  }
+
+  .toggleBtn {
+    display: none;
+  }
 }
 
 .navBtn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: $navBtn-size;
-  height: $navBtn-size;
-  border-radius: 50%;
-  border: 2px solid global.$primary-color;
-  background: transparent;
-  color: global.$primary-color;
-  font-size: $navBtn-arrow;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition:
-    background 0.3s ease,
-    color 0.3s ease;
+  display: none;
 
-  &:hover {
-    background: global.$primary-color;
-    color: global.$tertiary-color;
-  }
+  @include global.up(lg) {
+    @include global.flex-center;
+    @include global.interactive;
 
-  &.prev {
-    left: 0;
-  }
-  &.next {
-    right: 0;
-  }
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: global.$z-base;
 
-  @media (max-width: map.get(global.$breakpoints, sm)) {
-    display: none;
+    width: $navBtn-size;
+    height: $navBtn-size;
+
+    border: 2px solid global.$primary-color;
+    border-radius: global.$radius-pill;
+
+    background: transparent;
+    color: global.$primary-color;
+    font-size: $navBtn-arrow;
+
+    transition:
+      background global.$transition-card,
+      color global.$transition-card;
+
+    &:hover {
+      background: global.$primary-color;
+      color: global.$tertiary-color;
+    }
+
+    @include global.focus-ring(global.$primary-color);
+
+    &.prev {
+      left: 0;
+    }
+
+    &.next {
+      right: 0;
+    }
   }
 }
 
 .dots {
-  display: flex;
-  justify-content: center;
-  gap: var(--space-xs);
-  margin-top: var(--space-l);
+  @include global.flex-center;
 
-  @media (max-width: map.get(global.$breakpoints, sm)) {
-    display: none;
-    margin: 0;
-    gap: 0;
-  }
+  gap: var(--space-xs);
+  margin-top: var(--space-m);
 }
 
 .dot {
+  @include global.interactive;
+
   width: $dot-size;
   height: $dot-size;
-  border-radius: 50%;
-  border: none;
-  background: #d3d3d3;
   padding: 0;
-  cursor: pointer;
+  border: none;
+  border-radius: global.$radius-pill;
+  background: global.$border-medium;
+
   transition:
-    background 0.3s ease,
-    transform 0.3s ease;
+    background global.$transition-card,
+    transform global.$transition-card;
+
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -10px;
+  }
 
   &:hover {
     background: global.$primary-color;

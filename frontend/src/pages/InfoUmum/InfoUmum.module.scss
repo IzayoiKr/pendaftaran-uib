@@ -1,88 +1,142 @@
-// ── Tokens ────────────────────────────────────────────────────────────────────
-$accent: #1a3fa8;
-$accent-lt: #e8edf8;
-$text-hi: #111218;
-$text-md: #3d3f4f;
-$text-lo: #8a8c9a;
-$border: #e4e2db;
-$surface: #ffffff;
-
-// ── Section ───────────────────────────────────────────────────────────────────
+@use "@/styles/config" as global;
 
 .section {
+  @include global.section-spacing;
+
   width: 100%;
-  padding-top: clamp(2.5rem, 5vw, 3.5rem);
-  padding-bottom: clamp(4rem, 8vw, 7rem);
+  padding-top: calc(var(--header-height, 80px) + 2rem);
+
+  @include global.down(md) {
+    padding-top: calc(var(--header-height, 72px) + 2.25rem);
+  }
+
+  @include global.down(sm) {
+    padding-top: calc(var(--header-height, 68px) + 2rem);
+  }
+  flex: 1 0 auto;
 }
-
-// ── Hero ──────────────────────────────────────────────────────────────────────
-
-.hero {
-  padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 5vw, 4rem)
-    clamp(1.5rem, 3vw, 2.5rem);
-  text-align: center;
-}
-
-.heading {
-  margin: 0;
-  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  font-weight: 700;
-  color: $text-hi;
-}
-
-.sub {
-  margin-top: 0.6rem;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  color: $text-lo;
-}
-
-// ── Grid ──────────────────────────────────────────────────────────────────────
 
 .grid {
+  @include global.container;
+
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
-  padding: 0 clamp(1.5rem, 5vw, 4rem);
-  max-width: 1280px;
-  margin: 0 auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: global.$space-lg;
+  align-items: stretch;
+
+  @include global.down(lg) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include global.down(sm) {
+    grid-template-columns: 1fr;
+    gap: global.$space-md;
+  }
 }
 
-// ── Empty state ───────────────────────────────────────────────────────────────
+.pagination {
+  @include global.container;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: clamp(2rem, 4vw, 3rem);
+  flex-wrap: wrap;
+
+  @include global.down(sm) {
+    gap: 0.5rem;
+  }
+}
+
+.pageNumbers {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pageButton {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 0.95rem;
+  border: 1px solid global.$border-light;
+  border-radius: global.$radius-md;
+  background: global.$background-color;
+  color: global.$text-color-dark;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: global.$shadow-xs;
+
+  @include global.transition-standard;
+
+  @include global.hover-supported {
+    &:hover:not(:disabled) {
+      border-color: global.$tertiary-color;
+      color: global.$tertiary-color;
+      transform: translateY(-1px);
+      box-shadow: global.$shadow-sm;
+    }
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  @include global.down(sm) {
+    min-width: 38px;
+    height: 38px;
+    padding: 0 0.8rem;
+    font-size: 0.82rem;
+  }
+}
+
+.activePage {
+  background: global.$tertiary-color;
+  border-color: global.$tertiary-color;
+  color: global.$white;
+
+  @include global.hover-supported {
+    &:hover {
+      color: global.$white;
+    }
+  }
+}
+
+.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
 
 .empty {
-  margin: clamp(1.5rem, 4vw, 3rem) clamp(1.5rem, 5vw, 4rem);
-  background: $surface;
-  border: 1px solid $border;
-  border-radius: 14px;
-  padding: 3.5rem 2rem;
+  @include global.container;
+  @include global.flex-center;
+
+  min-height: 260px;
+  padding: global.$space-2xl;
+  border: 1px solid global.$border-light;
+  border-radius: global.$radius-lg;
+  background: global.$background-color;
+  box-shadow: global.$shadow-sm;
   text-align: center;
 
   p {
     margin: 0;
-    font-size: 1rem;
-    color: $text-lo;
-  }
-}
-
-// ── Responsive ────────────────────────────────────────────────────────────────
-
-@media (max-width: 1024px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
-  .hero {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
+    color: global.$text-color-soft;
+    font-size: var(--step--1);
+    line-height: 1.6;
   }
 
-  .grid {
-    grid-template-columns: 1fr;
-    padding: 0 1.25rem;
+  @include global.down(sm) {
+    min-height: 220px;
+    padding: global.$space-xl;
   }
 }

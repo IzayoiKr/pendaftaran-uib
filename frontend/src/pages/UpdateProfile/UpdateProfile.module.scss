@@ -64,7 +64,7 @@
 .sectionTitle {
   font-size: var(--step--1);
   font-weight: 700;
-  color: global.$text-color2;
+  color: global.$text-color-dark;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   margin-bottom: var(--space-xs);
@@ -103,7 +103,7 @@
 
 .infoValue {
   font-size: var(--step--1);
-  color: global.$text-color2;
+  color: global.$text-color-dark;
   font-weight: 600;
   word-break: break-word;
   letter-spacing: 0.01em;
@@ -113,7 +113,7 @@
   display: block;
   font-size: var(--step--1);
   font-weight: 600;
-  color: global.$text-color2;
+  color: global.$text-color-dark;
   margin-bottom: var(--space-xs);
 }
 

@@ -18,7 +18,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
-func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFunc {
+func Register(db *sql.DB, al *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		base := audit.EntryFromRequest(r)
 		lang := utils.Lang(r)
@@ -142,7 +142,7 @@ func Register(db *sql.DB, mailer *email.Mailer, al *audit.Logger) http.HandlerFu
 		}
 
 		go func() {
-			if err := mailer.SendVerificationEmail(req.Email, req.FullName, rawToken); err != nil {
+			if err := email.SendVerificationEmail(req.Email, req.FullName, rawToken); err != nil {
 				slog.Error("register: send verification email", "user_id", id.String(), "error", err)
 			}
 		}()

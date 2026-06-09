@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+const chunkSize = 32 * 1024
+
 type Client struct {
 	addr    string
 	timeout time.Duration
@@ -42,25 +44,20 @@ func (c *Client) ScanStream(ctx context.Context, r io.Reader) (bool, error) {
 		return false, fmt.Errorf("send zINSTREAM: %w", err)
 	}
 
-	buf := make([]byte, 32*1024)
-	sizeBuf := make([]byte, 4)
+	frame := make([]byte, 4+chunkSize)
 
 	var streamAborted = normalExit
-	
+
 	for {
 		if err := ctx.Err(); err != nil {
 			return false, fmt.Errorf("scan canceled during upload: %w", err)
 		}
 
-		_ = conn.SetDeadline(time.Now().Add(c.timeout))
-		n, readErr := r.Read(buf)
+		n, readErr := r.Read(frame[4:])
 		if n > 0 {
-			binary.BigEndian.PutUint32(sizeBuf, uint32(n))
-			if _, wErr := conn.Write(sizeBuf); wErr != nil {
-				streamAborted = writeError
-				break
-			}
-			if _, wErr := conn.Write(buf[:n]); wErr != nil {
+			binary.BigEndian.PutUint32(frame[:4], uint32(n))
+			_ = conn.SetDeadline(time.Now().Add(c.timeout))
+			if _, wErr := conn.Write(frame[:4+n]); wErr != nil {
 				streamAborted = writeError
 				break
 			}
@@ -74,8 +71,8 @@ func (c *Client) ScanStream(ctx context.Context, r io.Reader) (bool, error) {
 	}
 
 	if streamAborted == normalExit {
-		binary.BigEndian.PutUint32(sizeBuf, 0)
-		_, _ = conn.Write(sizeBuf)
+		var terminator [4]byte
+		_, _ = conn.Write(terminator[:])
 	}
 
 	_ = conn.SetDeadline(time.Now().Add(c.timeout))

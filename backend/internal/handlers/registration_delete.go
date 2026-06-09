@@ -34,7 +34,7 @@ func RegistrationDelete(db *sql.DB, storageDir string, al *audit.Logger) http.Ha
 			return
 		}
 
-		userID, err := uuid.Parse(claims.UserID)
+		userID, err := uuid.Parse(claims.Subject)
 		if err != nil {
 			slog.Error("registration_delete: parse uuid", "error", err)
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
@@ -77,14 +77,14 @@ func RegistrationDelete(db *sql.DB, storageDir string, al *audit.Logger) http.Ha
 			return
 		}
 
-		regDir := filepath.Join(storageDir, "registrations", claims.UserID, regID.String())
+		regDir := filepath.Join(storageDir, "registrations", claims.Subject, regID.String())
 		if err := os.RemoveAll(regDir); err != nil && !errors.Is(err, os.ErrNotExist) {
 			slog.Warn("registration_delete: remove directory", "dir", regDir, "error", err)
 		}
 
 		al.Log(audit.Entry{
 			Event:     audit.EventRegistrationDeleted,
-			UserID:    claims.UserID,
+			UserID:    claims.Subject,
 			IP:        base.IP,
 			UserAgent: base.UserAgent,
 			RequestID: base.RequestID,

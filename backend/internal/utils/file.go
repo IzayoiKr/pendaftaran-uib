@@ -28,7 +28,7 @@ var (
 )
 
 func SaveFile(
-	ctx context.Context, 
+	ctx context.Context,
 	file multipart.File,
 	header *multipart.FileHeader,
 	cfg UploadConfig,
@@ -90,7 +90,7 @@ func SaveFile(
 
 	finalPath := filepath.Join(cfg.TargetDir, cfg.TargetName)
 	tmpPath := finalPath + ".tmp"
-	
+
 	out, err := os.OpenFile(tmpPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return 0, err

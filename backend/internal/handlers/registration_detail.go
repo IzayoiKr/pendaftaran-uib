@@ -30,7 +30,7 @@ func GetRegistrationDetail(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		userID, err := uuid.Parse(claims.UserID)
+		userID, err := uuid.Parse(claims.Subject)
 		if err != nil {
 			utils.WriteJSON(w, http.StatusInternalServerError, utils.ErrJSON(i18n.T("common.server_error", lang)))
 			return
@@ -41,7 +41,7 @@ func GetRegistrationDetail(db *sql.DB) http.HandlerFunc {
 		var currentProdi, currentSession sql.NullString
 
 		err = db.QueryRowContext(r.Context(), `
-			SELECT 
+			SELECT
 				u.full_name, u.email, u.nik,
 				reg.id, reg.status, reg.examinee_id,
 				g.batch_key, g.batch_name, g.degree, g.batch_type,

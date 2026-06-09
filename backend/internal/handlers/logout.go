@@ -17,7 +17,7 @@ func Logout(ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc {
 		var userID, sessionID string
 
 		if claims := auth.GetClaims(r); claims != nil {
-			userID = claims.UserID
+			userID = claims.Subject
 
 			if err := ts.Revoke(r.Context(), claims); err != nil {
 				slog.Error("logout: revoke access token", "jti", claims.ID, "error", err)
@@ -28,7 +28,7 @@ func Logout(ts *auth.TokenStore, al *audit.Logger) http.HandlerFunc {
 			if refreshClaims, err := auth.ValidateToken(cookie.Value); err == nil {
 				sessionID = refreshClaims.SessionID
 				if userID == "" {
-					userID = refreshClaims.UserID
+					userID = refreshClaims.Subject
 				}
 
 				if err := ts.Revoke(r.Context(), refreshClaims); err != nil {

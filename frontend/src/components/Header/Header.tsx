@@ -7,17 +7,19 @@ import useScrollSpy from "@/hooks/useScrollSpy";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { useScrollSpyContext } from "@/providers/ScrollSpyProvider";
 import scrollToId from "@/utils/ScrollToId";
+import clsx from "clsx";
 import useAuthStore from "@/store/useAuthStore";
+import LanguageSwitcher from "@/components/LanguageSwitcher/LanguageSwitcher";
 import { headerNavLinks, spyIds } from "./data";
 import styles from "./Header.module.scss";
 
 interface HamburgerButtonProps {
-    isOpen?: boolean;
-    setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    isOpen: boolean;
+    onToggle: () => void;
 }
 
 interface NavMenuProps {
-    isOpen?: boolean;
+    isOpen: boolean;
     activeId: string;
     pathname: string;
     onLinkClick: (e: React.MouseEvent, to: string, hashId?: string) => void;
@@ -40,18 +42,18 @@ function UIBLogo() {
 
 const HamburgerButton = memo(function HamburgerButton({
     isOpen,
-    setIsOpen,
+    onToggle,
 }: HamburgerButtonProps) {
     return (
         <button
-            className={`${styles.toggler} ${isOpen ? styles.openState : ""}`}
-            onClick={() => setIsOpen((prev) => !prev)}
+            className={clsx(styles.toggler, isOpen && styles.openState)}
+            onClick={onToggle}
             aria-label="Toggle Menu"
             aria-expanded={isOpen}
         >
-            <span className={styles.iconBar}></span>
-            <span className={styles.iconBar}></span>
-            <span className={styles.iconBar}></span>
+            <span className={styles.iconBar} />
+            <span className={styles.iconBar} />
+            <span className={styles.iconBar} />
         </button>
     );
 });
@@ -66,13 +68,15 @@ function NavMenu({
     const t = useTranslations("header");
 
     return (
-        <div className={`${styles.menuContainer} ${isOpen ? styles.show : ""}`}>
+        <div className={clsx(styles.menuContainer, isOpen && styles.show)}>
             <nav className={styles.nav}>
                 <ul className={styles.menu}>
                     {headerNavLinks.map((link) => {
                         const isLoginLink =
                             link.to === "/login" && isAuthenticated;
+
                         const displayTo = isLoginLink ? "/account" : link.to;
+
                         const displayLabel = isLoginLink
                             ? t("myAccount")
                             : t(link.labelKey);
@@ -84,7 +88,10 @@ function NavMenu({
                         return (
                             <li className={styles.navItem} key={link.to}>
                                 <Link
-                                    className={`${styles.navLink} ${isActive ? styles.active : ""}`}
+                                    className={clsx(
+                                        styles.navLink,
+                                        isActive && styles.active,
+                                    )}
                                     href={displayTo}
                                     onClick={(e) =>
                                         onLinkClick(e, displayTo, link.hashId)
@@ -102,41 +109,43 @@ function NavMenu({
 }
 
 export default function Header() {
-    const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [isScrolled, setIsScrolled] = useState<boolean>(false);
+    const [openAtPathname, setOpenAtPathname] = useState<string | null>(null);
+
     const { ready } = useScrollSpyContext();
+
     const router = useRouter();
+
     const pathname = usePathname() ?? "";
 
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
     const headerRef = useRef<HTMLElement>(null);
+
     const [headerHeight, setHeaderHeight] = useState(80);
 
     useEffect(() => {
         const el = headerRef.current;
+
         if (!el) return;
 
         const update = () => setHeaderHeight(el.offsetHeight);
+
         update();
 
         const ro = new ResizeObserver(update);
+
         ro.observe(el);
+
         return () => ro.disconnect();
     }, []);
 
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setIsOpen(false);
-    }, [pathname]);
+    const isOpen = openAtPathname === pathname;
 
-    useEffect(() => {
-        const handleScroll = () => setIsScrolled(window.scrollY > 50);
-        window.addEventListener("scroll", handleScroll, { passive: true });
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
-
-    const activeId = useScrollSpy({ ids: spyIds, offset: headerHeight, ready });
+    const activeId = useScrollSpy({
+        ids: spyIds,
+        offset: headerHeight,
+        ready,
+    });
 
     const handleLinkClick = (
         e: React.MouseEvent,
@@ -144,12 +153,14 @@ export default function Header() {
         hashId?: string,
     ) => {
         e.preventDefault();
-        setIsOpen(false);
+
+        setOpenAtPathname(null);
 
         if (pathname === "/" && hashId) {
             scrollToId(hashId);
         } else {
             router.push(to);
+
             if (hashId) {
                 setTimeout(() => scrollToId(hashId), 150);
             }
@@ -158,12 +169,38 @@ export default function Header() {
 
     return (
         <header
-            className={`${styles.header} ${isScrolled ? styles.fixed : ""}`}
+            className={styles.header}
             ref={headerRef}
+            style={{ "--header-h": `${headerHeight}px` } as React.CSSProperties}
         >
             <div className={styles.container}>
-                <UIBLogo />
-                <HamburgerButton isOpen={isOpen} setIsOpen={setIsOpen} />
+                <div className={styles.left}>
+                    <UIBLogo />
+                </div>
+
+                <div className={styles.center}>
+                    <NavMenu
+                        isOpen={false}
+                        activeId={activeId}
+                        pathname={pathname}
+                        onLinkClick={handleLinkClick}
+                        isAuthenticated={isAuthenticated}
+                    />
+                </div>
+
+                <div className={styles.right}>
+                    <LanguageSwitcher />
+
+                    <HamburgerButton
+                        isOpen={isOpen}
+                        onToggle={() =>
+                            setOpenAtPathname(isOpen ? null : pathname)
+                        }
+                    />
+                </div>
+            </div>
+
+            <div className={styles.mobileMenuWrapper}>
                 <NavMenu
                     isOpen={isOpen}
                     activeId={activeId}

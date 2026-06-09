@@ -1,3 +1,6 @@
+DELETE FROM registration_s1_assessment WHERE scholarship_id IN (1, 2, 3, 4, 5, 6, 7);
+DELETE FROM registration_s2_assessment WHERE s2_package_id IN (1, 2, 3);
+
 DELETE FROM master_s2_package WHERE id IN (1, 2, 3);
 DELETE FROM master_s1_scholarship WHERE id IN (1, 2, 3, 4, 5, 6, 7);
 DELETE FROM master_s1_spp_matrix WHERE gelombang_number BETWEEN 1 AND 10;

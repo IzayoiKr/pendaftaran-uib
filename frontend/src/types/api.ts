@@ -1,7 +1,6 @@
 // Use snake case to match json type
 export interface Program {
     id: string;
-    code: string;
     title: string;
     faculty: string;
     degree: "S1" | "S2";
@@ -74,4 +73,29 @@ export interface AccessTokenResponse {
 export interface RegistrationResponse {
     message: string;
     status: string;
+}
+
+export interface ProgramChoice {
+    code: string;
+    title: string;
+}
+
+export interface ProdiRequestItem {
+    id: string;
+    request_date: string;
+    previous_prodi: string;
+    previous_shift: string;
+    new_prodi: string;
+    new_shift: string;
+    status: string;
+}
+
+export interface ProdiInfoResponse {
+    registration_id: string;
+    batch_name: string;
+    academic_year: string;
+    current_prodi: string;
+    current_shift: string;
+    available_programs: ProgramChoice[];
+    requests: ProdiRequestItem[];
 }
