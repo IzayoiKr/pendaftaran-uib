@@ -343,7 +343,94 @@
         "deleteForm": "Delete Form",
         "resultLetterComingSoon": "Result letter coming soon",
         "resultLetter": "Download Result Letter",
-        "transferProof": "Payment Proof",
+        "transferProof": {
+            "page": {
+                "tag": "Payment Verification",
+                "title": "Transfer Proof",
+                "subtitle": "Upload and manage your payment transfer proofs for registration verification."
+            },
+            "status": {
+                "accepted": "Verified",
+                "rejected": "Rejected"
+            },
+            "stats": {
+                "total": "Total Uploads",
+                "accepted": "Verified",
+                "pending": "Pending"
+            },
+            "timeline": {
+                "title": "Verification Progress",
+                "receiptUploaded": "Receipt Uploaded",
+                "receiptUploadedSub": "Your transfer proof has been received by our system.",
+                "underVerification": "Under Verification",
+                "underVerificationSub": "Admin is reviewing your payment document.",
+                "verified": "Verified",
+                "verifiedSub": "Your payment has been confirmed and validated."
+            },
+            "table": {
+                "title": "Transfer History",
+                "entries": "entries",
+                "searchPlaceholder": "Search by name, bank, or status...",
+                "filter": {
+                    "all": "All Status",
+                    "accepted": "Verified",
+                    "pending": "Pending",
+                    "rejected": "Rejected"
+                },
+                "headers": {
+                    "date": "Date",
+                    "owner": "Account Owner",
+                    "bank": "Bank",
+                    "proof": "Proof",
+                    "status": "Status",
+                    "action": "Action"
+                },
+                "btn": {
+                    "viewProof": "View Proof",
+                    "viewRop": "View ROP"
+                },
+                "empty": {
+                    "title": "No transfer proofs yet",
+                    "description": "Upload your first transfer proof using the form below."
+                }
+            },
+            "form": {
+                "title": "Upload New Proof",
+                "fields": {
+                    "owner": "Account Owner",
+                    "bank": "Bank Name",
+                    "proof": "Transfer Proof"
+                },
+                "upload": {
+                    "placeholder": "Click or drag file to upload",
+                    "hint": "JPG, PNG, or PDF up to 2 MB",
+                    "removeAria": "Remove file"
+                },
+                "btn": {
+                    "reset": "Reset",
+                    "upload": "Upload Proof",
+                    "uploading": "Uploading...",
+                    "back": "Back"
+                }
+            },
+            "sidebar": {
+                "title": "Registration Info",
+                "gelombang": "Batch",
+                "periode": "Period",
+                "prodi": "Study Program",
+                "waktuKuliah": "Class Time",
+                "vaTitle": "VA Payment Guide",
+                "vaDesc": "Download PDF guide"
+            },
+            "toast": {
+                "fetchError": "Failed to load data. Please try again.",
+                "maxFileSize": "File size exceeds 2 MB limit.",
+                "noFile": "Please select a file to upload.",
+                "noRegNumber": "Registration number not found.",
+                "uploadSuccess": "Transfer proof uploaded successfully!",
+                "uploadError": "Failed to upload transfer proof."
+            }
+        },
         "changeProdi": "Change Study Program",
         "resignationComingSoon": "Resignation coming soon",
         "resignation": "Resignation",
@@ -369,7 +456,46 @@
         "withdrawError": "An error occurred",
         "loadProfileError": "Failed to load profile",
         "wib": " WIB",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "prasyaratOspek": {
+            "page": {
+                "tag": "Orientation Requirements",
+                "title": "Ospek Prerequisites",
+                "subtitle": "Upload required documents for new student orientation registration."
+            },
+            "status": {
+                "title": "Document Status",
+                "notesLabel": "Admin Notes",
+                "noNotes": "No additional notes from admin."
+            },
+            "upload": {
+                "title": "Document Upload",
+                "placeholder": "Click or drag file to upload",
+                "hint": "JPG, PNG, or PDF up to 2 MB",
+                "maxFileSize": "File size exceeds 2 MB limit.",
+                "removeAria": "Remove file",
+                "exampleTitle": "Download Example",
+                "exampleDesc": "See the correct format",
+                "examplePasFoto": "Example Photo"
+            },
+            "fields": {
+                "pasFoto": "Passport Photo",
+                "ijazah": "Diploma / Certificate"
+            },
+            "btn": {
+                "upload": "Submit Documents",
+                "uploading": "Submitting...",
+                "back": "Back"
+            },
+            "toast": {
+                "fetchError": "Failed to load data. Please try again.",
+                "noRegNumber": "Registration number not found.",
+                "missingFiles": "Please upload the required files:",
+                "uploadSuccess": "Documents submitted successfully!",
+                "uploadError": "Failed to submit documents.",
+                "endpointError": "Upload service is currently unavailable."
+            }
+        }
     },
     "registration": {
         "pageTitle": "Registration {programType}",

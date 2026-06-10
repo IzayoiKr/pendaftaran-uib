@@ -343,7 +343,94 @@
         "deleteForm": "Hapus Formulir",
         "resultLetterComingSoon": "Surat hasil akan segera tersedia",
         "resultLetter": "Download Surat Hasil",
-        "transferProof": "Bukti Pembayaran",
+        "transferProof": {
+            "page": {
+                "tag": "Verifikasi Pembayaran",
+                "title": "Bukti Transfer",
+                "subtitle": "Unggah dan kelola bukti transfer pembayaran Anda untuk verifikasi pendaftaran."
+            },
+            "status": {
+                "accepted": "Terverifikasi",
+                "rejected": "Ditolak"
+            },
+            "stats": {
+                "total": "Total Unggahan",
+                "accepted": "Terverifikasi",
+                "pending": "Menunggu"
+            },
+            "timeline": {
+                "title": "Progres Verifikasi",
+                "receiptUploaded": "Kwitansi Diunggah",
+                "receiptUploadedSub": "Bukti transfer Anda telah diterima oleh sistem kami.",
+                "underVerification": "Dalam Pemeriksaan",
+                "underVerificationSub": "Admin sedang meninjau dokumen pembayaran Anda.",
+                "verified": "Terverifikasi",
+                "verifiedSub": "Pembayaran Anda telah dikonfirmasi dan divalidasi."
+            },
+            "table": {
+                "title": "Riwayat Transfer",
+                "entries": "entri",
+                "searchPlaceholder": "Cari berdasarkan nama, bank, atau status...",
+                "filter": {
+                    "all": "Semua Status",
+                    "accepted": "Terverifikasi",
+                    "pending": "Menunggu",
+                    "rejected": "Ditolak"
+                },
+                "headers": {
+                    "date": "Tanggal",
+                    "owner": "Pemilik Rekening",
+                    "bank": "Bank",
+                    "proof": "Bukti",
+                    "status": "Status",
+                    "action": "Aksi"
+                },
+                "btn": {
+                    "viewProof": "Lihat Bukti",
+                    "viewRop": "Lihat ROP"
+                },
+                "empty": {
+                    "title": "Belum ada bukti transfer",
+                    "description": "Unggah bukti transfer pertama Anda menggunakan formulir di bawah."
+                }
+            },
+            "form": {
+                "title": "Unggah Bukti Baru",
+                "fields": {
+                    "owner": "Pemilik Rekening",
+                    "bank": "Nama Bank",
+                    "proof": "Bukti Transfer"
+                },
+                "upload": {
+                    "placeholder": "Klik atau seret file untuk mengunggah",
+                    "hint": "JPG, PNG, atau PDF maksimal 2 MB",
+                    "removeAria": "Hapus file"
+                },
+                "btn": {
+                    "reset": "Reset",
+                    "upload": "Unggah Bukti",
+                    "uploading": "Mengunggah...",
+                    "back": "Kembali"
+                }
+            },
+            "sidebar": {
+                "title": "Info Pendaftaran",
+                "gelombang": "Gelombang",
+                "periode": "Periode",
+                "prodi": "Program Studi",
+                "waktuKuliah": "Waktu Kuliah",
+                "vaTitle": "Panduan Pembayaran VA",
+                "vaDesc": "Unduh panduan PDF"
+            },
+            "toast": {
+                "fetchError": "Gagal memuat data. Silakan coba lagi.",
+                "maxFileSize": "Ukuran file melebihi batas 2 MB.",
+                "noFile": "Silakan pilih file untuk diunggah.",
+                "noRegNumber": "Nomor pendaftaran tidak ditemukan.",
+                "uploadSuccess": "Bukti transfer berhasil diunggah!",
+                "uploadError": "Gagal mengunggah bukti transfer."
+            }
+        },
         "changeProdi": "Ganti Prodi",
         "resignationComingSoon": "Pengunduran diri akan segera tersedia",
         "resignation": "Pengunduran Diri",
@@ -369,7 +456,46 @@
         "withdrawError": "Terjadi kesalahan",
         "loadProfileError": "Gagal memuat profil",
         "wib": " WIB",
-        "cancel": "Batal"
+        "cancel": "Batal",
+        "prasyaratOspek": {
+            "page": {
+                "tag": "Prasyarat Ospek",
+                "title": "Prasyarat Orientasi",
+                "subtitle": "Unggah dokumen yang diperlukan untuk pendaftaran orientasi mahasiswa baru."
+            },
+            "status": {
+                "title": "Status Dokumen",
+                "notesLabel": "Catatan Admin",
+                "noNotes": "Tidak ada catatan tambahan dari admin."
+            },
+            "upload": {
+                "title": "Unggah Dokumen",
+                "placeholder": "Klik atau seret file untuk mengunggah",
+                "hint": "JPG, PNG, atau PDF maksimal 2 MB",
+                "maxFileSize": "Ukuran file melebihi batas 2 MB.",
+                "removeAria": "Hapus file",
+                "exampleTitle": "Unduh Contoh",
+                "exampleDesc": "Lihat format yang benar",
+                "examplePasFoto": "Contoh Foto"
+            },
+            "fields": {
+                "pasFoto": "Pas Foto",
+                "ijazah": "Ijazah / Sertifikat"
+            },
+            "btn": {
+                "upload": "Kirim Dokumen",
+                "uploading": "Mengirim...",
+                "back": "Kembali"
+            },
+            "toast": {
+                "fetchError": "Gagal memuat data. Silakan coba lagi.",
+                "noRegNumber": "Nomor pendaftaran tidak ditemukan.",
+                "missingFiles": "Silakan unggah file yang diperlukan:",
+                "uploadSuccess": "Dokumen berhasil dikirim!",
+                "uploadError": "Gagal mengirim dokumen.",
+                "endpointError": "Layanan unggah saat ini tidak tersedia."
+            }
+        }
     },
     "registration": {
         "pageTitle": "Pendaftaran {programType}",
