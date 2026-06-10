@@ -1,0 +1,8 @@
+allowBuilds:
+  "@bazel/concatjs": true
+  "@parcel/watcher": true
+  "@swc/core": true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true
+confirmModulesPurge: false

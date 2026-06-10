@@ -1,0 +1,57 @@
+{
+    "name": "frontend",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev --port 8989",
+        "build": "next build",
+        "start": "next start --port 8989",
+        "lint": "eslint",
+        "typecheck": "tsc --noEmit",
+        "tsec-security": "tsec -p tsconfig.tsec.json --noEmit",
+        "format": "prettier --write \"**/*.{js,jsx,ts,tsx,scss,css}\""
+    },
+    "dependencies": {
+        "@fontsource-variable/rubik": "^5.2.8",
+        "@fontsource/poppins": "^5.2.7",
+        "@hookform/resolvers": "^5.4.0",
+        "@marsidev/react-turnstile": "^1.5.1",
+        "@tanstack/react-query": "^5.100.14",
+        "axios": "^1.15.2",
+        "clsx": "^2.1.1",
+        "embla-carousel-autoplay": "^8.6.0",
+        "embla-carousel-react": "^8.6.0",
+        "next": "^16.2.4",
+        "next-intl": "^4.12.0",
+        "react": "^19.2.5",
+        "react-dom": "^19.2.5",
+        "react-hook-form": "^7.75.0",
+        "react-loading-skeleton": "^3.5.0",
+        "sonner": "^2.0.7",
+        "use-debounce": "^10.1.1",
+        "utopia-core-scss": "^1.3.1",
+        "zod": "^4.4.2",
+        "zustand": "^5.0.12"
+    },
+    "devDependencies": {
+        "@tanstack/react-query-devtools": "^5.100.14",
+        "@trivago/prettier-plugin-sort-imports": "^6.0.2",
+        "@types/node": "^25.6.0",
+        "@types/react": "^19.2.14",
+        "@types/react-dom": "^19.2.3",
+        "babel-plugin-react-compiler": "^1.0.0",
+        "eslint": "^9.39.4",
+        "eslint-config-next": "^16.2.4",
+        "sass": "^1.99.0",
+        "tsec": "^0.2.9",
+        "typescript": "^6.0.3"
+    },
+    "overrides": {
+        "postcss": "^8.5.12",
+        "protobufjs": "^7.5.8",
+        "glob@<11": "^11.1.0",
+        "rimraf@<6": "^6.0.1",
+        "inflight": "-"
+    },
+    "packageManager": "pnpm@11.5.2+sha512.71c631e382066efc25625d5cf029075de07b61b37f6e27350fbd84b1bda5864c8c1967adc280776b45c30a715c0359a3be08fef42d5bb09e2b99029979692916"
+}

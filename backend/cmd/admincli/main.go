@@ -11,8 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	// Uncomment this if you are not using docker/podman
-	// "github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 	"pendaftaran-uib/backend/internal/db"
 	"pendaftaran-uib/backend/internal/loa"
 
@@ -27,11 +26,10 @@ func main() {
 	}))
 	slog.SetDefault(logger)
 
-	// Uncomment this if you are not using docker/podman
-	// if err := godotenv.Load(); err != nil {
-	// 	slog.Error("error loading .env file", "error", err)
-	// 	os.Exit(1)
-	// }
+	if err := godotenv.Load(); err != nil {
+		slog.Error("error loading .env file", "error", err)
+		os.Exit(1)
+	}
 
 	provider, err := db.NewProvider(ctx)
 	if err != nil {

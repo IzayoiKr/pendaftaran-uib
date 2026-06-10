@@ -14,8 +14,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 
-	// Uncomment this if you are not using docker/podman
-	// "github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 
 	"pendaftaran-uib/backend/internal/audit"
 	"pendaftaran-uib/backend/internal/auth"
@@ -34,11 +33,10 @@ func main() {
 	}))
 	slog.SetDefault(logger)
 
-	// Uncomment this if you are not using docker/podman
-	// if err := godotenv.Load(); err != nil {
-	// 	slog.Error("error loading .env file", "error", err)
-	// 	os.Exit(1)
-	// }
+	if err := godotenv.Load(); err != nil {
+		slog.Error("error loading .env file", "error", err)
+		os.Exit(1)
+	}
 
 	if err := auth.InitAuth(); err != nil {
 		slog.Error("auth init error", "error", err)
