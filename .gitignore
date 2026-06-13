@@ -1,10 +1,10 @@
 .env*
 node_modules/
 .vscode/
-./package-lock.json
-./package.json
-./pnpm-lock.yaml
-./pnpm-workspace.yaml
+/package-lock.json
+/package.json
+/pnpm-lock.yaml
+/pnpm-workspace.yaml
 tmp/
 docker-compose.override.yaml
 docker-compose.override.yml
