@@ -342,6 +342,22 @@ $surface-raised: #f9fafb;
   }
 }
 
+.imagePreviewContainer {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid $color-slate-200;
+  background: global.$white;
+}
+
+.imagePreview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .fileInfo {
   display: flex;
   flex-direction: column;

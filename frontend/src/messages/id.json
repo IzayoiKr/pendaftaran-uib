@@ -403,7 +403,7 @@
                 },
                 "upload": {
                     "placeholder": "Klik atau seret file untuk mengunggah",
-                    "hint": "JPG, PNG, atau PDF maksimal 2 MB",
+                    "hint": "Hanya PDF maksimal 2 MB",
                     "removeAria": "Hapus file"
                 },
                 "btn": {
@@ -425,6 +425,7 @@
             "toast": {
                 "fetchError": "Gagal memuat data. Silakan coba lagi.",
                 "maxFileSize": "Ukuran file melebihi batas 2 MB.",
+                "invalidFileType": "Hanya file PDF yang diperbolehkan.",
                 "noFile": "Silakan pilih file untuk diunggah.",
                 "noRegNumber": "Nomor pendaftaran tidak ditemukan.",
                 "uploadSuccess": "Bukti transfer berhasil diunggah!",
@@ -471,8 +472,9 @@
             "upload": {
                 "title": "Unggah Dokumen",
                 "placeholder": "Klik atau seret file untuk mengunggah",
-                "hint": "JPG, PNG, atau PDF maksimal 2 MB",
+                "hint": "Hanya PDF maksimal 2 MB",
                 "maxFileSize": "Ukuran file melebihi batas 2 MB.",
+                "invalidFileType": "Hanya file PDF yang diperbolehkan.",
                 "removeAria": "Hapus file",
                 "exampleTitle": "Unduh Contoh",
                 "exampleDesc": "Lihat format yang benar",
@@ -913,7 +915,7 @@
         "searchError": "Pencarian tidak tersedia",
         "searchErrorManual": "Terjadi kesalahan. Silakan ketik manual",
         "uploadPlaceholder": "Seret file ke sini atau klik untuk memilih",
-        "uploadHint": "PDF saja, maksimal {maxSize}",
+        "uploadHint": "PDF maksimal {maxSize}",
         "fileSelected": "File terpilih: {fileName}. Tekan tombol hapus untuk mengganti.",
         "uploadLabel": "Unggah {label}. Tekan Enter atau klik untuk memilih file.",
         "removeFile": "Hapus file",
@@ -1537,11 +1539,16 @@
         }
     },
     "common": {
+        "invalidFileType": "Hanya file PDF yang diperbolehkan.",
+        "maxFileSize": "Ukuran file melebihi batas 2 MB.",
         "home": "Beranda",
         "readMore": "Baca Selengkapnya",
         "generalInformation": "Informasi Umum",
         "relatedInformation": "Informasi Lainnya",
-        "backToGeneralInformation": "Kembali ke Informasi Umum"
+        "backToGeneralInformation": "Kembali ke Informasi Umum",
+        "loading": "Memuat...",
+        "success": "Berhasil",
+        "serverError": "Terjadi kesalahan server"
     },
     "infoUmum": {
         "empty": "Belum ada informasi yang tersedia."

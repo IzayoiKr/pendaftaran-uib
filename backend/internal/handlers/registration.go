@@ -169,7 +169,7 @@ func registrationUpsert(db *sql.DB, storageDir string, scanner *clamav.Client, a
 				return
 			}
 			if errors.Is(err, utils.ErrInvalidType) {
-				utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.T("registration.invalid_file_type", lang)))
+				utils.WriteJSON(w, http.StatusBadRequest, utils.ErrJSON(i18n.T("common.invalid_file_type", lang)))
 				return
 			}
 			slog.Error("registration_upsert: file extraction layer broken", "error", err)

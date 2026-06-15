@@ -13,6 +13,8 @@ import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { api } from "@/api";
+import { UPLOAD_CONSTRAINTS } from "@/pages/Registration/registerOptions";
+import useAuthStore from "@/store/useAuthStore";
 import styles from "./TransferProof.module.scss";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -22,6 +24,7 @@ interface BiodataPendaftaran {
     periode: string;
     gelombang: string;
     jurusan: string;
+    waktuKuliah: string;
 }
 
 interface BuktiTransferRow {
@@ -328,6 +331,7 @@ const TABLE_HEADERS = [
 
 function BuktiTransferTable({ rows: initialRows }: { rows: BuktiTransferRow[] }) {
     const t = useTranslations("account.transferProof");
+    const tCommon = useTranslations("common");
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("all");
 
@@ -367,6 +371,20 @@ function BuktiTransferTable({ rows: initialRows }: { rows: BuktiTransferRow[] })
         }
         return result;
     }, [initialRows, search, filter]);
+
+    const handleDownload = async (url: string) => {
+        try {
+            toast.loading(tCommon("loading"), { id: url });
+            const blob = await api.storage.getFileBlob(url);
+            const objectUrl = window.URL.createObjectURL(blob);
+            window.open(objectUrl, "_blank");
+            setTimeout(() => window.URL.revokeObjectURL(objectUrl), 60000);
+            toast.success(tCommon("success"), { id: url });
+        } catch (err) {
+            console.error("Download error", err);
+            toast.error(tCommon("serverError"), { id: url });
+        }
+    };
 
     return (
         <section className={styles.card}>
@@ -436,15 +454,14 @@ function BuktiTransferTable({ rows: initialRows }: { rows: BuktiTransferRow[] })
                                     <td>{row.bank}</td>
                                     <td>
                                         {row.buktiTransferUrl ? (
-                                            <a
-                                                href={row.buktiTransferUrl}
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDownload(row.buktiTransferUrl)}
                                                 className={styles.btnReceipt}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
                                             >
                                                 <FileTextIcon />
                                                 {t("table.btn.viewProof")}
-                                            </a>
+                                            </button>
                                         ) : (
                                             "-"
                                         )}
@@ -461,15 +478,14 @@ function BuktiTransferTable({ rows: initialRows }: { rows: BuktiTransferRow[] })
                                         row.statusValidasi
                                             .toLowerCase()
                                             .includes("verified") ? (
-                                            <a
-                                                href={row.ropUrl}
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDownload(row.ropUrl)}
                                                 className={styles.btnRop}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
                                             >
                                                 <CreditCardIcon />
                                                 {t("table.btn.viewRop")}
-                                            </a>
+                                            </button>
                                         ) : (
                                             "-"
                                         )}
@@ -537,10 +553,17 @@ function UploadZone({
     const handleInputChange = useCallback(
         (e: ChangeEvent<HTMLInputElement>) => {
             const f = e.target.files?.[0] ?? null;
-            if (f && f.size > MAX_FILE_SIZE) {
-                toast.error(t("toast.maxFileSize"));
-                e.target.value = "";
-                return;
+            if (f) {
+                if (f.size > MAX_FILE_SIZE) {
+                    toast.error(t("toast.maxFileSize"));
+                    e.target.value = "";
+                    return;
+                }
+                if (!UPLOAD_CONSTRAINTS.acceptedTypes.includes(f.type as any)) {
+                    toast.error(t("toast.invalidFileType"));
+                    e.target.value = "";
+                    return;
+                }
             }
             onFileChange(f);
             e.target.value = "";
@@ -574,9 +597,16 @@ function UploadZone({
             e.stopPropagation();
             setIsDragOver(false);
             const f = e.dataTransfer.files?.[0] ?? null;
-            if (f && f.size > MAX_FILE_SIZE) {
-                toast.error(t("toast.maxFileSize"));
-                return;
+            if (f) {
+                if (f.size > MAX_FILE_SIZE) {
+                    toast.error(t("toast.maxFileSize"));
+                    return;
+                }
+                if (!UPLOAD_CONSTRAINTS.acceptedTypes.includes(f.type as any)) {
+                    toast.error(t("toast.invalidFileType"));
+                    return;
+                }
+
             }
             if (f) onFileChange(f);
         },
@@ -668,7 +698,7 @@ function UploadZone({
             <input
                 ref={inputRef}
                 type="file"
-                accept="image/*,application/pdf"
+                accept={UPLOAD_CONSTRAINTS.acceptedExtensions}
                 style={{ display: "none" }}
                 onChange={handleInputChange}
                 tabIndex={-1}
@@ -716,7 +746,7 @@ function RegistrationInfoCard({ data }: { data: BiodataPendaftaran }) {
                 <div className={styles.sideInfoItem}>
                     <span className={styles.sideInfoLabel}>{t("sidebar.waktuKuliah")}</span>
                     <span className={styles.sideInfoValue}>
-                        {data.nomorDaftar ? "-" : "-"}
+                        {data.waktuKuliah || "-"}
                     </span>
                 </div>
                 <div className={styles.sideInfoDivider} />
@@ -746,14 +776,17 @@ function RegistrationInfoCard({ data }: { data: BiodataPendaftaran }) {
 
 export default function TransferProof({ regID }: { regID: string }) {
     const t = useTranslations("account.transferProof");
+    const tCommon = useTranslations("common");
     const locale = useLocale();
     const router = useRouter();
+    const { accessToken } = useAuthStore();
 
     const [biodata, setBiodata] = useState<BiodataPendaftaran>({
         nomorDaftar: regID,
         periode: "",
         gelombang: "",
         jurusan: "",
+        waktuKuliah: "",
     });
     const [rows, setRows] = useState<BuktiTransferRow[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -772,25 +805,20 @@ export default function TransferProof({ regID }: { regID: string }) {
         const fetchData = async () => {
             setIsLoading(true);
             try {
-                const data = await api.profile.getRegistration(regID);
-                if (data) {
+                const data = await api.transfer.get(regID);
+                if (data && data.registration) {
+                    const reg = data.registration;
                     setBiodata({
                         nomorDaftar: regID,
-                        periode: new Date(data.created_at || Date.now())
-                            .getFullYear()
-                            .toString(),
-                        gelombang: data.batchName || "-",
-                        jurusan:
-                            data.type === "S1"
-                                ? data.prodi_pil_name ||
-                                  data.prodi_pil ||
-                                  "-"
-                                : data.jurusan || "-",
+                        periode: data.registration.academic_year || new Date().getFullYear().toString(),
+                        gelombang: reg.batch_name || "-",
+                        jurusan: data.current_prodi || "-",
+                        waktuKuliah: data.current_session || "-",
                     });
 
                     if (data.payments && Array.isArray(data.payments)) {
                         const mappedRows: BuktiTransferRow[] =
-                            data.payments.map((p: any) => ({
+                            data.payments.map((p) => ({
                                 tanggalUpload: p.created_at
                                     ? new Date(
                                           p.created_at,
@@ -802,7 +830,7 @@ export default function TransferProof({ regID }: { regID: string }) {
                                     : "-",
                                 pemilikRekening: p.pemilik_rekening || "-",
                                 bank: p.bank || "-",
-                                buktiTransferUrl: p.bukti_bayar_path,
+                                buktiTransferUrl: `/api/storage/${p.bukti_bayar_path}`,
                                 statusValidasi:
                                     p.status || "Masih dalam pemeriksaan",
                                 ropUrl: `/api/registration/${regID}/rop/${p.id}`,
@@ -819,7 +847,7 @@ export default function TransferProof({ regID }: { regID: string }) {
         };
 
         fetchData();
-    }, [regID, refreshKey, locale, t]);
+    }, [regID, refreshKey, locale, t, accessToken]);
 
     const handleTextChange =
         (
@@ -851,10 +879,12 @@ export default function TransferProof({ regID }: { regID: string }) {
             toast.success(t("toast.uploadSuccess"));
             setForm({ pemilikRekening: "", bank: "", file: null });
             setRefreshKey((k) => k + 1);
-        } catch (err) {
-            toast.error(
-                err instanceof Error ? err.message : t("toast.uploadError"),
-            );
+        } catch (err: any) {
+            const message =
+                err.message && err.message.startsWith("common.")
+                    ? tCommon(err.message.split(".")[1] as any)
+                    : err.message || t("toast.uploadError");
+            toast.error(message);
         } finally {
             setIsSubmitting(false);
         }

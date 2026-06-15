@@ -45,7 +45,8 @@
         "unauthorized": "unauthorized",
         "forbidden": "forbidden",
         "saved": "successfully saved",
-        "not_found": "{item} not found"
+        "not_found": "{item} not found",
+        "invalid_file_type": "document format must be a PDF file"
     },
     "registration": {
         "not_found": "registration not found or already closed",
@@ -54,7 +55,6 @@
         "form_invalid": "invalid form data",
         "upload_failed": "failed to upload document",
         "file_too_large": "one of the documents exceeds the maximum limit of {param}",
-        "invalid_file_type": "document format must be a PDF file",
         "invalid_doc_type": "invalid document type '{param}'",
         "field_required": "{field} is required",
         "doc_required": "{field} document is required",

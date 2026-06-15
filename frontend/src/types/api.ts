@@ -53,6 +53,36 @@ export interface RegistrationCard {
     usm_password?: string;
 }
 
+export interface TuitionFee {
+    id: number;
+    status: string;
+    pemilik_rekening: string;
+    bank: string;
+    amount: number;
+    bukti_bayar_path: string;
+    created_at: string;
+}
+
+export interface RegistrationDetailResponse {
+    registration: RegistrationCard;
+    payments?: TuitionFee[];
+    ospek?: OspekPrerequisite;
+    user: User;
+    current_prodi?: string;
+    current_session?: string;
+}
+
+export interface OspekPrerequisite {
+    registration_id: string;
+    pas_foto_path?: string;
+    pas_foto_name?: string;
+    ijazah_path?: string;
+    ijazah_name?: string;
+    status: string;
+    notes?: string;
+    uploaded_at: string;
+}
+
 export interface ProfileResponse extends User {
     registrations: RegistrationCard[];
 }

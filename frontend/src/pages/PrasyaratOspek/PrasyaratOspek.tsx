@@ -8,9 +8,10 @@ import {
     type ChangeEvent,
 } from "react";
 import { useRouter } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { api } from "@/api";
+import { UPLOAD_CONSTRAINTS } from "@/pages/Registration/registerOptions";
 import styles from "./PrasyaratOspek.module.scss";
 
 // ─── Inline SVG Icons ───────────────────────────────────────────────────────────
@@ -163,8 +164,6 @@ function StatusCard({ status, notes }: { status: string; notes: string }) {
 
 // ─── Upload Zone ──────────────────────────────────────────────────────────────
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
-
 function formatSize(bytes: number): string {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
@@ -191,8 +190,11 @@ function UploadZone({
     const zoneRef = useRef<HTMLDivElement>(null);
 
     const validateFile = useCallback((f: File): string | null => {
-        if (f.size > MAX_FILE_SIZE) {
+        if (f.size > UPLOAD_CONSTRAINTS.maxSizeBytes) {
             return t("upload.maxFileSize");
+        }
+        if (!UPLOAD_CONSTRAINTS.acceptedTypes.includes(f.type as any)) {
+            return t("upload.invalidFileType");
         }
         return null;
     }, [t]);
@@ -203,7 +205,11 @@ function UploadZone({
             if (f) {
                 const err = validateFile(f);
                 setError(err);
-                if (!err) onFileChange(f);
+                if (!err) {
+                    onFileChange(f);
+                } else {
+                    onFileChange(null);
+                }
             }
             e.target.value = "";
         },
@@ -239,7 +245,11 @@ function UploadZone({
             if (f) {
                 const err = validateFile(f);
                 setError(err);
-                if (!err) onFileChange(f);
+                if (!err) {
+                    onFileChange(f);
+                } else {
+                    onFileChange(null);
+                }
             }
         },
         [onFileChange, validateFile],
@@ -327,14 +337,14 @@ function UploadZone({
 
             {error && (
                 <span className={styles.errorMsg}>
-                    <span>•</span> {error}
+                    {error}
                 </span>
             )}
 
             <input
                 ref={inputRef}
                 type="file"
-                accept="image/*,application/pdf"
+                accept={UPLOAD_CONSTRAINTS.acceptedExtensions}
                 style={{ display: "none" }}
                 onChange={handleInputChange}
                 tabIndex={-1}
@@ -379,6 +389,7 @@ const UPLOAD_FIELDS_CONFIG = [
 
 export default function PrasyaratOspek({ regID }: { regID: string }) {
     const t = useTranslations("account.prasyaratOspek");
+    const tCommon = useTranslations("common");
     const router = useRouter();
 
     const [isLoading, setIsLoading] = useState(false);
@@ -397,13 +408,13 @@ export default function PrasyaratOspek({ regID }: { regID: string }) {
         const fetchData = async () => {
             setIsFetchingData(true);
             try {
-                const data = await api.profile.getRegistration(regID);
-                if (data) {
-                    if (data.doc_check_status) {
-                        setStatus(data.doc_check_status);
+                const data = await api.ospek.get(regID);
+                if (data && data.ospek) {
+                    if (data.ospek.status) {
+                        setStatus(data.ospek.status);
                     }
-                    if (data.doc_check_notes) {
-                        setCatatanPemeriksaan(data.doc_check_notes);
+                    if (data.ospek.notes) {
+                        setCatatanPemeriksaan(data.ospek.notes);
                     }
                 }
             } catch (err) {
@@ -441,16 +452,16 @@ export default function PrasyaratOspek({ regID }: { regID: string }) {
             });
             formData.append("nomorDaftar", regID);
 
-            if ((api as any).ospek?.uploadPrasyarat) {
-                await (api as any).ospek.uploadPrasyarat(formData);
-                toast.success(t("toast.uploadSuccess"));
-            } else {
-                toast.error(t("toast.endpointError"));
-            }
-        } catch (err) {
-            toast.error(
-                err instanceof Error ? err.message : t("toast.uploadError"),
-            );
+            await api.ospek.uploadPrasyarat(formData);
+            toast.success(t("toast.uploadSuccess"));
+            // Force refresh or redirect?
+            setTimeout(() => window.location.reload(), 1500);
+        } catch (err: any) {
+            const message =
+                err.message && err.message.startsWith("common.")
+                    ? tCommon(err.message.split(".")[1] as any)
+                    : err.message || t("toast.uploadError");
+            toast.error(message);
         } finally {
             setIsLoading(false);
         }

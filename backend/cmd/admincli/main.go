@@ -89,6 +89,38 @@ func main() {
 		}
 		cmdProdiReject(ctx, provider.MySQL, os.Args[2:])
 
+	case "ospek-verify", "ospek-reject":
+		if len(os.Args) < 3 {
+			slog.Error("missing required registration_id target positional argument", "command", commandVerb)
+			printUsage()
+			os.Exit(1)
+		}
+		if commandVerb == "ospek-verify" {
+			cmdOspekVerify(ctx, provider.MySQL, os.Args[2:])
+		} else {
+			cmdOspekReject(ctx, provider.MySQL, os.Args[2:])
+		}
+
+	case "payment-list":
+		if len(os.Args) < 3 {
+			slog.Error("missing required registration_id target positional argument", "command", commandVerb)
+			printUsage()
+			os.Exit(1)
+		}
+		cmdPaymentList(ctx, provider.MySQL, os.Args[2:])
+
+	case "payment-verify", "payment-reject":
+		if len(os.Args) < 4 {
+			slog.Error("missing required registration_id and payment_id positional arguments", "command", commandVerb)
+			printUsage()
+			os.Exit(1)
+		}
+		if commandVerb == "payment-verify" {
+			cmdPaymentVerify(ctx, provider.MySQL, os.Args[2:])
+		} else {
+			cmdPaymentReject(ctx, provider.MySQL, os.Args[2:])
+		}
+
 	default:
 		slog.Error("unrecognized or invalid administration tool instruction", "input", commandVerb)
 		printUsage()
@@ -134,7 +166,22 @@ Commands:
 		  Approve a pending major change request. Updates registration_s1_detail.
 
   prodi-reject   <request_id>
-  		  Reject a pending major change request with optional reason.`)
+  		  Reject a pending major change request with optional reason.
+
+  ospek-verify   <registration_id>
+          Verify the orientation (Ospek) prerequisite documents.
+
+  ospek-reject   <registration_id> [--notes="..."]
+          Reject the ospek documents with feedback notes.
+
+  payment-list   <registration_id>
+          List all payment proofs for a specific registration to get their IDs.
+
+  payment-verify <registration_id> <payment_id>
+          Verify a specific tuition fee payment proof.
+
+  payment-reject <registration_id> <payment_id>
+          Reject a specific tuition fee payment proof.`)
 }
 
 func cmdList(ctx context.Context, dbConn *sql.DB, args []string) {
@@ -916,4 +963,165 @@ func cmdProdiReject(ctx context.Context, dbConn *sql.DB, args []string) {
 	}
 
 	fmt.Printf("Request #%d rejected.\n", requestID)
+}
+
+func cmdOspekVerify(ctx context.Context, dbConn *sql.DB, args []string) {
+	fs := flag.NewFlagSet("ospek-verify", flag.ContinueOnError)
+	if err := fs.Parse(args); err != nil {
+		os.Exit(1)
+	}
+	positionalArgs := fs.Args()
+	if len(positionalArgs) < 1 {
+		fmt.Println("Usage: admincli ospek-verify <registration_id>")
+		os.Exit(1)
+	}
+	regID := parseRegID(positionalArgs[0])
+
+	res, err := dbConn.ExecContext(ctx, `
+		UPDATE ospek_prerequisite
+		SET status = 'VERIFIED', verified_at = NOW(), notes = NULL
+		WHERE registration_id = ?`,
+		regID[:],
+	)
+	if err != nil {
+		slog.Error("ospek-verify failed", "error", err)
+		os.Exit(1)
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 0 {
+		fmt.Println("Action aborted: no ospek record found for this registration.")
+		os.Exit(1)
+	}
+
+	fmt.Printf("Ospek documents for registration %s verified successfully.\n", regID.String())
+}
+
+func cmdOspekReject(ctx context.Context, dbConn *sql.DB, args []string) {
+	fs := flag.NewFlagSet("ospek-reject", flag.ContinueOnError)
+	notesFlag := fs.String("notes", "", "Feedback notes for the applicant")
+	if err := fs.Parse(args); err != nil {
+		os.Exit(1)
+	}
+	positionalArgs := fs.Args()
+	if len(positionalArgs) < 1 {
+		fmt.Println("Usage: admincli ospek-reject <registration_id> [--notes='...']")
+		os.Exit(1)
+	}
+	regID := parseRegID(positionalArgs[0])
+
+	res, err := dbConn.ExecContext(ctx, `
+		UPDATE ospek_prerequisite
+		SET status = 'REJECTED', notes = ?, verified_at = NULL
+		WHERE registration_id = ?`,
+		*notesFlag, regID[:],
+	)
+	if err != nil {
+		slog.Error("ospek-reject failed", "error", err)
+		os.Exit(1)
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 0 {
+		fmt.Println("Action aborted: no ospek record found for this registration.")
+		os.Exit(1)
+	}
+
+	fmt.Printf("Ospek documents for registration %s rejected with notes.\n", regID.String())
+}
+
+func cmdPaymentList(ctx context.Context, dbConn *sql.DB, args []string) {
+	fs := flag.NewFlagSet("payment-list", flag.ContinueOnError)
+	if err := fs.Parse(args); err != nil {
+		os.Exit(1)
+	}
+	positionalArgs := fs.Args()
+	if len(positionalArgs) < 1 {
+		fmt.Println("Usage: admincli payment-list <registration_id>")
+		os.Exit(1)
+	}
+	regID := parseRegID(positionalArgs[0])
+
+	rows, err := dbConn.QueryContext(ctx, `
+		SELECT id, status, amount, bank_name, account_holder, uploaded_at
+		FROM registration_tuition_fee
+		WHERE registration_id = ?
+		ORDER BY uploaded_at DESC`,
+		regID[:],
+	)
+	if err != nil {
+		slog.Error("payment-list query failed", "error", err)
+		os.Exit(1)
+	}
+	defer rows.Close()
+
+	fmt.Printf("%-5s %-12s %-12s %-15s %-25s %s\n",
+		"ID", "STATUS", "AMOUNT", "BANK", "HOLDER", "UPLOADED")
+	fmt.Println(strings.Repeat("-", 100))
+
+	for rows.Next() {
+		var id int64
+		var status, bank, holder, createdAt string
+		var amount uint64
+		if err := rows.Scan(&id, &status, &amount, &bank, &holder, &createdAt); err != nil {
+			slog.Error("payment-list scan failed", "error", err)
+			os.Exit(1)
+		}
+		fmt.Printf("%-5d %-12s %-12d %-15s %-25s %s\n",
+			id, status, amount, bank, holder, createdAt[:19])
+	}
+}
+
+func cmdPaymentVerify(ctx context.Context, dbConn *sql.DB, args []string) {
+	if len(args) < 2 {
+		fmt.Println("Usage: admincli payment-verify <registration_id> <payment_id>")
+		os.Exit(1)
+	}
+	regID := parseRegID(args[0])
+	paymentID, _ := strconv.ParseInt(args[1], 10, 64)
+
+	res, err := dbConn.ExecContext(ctx, `
+		UPDATE registration_tuition_fee
+		SET status = 'VERIFIED', verified_at = NOW()
+		WHERE id = ? AND registration_id = ?`,
+		paymentID, regID[:],
+	)
+	if err != nil {
+		slog.Error("payment-verify failed", "error", err)
+		os.Exit(1)
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 0 {
+		fmt.Println("Action aborted: payment record not found or does not belong to this registration.")
+		os.Exit(1)
+	}
+	fmt.Printf("Payment #%d for registration %s verified successfully.\n", paymentID, regID.String())
+}
+
+func cmdPaymentReject(ctx context.Context, dbConn *sql.DB, args []string) {
+	if len(args) < 2 {
+		fmt.Println("Usage: admincli payment-reject <registration_id> <payment_id>")
+		os.Exit(1)
+	}
+	regID := parseRegID(args[0])
+	paymentID, _ := strconv.ParseInt(args[1], 10, 64)
+
+	res, err := dbConn.ExecContext(ctx, `
+		UPDATE registration_tuition_fee
+		SET status = 'REJECTED'
+		WHERE id = ? AND registration_id = ?`,
+		paymentID, regID[:],
+	)
+	if err != nil {
+		slog.Error("payment-reject failed", "error", err)
+		os.Exit(1)
+	}
+
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 0 {
+		fmt.Println("Action aborted: payment record not found or does not belong to this registration.")
+		os.Exit(1)
+	}
+	fmt.Printf("Payment #%d for registration %s rejected.\n", paymentID, regID.String())
 }
