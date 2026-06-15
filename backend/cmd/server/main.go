@@ -185,9 +185,6 @@ func main() {
 		r.Get("/api/registrations/{batchKey}/status",
 			rl.registrationStatus.RateLimitUser(handlers.RegistrationStatus(provider.MySQL)),
 		)
-		r.Get("/api/registrations/{regID}",
-			rl.registrationInit.RateLimitUser(handlers.GetRegistrationDetail(provider.MySQL)),
-		)
 		r.Delete("/api/registrations/{batchKey}",
 			rl.registrationDelete.RateLimitUser(handlers.RegistrationDelete(provider.MySQL, storageDir, auditLogger)),
 		)
@@ -196,6 +193,9 @@ func main() {
 		)
 		r.Get("/api/registrations/{batchKey}/loa",
 			rl.registrationLoa.RateLimitUser(handlers.RegistrationLoA(provider.MySQL)),
+		)
+		r.Get("/api/registration/{regID}/rop/{paymentID}",
+			rl.registrationLoa.RateLimitUser(handlers.RegistrationROP(provider.MySQL)),
 		)
 		r.Get("/api/prodi/{regID}",
 			rl.prodiRequestHistory.RateLimitUser(handlers.GetProdiRequests(provider.MySQL)),
@@ -218,6 +218,20 @@ func main() {
 		r.Post("/api/registrations/{batchKey}/submit",
 			rl.registrationSubmit.RateLimitUser(handlers.RegistrationSubmit(provider.MySQL, storageDir, scanner, auditLogger)),
 		)
+		r.Get("/api/registrations/{regID}/transfer-proof",
+			rl.uploadTuitionFee.RateLimitUser(handlers.GetTransferProofs(provider.MySQL)),
+		)
+		r.Post("/api/registrations/{regID}/transfer-proof",
+			rl.uploadTuitionFee.RateLimitUser(handlers.UploadTransferProof(provider.MySQL, storageDir, scanner, auditLogger)),
+		)
+		r.Get("/api/registrations/{regID}/ospek-prerequisite",
+			rl.uploadOspek.RateLimitUser(handlers.GetOspekPrerequisites(provider.MySQL)),
+		)
+		r.Post("/api/registrations/{regID}/ospek-prerequisite",
+			rl.uploadOspek.RateLimitUser(handlers.UploadOspekPrerequisite(provider.MySQL, storageDir, scanner, auditLogger)),
+		)
+
+		r.Get("/api/storage/*", handlers.ServeStorageFile(storageDir))
 	})
 
 	port := os.Getenv("SERVER_PORT")
@@ -278,6 +292,8 @@ type rateLimiters struct {
 	prodiRequestHistory *auth.RateLimiter
 	prodiRequestChange	*auth.RateLimiter
 	prodiRequestDelete	*auth.RateLimiter
+	uploadTuitionFee    *auth.RateLimiter
+	uploadOspek         *auth.RateLimiter
 }
 
 func newRateLimiters() rateLimiters {
@@ -307,5 +323,7 @@ func newRateLimiters() rateLimiters {
 		prodiRequestHistory: auth.NewRateLimiter(60, 1*time.Minute),
 		prodiRequestChange:  auth.NewRateLimiter(5, 5*time.Minute),
 		prodiRequestDelete:  auth.NewRateLimiter(5, 5*time.Minute),
+		uploadTuitionFee:    auth.NewRateLimiter(10, 5*time.Minute),
+		uploadOspek:         auth.NewRateLimiter(10, 5*time.Minute),
 	}
 }

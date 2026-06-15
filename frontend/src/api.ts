@@ -9,6 +9,8 @@ import type {
     AccessTokenResponse,
     ProdiInfoResponse,
     ProfileResponse,
+    RegistrationCard,
+    RegistrationDetailResponse,
     RegistrationResponse,
     User,
 } from "@/types/api";
@@ -275,4 +277,43 @@ export const api = {
                 },
             ),
     },
+    transfer: {
+        get: (regID: string) =>
+            apiClient.get<never, RegistrationDetailResponse>(
+                `/api/registrations/${regID}/transfer-proof`,
+            ),
+        uploadBukti: (regID: string, formData: FormData) => {
+            const file = formData.get("file") as File;
+            if (file && file.type !== "application/pdf") {
+                return Promise.reject(new Error("common.invalidFileType"));
+            }
+            return apiClient.post<never, { message: string }>(
+                `/api/registrations/${regID}/transfer-proof`,
+                formData,
+            );
+        },
+    },
+    ospek: {
+        get: (regID: string) =>
+            apiClient.get<never, RegistrationDetailResponse>(
+                `/api/registrations/${regID}/ospek-prerequisite`,
+            ),
+        uploadPrasyarat: (formData: FormData) => {
+            const regID = formData.get("nomorDaftar");
+            const files = formData.getAll("files") as File[];
+            for (const file of files) {
+                if (file.type !== "application/pdf") {
+                    return Promise.reject(new Error("common.invalidFileType"));
+                }
+            }
+            return apiClient.post<never, { message: string }>(
+                `/api/registrations/${regID}/ospek-prerequisite`,
+                formData,
+            );
+        },
+    },
+    storage: {
+        getFileBlob: (url: string) =>
+            apiClient.get<never, Blob>(url, { responseType: "blob" }),
+    }
 };

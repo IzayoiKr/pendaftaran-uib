@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuitansi Pembayaran - {{.ReceiptNumber}}</title>
+    <style>
+        {{.CSS}}
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Cetak Kuitansi
+    </button>
+
+    <div class="receipt">
+        <div class="verified-stamp">VERIFIED</div>
+        
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <img src="{{.LogoDataURI}}" alt="UIB Logo">
+                </div>
+                <div class="uib-info">
+                    <h1>Universitas Internasional Batam</h1>
+                    <p>Jl. Gajah Mada, Baloi - Batam</p>
+                    <p>Telp: (0778) 460707 | Website: www.uib.ac.id</p>
+                </div>
+            </div>
+            <div class="receipt-meta">
+                <h2>Kuitansi</h2>
+                <div class="receipt-no">{{.ReceiptNumber}}</div>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <span class="section-title">Informasi Mahasiswa</span>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Nama Lengkap</label>
+                    <span>{{.StudentName}}</span>
+                </div>
+                <div class="info-item">
+                    <label>Nomor Pendaftaran</label>
+                    <span>{{.ExamineeID}}</span>
+                </div>
+                <div class="info-item">
+                    <label>Gelombang</label>
+                    <span>{{.BatchName}}</span>
+                </div>
+                <div class="info-item">
+                    <label>Jenjang</label>
+                    <span>{{.Degree}}</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <span class="section-title">Rincian Pembayaran</span>
+            <table class="payment-table">
+                <thead>
+                    <tr>
+                        <th>Deskripsi Pembayaran</th>
+                        <th style="text-align: right;">Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div><strong>{{.PaymentPurpose}}</strong></div>
+                            <div style="font-size: 9pt; color: #64748b; margin-top: 4px;">
+                                Bank: {{.BankName}} | Pengirim: {{.AccountHolder}}
+                            </div>
+                        </td>
+                        <td style="text-align: right;" class="amount-display">
+                            {{formatRupiah .Amount}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="terbilang-box">
+                <span class="terbilang-label">Terbilang:</span>
+                <span class="terbilang-value"># {{.AmountWords}} #</span>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="footer-notes">
+                <p><strong>Catatan:</strong></p>
+                <p>1. Kuitansi ini adalah bukti pembayaran resmi yang sah dan diterbitkan secara elektronik oleh sistem pendaftaran UIB.</p>
+                <p>2. Simpan kuitansi ini sebagai bukti untuk keperluan administrasi pendaftaran lebih lanjut.</p>
+            </div>
+            <div class="signature-section">
+                <div class="signature-date">Batam, {{.PaymentDate}}</div>
+                <div class="signature-space" style="height: 60px;"></div>
+                <span class="signer-name">Bagian Keuangan UIB</span>
+                <span class="signer-title">Dokumen ini sah secara digital</span>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

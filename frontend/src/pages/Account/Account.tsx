@@ -440,7 +440,7 @@ function RegistrationCardItem({
                             }
                             disabled={isActionDisabled}
                         >
-                            <MoneyIcon /> {t("transferProof")}
+                            <MoneyIcon /> {t("transferProof.page.title")}
                         </button>
                         <button
                             className={`${styles.btn} ${styles.btnSecondaryOutline}`}

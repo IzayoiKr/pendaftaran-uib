@@ -1,0 +1,267 @@
+:root {
+    --primary: #0b2d5c;
+    --accent: #3ba4f6;
+    --success: #10b981;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-muted: #64748b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: var(--text);
+    background: #f8fafc;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.receipt {
+    max-width: 800px;
+    width: 100%;
+    background: white;
+    padding: 60px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.receipt::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(to right, var(--primary), var(--accent));
+}
+
+.print-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.print-btn:hover {
+    background: #08204a;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 40px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 20px;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.logo img {
+    height: 64px;
+    width: auto;
+}
+
+.uib-info h1 {
+    font-size: 16pt;
+    color: var(--primary);
+    margin-bottom: 2px;
+}
+
+.uib-info p {
+    font-size: 9pt;
+    color: var(--text-muted);
+}
+
+.receipt-meta {
+    text-align: right;
+}
+
+.receipt-meta h2 {
+    font-size: 18pt;
+    text-transform: uppercase;
+    color: var(--primary);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.receipt-no {
+    font-family: monospace;
+    font-size: 11pt;
+    color: var(--text-muted);
+}
+
+.content-section {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 10pt;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    display: block;
+    border-left: 4px solid var(--accent);
+    padding-left: 10px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.info-item label {
+    font-size: 9pt;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.info-item span {
+    font-weight: 600;
+}
+
+.payment-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+.payment-table th {
+    background: #f1f5f9;
+    padding: 12px 15px;
+    text-align: left;
+    font-size: 10pt;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--border);
+}
+
+.payment-table td {
+    padding: 15px;
+    border-bottom: 1px solid var(--border);
+}
+
+.amount-display {
+    font-weight: 700;
+    font-size: 14pt;
+    color: var(--primary);
+}
+
+.terbilang-box {
+    background: #f8fafc;
+    border: 1px dashed var(--border);
+    padding: 15px 20px;
+    border-radius: 6px;
+    margin-bottom: 40px;
+}
+
+.terbilang-label {
+    font-size: 9pt;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.terbilang-value {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 60px;
+}
+
+.footer-notes {
+    max-width: 400px;
+    font-size: 9pt;
+    color: var(--text-muted);
+}
+
+.footer-notes p {
+    margin-bottom: 8px;
+}
+
+.signature-section {
+    text-align: center;
+    min-width: 200px;
+}
+
+.signature-date {
+    margin-bottom: 60px;
+}
+
+.signer-name {
+    font-weight: 700;
+    text-decoration: underline;
+    display: block;
+}
+
+.signer-title {
+    font-size: 10pt;
+    color: var(--text-muted);
+}
+
+.verified-stamp {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    border: 4px solid var(--success);
+    color: var(--success);
+    padding: 10px 30px;
+    font-size: 32pt;
+    font-weight: 900;
+    text-transform: uppercase;
+    opacity: 0.15;
+    border-radius: 12px;
+    pointer-events: none;
+}
+
+@media print {
+    body {
+        background: white;
+        padding: 0;
+    }
+    .receipt {
+        box-shadow: none;
+        padding: 0;
+    }
+    .print-btn {
+        display: none;
+    }
+    .receipt::before {
+        display: none;
+    }
+}

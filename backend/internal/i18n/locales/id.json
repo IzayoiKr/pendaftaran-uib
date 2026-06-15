@@ -45,7 +45,8 @@
         "unauthorized": "tidak memiliki akses",
         "forbidden": "akses dilarang",
         "saved": "berhasil disimpan",
-        "not_found": "{item} tidak ditemukan"
+        "not_found": "{item} tidak ditemukan",
+        "invalid_file_type": "format dokumen harus berupa file PDF"
     },
     "registration": {
         "not_found": "pendaftaran tidak ditemukan atau sudah ditutup",
@@ -54,7 +55,6 @@
         "form_invalid": "data form tidak valid",
         "upload_failed": "dokumen gagal diupload",
         "file_too_large": "salah satu dokumen melebihi batas maksimal {param}",
-        "invalid_file_type": "format dokumen harus berupa file PDF",
         "invalid_doc_type": "tipe dokumen '{param}' tidak valid",
         "field_required": "{field} wajib diisi",
         "doc_required": "dokumen {field} wajib diunggah",

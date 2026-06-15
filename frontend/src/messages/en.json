@@ -403,7 +403,7 @@
                 },
                 "upload": {
                     "placeholder": "Click or drag file to upload",
-                    "hint": "JPG, PNG, or PDF up to 2 MB",
+                    "hint": "Only PDF up to 2 MB",
                     "removeAria": "Remove file"
                 },
                 "btn": {
@@ -425,6 +425,7 @@
             "toast": {
                 "fetchError": "Failed to load data. Please try again.",
                 "maxFileSize": "File size exceeds 2 MB limit.",
+                "invalidFileType": "Only PDF files are allowed.",
                 "noFile": "Please select a file to upload.",
                 "noRegNumber": "Registration number not found.",
                 "uploadSuccess": "Transfer proof uploaded successfully!",
@@ -471,8 +472,9 @@
             "upload": {
                 "title": "Document Upload",
                 "placeholder": "Click or drag file to upload",
-                "hint": "JPG, PNG, or PDF up to 2 MB",
+                "hint": "Only PDF up to 2 MB",
                 "maxFileSize": "File size exceeds 2 MB limit.",
+                "invalidFileType": "Only PDF files are allowed.",
                 "removeAria": "Remove file",
                 "exampleTitle": "Download Example",
                 "exampleDesc": "See the correct format",
@@ -913,7 +915,7 @@
         "searchError": "Search unavailable",
         "searchErrorManual": "An error occurred. Please type manually",
         "uploadPlaceholder": "Drag file here or click to select",
-        "uploadHint": "PDF only, max {maxSize}",
+        "uploadHint": "PDF, max {maxSize}",
         "fileSelected": "Selected file: {fileName}. Press remove button to change.",
         "uploadLabel": "Upload {label}. Press Enter or click to select file.",
         "removeFile": "Remove file",
@@ -1537,11 +1539,16 @@
         }
     },
     "common": {
+        "invalidFileType": "Only PDF files are allowed.",
+        "maxFileSize": "File size exceeds 2 MB limit.",
         "home": "Home",
         "readMore": "Read More",
         "generalInformation": "General Information",
         "relatedInformation": "Related Information",
-        "backToGeneralInformation": "Back to General Information"
+        "backToGeneralInformation": "Back to General Information",
+        "loading": "Loading...",
+        "success": "Success",
+        "serverError": "Server error occurred"
     },
     "infoUmum": {
         "empty": "No information is currently available."
