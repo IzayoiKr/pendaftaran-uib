@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import PrasyaratOspek from "@/pages/PrasyaratOspek/PrasyaratOspek";
+import PrasyaratOspek from "@/views/PrasyaratOspek/PrasyaratOspek";
 
 export async function generateMetadata({
     params,

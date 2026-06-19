@@ -1,12 +1,12 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import Gelombang from "@/pages/Home/Gelombang/Gelombang";
-import GelombangSkeleton from "@/pages/Home/Gelombang/Gelombang.skeleton";
-import Guides from "@/pages/Home/Guides/Guides";
-import Hero from "@/pages/Home/Hero/Hero";
-import ProgramStudi from "@/pages/Home/ProgramStudi/ProgramStudi";
-import ProgramStudiSkeleton from "@/pages/Home/ProgramStudi/ProgramStudi.skeleton";
+import Gelombang from "@/views/Home/Gelombang/Gelombang";
+import GelombangSkeleton from "@/views/Home/Gelombang/Gelombang.skeleton";
+import Guides from "@/views/Home/Guides/Guides";
+import Hero from "@/views/Home/Hero/Hero";
+import ProgramStudi from "@/views/Home/ProgramStudi/ProgramStudi";
+import ProgramStudiSkeleton from "@/views/Home/ProgramStudi/ProgramStudi.skeleton";
 import type { Event, Program } from "@/types/api";
 
 export async function generateMetadata({

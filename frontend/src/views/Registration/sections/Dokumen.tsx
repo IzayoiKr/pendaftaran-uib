@@ -5,17 +5,17 @@ import {
     S1_BEASISWA_DOCS,
     S1_DOCS,
     S2_DOCS,
-} from "@/pages/Registration/registerOptions";
-import SectionCard from "@/pages/Registration/shared/SectionCard";
-import UploadZone from "@/pages/Registration/shared/UploadZone";
+} from "@/views/Registration/registerOptions";
+import SectionCard from "@/views/Registration/shared/SectionCard";
+import UploadZone from "@/views/Registration/shared/UploadZone";
 import type {
     DocumentField,
     RegistrationFormValues,
     SectionStatus,
-} from "@/pages/Registration/types";
-import { JENIS_DAFTAR } from "@/pages/Registration/valueOptions";
+} from "@/views/Registration/types";
+import { JENIS_DAFTAR } from "@/views/Registration/valueOptions";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
-import styles from "@/pages/Registration/Registration.module.scss";
+import styles from "@/views/Registration/Registration.module.scss";
 
 interface DokumenProps {
     level: "S1" | "S2";

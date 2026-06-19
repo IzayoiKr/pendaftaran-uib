@@ -1,17 +1,17 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import SectionCard from "@/pages/Registration/shared/SectionCard";
-import TextField from "@/pages/Registration/shared/TextField";
-import UploadZone from "@/pages/Registration/shared/UploadZone";
+import SectionCard from "@/views/Registration/shared/SectionCard";
+import TextField from "@/views/Registration/shared/TextField";
+import UploadZone from "@/views/Registration/shared/UploadZone";
 import type {
     PaymentConfig,
     RegistrationFormValues,
     SectionStatus,
-} from "@/pages/Registration/types";
+} from "@/views/Registration/types";
 import { Controller, useFormContext } from "react-hook-form";
 import { FileIcon } from "@/components/Icons/Icons";
-import styles from "@/pages/Registration/Registration.module.scss";
+import styles from "@/views/Registration/Registration.module.scss";
 
 interface PembayaranProps {
     paymentConfig: PaymentConfig;

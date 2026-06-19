@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { infoList } from "@/constants/infoUmum";
-import InfoDetail from "@/pages/InfoUmum/InfoDetail";
-import { infoDetailModules } from "@/pages/InfoUmum/InfoDetails";
+import InfoDetail from "@/views/InfoUmum/InfoDetail";
+import { infoDetailModules } from "@/views/InfoUmum/InfoDetails";
 
 interface Props {
     params: Promise<{

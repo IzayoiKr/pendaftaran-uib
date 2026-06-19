@@ -7,20 +7,20 @@ import {
     STATUS_INSTANSI_OPTIONS,
     SUMBER_BIAYA_OPTIONS,
     TAHUN_MULAI_KERJA_OPTIONS,
-} from "@/pages/Registration/registerOptions";
-import DisplayField from "@/pages/Registration/shared/DisplayField";
-import FormField from "@/pages/Registration/shared/FormField";
-import PhoneField from "@/pages/Registration/shared/PhoneField";
-import SearchableField from "@/pages/Registration/shared/SearchableField";
-import SectionCard from "@/pages/Registration/shared/SectionCard";
-import SelectField from "@/pages/Registration/shared/SelectField";
-import TextField from "@/pages/Registration/shared/TextField";
+} from "@/views/Registration/registerOptions";
+import DisplayField from "@/views/Registration/shared/DisplayField";
+import FormField from "@/views/Registration/shared/FormField";
+import PhoneField from "@/views/Registration/shared/PhoneField";
+import SearchableField from "@/views/Registration/shared/SearchableField";
+import SectionCard from "@/views/Registration/shared/SectionCard";
+import SelectField from "@/views/Registration/shared/SelectField";
+import TextField from "@/views/Registration/shared/TextField";
 import type {
     RegistrationFormValues,
     SectionStatus,
-} from "@/pages/Registration/types";
+} from "@/views/Registration/types";
 import { Controller, useFormContext } from "react-hook-form";
-import styles from "@/pages/Registration/Registration.module.scss";
+import styles from "@/views/Registration/Registration.module.scss";
 
 interface S2BiodataProps {
     user: { full_name: string; email: string } | null;

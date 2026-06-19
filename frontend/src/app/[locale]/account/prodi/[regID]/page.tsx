@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import Prodi from "@/pages/Prodi/Prodi";
+import Prodi from "@/views/Prodi/Prodi";
 
 export async function generateMetadata({
     params,

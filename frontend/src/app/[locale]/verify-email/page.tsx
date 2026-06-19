@@ -1,6 +1,7 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import VerifyEmail from "@/pages/VerifyEmail/VerifyEmail";
+import VerifyEmail from "@/views/VerifyEmail/VerifyEmail";
 
 export async function generateMetadata({
     params,
@@ -24,5 +25,9 @@ export async function generateMetadata({
 }
 
 export default function VerifyEmailPage() {
-    return <VerifyEmail />;
+    return (
+        <Suspense>
+            <VerifyEmail />
+        </Suspense>
+    );
 }

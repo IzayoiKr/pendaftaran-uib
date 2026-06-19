@@ -1,6 +1,7 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import ResetPassword from "@/pages/ResetPassword/ResetPassword";
+import ResetPassword from "@/views/ResetPassword/ResetPassword";
 
 export async function generateMetadata({
     params,
@@ -24,5 +25,9 @@ export async function generateMetadata({
 }
 
 export default function ResetPasswordPage() {
-    return <ResetPassword />;
+    return (
+        <Suspense>
+            <ResetPassword />
+        </Suspense>
+    );
 }

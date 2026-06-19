@@ -1,6 +1,7 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import Login from "@/pages/Login/Login";
+import Login from "@/views/Login/Login";
 
 export async function generateMetadata({
     params,
@@ -17,5 +18,9 @@ export async function generateMetadata({
 }
 
 export default function LoginPage() {
-    return <Login />;
+    return (
+        <Suspense>
+            <Login />
+        </Suspense>
+    );
 }

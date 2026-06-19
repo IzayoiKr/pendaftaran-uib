@@ -11,7 +11,7 @@ import {
     STATUS_ORANG_TUA,
     SUMBER_BIAYA,
     WAKTU_KULIAH,
-} from "@/pages/Registration/valueOptions";
+} from "@/views/Registration/valueOptions";
 import { z } from "zod";
 
 export type TV = (

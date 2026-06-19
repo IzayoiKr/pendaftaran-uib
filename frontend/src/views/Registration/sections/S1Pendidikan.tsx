@@ -4,19 +4,19 @@ import { useTranslations } from "next-intl";
 import {
     TAHUN_LULUS_SMA_OPTIONS,
     WAKTU_KULIAH_OPTIONS,
-} from "@/pages/Registration/registerOptions";
-import CardSelect from "@/pages/Registration/shared/CardSelect";
-import FormField from "@/pages/Registration/shared/FormField";
-import SearchableField from "@/pages/Registration/shared/SearchableField";
-import SectionCard from "@/pages/Registration/shared/SectionCard";
-import SelectField from "@/pages/Registration/shared/SelectField";
-import TextField from "@/pages/Registration/shared/TextField";
+} from "@/views/Registration/registerOptions";
+import CardSelect from "@/views/Registration/shared/CardSelect";
+import FormField from "@/views/Registration/shared/FormField";
+import SearchableField from "@/views/Registration/shared/SearchableField";
+import SectionCard from "@/views/Registration/shared/SectionCard";
+import SelectField from "@/views/Registration/shared/SelectField";
+import TextField from "@/views/Registration/shared/TextField";
 import type {
     RegistrationFormValues,
     SectionStatus,
-} from "@/pages/Registration/types";
+} from "@/views/Registration/types";
 import { Controller, useFormContext } from "react-hook-form";
-import styles from "@/pages/Registration/Registration.module.scss";
+import styles from "@/views/Registration/Registration.module.scss";
 
 interface S1PendidikanProps {
     batchType: "Beasiswa" | "Reguler";

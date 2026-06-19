@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import UpdateProfile from "@/pages/UpdateProfile/UpdateProfile";
+import UpdateProfile from "@/views/UpdateProfile/UpdateProfile";
 
 export async function generateMetadata({
     params,

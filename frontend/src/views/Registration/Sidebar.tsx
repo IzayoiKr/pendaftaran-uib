@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { SectionStatus } from "@/pages/Registration/types";
+import type { SectionStatus } from "@/views/Registration/types";
 import { CheckIcon } from "@/components/Icons/Icons";
 import styles from "./Sidebar.module.scss";
 

@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import Registration from "@/pages/Registration/Registration";
+import Registration from "@/views/Registration/Registration";
 import Loading from "@/components/Loading/Loading";
 import NotFound from "@/components/NotFound/NotFound";
 import type { ProgramChoice } from "@/types/api";

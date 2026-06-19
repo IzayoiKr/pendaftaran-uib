@@ -11,7 +11,7 @@ import {
 } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { UPLOAD_CONSTRAINTS } from "@/pages/Registration/registerOptions";
+import { UPLOAD_CONSTRAINTS } from "@/views/Registration/registerOptions";
 import { toast } from "sonner";
 import { api } from "@/api";
 import useAuthStore from "@/store/useAuthStore";

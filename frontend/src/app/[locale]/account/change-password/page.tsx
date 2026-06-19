@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import ChangePassword from "@/pages/ChangePassword/ChangePassword";
+import ChangePassword from "@/views/ChangePassword/ChangePassword";
 
 export async function generateMetadata({
     params,

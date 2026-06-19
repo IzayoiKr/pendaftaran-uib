@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import TransferProof from "@/pages/TransferProof/TransferProof";
+import TransferProof from "@/views/TransferProof/TransferProof";
 
 export async function generateMetadata({
     params,

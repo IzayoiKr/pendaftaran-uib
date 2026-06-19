@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Panduan from "@/pages/Panduan/Panduan";
+import Panduan from "@/views/Panduan/Panduan";
 
 export const metadata: Metadata = {
     title: "Panduan Admisi",

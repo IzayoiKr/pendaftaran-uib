@@ -73,7 +73,7 @@ export default async function RootLayout({
     params,
 }: {
     children: React.ReactNode;
-    params: Promise<{ locale: "id" | "en" }>;
+    params: Promise<{ locale: string }>;
 }) {
     // const nonce = (await headers()).get('x-nonce') ?? '';
     const { locale } = await params;

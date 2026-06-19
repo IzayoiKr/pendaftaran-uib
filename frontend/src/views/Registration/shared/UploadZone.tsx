@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { UPLOAD_CONSTRAINTS } from "@/pages/Registration/registerOptions";
+import { UPLOAD_CONSTRAINTS } from "@/views/Registration/registerOptions";
 import { FileIcon, XIcon } from "@/components/Icons/Icons";
 import { type DocumentField, getDocumentDisplay } from "../types";
 import styles from "./UploadZone.module.scss";
