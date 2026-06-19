@@ -252,5 +252,3 @@ func UploadTransferProof(db *sql.DB, storageDir string, scanner *clamav.Client, 
 		utils.WriteJSON(w, http.StatusOK, map[string]string{"message": i18n.T("registration.upload_success", lang)})
 	}
 }
-
-

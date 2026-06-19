@@ -295,28 +295,28 @@ export default function Prodi({ regID }: ProdiProps) {
                                                     />
                                                     {req.status ===
                                                         "PENDING" && (
-                                                            <button
-                                                                type="button"
-                                                                className={`${styles.btnIcon} ${styles.btnIconDanger}`}
-                                                                onClick={() =>
-                                                                    handleCancel(
-                                                                        req.id,
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    isCancelling ===
-                                                                    req.id
-                                                                }
-                                                                aria-label={t(
-                                                                    "cancelRequest",
-                                                                )}
-                                                                title={t(
-                                                                    "cancelRequest",
-                                                                )}
-                                                            >
-                                                                <TrashIcon />
-                                                            </button>
-                                                        )}
+                                                        <button
+                                                            type="button"
+                                                            className={`${styles.btnIcon} ${styles.btnIconDanger}`}
+                                                            onClick={() =>
+                                                                handleCancel(
+                                                                    req.id,
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                isCancelling ===
+                                                                req.id
+                                                            }
+                                                            aria-label={t(
+                                                                "cancelRequest",
+                                                            )}
+                                                            title={t(
+                                                                "cancelRequest",
+                                                            )}
+                                                        >
+                                                            <TrashIcon />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </div>
 

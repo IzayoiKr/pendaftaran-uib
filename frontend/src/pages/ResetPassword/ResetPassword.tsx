@@ -61,6 +61,8 @@ function SubmitAction({ isLoading }: { isLoading: boolean }) {
 
 function ResetPasswordForm() {
     const t = useTranslations("resetPassword");
+    const tv = useTranslations("validation");
+
     const router = useRouter();
     const searchParams = useSearchParams();
     const token = searchParams?.get("token") ?? "";
@@ -80,8 +82,6 @@ function ResetPasswordForm() {
         const { name, value } = e.target;
         setForm((prev) => ({ ...prev, [name]: value }));
     };
-
-    const tv = useTranslations("validation");
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();

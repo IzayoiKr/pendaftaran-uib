@@ -94,7 +94,9 @@ $surface-raised: #f9fafb;
 .pageHeader {
   background: global.$white;
   border-radius: 1.25rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(11, 45, 92, 0.06);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(11, 45, 92, 0.06);
   border: 1px solid $color-slate-200;
   padding: var(--space-l) var(--space-xl);
   display: flex;
@@ -118,7 +120,9 @@ $surface-raised: #f9fafb;
   }
 
   &:hover {
-    box-shadow: 0 4px 16px rgba(11, 45, 92, 0.1), 0 12px 32px rgba(11, 45, 92, 0.08);
+    box-shadow:
+      0 4px 16px rgba(11, 45, 92, 0.1),
+      0 12px 32px rgba(11, 45, 92, 0.08);
     transform: translateY(-1px);
   }
 }
@@ -183,7 +187,9 @@ $surface-raised: #f9fafb;
 .statCard {
   background: global.$white;
   border-radius: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.03);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.03);
   border: 1px solid $color-slate-200;
   padding: var(--space-m);
   display: flex;
@@ -196,7 +202,9 @@ $surface-raised: #f9fafb;
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(11, 45, 92, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow:
+      0 8px 24px rgba(11, 45, 92, 0.08),
+      0 2px 8px rgba(0, 0, 0, 0.04);
     border-color: $color-slate-300;
   }
 
@@ -259,18 +267,26 @@ $surface-raised: #f9fafb;
 .card {
   background: global.$white;
   border-radius: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.03);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.03);
   border: 1px solid $color-slate-200;
   padding: var(--space-l);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.04);
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.06),
+      0 8px 24px rgba(0, 0, 0, 0.04);
   }
 }
 
 .cardGlass {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.95) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(248, 250, 252, 0.95) 100%
+  );
   backdrop-filter: blur(12px);
   border: 1px solid rgba(226, 232, 240, 0.8);
 }
@@ -466,7 +482,8 @@ $surface-raised: #f9fafb;
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
   }
   50% {
@@ -892,12 +909,16 @@ $surface-raised: #f9fafb;
 .btnPrimary {
   background: linear-gradient(135deg, $color-accent 0%, #0288d1 100%);
   color: global.$white;
-  box-shadow: 0 4px 14px rgba(59, 164, 246, 0.3), 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 4px 14px rgba(59, 164, 246, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.1);
 
   &:hover:not(:disabled) {
     background: linear-gradient(135deg, #0288d1 0%, $color-accent 100%);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(59, 164, 246, 0.4), 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-shadow:
+      0 8px 24px rgba(59, 164, 246, 0.4),
+      0 2px 6px rgba(0, 0, 0, 0.1);
   }
 
   &:active:not(:disabled) {

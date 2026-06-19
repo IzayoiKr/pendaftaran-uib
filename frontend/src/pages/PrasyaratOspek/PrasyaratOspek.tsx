@@ -1,24 +1,34 @@
 "use client";
 
 import {
+    type ChangeEvent,
+    useCallback,
     useEffect,
     useRef,
     useState,
-    useCallback,
-    type ChangeEvent,
 } from "react";
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { UPLOAD_CONSTRAINTS } from "@/pages/Registration/registerOptions";
 import { toast } from "sonner";
 import { api } from "@/api";
-import { UPLOAD_CONSTRAINTS } from "@/pages/Registration/registerOptions";
 import styles from "./PrasyaratOspek.module.scss";
 
 // ─── Inline SVG Icons ───────────────────────────────────────────────────────────
 
 function CheckIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <polyline points="20 6 9 17 4 12" />
         </svg>
     );
@@ -26,7 +36,17 @@ function CheckIcon({ className }: { className?: string }) {
 
 function ClockIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <circle cx="12" cy="12" r="10" />
             <polyline points="12 6 12 12 16 14" />
         </svg>
@@ -35,7 +55,17 @@ function ClockIcon({ className }: { className?: string }) {
 
 function XIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
         </svg>
@@ -44,7 +74,17 @@ function XIcon({ className }: { className?: string }) {
 
 function UploadCloudIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
             <path d="M12 12v9" />
             <path d="m16 16-4-4-4 4" />
@@ -54,7 +94,17 @@ function UploadCloudIcon({ className }: { className?: string }) {
 
 function ArrowLeftIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <path d="m12 19-7-7 7-7" />
             <path d="M19 12H5" />
         </svg>
@@ -63,7 +113,17 @@ function ArrowLeftIcon({ className }: { className?: string }) {
 
 function FileTextIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
             <path d="M14 2v4a2 2 0 0 0 2 2h4" />
             <path d="M10 9H8" />
@@ -75,7 +135,17 @@ function FileTextIcon({ className }: { className?: string }) {
 
 function TrashIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <path d="M3 6h18" />
             <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
             <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
@@ -85,7 +155,17 @@ function TrashIcon({ className }: { className?: string }) {
 
 function DownloadIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="7 10 12 15 17 10" />
             <line x1="12" x2="12" y1="15" y2="3" />
@@ -135,9 +215,7 @@ function PageHeader() {
                     <span className={styles.pageTag}>{t("page.tag")}</span>
                 </div>
                 <h1 className={styles.pageTitle}>{t("page.title")}</h1>
-                <p className={styles.pageSubtitle}>
-                    {t("page.subtitle")}
-                </p>
+                <p className={styles.pageSubtitle}>{t("page.subtitle")}</p>
             </div>
         </div>
     );
@@ -153,7 +231,9 @@ function StatusCard({ status, notes }: { status: string; notes: string }) {
                 <StatusBadge status={status} />
             </div>
             <div className={styles.notesBox}>
-                <span className={styles.notesLabel}>{t("status.notesLabel")}</span>
+                <span className={styles.notesLabel}>
+                    {t("status.notesLabel")}
+                </span>
                 <p className={styles.notesText}>
                     {notes || t("status.noNotes")}
                 </p>
@@ -168,6 +248,33 @@ function formatSize(bytes: number): string {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+const commonErrorKeys = [
+    "invalidFileType",
+    "maxFileSize",
+    "serverError",
+] as const;
+
+type CommonErrorKey = (typeof commonErrorKeys)[number];
+
+function isAcceptedUploadType(type: string): boolean {
+    return (UPLOAD_CONSTRAINTS.acceptedTypes as readonly string[]).includes(
+        type,
+    );
+}
+
+function getErrorMessage(err: unknown): string | null {
+    return err instanceof Error ? err.message : null;
+}
+
+function getCommonErrorKey(message: string): CommonErrorKey | null {
+    if (!message.startsWith("common.")) return null;
+
+    const key = message.slice("common.".length);
+    return (commonErrorKeys as readonly string[]).includes(key)
+        ? (key as CommonErrorKey)
+        : null;
 }
 
 function UploadZone({
@@ -189,15 +296,18 @@ function UploadZone({
     const inputRef = useRef<HTMLInputElement>(null);
     const zoneRef = useRef<HTMLDivElement>(null);
 
-    const validateFile = useCallback((f: File): string | null => {
-        if (f.size > UPLOAD_CONSTRAINTS.maxSizeBytes) {
-            return t("upload.maxFileSize");
-        }
-        if (!UPLOAD_CONSTRAINTS.acceptedTypes.includes(f.type as any)) {
-            return t("upload.invalidFileType");
-        }
-        return null;
-    }, [t]);
+    const validateFile = useCallback(
+        (f: File): string | null => {
+            if (f.size > UPLOAD_CONSTRAINTS.maxSizeBytes) {
+                return t("upload.maxFileSize");
+            }
+            if (!isAcceptedUploadType(f.type)) {
+                return t("upload.invalidFileType");
+            }
+            return null;
+        },
+        [t],
+    );
 
     const handleInputChange = useCallback(
         (e: ChangeEvent<HTMLInputElement>) => {
@@ -306,7 +416,9 @@ function UploadZone({
                         <FileTextIcon />
                         <div className={styles.fileInfo}>
                             <span className={styles.fileName}>{file.name}</span>
-                            <span className={styles.fileSize}>{formatSize(file.size)}</span>
+                            <span className={styles.fileSize}>
+                                {formatSize(file.size)}
+                            </span>
                         </div>
                         <div className={styles.uploadActions}>
                             <button
@@ -335,11 +447,7 @@ function UploadZone({
                 )}
             </div>
 
-            {error && (
-                <span className={styles.errorMsg}>
-                    {error}
-                </span>
-            )}
+            {error && <span className={styles.errorMsg}>{error}</span>}
 
             <input
                 ref={inputRef}
@@ -352,17 +460,17 @@ function UploadZone({
             />
 
             {exampleHref && (
-                <a
-                    href={exampleHref}
-                    download
-                    className={styles.exampleLink}
-                >
+                <a href={exampleHref} download className={styles.exampleLink}>
                     <span className={styles.exampleIcon}>
                         <DownloadIcon />
                     </span>
                     <div className={styles.exampleText}>
-                        <span className={styles.exampleTitle}>{exampleLabel || t("upload.exampleTitle")}</span>
-                        <span className={styles.exampleDesc}>{t("upload.exampleDesc")}</span>
+                        <span className={styles.exampleTitle}>
+                            {exampleLabel || t("upload.exampleTitle")}
+                        </span>
+                        <span className={styles.exampleDesc}>
+                            {t("upload.exampleDesc")}
+                        </span>
                     </div>
                 </a>
             )}
@@ -417,8 +525,7 @@ export default function PrasyaratOspek({ regID }: { regID: string }) {
                         setCatatanPemeriksaan(data.ospek.notes);
                     }
                 }
-            } catch (err) {
-                console.error("Failed to fetch registration details", err);
+            } catch {
                 toast.error(t("toast.fetchError"));
             } finally {
                 setIsFetchingData(false);
@@ -448,7 +555,8 @@ export default function PrasyaratOspek({ regID }: { regID: string }) {
         try {
             const formData = new FormData();
             UPLOAD_FIELDS_CONFIG.forEach((f) => {
-                if (files[f.name]) formData.append(f.name, files[f.name] as File);
+                if (files[f.name])
+                    formData.append(f.name, files[f.name] as File);
             });
             formData.append("nomorDaftar", regID);
 
@@ -456,11 +564,15 @@ export default function PrasyaratOspek({ regID }: { regID: string }) {
             toast.success(t("toast.uploadSuccess"));
             // Force refresh or redirect?
             setTimeout(() => window.location.reload(), 1500);
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const errorMessage = getErrorMessage(err);
+            const commonKey = errorMessage
+                ? getCommonErrorKey(errorMessage)
+                : null;
             const message =
-                err.message && err.message.startsWith("common.")
-                    ? tCommon(err.message.split(".")[1] as any)
-                    : err.message || t("toast.uploadError");
+                commonKey !== null
+                    ? tCommon(commonKey)
+                    : errorMessage || t("toast.uploadError");
             toast.error(message);
         } finally {
             setIsLoading(false);
@@ -474,29 +586,54 @@ export default function PrasyaratOspek({ regID }: { regID: string }) {
 
                 {isFetchingData ? (
                     <div className={styles.card}>
-                        <p style={{ textAlign: "center", padding: "2rem", color: "#64748b" }}>
+                        <p
+                            style={{
+                                textAlign: "center",
+                                padding: "2rem",
+                                color: "#64748b",
+                            }}
+                        >
                             Loading...
                         </p>
                     </div>
                 ) : (
                     <>
-                        <StatusCard status={status} notes={catatanPemeriksaan} />
+                        <StatusCard
+                            status={status}
+                            notes={catatanPemeriksaan}
+                        />
 
                         <section className={styles.card}>
                             <div className={styles.cardHeaderLine}>
-                                <span className={styles.cardHeaderIcon}>⬆️</span>
-                                <h2 className={styles.cardTitle}>{t("upload.title")}</h2>
+                                <span className={styles.cardHeaderIcon}>
+                                    ⬆️
+                                </span>
+                                <h2 className={styles.cardTitle}>
+                                    {t("upload.title")}
+                                </h2>
                             </div>
 
-                            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-l)" }}>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "var(--space-l)",
+                                }}
+                            >
                                 {UPLOAD_FIELDS_CONFIG.map((field) => (
                                     <UploadZone
                                         key={field.name}
                                         label={t(field.labelKey)}
                                         file={files[field.name]}
-                                        onFileChange={(file) => handleFileChange(field.name, file)}
+                                        onFileChange={(file) =>
+                                            handleFileChange(field.name, file)
+                                        }
                                         exampleHref={field.exampleHref}
-                                        exampleLabel={field.exampleLabelKey ? t(field.exampleLabelKey) : undefined}
+                                        exampleLabel={
+                                            field.exampleLabelKey
+                                                ? t(field.exampleLabelKey)
+                                                : undefined
+                                        }
                                     />
                                 ))}
                             </div>
@@ -511,7 +648,11 @@ export default function PrasyaratOspek({ regID }: { regID: string }) {
                                 >
                                     {isLoading ? (
                                         <>
-                                            <span className={styles.spinner} aria-hidden="true" /> {t("btn.uploading")}
+                                            <span
+                                                className={styles.spinner}
+                                                aria-hidden="true"
+                                            />{" "}
+                                            {t("btn.uploading")}
                                         </>
                                     ) : (
                                         <>

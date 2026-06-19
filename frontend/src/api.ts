@@ -9,7 +9,6 @@ import type {
     AccessTokenResponse,
     ProdiInfoResponse,
     ProfileResponse,
-    RegistrationCard,
     RegistrationDetailResponse,
     RegistrationResponse,
     User,
@@ -315,5 +314,5 @@ export const api = {
     storage: {
         getFileBlob: (url: string) =>
             apiClient.get<never, Blob>(url, { responseType: "blob" }),
-    }
+    },
 };

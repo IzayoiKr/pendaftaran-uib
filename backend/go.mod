@@ -8,6 +8,7 @@ require (
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/uuid v1.6.0
+	github.com/joho/godotenv v1.5.1
 	github.com/minio/sio v0.5.1
 	github.com/vanng822/go-premailer v1.33.0
 	go.mongodb.org/mongo-driver v1.17.9
@@ -27,7 +28,6 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/inbucket/html2text v1.0.0 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect

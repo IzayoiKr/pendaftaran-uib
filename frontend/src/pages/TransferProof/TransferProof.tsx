@@ -1,19 +1,19 @@
 "use client";
 
 import {
+    type ChangeEvent,
+    type FormEvent,
+    useCallback,
     useEffect,
     useMemo,
     useRef,
     useState,
-    useCallback,
-    type ChangeEvent,
-    type FormEvent,
 } from "react";
-import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { UPLOAD_CONSTRAINTS } from "@/pages/Registration/registerOptions";
 import { toast } from "sonner";
 import { api } from "@/api";
-import { UPLOAD_CONSTRAINTS } from "@/pages/Registration/registerOptions";
 import useAuthStore from "@/store/useAuthStore";
 import styles from "./TransferProof.module.scss";
 
@@ -42,11 +42,48 @@ interface TambahBuktiTransferForm {
     file: File | null;
 }
 
+const commonErrorKeys = [
+    "invalidFileType",
+    "maxFileSize",
+    "serverError",
+] as const;
+
+type CommonErrorKey = (typeof commonErrorKeys)[number];
+
+function isAcceptedUploadType(type: string): boolean {
+    return (UPLOAD_CONSTRAINTS.acceptedTypes as readonly string[]).includes(
+        type,
+    );
+}
+
+function getErrorMessage(err: unknown): string | null {
+    return err instanceof Error ? err.message : null;
+}
+
+function getCommonErrorKey(message: string): CommonErrorKey | null {
+    if (!message.startsWith("common.")) return null;
+
+    const key = message.slice("common.".length);
+    return (commonErrorKeys as readonly string[]).includes(key)
+        ? (key as CommonErrorKey)
+        : null;
+}
+
 // ─── Inline SVG Icons ────────────────────────────────────────────────────────
 
 function CheckIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <polyline points="20 6 9 17 4 12" />
         </svg>
     );
@@ -54,7 +91,17 @@ function CheckIcon({ className }: { className?: string }) {
 
 function ClockIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <circle cx="12" cy="12" r="10" />
             <polyline points="12 6 12 12 16 14" />
         </svg>
@@ -63,7 +110,17 @@ function ClockIcon({ className }: { className?: string }) {
 
 function XIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
         </svg>
@@ -72,7 +129,17 @@ function XIcon({ className }: { className?: string }) {
 
 function UploadCloudIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
             <path d="M12 12v9" />
             <path d="m16 16-4-4-4 4" />
@@ -82,7 +149,17 @@ function UploadCloudIcon({ className }: { className?: string }) {
 
 function ArrowLeftIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <path d="m12 19-7-7 7-7" />
             <path d="M19 12H5" />
         </svg>
@@ -91,7 +168,17 @@ function ArrowLeftIcon({ className }: { className?: string }) {
 
 function FileTextIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
             <path d="M14 2v4a2 2 0 0 0 2 2h4" />
             <path d="M10 9H8" />
@@ -103,7 +190,17 @@ function FileTextIcon({ className }: { className?: string }) {
 
 function SearchIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.3-4.3" />
         </svg>
@@ -112,7 +209,17 @@ function SearchIcon({ className }: { className?: string }) {
 
 function DownloadIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
             <polyline points="7 10 12 15 17 10" />
             <line x1="12" x2="12" y1="15" y2="3" />
@@ -122,7 +229,17 @@ function DownloadIcon({ className }: { className?: string }) {
 
 function CreditCardIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <rect width="20" height="14" x="2" y="5" rx="2" />
             <line x1="2" x2="22" y1="10" y2="10" />
         </svg>
@@ -131,7 +248,17 @@ function CreditCardIcon({ className }: { className?: string }) {
 
 function TrashIcon({ className }: { className?: string }) {
     return (
-        <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+            className={className}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
             <path d="M3 6h18" />
             <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
             <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
@@ -171,7 +298,11 @@ function StatusBadge({ status }: { status: string }) {
     );
 }
 
-function PageHeader({ status }: { status: "accepted" | "pending" | "rejected" }) {
+function PageHeader({
+    status,
+}: {
+    status: "accepted" | "pending" | "rejected";
+}) {
     const t = useTranslations("account.transferProof");
     const config = {
         accepted: { label: t("status.accepted"), color: "accepted" as const },
@@ -186,9 +317,7 @@ function PageHeader({ status }: { status: "accepted" | "pending" | "rejected" })
                     <span className={styles.pageTag}>{t("page.tag")}</span>
                 </div>
                 <h1 className={styles.pageTitle}>{t("page.title")}</h1>
-                <p className={styles.pageSubtitle}>
-                    {t("page.subtitle")}
-                </p>
+                <p className={styles.pageSubtitle}>{t("page.subtitle")}</p>
             </div>
             {c && (
                 <div className={styles.pageHeaderBadges}>
@@ -238,14 +367,18 @@ function StatsCards({ rows }: { rows: BuktiTransferRow[] }) {
                 <span className={styles.statLabel}>{t("stats.total")}</span>
             </div>
             <div className={`${styles.statCard} ${styles.statCardSuccess}`}>
-                <div className={`${styles.statIconWrap} ${styles.statIconWrapSuccess}`}>
+                <div
+                    className={`${styles.statIconWrap} ${styles.statIconWrapSuccess}`}
+                >
                     <CheckIcon className={styles.statIcon} />
                 </div>
                 <span className={styles.statValue}>{stats.accepted}</span>
                 <span className={styles.statLabel}>{t("stats.accepted")}</span>
             </div>
             <div className={`${styles.statCard} ${styles.statCardWarning}`}>
-                <div className={`${styles.statIconWrap} ${styles.statIconWrapWarning}`}>
+                <div
+                    className={`${styles.statIconWrap} ${styles.statIconWrapWarning}`}
+                >
                     <ClockIcon className={styles.statIcon} />
                 </div>
                 <span className={styles.statValue}>{stats.pending}</span>
@@ -262,7 +395,9 @@ function Timeline({ rows }: { rows: BuktiTransferRow[] }) {
     const hasVerified = rows.some((r) => {
         const s = r.statusValidasi.toLowerCase();
         return (
-            s.includes("lunas") || s.includes("verified") || s.includes("diterima")
+            s.includes("lunas") ||
+            s.includes("verified") ||
+            s.includes("diterima")
         );
     });
     const isUnderVerification = !hasVerified && rows.length > 0;
@@ -303,7 +438,9 @@ function Timeline({ rows }: { rows: BuktiTransferRow[] }) {
                         } ${step.active ? styles.timelineActive : ""}`}
                     >
                         <div className={styles.timelineDot}>
-                            {step.done && <CheckIcon className={styles.timelineCheck} />}
+                            {step.done && (
+                                <CheckIcon className={styles.timelineCheck} />
+                            )}
                         </div>
                         <div className={styles.timelineContent}>
                             <span className={styles.timelineLabel}>
@@ -320,16 +457,13 @@ function Timeline({ rows }: { rows: BuktiTransferRow[] }) {
     );
 }
 
-const TABLE_HEADERS = [
-    "date",
-    "owner",
-    "bank",
-    "proof",
-    "status",
-    "action",
-];
+const TABLE_HEADERS = ["date", "owner", "bank", "proof", "status", "action"];
 
-function BuktiTransferTable({ rows: initialRows }: { rows: BuktiTransferRow[] }) {
+function BuktiTransferTable({
+    rows: initialRows,
+}: {
+    rows: BuktiTransferRow[];
+}) {
     const t = useTranslations("account.transferProof");
     const tCommon = useTranslations("common");
     const [search, setSearch] = useState("");
@@ -380,8 +514,7 @@ function BuktiTransferTable({ rows: initialRows }: { rows: BuktiTransferRow[] })
             window.open(objectUrl, "_blank");
             setTimeout(() => window.URL.revokeObjectURL(objectUrl), 60000);
             toast.success(tCommon("success"), { id: url });
-        } catch (err) {
-            console.error("Download error", err);
+        } catch {
             toast.error(tCommon("serverError"), { id: url });
         }
     };
@@ -391,7 +524,9 @@ function BuktiTransferTable({ rows: initialRows }: { rows: BuktiTransferRow[] })
             <div className={styles.cardHeaderLine}>
                 <span className={styles.cardHeaderIcon}>🧾</span>
                 <h2 className={styles.cardTitle}>{t("table.title")}</h2>
-                <span className={styles.badgeCount}>{rows.length} {t("table.entries")}</span>
+                <span className={styles.badgeCount}>
+                    {rows.length} {t("table.entries")}
+                </span>
             </div>
 
             <div className={styles.tableToolbar}>
@@ -411,9 +546,13 @@ function BuktiTransferTable({ rows: initialRows }: { rows: BuktiTransferRow[] })
                     onChange={(e) => setFilter(e.target.value)}
                 >
                     <option value="all">{t("table.filter.all")}</option>
-                    <option value="accepted">{t("table.filter.accepted")}</option>
+                    <option value="accepted">
+                        {t("table.filter.accepted")}
+                    </option>
                     <option value="pending">{t("table.filter.pending")}</option>
-                    <option value="rejected">{t("table.filter.rejected")}</option>
+                    <option value="rejected">
+                        {t("table.filter.rejected")}
+                    </option>
                 </select>
             </div>
 
@@ -435,7 +574,9 @@ function BuktiTransferTable({ rows: initialRows }: { rows: BuktiTransferRow[] })
                                 >
                                     <div className={styles.emptyState}>
                                         <div className={styles.emptyVisual}>
-                                            <UploadCloudIcon className={styles.emptyIconSvg} />
+                                            <UploadCloudIcon
+                                                className={styles.emptyIconSvg}
+                                            />
                                         </div>
                                         <h3 className={styles.emptyTitle}>
                                             {t("table.empty.title")}
@@ -456,7 +597,11 @@ function BuktiTransferTable({ rows: initialRows }: { rows: BuktiTransferRow[] })
                                         {row.buktiTransferUrl ? (
                                             <button
                                                 type="button"
-                                                onClick={() => handleDownload(row.buktiTransferUrl)}
+                                                onClick={() =>
+                                                    handleDownload(
+                                                        row.buktiTransferUrl,
+                                                    )
+                                                }
                                                 className={styles.btnReceipt}
                                             >
                                                 <FileTextIcon />
@@ -480,7 +625,9 @@ function BuktiTransferTable({ rows: initialRows }: { rows: BuktiTransferRow[] })
                                             .includes("verified") ? (
                                             <button
                                                 type="button"
-                                                onClick={() => handleDownload(row.ropUrl)}
+                                                onClick={() =>
+                                                    handleDownload(row.ropUrl)
+                                                }
                                                 className={styles.btnRop}
                                             >
                                                 <CreditCardIcon />
@@ -559,7 +706,7 @@ function UploadZone({
                     e.target.value = "";
                     return;
                 }
-                if (!UPLOAD_CONSTRAINTS.acceptedTypes.includes(f.type as any)) {
+                if (!isAcceptedUploadType(f.type)) {
                     toast.error(t("toast.invalidFileType"));
                     e.target.value = "";
                     return;
@@ -568,7 +715,7 @@ function UploadZone({
             onFileChange(f);
             e.target.value = "";
         },
-        [onFileChange, t],
+        [MAX_FILE_SIZE, onFileChange, t],
     );
 
     const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -602,15 +749,14 @@ function UploadZone({
                     toast.error(t("toast.maxFileSize"));
                     return;
                 }
-                if (!UPLOAD_CONSTRAINTS.acceptedTypes.includes(f.type as any)) {
+                if (!isAcceptedUploadType(f.type)) {
                     toast.error(t("toast.invalidFileType"));
                     return;
                 }
-
             }
             if (f) onFileChange(f);
         },
-        [onFileChange, t],
+        [MAX_FILE_SIZE, onFileChange, t],
     );
 
     const handleRemove = useCallback(
@@ -661,9 +807,7 @@ function UploadZone({
                     <div className={styles.uploadPreview}>
                         <FileTextIcon />
                         <div className={styles.fileInfo}>
-                            <span className={styles.fileName}>
-                                {file.name}
-                            </span>
+                            <span className={styles.fileName}>{file.name}</span>
                             <span className={styles.fileSize}>
                                 {formatSize(file.size)}
                             </span>
@@ -726,25 +870,33 @@ function RegistrationInfoCard({ data }: { data: BiodataPendaftaran }) {
             </div>
             <div className={styles.sideInfoList}>
                 <div className={styles.sideInfoItem}>
-                    <span className={styles.sideInfoLabel}>{t("sidebar.gelombang")}</span>
+                    <span className={styles.sideInfoLabel}>
+                        {t("sidebar.gelombang")}
+                    </span>
                     <span className={styles.sideInfoValue}>
                         {data.gelombang || "-"}
                     </span>
                 </div>
                 <div className={styles.sideInfoItem}>
-                    <span className={styles.sideInfoLabel}>{t("sidebar.periode")}</span>
+                    <span className={styles.sideInfoLabel}>
+                        {t("sidebar.periode")}
+                    </span>
                     <span className={styles.sideInfoValue}>
                         {data.periode || "-"}
                     </span>
                 </div>
                 <div className={styles.sideInfoItem}>
-                    <span className={styles.sideInfoLabel}>{t("sidebar.prodi")}</span>
+                    <span className={styles.sideInfoLabel}>
+                        {t("sidebar.prodi")}
+                    </span>
                     <span className={styles.sideInfoValue}>
                         {data.jurusan || "-"}
                     </span>
                 </div>
                 <div className={styles.sideInfoItem}>
-                    <span className={styles.sideInfoLabel}>{t("sidebar.waktuKuliah")}</span>
+                    <span className={styles.sideInfoLabel}>
+                        {t("sidebar.waktuKuliah")}
+                    </span>
                     <span className={styles.sideInfoValue}>
                         {data.waktuKuliah || "-"}
                     </span>
@@ -810,7 +962,9 @@ export default function TransferProof({ regID }: { regID: string }) {
                     const reg = data.registration;
                     setBiodata({
                         nomorDaftar: regID,
-                        periode: data.registration.academic_year || new Date().getFullYear().toString(),
+                        periode:
+                            data.registration.academic_year ||
+                            new Date().getFullYear().toString(),
                         gelombang: reg.batch_name || "-",
                         jurusan: data.current_prodi || "-",
                         waktuKuliah: data.current_session || "-",
@@ -820,13 +974,14 @@ export default function TransferProof({ regID }: { regID: string }) {
                         const mappedRows: BuktiTransferRow[] =
                             data.payments.map((p) => ({
                                 tanggalUpload: p.created_at
-                                    ? new Date(
-                                          p.created_at,
-                                      ).toLocaleDateString(locale, {
-                                          day: "2-digit",
-                                          month: "short",
-                                          year: "numeric",
-                                      })
+                                    ? new Date(p.created_at).toLocaleDateString(
+                                          locale,
+                                          {
+                                              day: "2-digit",
+                                              month: "short",
+                                              year: "numeric",
+                                          },
+                                      )
                                     : "-",
                                 pemilikRekening: p.pemilik_rekening || "-",
                                 bank: p.bank || "-",
@@ -838,8 +993,7 @@ export default function TransferProof({ regID }: { regID: string }) {
                         setRows(mappedRows);
                     }
                 }
-            } catch (err) {
-                console.error("Failed to fetch registration details", err);
+            } catch {
                 toast.error(t("toast.fetchError"));
             } finally {
                 setIsLoading(false);
@@ -879,11 +1033,15 @@ export default function TransferProof({ regID }: { regID: string }) {
             toast.success(t("toast.uploadSuccess"));
             setForm({ pemilikRekening: "", bank: "", file: null });
             setRefreshKey((k) => k + 1);
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const errorMessage = getErrorMessage(err);
+            const commonKey = errorMessage
+                ? getCommonErrorKey(errorMessage)
+                : null;
             const message =
-                err.message && err.message.startsWith("common.")
-                    ? tCommon(err.message.split(".")[1] as any)
-                    : err.message || t("toast.uploadError");
+                commonKey !== null
+                    ? tCommon(commonKey)
+                    : errorMessage || t("toast.uploadError");
             toast.error(message);
         } finally {
             setIsSubmitting(false);

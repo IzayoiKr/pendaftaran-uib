@@ -12,17 +12,17 @@ import (
 type ReceiptData struct {
 	ReceiptNumber string
 	PaymentDate   string
-	
+
 	StudentName   string
 	ExamineeID    string
 	BatchName     string
 	Degree        string
-	
+
 	Amount        uint64
 	AmountWords   string
 	BankName      string
 	AccountHolder string
-	
+
 	PaymentPurpose string
 }
 
@@ -34,7 +34,7 @@ func LoadReceiptData(ctx context.Context, db *sql.DB, regID uuid.UUID, paymentID
 
 	// Fetch student and registration details
 	err := db.QueryRowContext(ctx, `
-		SELECT 
+		SELECT
 			u.full_name,
 			r.examinee_id,
 			g.batch_name,
@@ -60,7 +60,7 @@ func LoadReceiptData(ctx context.Context, db *sql.DB, regID uuid.UUID, paymentID
 	// Fetch payment details
 	var amountFloat float64
 	err = db.QueryRowContext(ctx, `
-		SELECT 
+		SELECT
 			account_holder,
 			bank_name,
 			amount,

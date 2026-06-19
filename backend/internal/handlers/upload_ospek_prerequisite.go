@@ -162,7 +162,7 @@ func UploadOspekPrerequisite(db *sql.DB, storageDir string, scanner *clamav.Clie
 		}
 
 		targetDir := filepath.Join(storageDir, "registrations", userID.String(), regID.String(), "ospek")
-		
+
 		processedFiles := make(map[string]struct {
 			path string
 			name string
