@@ -6,3 +6,9 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
 confirmModulesPurge: false
+overrides:
+  postcss: ^8.5.12
+  protobufjs: ^7.5.8
+  glob@<13: ^13.0.6
+  rimraf@<6: ^6.0.1
+  inflight: "-"
